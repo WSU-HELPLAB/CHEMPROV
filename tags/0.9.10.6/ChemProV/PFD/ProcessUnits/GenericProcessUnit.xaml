@@ -1,0 +1,15 @@
+﻿<UserControl x:Class="ChemProV.PFD.ProcessUnits.GenericProcessUnit"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    Width="45" Height="45">
+    <Grid Background="Transparent">
+        <Border Name="ProcessUnitBorder" BorderThickness="2" BorderBrush="Transparent">
+            <Image Name="ProcessUnitImage"
+               Source="/UI/Icons/pu_generic.png"
+               Stretch="None"
+               Height="41"
+               Width="41"
+               />
+        </Border>
+    </Grid>
+</UserControl>

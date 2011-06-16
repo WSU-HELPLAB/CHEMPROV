@@ -1,0 +1,16 @@
+<!--
+Copyright 2010 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Open Software License ("OSL") v3.0.
+Consult "LICENSE.txt" included in this package for the complete OSL license.
+-->
+<Application xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="ChemProV.App"
+             >
+    <Application.Resources>
+
+    </Application.Resources>
+</Application>

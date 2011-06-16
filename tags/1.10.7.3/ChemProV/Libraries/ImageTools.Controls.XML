@@ -1,0 +1,526 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ImageTools.Controls</name>
+    </assembly>
+    <members>
+        <member name="T:ImageTools.Controls.ImageConverter">
+            <summary>
+            Converts a image to a bitmap source, so that the image can 
+            assigned to a silverlight image control with data binding.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.ImageConverter.Convert(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            Modifies the source data before passing it to the target for display in the UI.
+            </summary>
+            <param name="value">The source data being passed to the target.</param>
+            <param name="targetType">The <see cref="T:System.Type"/> of data expected by the target dependency property.</param>
+            <param name="parameter">An optional parameter to be used in the converter logic.</param>
+            <param name="culture">The culture of the conversion.</param>
+            <returns>
+            The value to be passed to the target dependency property.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Controls.ImageConverter.ConvertBack(System.Object,System.Type,System.Object,System.Globalization.CultureInfo)">
+            <summary>
+            Modifies the target data before passing it to the source object.  This method is called only in <see cref="F:System.Windows.Data.BindingMode.TwoWay"/> bindings.
+            </summary>
+            <param name="value">The target data being passed to the source.</param>
+            <param name="targetType">The <see cref="T:System.Type"/> of data expected by the source object.</param>
+            <param name="parameter">An optional parameter to be used in the converter logic.</param>
+            <param name="culture">The culture of the conversion.</param>
+            <returns>
+            The value to be passed to the source object.
+            </returns>
+        </member>
+        <member name="T:ImageTools.Controls.RectangleD">
+            <summary>
+            Stores a set of four doubleegers that represent the location and 
+            size of a RectangleD. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.RectangleD.Zero">
+            <summary>
+            Zero rectangle with no width and no height.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.RectangleD._height">
+            <summary>
+            The height of this RectangleD.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.RectangleD._width">
+            <summary>
+            The width of this RectangleD.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.RectangleD._x">
+            <summary>
+            The x-coordinate of the upper-left corner.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.RectangleD._y">
+            <summary>
+            The y-coordinate of the upper-left corner.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.#ctor(System.Double,System.Double,System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Controls.RectangleD"/> struct
+            with the specified location and size.
+            </summary>
+            <param name="x">The x-coordinate of the upper-left corner 
+            of the RectangleD.</param>
+            <param name="y">The y-coordinate of the upper-left corner 
+            of the RectangleD. </param>
+            <param name="width">The width of the RectangleD. </param>
+            <param name="height">The height of the RectangleD. </param>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.#ctor(ImageTools.Rectangle)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Controls.RectangleD"/> struct 
+            from a <see cref="T:ImageTools.Rectangle"/>
+            </summary>
+            <param name="other">The other rectangle.</param>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.#ctor(ImageTools.Controls.RectangleD)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Controls.RectangleD"/> struct 
+            from other a <see cref="T:ImageTools.Controls.RectangleD"/>
+            </summary>
+            <param name="other">The other rectangle.</param>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <param name="obj">Another object to compare to.</param>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same 
+            type and represent the same value; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.Equals(ImageTools.Controls.RectangleD)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>
+            true if the current object is equal to the 
+            <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed doubleeger that is the hash code for this instance.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.op_Equality(ImageTools.Controls.RectangleD,ImageTools.Controls.RectangleD)">
+            <summary>
+            Tests whether two <see cref="T:ImageTools.Controls.RectangleD"/> structures have 
+            equal location and size.
+            </summary>
+            <param name="left">The <see cref="T:ImageTools.Controls.RectangleD"/> structure that is to the 
+            left of the equality operator.</param>
+            <param name="right">The <see cref="T:ImageTools.Controls.RectangleD"/> structure that is to the 
+            right of the equality operator.</param>
+            <returns>This operator returns true if the two <see cref="T:ImageTools.Controls.RectangleD"/> structures 
+            have equal X, Y, Width, and Height properties.</returns>
+        </member>
+        <member name="M:ImageTools.Controls.RectangleD.op_Inequality(ImageTools.Controls.RectangleD,ImageTools.Controls.RectangleD)">
+            <summary>
+            Tests whether two <see cref="T:ImageTools.Controls.RectangleD"/> structures differ
+            in location or size.
+            </summary>
+            <param name="left">The <see cref="T:ImageTools.Controls.RectangleD"/> structure that is to the 
+            left of the inequality  operator.</param>
+            <param name="right">The <see cref="T:ImageTools.Controls.RectangleD"/> structure that is to the 
+            right of the inequality  operator.</param>
+            <returns>This operator returns true if any of the X, Y, Width or Height 
+            properties of the two <see cref="T:ImageTools.Controls.RectangleD"/> structures are unequal; otherwise false.</returns>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Bottom">
+            <summary>
+            Gets the y-coordinate of the bottom edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The y-coordinate of the bottom edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Height">
+            <summary>
+            Gets or sets the height of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The width of this <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Left">
+            <summary>
+            Gets the x-coordinate of the left edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The x-coordinate of the left edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Right">
+            <summary>
+            Gets the x-coordinate of the right edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The x-coordinate of the right edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Top">
+            <summary>
+            Gets the y-coordinate of the top edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The y-coordinate of the top edge of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Width">
+            <summary>
+            Gets or sets the width of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The width of this <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.X">
+            <summary>
+            Gets or sets the x-coordinate of the upper-left corner of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The x-coordinate of the upper-left corner 
+            of this <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Controls.RectangleD.Y">
+            <summary>
+            Gets or sets the y-coordinate of the upper-left corner of this 
+            <see cref="T:ImageTools.Controls.RectangleD"/> structure.
+            </summary>
+            <value>The y-coordinate of the upper-left corner 
+            of this <see cref="T:ImageTools.Controls.RectangleD"/> structure.</value>
+        </member>
+        <member name="T:ImageTools.Controls.AnimationMode">
+            <summary>
+            Defines how the image should be animated.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimationMode.None">
+            <summary>
+            The image should not be animated.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimationMode.PlayOnce">
+            <summary>
+            The Animation should always be played once.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimationMode.Repeat">
+            <summary>
+            Animation should always be repeated. If the end of the animation
+            is reached, the animation will start again.
+            </summary>
+        </member>
+        <member name="T:ImageTools.Controls.ImageEditorContainer">
+            <summary>
+            Defines a container for editing images, where images can be zoomed or 
+            or selected with a selection border.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.ScrollViewerElement">
+            <summary>
+            Defines the name for the scroll viewer template part.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.SelectionArea">
+            <summary>
+            Defines the name for the selection area template part.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.SelectionBorder">
+            <summary>
+            Defines the name for the selection border template part.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.ImageElement">
+            <summary>
+            Defines the name for the image element template part.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.RequiredSelectionHeightProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.RequiredSelectionHeight"/> property.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.RequiredSelectionWidthProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.RequiredSelectionWidth"/> property.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.SelectionModeProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.SelectionMode"/> property.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.SelectionProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.Selection"/> property.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.SourceProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.Source"/> dependency property. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.ScalingProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.Scaling"/> property.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorContainer.MoveSelectionProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.ImageEditorContainer.MoveSelection"/> property.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.ImageEditorContainer.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Controls.ImageEditorContainer"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.ImageEditorContainer.OnApplyTemplate">
+            <summary>
+            When overridden in a derived class, is invoked whenever application code or 
+            internal processes (such as a rebuilding layout pass) 
+            call <see cref="M:System.Windows.Controls.Control.ApplyTemplate"/>.
+            </summary>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.RequiredSelectionHeight">
+            <summary>
+            Gets or sets the height of the selection border.
+            </summary>
+            <value>The height of the selection.</value>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.RequiredSelectionWidth">
+            <summary>
+            Gets or sets the width of the selection border.
+            </summary>
+            <value>The width of the selection.</value>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.SelectionMode">
+            <summary>
+            Gets or sets the selection mode.
+            </summary>
+            <value>The selection mode.</value>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.Selection">
+            <summary>
+            Gets or sets the selection.
+            </summary>
+            <value>The selection.</value>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.Source">
+            <summary>
+            Gets or sets the source for the image.
+            </summary>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.Scaling">
+            <summary>
+            Gets or sets the scaling, which defines how the image should be scaled.
+            </summary>
+            <value>The scaling.</value>
+            <remarks>Define the zomming factor with a positive value or apply a negative value, if the image should
+            be scaled to fit to the screeen.</remarks>
+        </member>
+        <member name="P:ImageTools.Controls.ImageEditorContainer.MoveSelection">
+            <summary>
+            Gets or sets the interaction mode, which defines how the control behaves when the mouse is moved.
+            </summary>
+            <value>The interaction mode.</value>
+        </member>
+        <member name="T:ImageTools.Controls.AnimatedImage">
+            <summary>
+            Represents a control, that displays an image or an animated image.
+            </summary>
+            <remarks>
+            <para>
+            Depending on the specified source type the <see cref="T:ImageTools.Controls.AnimatedImage"/> class 
+            enables you to load the following image types: .bmp, .gif, .jpg and .png. The control
+            also supports animated image (at the moment only from gif files)
+            </para>
+            </remarks>
+        </member>
+        <member name="F:ImageTools.Controls.AnimatedImage.ImageElementName">
+            <summary>
+            The name of the image element in the control template.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.OnLoadingFailed(System.UnhandledExceptionEventArgs)">
+            <summary>
+            Raises the <see cref="E:Name"/> event.
+            </summary>
+            <param name="e">The <see cref="T:System.EventArgs"/> instance containing the event data.</param>
+        </member>
+        <member name="F:ImageTools.Controls.AnimatedImage.FilterProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.AnimatedImage.Filter"/> dependency property. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimatedImage.StretchProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.AnimatedImage.Stretch"/> dependency property. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimatedImage.AutoSizeProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.AnimatedImage.AutoSize"/> dependency property. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimatedImage.AnimationModeProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.AnimatedImage.AnimationMode"/> dependency property. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.AnimatedImage.SourceProperty">
+            <summary>
+            Identifies the <see cref="P:ImageTools.Controls.AnimatedImage.Source"/> dependency property. 
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.OnSourcePropertyChanged(System.Windows.DependencyObject,System.Windows.DependencyPropertyChangedEventArgs)">
+            <summary>
+            Called when source property is changed.
+            </summary>
+            <param name="d">The dependency object, which raised the event.</param>
+            <param name="e">The <see cref="T:System.Windows.DependencyPropertyChangedEventArgs"/> 
+            instance containing the event data.</param>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.OnSourceChanged">
+            <summary>
+            Called when the value of the source property is changed.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Controls.AnimatedImage"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.OnApplyTemplate">
+            <summary>
+            Invoked whenever 
+            application code or internal processes (such as a rebuilding layout pass) 
+            call <see cref="M:System.Windows.Controls.Control.ApplyTemplate"/>.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.Pause">
+            <summary>
+            Pauses the animation. If there is no image assigned or the 
+            assigned image is not a animated image, this method will just be ignored.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.Play">
+            <summary>
+            Starts the animation. If there is no image assigned or the 
+            assigned image is not a animated image, this method will just be ignored. If 
+            the animation was paused, the animation will continue where it was stopped.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Controls.AnimatedImage.Stop">
+            <summary>
+            Stops the animation. If there is no image assigned or the 
+            assigned image is not a animated image, this method will just be ignored.
+            </summary>
+        </member>
+        <member name="E:ImageTools.Controls.AnimatedImage.LoadingFailed">
+            <summary>
+            Occurs when the loading of an image failed.
+            </summary>
+        </member>
+        <member name="P:ImageTools.Controls.AnimatedImage.Filter">
+            <summary>
+            Gets or sets the filter that will be used before the image will be applied.
+            </summary>
+            <value>The filter.</value>
+        </member>
+        <member name="P:ImageTools.Controls.AnimatedImage.Stretch">
+            <summary>
+            Gets or sets a value that describes how an <see cref="T:ImageTools.Controls.AnimatedImage"/> 
+            should be stretched to fill the destination rectangle. This is a dependency property.
+            </summary>
+            <value>A value of the enumeration that specifies how the source image is applied if the 
+            Height and Width of the Image are specified and are different than the source image's height and width.
+            The default value is Uniform.</value>
+        </member>
+        <member name="P:ImageTools.Controls.AnimatedImage.AutoSize">
+            <summary>
+            Gets or sets a value indicating whether the control should be auto sized. If the value is true
+            the control will get the width and the height of its image source. This is a 
+            dependency property.
+            </summary>
+            <value><c>true</c> if the size of the control should be set to the image
+            width and height; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:ImageTools.Controls.AnimatedImage.AnimationMode">
+            <summary>
+            Gets or sets the animation mode of the image. This property will be just
+            ignored if the specified source is not an animated image.
+            </summary>
+            <value>A value of the enumeration, that defines how to animate the image.</value>
+        </member>
+        <member name="P:ImageTools.Controls.AnimatedImage.Source">
+            <summary>
+            Gets or sets the source for the image.
+            </summary>
+            <value>The source of the image control.</value>
+            <remarks>
+            The property supports the following types:
+            <list type="table">
+            <listheader>
+            	<term>Type</term>
+            	<description>Description</description>
+            </listheader>
+            <item>
+            	<term><see cref="T:System.String"/></term>
+            	<description>A string will be transformed to a <see cref="T:System.Uri"/> object with a relative path. A new BitmapImage
+                will be loaded asynchronously and assigned to the internal image element. Only png and .jpeg files
+                are supported usings string directly.</description>
+            </item>
+            <item>
+            	<term><see cref="T:System.Windows.Media.ImageSource"/></term>
+            	<description>The image source will be directly assigned. No animations will be used.</description>
+            </item>
+            <item>
+            	<term><see cref="T:ImageTools.Image"/></term>
+            	<description>The image will be assigned. Depending of the fact, if it is an animated image or not, 
+            	the animation will be started immediatly.</description>
+            </item>
+            	</list>
+            </remarks>
+            <exception cref="T:System.ArgumentException">The specified value is not supported. Must be one of the types 
+            defined below.</exception>
+        </member>
+        <member name="T:ImageTools.Controls.ImageEditorSelectionMode">
+            <summary>
+            Defines the selection mode of the image editor.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorSelectionMode.Normal">
+            <summary>
+            Default selection mode.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorSelectionMode.FixedSize">
+            <summary>
+            The size and width of the selected area is fixed.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Controls.ImageEditorSelectionMode.FixedRatio">
+            <summary>
+            The ratio between height and width of the selection area is fixed.
+            </summary>
+        </member>
+    </members>
+</doc>

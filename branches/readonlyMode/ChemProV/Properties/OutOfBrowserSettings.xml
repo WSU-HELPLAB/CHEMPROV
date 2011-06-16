@@ -1,0 +1,15 @@
+<OutOfBrowserSettings ShortName="ChemProV" EnableGPUAcceleration="True" ShowInstallMenuItem="True">
+  <OutOfBrowserSettings.Blurb>ChemProV: For All Your Chemical Engineering Needs</OutOfBrowserSettings.Blurb>
+  <OutOfBrowserSettings.WindowSettings>
+    <WindowSettings Title="ChemProV" />
+  </OutOfBrowserSettings.WindowSettings>
+  <OutOfBrowserSettings.SecuritySettings>
+    <SecuritySettings ElevatedPermissions="NotRequired" />
+  </OutOfBrowserSettings.SecuritySettings>
+  <OutOfBrowserSettings.Icons>
+    <Icon Size="16,16">UI/Icons/logo16.png</Icon>
+    <Icon Size="32,32">UI/Icons/logo32.png</Icon>
+    <Icon Size="48,48">UI/Icons/logo48.png</Icon>
+    <Icon Size="128,128">UI/Icons/logo128.png</Icon>
+  </OutOfBrowserSettings.Icons>
+</OutOfBrowserSettings>

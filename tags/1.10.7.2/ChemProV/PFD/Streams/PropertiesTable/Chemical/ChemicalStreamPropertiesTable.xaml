@@ -1,0 +1,172 @@
+﻿<UserControl
+    x:Class="ChemProV.PFD.Streams.PropertiesTable.Chemical.ChemicalStreamPropertiesTable"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:sl="clr-namespace:Silverlight.Controls;assembly=Silverlight.Controls"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:local="clr-namespace:ChemProV.PFD.Streams.PropertiesTable"
+    xmlns:chem="clr-namespace:ChemProV.PFD.Streams.PropertiesTable.Chemical"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
+    mc:Ignorable="d" d:DesignHeight="300" d:DesignWidth="400">
+    <UserControl.Resources>
+        <chem:UnitsFormatter x:Key="UnitsFormatter"/>
+        <chem:CompoundFormatter x:Key="CompoundFormatter"/>
+    </UserControl.Resources>
+    <Canvas Name="LayoutRoot">
+        <sdk:DataGrid 
+        x:Name="PropertiesTableDataGrid" 
+        Height="Auto" 
+        Margin="0,0,0,0" 
+        SelectionMode="Single"
+        ItemsSource="{Binding ItemSource, Mode=TwoWay}"
+        AutoGenerateColumns="False"
+        Width="Auto" 
+        Canvas.Top="0" 
+        Canvas.Left="0" 
+        IsHitTestVisible="True" 
+        IsEnabled="True" 
+        IsReadOnly="False"
+        Grid.Row="0"
+        MouseLeftButtonDown="PropertiesTableDataGrid_MouseLeftButtonDown"
+        Grid.Column="0" 
+        SizeChanged="PropertiesTableDataGrid_SizeChanged" 
+        FontSize="10" FontFamily="Times New Roman" 
+        FontStretch="Condensed" 
+        FontWeight="Thin" 
+        LoadingRow="PropertiesTableDataGrid_LoadingRow" CellEditEnded="PropertiesTableDataGrid_CellEditEnded" CellEditEnding="PropertiesTableDataGrid_CellEditEnding">
+            <sdk:DataGrid.Columns>
+                <sdk:DataGridTextColumn 
+                x:Name="LabelColumn"
+                Header="Label"
+                Binding="{Binding Label, Mode=TwoWay}"
+                CanUserSort="False" 
+                CanUserResize="False"
+                CanUserReorder="False" 
+                />
+                <sdk:DataGridTextColumn 
+                x:Name="QuantityColumn"
+                Header="Quantity" 
+                Binding="{Binding Quantity, Mode=TwoWay}"
+                CanUserSort="False" 
+                CanUserResize="False"
+                CanUserReorder="False" 
+                />
+                <sdk:DataGridTemplateColumn 
+                x:Name="UnitsColumn"
+                Header="Units" 
+                CanUserSort="False" 
+                CanUserResize="False" 
+                CanUserReorder="False"
+                >
+                    <sdk:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock 
+                            Margin="4"
+                            Text="{Binding Units, Converter={StaticResource UnitsFormatter}}"
+                            />
+                        </DataTemplate>
+                    </sdk:DataGridTemplateColumn.CellTemplate>
+                    <sdk:DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox 
+                            Name="comboBox1" 
+                            SelectedIndex="{Binding Units, Mode=TwoWay}" DropDownClosed="ComboBox_DropDownClosed" FontFamily="Times New Roman" FontSize="10" FontStretch="Condensed">
+                                <ComboBoxItem Content="%" />
+                                <ComboBoxItem Content="grams" />
+                                <ComboBoxItem Content="grams per minute" />
+                                <ComboBoxItem Content="kilograms" />
+                                <ComboBoxItem Content="kilograms per minute" />
+                                <ComboBoxItem Content="moles" />
+                                <ComboBoxItem Content="moles per minute" />
+                            </ComboBox>
+                        </DataTemplate>
+                    </sdk:DataGridTemplateColumn.CellEditingTemplate>
+
+
+                </sdk:DataGridTemplateColumn>
+                <sdk:DataGridTemplateColumn 
+                x:Name="CompoundColumn"
+                Header="Compound" 
+                CanUserSort="False" 
+                CanUserResize="False" 
+                CanUserReorder="False"
+                >
+                    <sdk:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <TextBlock 
+                            Text="{Binding Compound, Converter={StaticResource CompoundFormatter}}" 
+                            Margin="4"
+                            />
+                        </DataTemplate>
+                    </sdk:DataGridTemplateColumn.CellTemplate>
+                    <sdk:DataGridTemplateColumn.CellEditingTemplate>
+                        <DataTemplate>
+                            <ComboBox  
+                            Name="Compound_ComboBox"  
+                            SelectedIndex="{Binding Compound, Mode=TwoWay}" DropDownClosed="ComboBox_DropDownClosed"  FontFamily="Times New Roman" FontSize="10" FontStretch="Condensed">
+                                <ComboBoxItem Content="acetic acid" />
+                                <ComboBoxItem Content="ammonia" />
+                                <ComboBoxItem Content="benzene" />
+                                <ComboBoxItem Content="carbon dioxide" />
+                                <ComboBoxItem Content="carbon monoxide" />
+                                <ComboBoxItem Content="cyclohexane" />
+                                <ComboBoxItem Content="ethane" />
+                                <ComboBoxItem Content="ethanol" />
+                                <ComboBoxItem Content="ethylene" />
+                                <ComboBoxItem Content="hydrochloric acid" />
+                                <ComboBoxItem Content="hydrogen" />
+                                <ComboBoxItem Content="methane" />
+                                <ComboBoxItem Content="methanol" />
+                                <ComboBoxItem Content="n-butane" />
+                                <ComboBoxItem Content="n-hexane" />
+                                <ComboBoxItem Content="n-octane" />
+                                <ComboBoxItem Content="nitrogren" />
+                                <ComboBoxItem Content="oxygen" />
+                                <ComboBoxItem Content="phosphoric acid" />
+                                <ComboBoxItem Content="propane" />
+                                <ComboBoxItem Content="sodium hydroxide" />
+                                <ComboBoxItem Content="sulfuric acid" />
+                                <ComboBoxItem Content="toluene" />
+                                <ComboBoxItem Content="water" />
+                            </ComboBox>
+                        </DataTemplate>
+                    </sdk:DataGridTemplateColumn.CellEditingTemplate>
+                </sdk:DataGridTemplateColumn>
+                <sdk:DataGridTemplateColumn 
+                x:Name="FeedbackColumn"
+                Header=""
+                CanUserSort="False" 
+                CanUserResize="False"
+                CanUserReorder="False" 
+                >
+                    <sdk:DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate >
+                            <sdk:Label
+                                x:Name="feedbackTextBlock"
+                                Loaded="feedbackTextBlock_Loaded"
+                                MouseLeftButtonDown="feedbackTextBlock_MouseLeftButtonDown"
+                                Content="{Binding Feedback}" 
+                                Margin="4"
+                                Cursor="Arrow"
+                                BorderThickness="0"
+                                Background="Transparent"
+                                >
+                            </sdk:Label>
+                        </DataTemplate>
+                    </sdk:DataGridTemplateColumn.CellTemplate>
+                </sdk:DataGridTemplateColumn>
+            </sdk:DataGrid.Columns>
+        </sdk:DataGrid>
+        <!-- HACK.  We put this canvas over the top of the header because the mouse events on datagrids do not
+        fire correctly so we use this guy instead.-->
+        <Grid
+            Canvas.Left="0" 
+            Canvas.Top="0" 
+            Height="22" 
+            Name="HeaderCanvas" 
+            Width="232" 
+            Background="Transparent"
+            />
+    </Canvas>
+</UserControl>

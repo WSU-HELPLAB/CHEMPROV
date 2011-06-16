@@ -1,0 +1,237 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ImageTools.Filtering</name>
+    </assembly>
+    <members>
+        <member name="T:ImageTools.Filtering.GrayscaleRMY">
+            <summary>
+            Grayscale image using R-Y algorithm.
+            </summary>
+            <remarks>The class uses <b>R-Y</b> algorithm to convert color image
+            to grayscale. The conversion coefficients are:
+            <list type="bullet">
+                <item>Red: 0.5;</item>
+                <item>Green: 0.419;</item>
+                <item>Blue: 0.081.</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="T:ImageTools.Filtering.Grayscale">
+            <summary>
+            Base class for image grayscaling.
+            </summary>
+            <remarks>
+            This class is the base class for image grayscaling. Other
+            classes should inherit from this class and specify <b>RGB</b>
+            coefficients used for image conversion to grayscale.
+            </remarks>
+            <example>
+            This is only a sample usage. We recommend always tu use the
+            <see cref="T:ImageTools.Filtering.GrayscaleBT709"/> or <see cref="T:ImageTools.Filtering.GrayscaleRMY"/> filter.
+            <code>
+            // Create grayscale filter (BT709)
+            Grayscale filter = new Grayscale(0.2125, 0.7154, 0.0721);
+            
+            // Apply the filter
+            Image grayImage = filter.Apply(image);
+            </code>
+            </example>
+        </member>
+        <member name="T:ImageTools.Filtering.ImageFilter">
+            <summary>
+            Abstract base class for all filter not depending, if they change the image
+            size or not. The images will be cloned and the cloned 
+            image will be manipulated.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Filtering.ImageFilter.Apply(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Apply filter to an image at the area of the specified rectangle.
+            </summary>
+            <param name="image">Source image to apply filter to.</param>
+            <param name="rectangle">The rectangle, which defines the area of the
+            image where the filter should be applied to.</param>
+            <remarks>The method keeps the source image unchanged and returns the
+            the result of image processing filter as new image.</remarks>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is
+            null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="rectangle"/> doesnt
+            fits to the image.</exception>
+        </member>
+        <member name="M:ImageTools.Filtering.ImageFilter.Apply(ImageTools.ImageBase)">
+            <summary>
+            Apply filter to an image.
+            </summary>
+            <param name="image">Source image to apply filter to.</param>
+            <remarks>The method keeps the source image unchanged and returns the
+            the result of image processing filter as new image.</remarks>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is
+            null (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.Filtering.ImageFilter.ProcessFiltering(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Processes the filtering on the specified image in the given 
+            area, specified by a rectangle.
+            </summary>
+            <param name="image">The image, where the filter should be applied to.</param>
+            <param name="rectangle">An rectangle which defines, which area of the
+            image should be filtered.</param>
+        </member>
+        <member name="F:ImageTools.Filtering.Grayscale._cr">
+            <summary>
+            Red coefficient for GrayScale transforming.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Filtering.Grayscale._cg">
+            <summary>
+            Green coefficient for GrayScale transforming.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Filtering.Grayscale._cb">
+            <summary>
+            Blue coefficient for GrayScale transforming.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Filtering.Grayscale.#ctor(System.Double,System.Double,System.Double)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Filtering.Grayscale"/> class.
+            </summary>
+            <param name="redCoefficient">Red coefficient.</param>
+            <param name="greenCoefficient">Green coefficient.</param>
+            <param name="blueCoefficient">Blue coefficient.</param>
+        </member>
+        <member name="M:ImageTools.Filtering.Grayscale.ProcessFiltering(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Processes the filtering on the specified image in the given 
+            area, specified by a rectangle.
+            </summary>
+            <param name="image">The image, where the filter should be applied to.</param>
+            <param name="rectangle">An rectangle which defines, which area of the
+            image should be filtered.</param>
+        </member>
+        <member name="M:ImageTools.Filtering.GrayscaleRMY.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Filtering.GrayscaleRMY"/> class.
+            </summary>
+        </member>
+        <member name="T:ImageTools.Filtering.Brightness">
+            <summary>
+            A <see cref="T:ImageTools.Filtering.ImageFilter"/> for changing the brightness of an <see cref="T:ImageTools.Image"/>.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Filtering.Brightness.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Filtering.Brightness"/> class.
+            </summary>
+            <param name="brightness">The brightness.</param>
+        </member>
+        <member name="M:ImageTools.Filtering.Brightness.ProcessFiltering(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Processes the filtering on the specified image in the given
+            area, specified by a rectangle.
+            </summary>
+            <param name="image">The image, where the filter should be applied to.</param>
+            <param name="rectangle">An rectangle which defines, which area of the
+            image should be filtered.</param>
+        </member>
+        <member name="T:ImageTools.Filtering.GrayscaleBT709">
+            <summary>
+            Grayscale image using BT709 algorithm.
+            </summary>
+            <remarks>The class uses <b>BT709</b> algorithm to convert color image
+            to grayscale. The conversion coefficients are:
+            <list type="bullet">
+                <item>Red: 0.2125;</item>
+                <item>Green: 0.7154;</item>
+                <item>Blue: 0.0721.</item>
+            </list>
+            </remarks>
+        </member>
+        <member name="M:ImageTools.Filtering.GrayscaleBT709.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Filtering.GrayscaleBT709"/> class.
+            </summary>
+        </member>
+        <member name="T:ImageTools.Filtering.Inverter">
+            <summary>
+            Simple filter for inverting the colors of an image.
+            </summary>
+            <remarks>The filter inverts colored and grayscale images.</remarks> 
+        </member>
+        <member name="M:ImageTools.Filtering.Inverter.ProcessFiltering(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Processes the filtering on the specified image in the given 
+            area, specified by a rectangle.
+            </summary>
+            <param name="image">The image, where the filter should be applied to.</param>
+            <param name="rectangle">An rectangle which defines, which area of the
+            image should be filtered.</param>
+        </member>
+        <member name="T:ImageTools.Filtering.Contrast">
+            <summary>
+            A <see cref="T:ImageTools.Filtering.ImageFilter"/> to change the contrast of an <see cref="T:ImageTools.Image"/>.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Filtering.Contrast.#ctor(System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Filtering.Contrast"/> class and sets 
+            the new contrast of the image.
+            </summary>
+            <param name="contrast">The new contrast of the image. Must be between 
+            -100 and 100.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="contrast"/> is less
+            than -100 or greater than 100.</exception>
+        </member>
+        <member name="M:ImageTools.Filtering.Contrast.ProcessFiltering(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Processes the filtering on the specified image in the given
+            area, specified by a rectangle.
+            </summary>
+            <param name="image">The image, where the filter should be applied to.</param>
+            <param name="rectangle">An rectangle which defines, which area of the
+            image should be filtered.</param>
+        </member>
+        <member name="T:ImageTools.Filtering.Sepia">
+            <summary>
+            Simple sepia filter, which makes the image look like an old brown photo.
+            </summary>
+            <remarks>The filter makes an image look like an old brown photo.</remarks>
+        </member>
+        <member name="M:ImageTools.Filtering.Sepia.ProcessFiltering(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Processes the filtering on the specified image in the given 
+            area, specified by a rectangle.
+            </summary>
+            <param name="image">The image, where the filter should be applied to.</param>
+            <param name="rectangle">An rectangle which defines, which area of the
+            image should be filtered.</param>
+        </member>
+        <member name="T:ImageTools.Filtering.NearestNeighborResizer">
+            <summary>
+            Default image resizer, which resizes the image with the fast known method,
+            without optimizing the quality of the image. Uses the nearest neighbor interpolation.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Filtering.NearestNeighborResizer.Resize(ImageTools.ImageBase,ImageTools.ImageBase,System.Int32,System.Int32)">
+            <summary>
+            Resizes the specified source image by creating a new image with
+            the spezified size which is a resized version of the passed image..
+            </summary>
+            <param name="source">The source image, where the pixel data should be get from.</param>
+            <param name="target">The resized image.</param>
+            <param name="width">The width of the new image. Must be greater than zero.</param>
+            <param name="height">The height of the new image. Must be greater than zero..</param>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="soure"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="target"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="width"/> is negative.</para>
+            	<para>- or -</para>
+            	<para><paramref name="height"/> is negative.</para>
+            </exception>
+        </member>
+    </members>
+</doc>
