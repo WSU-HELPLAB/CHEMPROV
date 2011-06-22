@@ -6,6 +6,18 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Web", "ChemProV.Web\ChemProV.Web.csproj", "{55A67B1F-DFD8-4B50-A99C-89B8B4948A42}"
 EndProject
 Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = ChemProV\\ChemProV.csproj
+		SccProjectName1 = ChemProV
+		SccLocalPath1 = ChemProV
+		SccProjectUniqueName2 = ChemProV.Web\\ChemProV.Web.csproj
+		SccProjectName2 = ChemProV.Web
+		SccLocalPath2 = ChemProV.Web
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU

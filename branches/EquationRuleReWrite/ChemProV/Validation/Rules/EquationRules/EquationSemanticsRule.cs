@@ -63,7 +63,7 @@ namespace ChemProV.Validation.Rules.EquationRules
         {
             this.equationData = equationData;
             this.variableNames = variableNames;
-            this.equationTokens = equationData.EquationTokensDeepCopy;
+            this.equationTokens = equationData.EquationTokens;
         }
 
         /// <summary>
@@ -462,7 +462,7 @@ namespace ChemProV.Validation.Rules.EquationRules
             }
             else if (equationData.Type.Classification == EquationClassification.Element)
             {
-                vr = CheckSameElement(equationData.Type.Name);
+                vr = CheckSameElement(equationData.Type.Content as string);
                 if (vr != ValidationResult.Empty)
                 {
                     return vr;
@@ -513,7 +513,7 @@ namespace ChemProV.Validation.Rules.EquationRules
 
                 if (DictionaryOfTableData[token].Compound != "Overall")
                 {
-                    var elements = CompoundFactory.GetElementsOfCompound(token).elements;
+                    var elements = CompoundFactory.GetElementsOfCompound(DictionaryOfTableData[token].Compound).elements;
                     var d = (from c in elements where c.Key.Name == element select c);
 
                     if (d == null || d.Count() == 0)
@@ -552,6 +552,7 @@ namespace ChemProV.Validation.Rules.EquationRules
         private ValidationResult CheckSameCompound(string compound)
         {
             int i = 0;
+            bool compoundUsed = false;
             while (i < variableNames.Count)
             {
                 string varName = variableNames[i];
@@ -562,8 +563,17 @@ namespace ChemProV.Validation.Rules.EquationRules
                 {
                     return new ValidationResult(equationData.EquationReference, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.More_Than_One_Compound, compound, data.Compound));
                 }
+                else if (compound == data.Compound)
+                {
+                    compoundUsed = true;
+                }
 
                 i++;
+            }
+
+            if (compoundUsed == false)
+            {
+                return new ValidationResult(equationData.EquationReference, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Compound_Not_Used));
             }
 
             return ValidationResult.Empty;

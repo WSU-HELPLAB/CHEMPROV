@@ -283,7 +283,11 @@ namespace ChemProV.Validation.Rules
 
                 CheckProcessUnits(processUnits);
                 CheckChemicalStreamPropertiesWindowFeedback(tables);
-                CheckEquationSemantics(equations, userDefinedVariables, processUnits.ToList());
+
+                if (EveryoneDict.Count == 0)
+                {
+                    CheckEquationSemantics(equations, userDefinedVariables, processUnits.ToList());
+                }
             }
         }
 

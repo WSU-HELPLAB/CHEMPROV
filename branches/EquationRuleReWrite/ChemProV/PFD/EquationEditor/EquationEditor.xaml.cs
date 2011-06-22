@@ -77,18 +77,12 @@ namespace ChemProV.PFD.EquationEditor
                 ObservableCollection<EquationData> newEquationDatas = new ObservableCollection<EquationData>();
                 foreach (Equation eq in Equations)
                 {
-                    EquationData data = new EquationData(eq);
-                    if (data.IsValid)
-                    {
-                        newEquationDatas.Add(data);
-                    }
+                    newEquationDatas.Add(new EquationData(eq));
                 }
                 equationData = newEquationDatas;
                 return newEquationDatas;
             }
         }
-
-        //private EquationValidationChecker variableNameExisitanceRule = EquationValidationChecker.GetInstance();
 
         public IList<string> Compounds
         {
@@ -276,7 +270,7 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
-            equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.VariableDefinition));
+            //equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.VariableDefinition));
             equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Overall));
 
             foreach (string compound in compounds)

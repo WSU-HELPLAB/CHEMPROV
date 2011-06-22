@@ -22,6 +22,9 @@ namespace ChemProV.PFD.EquationEditor
 
         #endregion Fields
 
+        /// <summary>
+        /// Item 1 is the LHS of the equation.  Item 2 is the RHS of the equation
+        /// </summary>
         public Tuple<List<string>, List<string>> VariableNames
         {
             get
@@ -65,7 +68,7 @@ namespace ChemProV.PFD.EquationEditor
         {
             equationReference = equation;
             equationTokens = equationReference.EquationTokens;
-            equationTokensDeepCopy = deepCopy();
+            //equationTokensDeepCopy = deepCopy();
             variableNames = BuildVariableList(equationTokens);
             equation.EquationTokens.CollectionChanged += new NotifyCollectionChangedEventHandler(EquationTokens_CollectionChanged);
         }

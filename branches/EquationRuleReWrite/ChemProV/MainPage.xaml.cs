@@ -219,7 +219,7 @@ namespace ChemProV
                 MessageBox.Show("There might have been an error when trying to load the ChemProV file.  Please ensure that the file loaded correctly.  If it did then please proceed as normal, if it did not please try to reload the file");
 
                 //This is the programmer friendly error message and has been commented out for the release version
-                //MessageBox.Show(ex.ToString());
+                MessageBox.Show(ex.ToString());
             }
         }
 

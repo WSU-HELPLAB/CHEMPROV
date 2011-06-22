@@ -187,6 +187,7 @@ namespace ChemProV.PFD.EquationEditor
             equationId = "Eq_" + equationIdCounter;
             EquationTokens = new ObservableCollection<IEquationToken>();
             VariableNames = new ObservableCollection<string>();
+            EquationType.SelectionChanged += new SelectionChangedEventHandler(EquationType_SelectionChanged);
         }
 
         #endregion Initializes
@@ -302,6 +303,11 @@ namespace ChemProV.PFD.EquationEditor
         #endregion Public Methods
 
         #region Private Functions
+
+        private void EquationType_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            EquationTokensChagned(this, EventArgs.Empty);
+        }
 
         /// <summary>
         /// We use this as a hack because TextChanged does not fire if Cntrl V is used so we call it ourselves

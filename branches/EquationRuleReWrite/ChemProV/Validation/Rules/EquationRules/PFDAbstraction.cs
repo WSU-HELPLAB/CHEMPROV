@@ -51,7 +51,7 @@ namespace ChemProV.Validation.Rules.EquationRules
             Dictionary<List<IProcessUnit>, List<EquationData>> matchedGraphsAndEquations = new Dictionary<List<IProcessUnit>, List<EquationData>>();
             foreach (EquationData eqData in equations)
             {
-                if (eqData.Type != null && eqData.Type.Classification != EquationClassification.VariableDefinition)
+                if (eqData.Type != null && eqData.IsValid && eqData.Type.Classification != EquationClassification.VariableDefinition)
                 {
                     if (eqData.VariableNames.Item1[0].Count() >= 1 && eqData.VariableNames.Item2[0].Count() >= 1)
                     {
@@ -71,6 +71,10 @@ namespace ChemProV.Validation.Rules.EquationRules
                                 }
 
                                 matchedGraphsAndEquations[graph].Add(eqData);
+                            }
+                            else
+                            {
+                                throw new Exception("The equation was not valid");
                             }
                         }
                         else
@@ -194,26 +198,29 @@ namespace ChemProV.Validation.Rules.EquationRules
                     lhsIsIncomming = false;
                 }
 
-                if (lhsIsIncomming)
+                if (eqData.Type.Classification == EquationClassification.Overall)
                 {
-                    if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item1, apu.IncomingStreams, dictionaryOfTableData)))
+                    if (lhsIsIncomming)
                     {
-                        return false;
+                        if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item1, apu.IncomingStreams, dictionaryOfTableData)))
+                        {
+                            return false;
+                        }
+                        if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item2, apu.OutgoingStreams, dictionaryOfTableData)))
+                        {
+                            return false;
+                        }
                     }
-                    if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item2, apu.OutgoingStreams, dictionaryOfTableData)))
+                    else
                     {
-                        return false;
-                    }
-                }
-                else
-                {
-                    if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item1, apu.OutgoingStreams, dictionaryOfTableData)))
-                    {
-                        return false;
-                    }
-                    if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item2, apu.IncomingStreams, dictionaryOfTableData)))
-                    {
-                        return false;
+                        if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item1, apu.OutgoingStreams, dictionaryOfTableData)))
+                        {
+                            return false;
+                        }
+                        if (!(allVariablesExistAndAllStreamsUsed(eqData.VariableNames.Item2, apu.IncomingStreams, dictionaryOfTableData)))
+                        {
+                            return false;
+                        }
                     }
                 }
             }
@@ -235,6 +242,7 @@ namespace ChemProV.Validation.Rules.EquationRules
                 {
                     return false;
                 }
+
                 allstreamsUsed[streams.IndexOf(stream)] = true;
             }
 

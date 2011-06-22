@@ -30,30 +30,43 @@ namespace ChemProV.Validation.Rules.EquationRules
             //clear any previous messages
             results.Clear();
 
+            bool foundOneValid = false;
+
             ValidationResult vr;
 
             //minus 1 because the last equation doesn't count
             if (listOfEquations != null || listOfEquations.Count - 1 <= 0)
             {
+                //insertUserDefinedVariables();
                 //So in this tuple item1 is a reference to the Equation class, item2 is the parsed tokens from the equation
                 foreach (EquationData eqData in listOfEquations)
                 {
-                    if (eqData.Type != null && eqData.Type.Classification != EquationClassification.VariableDefinition)
+                    if (eqData.IsValid)
                     {
-                        ObservableCollection<IEquationToken> equation = eqData.EquationTokens;
-                        List<string> variablesNames = new List<string>();
-                        variablesNames.AddRange(eqData.VariableNames.Item1);
-                        variablesNames.AddRange(eqData.VariableNames.Item2);
-                        VariableNamesPerEquation.Add(variablesNames);
-                        EquationSemanticsRule esr = new EquationSemanticsRule(eqData, variablesNames);
-                        esr.DictionaryOfTableData = DictionaryOfTableData;
-                        vr = esr.CheckRule();
-                        if (!vr.IsEmpty)
+                        foundOneValid = true;
+                        if (eqData.Type != null && eqData.Type.Classification != EquationClassification.VariableDefinition)
                         {
-                            ValidationResults.Add(vr);
+                            ObservableCollection<IEquationToken> equation = eqData.EquationTokens;
+                            List<string> variablesNames = new List<string>();
+                            variablesNames.AddRange(eqData.VariableNames.Item1);
+                            variablesNames.AddRange(eqData.VariableNames.Item2);
+                            VariableNamesPerEquation.Add(variablesNames);
+                            EquationSemanticsRule esr = new EquationSemanticsRule(eqData, variablesNames);
+                            esr.DictionaryOfTableData = DictionaryOfTableData;
+                            vr = esr.CheckRule();
+                            if (!vr.IsEmpty)
+                            {
+                                ValidationResults.Add(vr);
+                            }
                         }
                     }
                 }
+
+                if (foundOneValid == false)
+                {
+                    ValidationResults.Add(new ValidationResult(listOfEquations[0].EquationReference, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Insuffcient_infomation)));
+                }
+
                 if (ValidationResults.Count != 0)
                 {
                     return;
@@ -81,6 +94,38 @@ namespace ChemProV.Validation.Rules.EquationRules
             else
             {
             }
+        }
+
+        private ValidationResult insertUserDefinedVariables()
+        {
+            Dictionary<string, EquationData> variableDefinitions = new Dictionary<string, EquationData>();
+            foreach (EquationData eqData in listOfEquations)
+            {
+                if (eqData.Type.Classification == EquationClassification.VariableDefinition)
+                {
+                    if (eqData.IsValid && eqData.VariableNames.Item1.Count == 1)
+                    {
+                        variableDefinitions.Add(eqData.VariableNames.Item1[0], eqData);
+                    }
+                    else
+                    {
+                        return new ValidationResult(eqData.EquationReference, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Variable_Defination_Incorrect_Format));
+                    }
+                }
+            }
+            foreach (KeyValuePair<string, EquationData> variableDefinition in variableDefinitions)
+            {
+                foreach (EquationData eqData in listOfEquations)
+                {
+                    while (eqData.VariableNames.Item1.Contains(variableDefinition.Key))
+                    {
+                        int index = eqData.VariableNames.Item1.IndexOf(variableDefinition.Key);
+                        eqData.VariableNames.Item1.RemoveAt(index);
+                        eqData.VariableNames.Item1.InsertRange(index, variableDefinition.Value.VariableNames.Item2);
+                    }
+                }
+            }
+            return ValidationResult.Empty;
         }
 
         /// <summary>

@@ -353,37 +353,40 @@ namespace ChemProV.Validation.Feedback
 
         public void LoadXmlElements(XElement doc)
         {
-            XElement feedback = doc.Descendants("Feedback").ElementAt(0);
-            foreach (XElement xmlFeedback in feedback.Elements())
+            XElement feedback = doc.Descendants("Feedback").FirstOrDefault();
+            if (feedback != null)
             {
-                string[] targetIds = (xmlFeedback.Attribute("target").Value as string).Split(", ".ToCharArray());
-                object targets;
-                if (workSpaceReference.GetobjectFromId(targetIds[0]) is IStream)
+                foreach (XElement xmlFeedback in feedback.Elements())
                 {
-                    List<IStream> list = new List<IStream>();
-                    foreach (string targetID in targetIds)
+                    string[] targetIds = (xmlFeedback.Attribute("target").Value as string).Split(", ".ToCharArray());
+                    object targets;
+                    if (workSpaceReference.GetobjectFromId(targetIds[0]) is IStream)
                     {
-                        list.Add(workSpaceReference.GetobjectFromId(targetID) as IStream);
+                        List<IStream> list = new List<IStream>();
+                        foreach (string targetID in targetIds)
+                        {
+                            list.Add(workSpaceReference.GetobjectFromId(targetID) as IStream);
+                        }
+                        targets = list;
                     }
-                    targets = list;
-                }
-                else if (workSpaceReference.GetobjectFromId(targetIds[0]) is IPropertiesWindow)
-                {
-                    List<IPropertiesWindow> list = new List<IPropertiesWindow>();
-                    foreach (string targetID in targetIds)
+                    else if (workSpaceReference.GetobjectFromId(targetIds[0]) is IPropertiesWindow)
                     {
-                        list.Add(workSpaceReference.GetobjectFromId(targetID) as IPropertiesWindow);
+                        List<IPropertiesWindow> list = new List<IPropertiesWindow>();
+                        foreach (string targetID in targetIds)
+                        {
+                            list.Add(workSpaceReference.GetobjectFromId(targetID) as IPropertiesWindow);
+                        }
+                        targets = list;
                     }
-                    targets = list;
-                }
-                else
-                {
-                    //must only be one thing so set it to tgars
-                    targets = workSpaceReference.GetobjectFromId(targetIds[0]);
-                }
+                    else
+                    {
+                        //must only be one thing so set it to tgars
+                        targets = workSpaceReference.GetobjectFromId(targetIds[0]);
+                    }
 
-                Feedback fb = new Feedback(targets, xmlFeedback.Attribute("message").Value);
-                fb.Id = xmlFeedback.Attribute("id").Value;
+                    Feedback fb = new Feedback(targets, xmlFeedback.Attribute("message").Value);
+                    fb.Id = xmlFeedback.Attribute("id").Value;
+                }
             }
         }
 

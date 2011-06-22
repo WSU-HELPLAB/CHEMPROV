@@ -70,7 +70,19 @@ namespace ChemProV.Validation
         /// </summary>
         NonUniqueNames,
 
+        ////////////////////////////////////////////User Defined Equation Rules////////////////////////////////////////////
+
+        /// <summary>
+        /// This is used if the the variable definition is in the incorrect format
+        /// </summary>
+        Variable_Defination_Incorrect_Format,
+
         ////////////////////////////////////////////Chemical Equation Rules////////////////////////////////////////////
+
+        /// <summary>
+        /// If the compound that is supposed to be used is not used at all
+        /// </summary>
+        Compound_Not_Used,
         /// <summary>
         /// Equation Rules: If the variables used are not labels in the tables
         /// </summary>
@@ -160,6 +172,11 @@ namespace ChemProV.Validation
             string[] args = list as string[];
             switch (message)
             {
+                case ErrorMessages.Compound_Not_Used:
+                    resultMessage = "The compound that was expected was not used";
+
+                    break;
+
                 case ErrorMessages.Overall_Flowrate_Mismatch:
                     resultMessage = "Overall mass balance across the process unit connected to this "
                                   + "stream is not satisfied.  Make sure that the quantities of all incoming "
@@ -185,6 +202,8 @@ namespace ChemProV.Validation
                     break;
                 case ErrorMessages.Inconsistant_Units:
                     resultMessage = "The units: {0}, {1} where used, but these units are not allowed to be mix matched change one of these units";
+
+                    resultMessage = String.Format(resultMessage, list[0], list[1]);
                     break;
 
                 case ErrorMessages.Equation_Variable_Not_In_Tables:
@@ -288,6 +307,9 @@ namespace ChemProV.Validation
 
                 case ErrorMessages.Equation_doesnt_match_PFD:
                     resultMessage = "The equation does not match the PFD, or it is in a format that ChemProV cannot recognize try to re-write it";
+                    break;
+                case ErrorMessages.Variable_Defination_Incorrect_Format:
+                    resultMessage = "The Variable Definition is not in the correct format please change it so the variable label = some expression";
                     break;
                 default:
                     resultMessage = "There are no messages, for me to poop on!";
