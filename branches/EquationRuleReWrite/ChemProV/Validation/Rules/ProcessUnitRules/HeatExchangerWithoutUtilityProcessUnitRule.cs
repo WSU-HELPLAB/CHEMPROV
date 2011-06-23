@@ -80,14 +80,14 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             {
                 if (matchingStreams1.Item1.GetUnitAtRow(0) != matchingStreams1.Item2.GetUnitAtRow(0))
                 {
-                    return new ValidationResult(feedbackTarget, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units));
+                    return new ValidationResult(feedbackTarget, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units, matchingStreams1.Item1.GetUnitAtRow(0), matchingStreams1.Item2.GetUnitAtRow(0)));
                 }
             }
             if (matchingStreams2 != null)
             {
                 if (matchingStreams2.Item1.GetUnitAtRow(0) != matchingStreams2.Item2.GetUnitAtRow(0))
                 {
-                    return new ValidationResult(feedbackTarget, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units));
+                    return new ValidationResult(feedbackTarget, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units, matchingStreams2.Item1.GetUnitAtRow(0), matchingStreams2.Item2.GetUnitAtRow(0)));
                 }
             }
             return ValidationResult.Empty;

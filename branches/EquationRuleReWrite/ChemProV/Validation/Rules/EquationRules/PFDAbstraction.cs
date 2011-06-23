@@ -5,6 +5,7 @@ using ChemProV.PFD.EquationEditor;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 using ChemProV.Validation.Rules.Adapters.Table;
 
 namespace ChemProV.Validation.Rules.EquationRules
@@ -55,11 +56,34 @@ namespace ChemProV.Validation.Rules.EquationRules
                 {
                     if (eqData.VariableNames.Item1[0].Count() >= 1 && eqData.VariableNames.Item2[0].Count() >= 1)
                     {
-                        IStream stream1 = dictionaryOfTableData[eqData.VariableNames.Item1[0]].Parent.ParentStream;
+                        IStream stream1 = null;
+                        int index = 0;
+                        while (stream1 == null && index < eqData.VariableNames.Item1.Count)
+                        {
+                            if (dictionaryOfTableData.Keys.Contains(eqData.VariableNames.Item1[index]))
+                            {
+                                stream1 = dictionaryOfTableData[eqData.VariableNames.Item1[index]].Parent.ParentStream;
+                            }
+                            index++;
+                        }
 
-                        IStream stream2 = dictionaryOfTableData[eqData.VariableNames.Item2[0]].Parent.ParentStream;
+                        IStream stream2 = null;
+                        index = 0;
+                        while (stream2 == null && index < eqData.VariableNames.Item2.Count)
+                        {
+                            if (dictionaryOfTableData.Keys.Contains(eqData.VariableNames.Item2[index]))
+                            {
+                                stream2 = dictionaryOfTableData[eqData.VariableNames.Item2[index]].Parent.ParentStream;
+                            }
+                            index++;
+                        }
 
-                        List<IProcessUnit> graph = FindGraph(stream1, stream2, abstractedGraphs);
+                        List<IProcessUnit> graph = null;
+
+                        if (stream1 != null && stream2 != null)
+                        {
+                            graph = FindGraph(stream1, stream2, abstractedGraphs);
+                        }
 
                         if (graph != null)
                         {
@@ -244,6 +268,15 @@ namespace ChemProV.Validation.Rules.EquationRules
                 }
 
                 allstreamsUsed[streams.IndexOf(stream)] = true;
+            }
+
+            //Heat streams don't count for this so set them all to true
+            foreach (IStream stream in streams)
+            {
+                if (stream.Table is HeatStreamPropertiesWindow)
+                {
+                    allstreamsUsed[streams.IndexOf(stream)] = true;
+                }
             }
 
             foreach (bool b in allstreamsUsed)

@@ -82,7 +82,7 @@ namespace ChemProV.Validation.Rules
             //the firstRowUnits must be equal too the secondRowUnits unless secondRowUnits is wildcard
             if (firstRowUnits != secondRowUnits && secondRowUnits != "?")
             {
-                return new ValidationResult(target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units));
+                return new ValidationResult(target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units, firstRowUnits, secondRowUnits));
             }
 
             //start index at 2
@@ -93,7 +93,7 @@ namespace ChemProV.Validation.Rules
                 //All subrows must be in percent if the second row is or match the first and second row but we know they are equal
                 if (secondRowUnits != tableAdapter.GetUnitAtRow(i))
                 {
-                    return new ValidationResult(target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units));
+                    return new ValidationResult(target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Inconsistant_Units, secondRowUnits, tableAdapter.GetUnitAtRow(i)));
                 }
                 i++;
             }

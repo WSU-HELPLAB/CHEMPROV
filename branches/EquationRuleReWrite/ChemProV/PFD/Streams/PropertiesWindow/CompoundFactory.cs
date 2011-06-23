@@ -13,13 +13,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
 {
     public class CompoundFactory
     {
-        private static Element hydrogren = new Element("hydrogren");
+        private static Element hydrogren = new Element("hydrogen");
         private static Element oxygen = new Element("oxygen");
         private static Element carbon = new Element("carbon");
         private static Element nitrogen = new Element("nitrogen");
         private static Element chlorine = new Element("chlorine");
         private static Element phosphorus = new Element("phosphorus");
-        private static Element sulfer = new Element("sulfer");
+        private static Element sulfer = new Element("sulfur");
         private static Element sodium = new Element("sodium");
 
         private CompoundFactory()

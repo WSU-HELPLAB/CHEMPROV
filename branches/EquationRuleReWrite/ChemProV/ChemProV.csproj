@@ -282,6 +282,7 @@
     <Compile Include="Validation\Rules\ProcessUnitRules\GenericProcessUnitRule.cs" />
     <Compile Include="Validation\Rules\RuleManager.cs" />
     <Compile Include="Validation\Rules\ValidationResult.cs" />
+    <Compile Include="Validation\Rules\ValidationResultsException.cs" />
   </ItemGroup>
   <ItemGroup>
     <ApplicationDefinition Include="App.xaml">

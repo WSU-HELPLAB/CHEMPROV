@@ -199,28 +199,28 @@ namespace ChemProV
 
         private void OpenFile(FileInfo file)
         {
-            try
-            {
-                FileStream fs = file.OpenRead();
-                XDocument doc = XDocument.Load(fs);
+            //         try
+            //          {
+            FileStream fs = file.OpenRead();
+            XDocument doc = XDocument.Load(fs);
 
-                string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
-                CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
+            string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
+            CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
 
-                WorkSpace.LoadXmlElements(doc);
+            WorkSpace.LoadXmlElements(doc);
 
-                userDefinedVariableWindow.LoadXmlElements(doc);
-                //we dont want to load the config file so stop the event from firing
-                this.Loaded -= new RoutedEventHandler(LoadConfigFile);
-            }
-            catch (Exception ex)
-            {
-                //This is the user friendly error message.
-                MessageBox.Show("There might have been an error when trying to load the ChemProV file.  Please ensure that the file loaded correctly.  If it did then please proceed as normal, if it did not please try to reload the file");
+            userDefinedVariableWindow.LoadXmlElements(doc);
+            //we dont want to load the config file so stop the event from firing
+            this.Loaded -= new RoutedEventHandler(LoadConfigFile);
+            //          }
+            //           catch (Exception ex)
+            //         {
+            //This is the user friendly error message.
+            //            MessageBox.Show("There might have been an error when trying to load the ChemProV file.  Please ensure that the file loaded correctly.  If it did then please proceed as normal, if it did not please try to reload the file");
 
-                //This is the programmer friendly error message and has been commented out for the release version
-                MessageBox.Show(ex.ToString());
-            }
+            //This is the programmer friendly error message and has been commented out for the release version
+            //             MessageBox.Show(ex.ToString());
+            //         }
         }
 
         /// <summary>

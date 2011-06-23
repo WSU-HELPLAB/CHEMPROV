@@ -225,8 +225,17 @@ namespace ChemProV.PFD.EquationEditor
                 eq.EquationTextChanged();
             }
 
+            //create the equation
+            Equation lastEq = new Equation(isReadOnly);
+
+            //attach event listeners
+            RegisterEquationListeners(lastEq);
+
+            //add to the list of equations
+            EquationStackPanel.Children.Add(lastEq);
+
             //the last equation added needs to have a special event listener attached
-            (EquationStackPanel.Children.ElementAt(EquationStackPanel.Children.Count - 1) as Equation).MyTextChanged += new EventHandler(eq_MyTextChanged);
+            lastEq.MyTextChanged += new EventHandler(eq_MyTextChanged);
         }
 
         #endregion Methods
@@ -282,7 +291,7 @@ namespace ChemProV.PFD.EquationEditor
             {
                 foreach (string element in elements)
                 {
-                    equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Element, element));
+                    equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Element, element + "(e)"));
                 }
             }
 

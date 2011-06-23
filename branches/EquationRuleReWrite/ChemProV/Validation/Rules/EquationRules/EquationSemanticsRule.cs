@@ -194,17 +194,18 @@ namespace ChemProV.Validation.Rules.EquationRules
 
                 while (index < endOfEntropyCalc)
                 {
-                    vr = sumOfEntropy(index);
-                    if (!vr.IsEmpty)
+                    try
                     {
-                        return vr;
+                        index = sumOfEntropy(index);
+                        index++;
                     }
-
-                    index += 8;
+                    catch (ValidationResultException validationException)
+                    {
+                        return validationException.ValidationResult;
+                    }
 
                     if (index + 1 < endOfEntropyCalc)
                     {
-                        index++;
                         if (equationTokens[index].Value == "+" || equationTokens[index].Value == "-")
                         {
                             //after this it will start to what should be the start of the next Entropy calc.
@@ -220,121 +221,140 @@ namespace ChemProV.Validation.Rules.EquationRules
             return ValidationResult.Empty;
         }
 
-        private ValidationResult sumOfEntropy(int index)
+        private void ThrowInvalidHeatEquationException()
+        {
+            throw new ValidationResultException(new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation)));
+        }
+
+        private void ThrowUnknownConstantException()
+        {
+            throw new ValidationResultException(new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Unknown_Constant)));
+        }
+
+        private int sumOfEntropy(int index)
         {
             string currentAbbr;
-            if (equationTokens[index].Value.Length != 4)
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-            if (equationTokens[index].Value[0] != 'H' && equationTokens[index].Value[1] != 'f')
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-            currentAbbr = equationTokens[index].Value[2].ToString();
-            currentAbbr += equationTokens[index].Value[3].ToString();
 
-            if (double.IsNaN(CompoundFactory.GetElementsOfCompound(CompoundFactory.GetCompoundNameFromAbbr(currentAbbr)).HeatFormation))
+            //rather than making sure we don't go out side of the index if we do we catch it and then return the Invalid_Heat_Equation error
+            try
             {
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Unknown_Constant));
-            }
-            index++;
-
-            if (equationTokens[index].Value != "+")
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-
-            index++;
-
-            if (equationTokens[index].Value.Length != 4)
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-            if (equationTokens[index].Value[0] != 'C' && equationTokens[index].Value[1] != 'p')
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-            if (currentAbbr != equationTokens[index].Value[2].ToString() + equationTokens[index].Value[3].ToString())
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Incorrect_Abbrv));
-            }
-
-            if (double.IsNaN(CompoundFactory.GetElementsOfCompound(CompoundFactory.GetCompoundNameFromAbbr(currentAbbr)).HeatCapacity))
-            {
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Unknown_Constant));
-            }
-
-            index++;
-
-            if (equationTokens[index].Value != "*")
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-
-            index++;
-
-            if (equationTokens[index].Value[0] != 'T')
-            {
-                try
+                if (equationTokens[index].Value.Length != 4)
                 {
-                    double.Parse(equationTokens[index].Value);
-                    //number so ok
-                }
-                catch
-                {
-                    //not number not temp label
                     //error
-                    return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
+                    ThrowInvalidHeatEquationException();
+                }
+                if (equationTokens[index].Value[0] != 'H' && equationTokens[index].Value[1] != 'f')
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+                currentAbbr = equationTokens[index].Value[2].ToString();
+                currentAbbr += equationTokens[index].Value[3].ToString();
+
+                if (double.IsNaN(CompoundFactory.GetElementsOfCompound(CompoundFactory.GetCompoundNameFromAbbr(currentAbbr)).HeatFormation))
+                {
+                    ThrowUnknownConstantException();
+                }
+                index++;
+
+                if (equationTokens[index].Value != "+")
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+
+                index++;
+
+                if (equationTokens[index].Value.Length != 4)
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+                if (equationTokens[index].Value[0] != 'C' && equationTokens[index].Value[1] != 'p')
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+                if (currentAbbr != equationTokens[index].Value[2].ToString() + equationTokens[index].Value[3].ToString())
+                {
+                    //error
+                    throw new ValidationResultException(new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Incorrect_Abbrv)));
+                }
+
+                if (double.IsNaN(CompoundFactory.GetElementsOfCompound(CompoundFactory.GetCompoundNameFromAbbr(currentAbbr)).HeatCapacity))
+                {
+                    ThrowUnknownConstantException();
+                }
+
+                index++;
+
+                if (equationTokens[index].Value != "*")
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+
+                index++;
+
+                if (equationTokens[index].Value[0] != 'T')
+                {
+                    try
+                    {
+                        double.Parse(equationTokens[index].Value);
+                        //number so ok
+                    }
+                    catch
+                    {
+                        //not number not temp label
+                        //error
+                        ThrowInvalidHeatEquationException();
+                    }
+                }
+
+                index++;
+
+                if (equationTokens[index].Value != "-")
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+
+                index++;
+
+                int twentyFive;
+                int.TryParse(equationTokens[index].Value, out twentyFive);
+                if (twentyFive != 25)
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+
+                index++;
+
+                if (equationTokens[index].Value != "*")
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+
+                index++;
+
+                if (!DictionaryOfTableData.ContainsKey(equationTokens[index].Value))
+                {
+                    //error
+                    ThrowInvalidHeatEquationException();
+                }
+                if ((DictionaryOfTableData[equationTokens[index].Value].Compound != CompoundFactory.GetCompoundNameFromAbbr(currentAbbr)))
+                {
+                    //error
+                    throw new ValidationResultException(new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Incorrect_Abbrv)));
                 }
             }
-
-            index++;
-
-            if (equationTokens[index].Value != "-")
+            catch
             {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
+                ThrowInvalidHeatEquationException();
             }
-
-            index++;
-
-            int twentyFive;
-            int.TryParse(equationTokens[index].Value, out twentyFive);
-            if (twentyFive != 25)
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-
-            index++;
-
-            if (equationTokens[index].Value != "*")
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-
-            index++;
-
-            if (!DictionaryOfTableData.ContainsKey(equationTokens[index].Value))
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.InValid_Heat_Equation));
-            }
-            if ((DictionaryOfTableData[equationTokens[index].Value].Compound != CompoundFactory.GetCompoundNameFromAbbr(currentAbbr)))
-            {
-                //error
-                return new ValidationResult(Target, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Incorrect_Abbrv));
-            }
-            return ValidationResult.Empty;
+            return index;
         }
 
         private ValidationResult isValidSumOfTemp()
@@ -345,11 +365,13 @@ namespace ChemProV.Validation.Rules.EquationRules
             while (i + 8 < equationTokens.Count)
             {
                 //is it in this format Hf?? + Cp?? * temp - 298 * moles + *something* + ... = Hf?? + Cp?? * temp - 298 * moles + *same thing* + ...
-                vr = sumOfEntropy(i);
-                i += 9;
-                if (!vr.IsEmpty)
+                try
                 {
-                    return vr;
+                    i += sumOfEntropy(i);
+                }
+                catch (ValidationResultException validationException)
+                {
+                    return validationException.ValidationResult;
                 }
 
                 if (i == equationTokens.Count)
@@ -462,7 +484,11 @@ namespace ChemProV.Validation.Rules.EquationRules
             }
             else if (equationData.Type.Classification == EquationClassification.Element)
             {
-                vr = CheckSameElement(equationData.Type.Content as string);
+                string elementName = (equationData.Type.Content as string);
+
+                elementName = elementName.Remove(elementName.Length - 3);
+
+                vr = CheckSameElement(elementName);
                 if (vr != ValidationResult.Empty)
                 {
                     return vr;
