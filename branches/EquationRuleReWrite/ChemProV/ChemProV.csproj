@@ -381,6 +381,34 @@
     </None>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Libraries\Behaviors.dll" />
+    <Content Include="Libraries\Behaviors.pdb" />
+    <Content Include="Libraries\ICSharpCode.SharpZipLib.Silverlight.dll" />
+    <Content Include="Libraries\ImageTools.Controls.dll" />
+    <Content Include="Libraries\ImageTools.Controls.pdb" />
+    <Content Include="Libraries\ImageTools.Controls.XML" />
+    <Content Include="Libraries\ImageTools.dll" />
+    <Content Include="Libraries\ImageTools.Filtering.dll" />
+    <Content Include="Libraries\ImageTools.Filtering.pdb" />
+    <Content Include="Libraries\ImageTools.Filtering.XML" />
+    <Content Include="Libraries\ImageTools.IO.Bmp.dll" />
+    <Content Include="Libraries\ImageTools.IO.Bmp.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Bmp.XML" />
+    <Content Include="Libraries\ImageTools.IO.Gif.dll" />
+    <Content Include="Libraries\ImageTools.IO.Gif.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Gif.XML" />
+    <Content Include="Libraries\ImageTools.IO.Jpeg.dll" />
+    <Content Include="Libraries\ImageTools.IO.Jpeg.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Jpeg.XML" />
+    <Content Include="Libraries\ImageTools.IO.Png.dll" />
+    <Content Include="Libraries\ImageTools.IO.Png.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Png.XML" />
+    <Content Include="Libraries\ImageTools.pdb" />
+    <Content Include="Libraries\ImageTools.Utils.dll" />
+    <Content Include="Libraries\ImageTools.Utils.pdb" />
+    <Content Include="Libraries\ImageTools.XML" />
+    <Content Include="Libraries\Silverlight.Controls.dll" />
+    <Content Include="Libraries\Silverlight.Controls.pdb" />
     <Content Include="UI\Icons\logo128.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -472,6 +500,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
