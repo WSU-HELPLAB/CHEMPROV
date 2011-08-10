@@ -284,10 +284,16 @@ namespace ChemProV.Validation.Rules
                 CheckProcessUnits(processUnits);
                 CheckChemicalStreamPropertiesWindowFeedback(tables);
 
+                // AC: Removing checks for equation correctness as it currently doesn't work right
+                //     and it's better to have no messages over a bunch of false positives.
+                //     I'm not removing the code block below because I'm not yet familiar enough
+                //     with the code and worry that I wouldn't be able to reproduce the line.
+                /*
                 if (EveryoneDict.Count == 0)
                 {
                     CheckEquationSemantics(equations, userDefinedVariables, processUnits.ToList());
                 }
+                 * */
             }
         }
 

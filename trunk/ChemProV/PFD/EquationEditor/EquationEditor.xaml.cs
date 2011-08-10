@@ -152,15 +152,9 @@ namespace ChemProV.PFD.EquationEditor
 
         public void ChangeSolveabiltyStatus(bool solvable)
         {
-            if (solvable)
-            {
-                //white space to make it more centered.
-                EquationTitle.Content = "Equations (Solvable)";
-            }
-            else
-            {
-                EquationTitle.Content = "Equations (Not Solvable)";
-            }
+            //Empty since solvability is turned off.
+            //We can't really say if something is solvable or not.
+            return;
         }
 
         /// <summary>
@@ -214,9 +208,16 @@ namespace ChemProV.PFD.EquationEditor
 
                 XElement xmlEquationType = xmlEquation.Element("EquationType");
 
-                string content = xmlEquationType.Attribute("SelectedItemContent").Value;
-                EquationClassification classification = (EquationClassification)Int32.Parse(xmlEquationType.Attribute("SelectedItemClassification").Value);
-
+                //AC: Default to an overall balance if the EquationType element has no children.
+                //    This is kind of a quick hack, and as such, I'm not sure whether or not
+                //    there are constants that I could be using instead of my strings.
+                string content = "Overall";
+                EquationClassification classification = EquationClassification.Overall;
+                if (xmlEquationType.HasAttributes)
+                {
+                    content = xmlEquationType.Attribute("SelectedItemContent").Value;
+                    classification = (EquationClassification)Int32.Parse(xmlEquationType.Attribute("SelectedItemClassification").Value);
+                }
                 ComboBoxEquationTypeItem item = new ComboBoxEquationTypeItem(classification, content);
 
                 eq.EquationTypes.Add(item);
@@ -308,7 +309,8 @@ namespace ChemProV.PFD.EquationEditor
 
         private void EquationTokens_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            EquationTokensChanged(sender, new EventArgs());
+            //AC: Since I'm gutting the equation validation process, we don't need this any more.
+            //EquationTokensChanged(sender, new EventArgs());
         }
 
         /// <summary>
@@ -336,7 +338,8 @@ namespace ChemProV.PFD.EquationEditor
 
         private void EquationTextChanged(object sender, EventArgs e)
         {
-            EquationTokensChanged(sender, e);
+            //Not needed because I turned off equation validation
+            //EquationTokensChanged(sender, e);
         }
 
         /// <summary>

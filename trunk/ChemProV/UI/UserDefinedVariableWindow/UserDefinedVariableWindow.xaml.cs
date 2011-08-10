@@ -180,6 +180,13 @@ namespace ChemProV.UI.UserDefinedVariableWindow
 
         public void LoadXmlElements(XDocument doc)
         {
+            //not all documents have a UDF window.  Check to make sure that we have one
+            //before parsing.
+            if (doc.Descendants("UserDefinedVariableWindow").Count() == 0)
+            {
+                return;
+            }
+
             XElement variableDefinitions = doc.Descendants("UserDefinedVariableWindow").ElementAt(0);
 
             foreach (XElement variableDefinition in variableDefinitions.Elements())

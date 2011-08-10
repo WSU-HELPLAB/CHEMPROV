@@ -22,7 +22,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
         <StackPanel>
             <StackPanel Background="Silver" HorizontalAlignment="Stretch">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <sdk:Label Name="EquationTitle" Content="Equations (Not Solvable)" Padding="3" FontSize="14" HorizontalContentAlignment="Left" Width="211" />
+                    <sdk:Label Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Left" Width="211" />
                 </StackPanel>
             </StackPanel>
             <ScrollViewer

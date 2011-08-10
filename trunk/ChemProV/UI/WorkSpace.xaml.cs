@@ -260,7 +260,11 @@ namespace ChemProV.UI
             //load the equations
             EquationEditor.LoadXmlElements(doc.Descendants("EquationEditor").ElementAt(0));
 
-            FeedbackWindow.LoadXmlElements(doc.Descendants("FeedbackWindow").ElementAt(0));
+            //some items don't have feedback so there might not be a feedbackwindow element.
+            if (doc.Descendants("FeedbackWindow").Count() > 0)
+            {
+                FeedbackWindow.LoadXmlElements(doc.Descendants("FeedbackWindow").ElementAt(0));
+            }
 
             //done loading the file so set isLoadingFile to false and call the CheckRulesForPFD to check the rules
             isLoadingFile = false;
