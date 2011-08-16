@@ -199,8 +199,6 @@ namespace ChemProV
 
         private void OpenFile(FileInfo file)
         {
-            //         try
-            //          {
             FileStream fs = file.OpenRead();
             XDocument doc = XDocument.Load(fs);
 
@@ -210,17 +208,10 @@ namespace ChemProV
             WorkSpace.LoadXmlElements(doc);
 
             userDefinedVariableWindow.LoadXmlElements(doc);
+
             //we dont want to load the config file so stop the event from firing
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);
-            //          }
-            //           catch (Exception ex)
-            //         {
-            //This is the user friendly error message.
-            //            MessageBox.Show("There might have been an error when trying to load the ChemProV file.  Please ensure that the file loaded correctly.  If it did then please proceed as normal, if it did not please try to reload the file");
 
-            //This is the programmer friendly error message and has been commented out for the release version
-            //             MessageBox.Show(ex.ToString());
-            //         }
         }
 
         /// <summary>
@@ -410,8 +401,6 @@ namespace ChemProV
             //create our XML writer
             using (XmlWriter writer = XmlWriter.Create(stream, settings))
             {
-                //    try
-                //    {
                 //root node
                 writer.WriteStartElement("ProcessFlowDiagram");
 
@@ -435,11 +424,6 @@ namespace ChemProV
 
                 //end root node
                 writer.WriteEndElement();
-                // }
-                //catch (Exception ex)
-                //                {
-                //                  MessageBox.Show(ex.ToString());
-                //            }
             }
         }
 
@@ -568,10 +552,9 @@ namespace ChemProV
             if (openFileResult == true)
             {
                 bool openFile = false;
-                if (WorkSpace.DrawingCanvas.Children
-                  .Count > 0)
+                if (WorkSpace.DrawingCanvas.Children.Count > 0)
                 {
-                    MessageBoxResult result = MessageBox.Show("Openning a new file will erase the current process flow diagram.  Click OK to continue or CANCEL to go back and save.  This action will not be undo-able", "Open File Confirmation", MessageBoxButton.OKCancel);
+                    MessageBoxResult result = MessageBox.Show("Opening a new file will erase the current process flow diagram.  Click OK to continue or CANCEL to go back and save.  This action cannot be undone.", "Open File Confirmation", MessageBoxButton.OKCancel);
                     if (result == MessageBoxResult.OK)
                     {
                         openFile = true;

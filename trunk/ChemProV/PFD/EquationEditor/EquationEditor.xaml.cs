@@ -256,6 +256,7 @@ namespace ChemProV.PFD.EquationEditor
             eq.MyTextChanged += new EventHandler(eq_MyTextChanged);
             RegisterEquationListeners(eq);
             EquationStackPanel.Children.Add(eq);
+            EquationTokensChanged(this, EventArgs.Empty);
         }
 
         private void eq_ReceivedFocus(object sender, EventArgs e)

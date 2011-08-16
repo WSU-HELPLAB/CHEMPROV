@@ -11,6 +11,7 @@ using System.IO;
 using System.Windows.Controls;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
+using ChemProV.Validation.Rules;
 
 namespace ChemProV
 {
@@ -54,7 +55,6 @@ namespace ChemProV
 
             mp.RequestNewBlankMainPage += new EventHandler(newBlankChemProV);
             mp.RequestOpenFile += new RequestOpenFileEventHandler(RequestOpenFile);
-
             this.LayoutRoot.Children.Add(mp);
         }
     }
