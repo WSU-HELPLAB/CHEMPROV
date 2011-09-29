@@ -410,6 +410,7 @@
     <Content Include="Libraries\Microsoft.Expression.Drawing.dll" />
     <Content Include="Libraries\Silverlight.Controls.dll" />
     <Content Include="Libraries\Silverlight.Controls.pdb" />
+    <Content Include="Libraries\System.Windows.Interactivity.dll" />
     <Content Include="UI\Icons\logo128.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
