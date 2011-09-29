@@ -1,0 +1,29 @@
+<!--
+Copyright 2010, 2011 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+-->
+<controls:ChildWindow x:Class="ChemProV.UI.OptionWindow"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+           Width="400" Height="300"
+           Title="OptionWindow">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Orientation="Vertical" Grid.Row="0" VerticalAlignment="Center">
+            <TextBlock Text="Select Problem Type:"/>
+            <RadioButton x:Name="Simplest" IsChecked="True" Content="(Simplest) Material Balances Without Reactors" />
+            <RadioButton x:Name="Medium"  Content="(Medium) Material Balances with Reactors"/>
+            <RadioButton x:Name="MostComplex"  Content="(Most Complex) Material and Energy Balances"/>
+        </StackPanel>
+        <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" />
+        <Button x:Name="OKButton" Content="OK" Click="OKButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,79,0" Grid.Row="1" />
+    </Grid>
+</controls:ChildWindow>

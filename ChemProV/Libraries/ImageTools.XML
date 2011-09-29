@@ -1,0 +1,1555 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ImageTools</name>
+    </assembly>
+    <members>
+        <member name="T:ImageTools.IImageFilter">
+            <summary>
+            Image processing filter interface.
+            </summary>
+            <remarks>The interface defines the set of methods, which should be
+            provided by all image processing filters. Methods of this interface
+            manipulate the original image.</remarks>
+        </member>
+        <member name="M:ImageTools.IImageFilter.Apply(ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Apply filter to an image at the area of the specified rectangle.
+            </summary>
+            <param name="image">Source image to apply filter to.</param>
+            <param name="rectangle">The rectangle, which defines the area of the
+            image where the filter should be applied to.</param>
+            <remarks>The method keeps the source image unchanged and returns the
+            the result of image processing filter as new image.</remarks>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is
+            null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="rectangle"/> doesnt
+            fits to the image.</exception>
+        </member>
+        <member name="M:ImageTools.IImageFilter.Apply(ImageTools.ImageBase)">
+            <summary>
+            Apply filter to an image.
+            </summary>
+            <param name="image">Source image to apply filter to.</param>
+            <remarks>The method keeps the source image unchanged and returns the
+            the result of image processing filter as new image.</remarks>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is
+            null (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="T:ImageTools.ImageFrameCollection">
+            <summary>
+            A collection of <see cref="T:ImageTools.ImageFrame"/> objects.
+            </summary>
+        </member>
+        <member name="T:ImageTools.ImageFrame">
+            <summary>
+            Represents a frame in a animation.
+            </summary>
+        </member>
+        <member name="T:ImageTools.ImageBase">
+            <summary>
+            Base classes for all Images.
+            </summary>
+        </member>
+        <member name="F:ImageTools.ImageBase._data">
+            <summary>
+            The array of pixels.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageBase.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageBase"/> class
+            with the height and the width of the image.
+            </summary>
+            <param name="width">The width of the image in pixels.</param>
+            <param name="height">The height of the image in pixels.</param>
+        </member>
+        <member name="M:ImageTools.ImageBase.#ctor(ImageTools.ImageBase)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageBase"/> class
+            by making a copy from another image.
+            </summary>
+            <param name="other">The other, where the clone should be made from.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="other"/> is null
+            (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="other"/> is not loaded.</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageBase"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageBase.GetPixel(System.Int32,System.Int32)">
+            <summary>
+            Gets the color of a pixel at the specified position.
+            </summary>
+            <param name="x">The x-coordinate of the pixel. Must be greater
+            than zero and smaller than the width of the pixel.</param>
+            <param name="y">The y-coordinate of the pixel. Must be greater
+            than zero and smaller than the width of the pixel.</param>
+            <returns>The color of the pixel.</returns>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="x"/> is smaller than zero or greater than
+            the width of the image.</para>
+            	<para>- or -</para>
+            	<para><paramref name="y"/> is smaller than zero or greater than
+            the height of the image.</para>
+            </exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.GetPixels">
+            <summary>
+            Returns all pixels of the image as simple byte array.
+            </summary>
+            <returns>All image pixels as byte array.</returns>
+            <remarks>The returned array has a length of Width * Length * 4 bytes
+            and stores the red, the green, the blue and the alpha value for
+            each pixel in this order.</remarks>
+        </member>
+        <member name="M:ImageTools.ImageBase.SetPixel(System.Int32,System.Int32,System.Windows.Media.Color)">
+            <summary>
+            Sets the color of a pixel at the specified position.
+            </summary>
+            <param name="x">The x-coordinate of the pixel. Must be greater
+            than zero and smaller than the width of the pixel.</param>
+            <param name="y">The y-coordinate of the pixel. Must be greater
+            than zero and smaller than the width of the pixel.</param>
+            <param name="color">The color of the pixel.</param>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="x"/> is smaller than zero or greater than
+            the width of the image.</para>
+            	<para>- or -</para>
+            	<para><paramref name="y"/> is smaller than zero or greater than
+            the height of the image.</para>
+            </exception>
+            <exception cref="T:System.InvalidOperationException">Image is not initialized, 
+            the image was initialized the empty constructor without initializing the
+            pixel array.</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.SetPixel(System.Int32,System.Int32,System.Byte,System.Byte,System.Byte,System.Byte)">
+            <summary>
+            Sets the color of a pixel at the specified position.
+            </summary>
+            <param name="x">The x-coordinate of the pixel. Must be greater
+            than zero and smaller than the width of the pixel.</param>
+            <param name="y">The y-coordinate of the pixel. Must be greater
+            than zero and smaller than the width of the pixel.</param>
+            <param name="red">The red part of the color.</param>
+            <param name="green">The green part of the color.</param>
+            <param name="blue">The blue part of the color.</param>
+            <param name="alpha">The alpha part of the color.</param>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="x"/> is smaller than zero or greater than
+            the width of the image.</para>
+            	<para>- or -</para>
+            	<para><paramref name="y"/> is smaller than zero or greater than
+            the height of the image.</para>
+            </exception>
+            <exception cref="T:System.InvalidOperationException">Image is not initialized, 
+            the image was initialized the empty constructor without initializing the
+            pixel array.</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.SetPixels(System.Int32,System.Int32,System.Byte[])">
+            <summary>
+            Sets the pixel array of the image.
+            </summary>
+            <param name="width">The new width of the image.
+            Must be greater than zero.</param>
+            <param name="height">The new height of the image.
+            Must be greater than zero.</param>
+            <param name="pixels">The array with colors. Must be a multiple
+            of four, width and height.</param>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="width"/> is smaller than zero.</para>
+            	<para>- or -</para>
+            	<para><paramref name="height"/> is smaller than zero.</para>
+            	<para>- or -</para>
+            	<para><paramref name="pixels"/> is not a multiple of four, 
+            	width and height.</para>
+            </exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="pixels"/> is
+            null (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.CalculateBounds">
+            <summary>
+            Calculates a new rectangle which represents 
+            the dimensions of this image.
+            </summary>
+            <returns>The <see cref="T:ImageTools.Rectangle"/> object, which
+            represents the image dimension.</returns>
+        </member>
+        <member name="M:ImageTools.ImageBase.VerifyDataIsInitialized">
+            <summary>
+            Verifies that the data is already initialized and throws 
+            and <see cref="T:System.InvalidOperationException"/> if the data 
+            is not initialized.
+            </summary>
+            <exception cref="T:System.InvalidOperationException">The data
+            was not initialized yet.</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.FlipX(ImageTools.ImageBase)">
+            <summary>
+            Swaps the image at the X-axis, which goes throug the middle
+             of the height of the image.
+            </summary>
+            <param name="image">The image to swap at the x-axis. Cannot be null
+            (Nothing in Visual Basic).</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is null
+            (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.FlipY(ImageTools.ImageBase)">
+            <summary>
+            Swaps the image at the Y-axis, which goes throug the middle
+             of the width of the image.
+            </summary>
+            <param name="image">The image to swap at the y-axis. Cannot be null
+            (Nothing in Visual Basic).</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is null
+            (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.Transform(ImageTools.ImageBase,ImageTools.ImageBase,ImageTools.RotationType,ImageTools.FlippingType)">
+            <summary>
+            Transforms the specified image by flipping and rotating it. First the image
+            will be rotated, then the image will be flipped. A new image will be returned. The original image
+            will not be changed.
+            </summary>
+            <param name="source">The image, which should be transformed.</param>
+            <param name="target">The new transformed image.</param>
+            <param name="rotationType">Type of the rotation.</param>
+            <param name="flippingType">Type of the flipping.</param>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="image"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="newImage"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+        </member>
+        <member name="M:ImageTools.ImageBase.Crop(ImageTools.ImageBase,ImageTools.ImageBase,ImageTools.Rectangle)">
+            <summary>
+            Cuts the image with the specified rectangle and returns a new image.
+            </summary>
+            <param name="source">The image, where a cutted copy should be made from.</param>
+            <param name="target">The new image.</param>
+            <param name="bounds">The bounds of the new image.</param>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="source"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="target"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+        </member>
+        <member name="P:ImageTools.ImageBase.IsLoaded">
+            <summary>
+            Gets or sets a value indicating whether this image has been loaded.
+            </summary>
+            <value><c>true</c> if this image has been loaded; otherwise, <c>false</c>.</value>
+        </member>
+        <member name="P:ImageTools.ImageBase.Height">
+            <summary>
+            Gets the height of this <see cref="T:ImageTools.Image"/> in pixels.
+            </summary>
+            <value>The height of this image.</value>
+            <remarks>The height will be initialized by the constructor
+            or when the data will be pixel data will set.</remarks>
+        </member>
+        <member name="P:ImageTools.ImageBase.Width">
+            <summary>
+            Gets the width of this <see cref="T:ImageTools.Image"/> in pixels.
+            </summary>
+            <value>The width of this image.</value>
+            <remarks>The width will be initialized by the constructor
+            or when the data will be pixel data will set.</remarks>
+        </member>
+        <member name="M:ImageTools.ImageFrame.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageFrame"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageFrame.#ctor(ImageTools.ImageFrame)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageFrame"/> class
+            by making a copy from another image.
+            </summary>
+            <param name="other">The other image, where the clone should be made from.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="other"/> is null
+            (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="T:ImageTools.ImageProperty">
+            <summary>
+            Stores meta information about a image, like the name of the author,
+            the copyright information, the date, where the image was created
+            or some other information.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageProperty.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageProperty"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageProperty.#ctor(System.String,System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageProperty"/> class
+            by setting the name and the value of the property.
+            </summary>
+            <param name="name">The name of the property.</param>
+            <param name="value">The value of the property.</param>
+        </member>
+        <member name="M:ImageTools.ImageProperty.Equals(System.Object)">
+            <summary>
+            Determines whether the specified <see cref="T:System.Object"/> is 
+            equal to the current <see cref="T:System.Object"/>.
+            </summary>
+            <param name="obj">The <see cref="T:System.Object"/> to compare with 
+            the current <see cref="T:System.Object"/>.</param>
+            <returns>
+            true if the specified <see cref="T:System.Object"/> is equal to the 
+            current <see cref="T:System.Object"/>; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:ImageTools.ImageProperty.Equals(ImageTools.ImageProperty)">
+            <summary>
+            Indicates whether the current object is equal to 
+            another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>
+            true if the current object is equal to the <paramref name="other"/> 
+            parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:ImageTools.ImageProperty.GetHashCode">
+            <summary>
+            Serves as a hash function for a particular type.
+            </summary>
+            <returns>
+            A hash code for the current <see cref="T:System.Object"/>.
+            </returns>
+        </member>
+        <member name="P:ImageTools.ImageProperty.Name">
+            <summary>
+            Gets or sets the name of the value, indicating
+            which kind of information this property stores.
+            </summary>
+            <value>The name of the property.</value>
+            <example>Typical properties are the author, copyright
+            information or other meta information.</example>
+        </member>
+        <member name="P:ImageTools.ImageProperty.Value">
+            <summary>
+            Gets or sets the value of the property, e.g. the name
+            of the author.
+            </summary>
+            <value>The value of this property.</value>
+        </member>
+        <member name="T:ImageTools.IO.IImageEncoder">
+            <summary>
+            Interface for image decoders for saving images to streams.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.IImageEncoder.IsSupportedFileExtension(System.String)">
+            <summary>
+            Indicates if the image encoder supports the specified
+            file extension.
+            </summary>
+            <param name="extension">The file extension.</param>
+            <returns>
+            <c>true</c>, if the encoder supports the specified
+            extensions; otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="extension"/>
+            is null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="extension"/> is a string
+            of length zero or contains only blanks.</exception>
+        </member>
+        <member name="M:ImageTools.IO.IImageEncoder.Encode(ImageTools.Image,System.IO.Stream)">
+            <summary>
+            Encodes the data of the specified image and writes the result to
+            the specified stream.
+            </summary>
+            <param name="image">The image, where the data should be get from.
+            Cannot be null (Nothing in Visual Basic).</param>
+            <param name="stream">The stream, where the image data should be written to. 
+            Cannot be null (Nothing in Visual Basic).</param>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="image"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="stream"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+        </member>
+        <member name="P:ImageTools.IO.IImageEncoder.Extension">
+            <summary>
+            Gets the default file extension for this encoder.
+            </summary>
+            <value>The default file extension for this encoder.</value>
+        </member>
+        <member name="T:ImageTools.IO.Decoders">
+            <summary>
+            Helper methods for decoders.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.Decoders.AddDecoder``1">
+            <summary>
+            Adds the type of the decoder to the list of available image decoders.
+            </summary>
+            <typeparam name="TDecoder">The type of the decoder.</typeparam>
+        </member>
+        <member name="M:ImageTools.IO.Decoders.GetAvailableDecoders">
+            <summary>
+            Gets a list of all available decoders.
+            </summary>
+            <returns>A list of all available decoders.</returns>
+        </member>
+        <member name="T:ImageTools.ImagePropertyCollection">
+            <summary>
+            Represents a list of <see cref="T:ImageTools.ImageProperty"/> instances.
+            </summary>
+        </member>
+        <member name="T:ImageTools.Image">
+            <summary>
+            Image class with stores the pixels and provides common functionality
+            such as loading images from files and streams or operation like resizing or cutting.
+            </summary>
+            <remarks>The image data is alway stored in RGBA format, where the red, the blue, the
+            alpha values are simple bytes.</remarks>
+            <example>The following code example demonstrates how to construct a new Image from a 
+            file, using the GetPixel and SetPixel methods to recolor the image.
+            <code>
+            // Load the image from a file.
+            Image image = Image.FromFile("MyImage.png");
+            
+            // Loop through the images pixels to reset color.
+            for (int y = 0; y &lt; image.Height; y++)
+            {
+                for (int x = 0; x &lt; image.Width; x++)
+                {
+                    Color color = image.GetPixel(x, y);
+                    color.Red = 0;
+                    color.Blue = 0;
+                    
+                    image.SetPixel(x, y, color);
+                }
+            }
+            
+            // Writes the image information to the pixel.
+            Console.WriteLine("Width: {0}, Height: {1}, image.Width, image.Height);
+            </code>
+            </example>
+        </member>
+        <member name="M:ImageTools.Image.OnDownloadCompleted(System.Net.OpenReadCompletedEventArgs)">
+            <summary>
+            Raises the <see cref="E:DownloadCompleted"/> event.
+            </summary>
+            <param name="e">The <see cref="T:System.Net.OpenReadCompletedEventArgs"/> instance 
+            containing the event data.</param>
+        </member>
+        <member name="M:ImageTools.Image.OnDownloadProgress(System.Net.DownloadProgressChangedEventArgs)">
+            <summary>
+            Raises the <see cref="E:DownloadProgress"/> event.
+            </summary>
+            <param name="e">The <see cref="T:System.Net.DownloadProgressChangedEventArgs"/> instance 
+            containing the event data.</param>
+        </member>
+        <member name="M:ImageTools.Image.OnLoadingCompleted(System.EventArgs)">
+            <summary>
+            Raises the <see cref="E:LoadingCompleted"/> event.
+            </summary>
+            <param name="e">The <see cref="T:System.EventArgs"/> instance 
+            containing the event data.</param>
+        </member>
+        <member name="M:ImageTools.Image.OnLoadingFailed(System.UnhandledExceptionEventArgs)">
+            <summary>
+            Raises the <see cref="E:Name"/> event.
+            </summary>
+            <param name="e">The <see cref="T:System.EventArgs"/> instance containing the event data.</param>
+        </member>
+        <member name="F:ImageTools.Image._frames">
+            <summary>
+            The list of frames for the animation.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Image._properties">
+            <summary>
+            List of properties for storing meta information about the image.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Image._animationSpeed">
+            <summary>
+            The animation speed for animated images.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Image.#ctor(System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Image"/> class
+            with the height and the width of the image.
+            </summary>
+            <param name="width">The width of the image in pixels.</param>
+            <param name="height">The height of the image in pixels.</param>
+        </member>
+        <member name="M:ImageTools.Image.#ctor(ImageTools.Image)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Image"/> class
+            by making a copy from another image.
+            </summary>
+            <param name="other">The other image, where the clone should be made from.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="other"/> is null
+            (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.Image.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Image"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Image.Apply(ImageTools.Image,ImageTools.IImageFilter[])">
+            <summary>
+            Applies the specified filter to the image.
+            </summary>
+            <param name="source">The image, where the filter should be applied to.</param>
+            <param name="filter">The filter, which should be applied to.</param>
+            <returns>
+            A copy of the image with the applied filter.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="source"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="filter"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+        </member>
+        <member name="M:ImageTools.Image.Apply(ImageTools.Image,ImageTools.Rectangle,ImageTools.IImageFilter[])">
+            <summary>
+            Applies the specified filter to the image ath the specified rectangle.
+            </summary>
+            <param name="source">The image, where the filter should be applied to.</param>
+            <param name="filter">The filter, which should be applied to.</param>
+            <param name="rectangle">The rectangle, where the filter should be applied to.</param>
+            <returns>
+            A copy of the image with the applied filter.
+            </returns>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="source"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="filter"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+        </member>
+        <member name="M:ImageTools.Image.Crop(ImageTools.Image,ImageTools.Rectangle)">
+            <summary>
+            Cuts the image with the specified rectangle and returns a new image.
+            </summary>
+            <param name="source">The image, where a cutted copy should be made from.</param>
+            <param name="bounds">The bounds of the new image.</param>
+            <returns>The new cutted image.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null
+            (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.Image.Resize(ImageTools.Image,System.Int32,System.Int32,ImageTools.IImageResizer)">
+            <summary>
+            Resizes the specified image by using the specified <see cref="T:ImageTools.IImageResizer"/> and
+            return a new image with
+            the spezified size which is a resized version of the passed image.
+            </summary>
+            <param name="source">The width of the new image. Must be greater than zero.</param>
+            <param name="width">The width of the new image. Must be greater than zero.</param>
+            <param name="height">The height of the new image. Must be greater than zero.</param>
+            <param name="resizer">The resizer, which should resize the image.</param>
+            <returns>The new image.</returns>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="resizer"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="source"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="width"/> is negative.</para>
+            	<para>- or -</para>
+            	<para><paramref name="height"/> is negative.</para>
+            </exception>
+        </member>
+        <member name="M:ImageTools.Image.Resize(ImageTools.Image,System.Int32,ImageTools.IImageResizer)">
+            <summary>
+            Resizes the specified image by using the specified <see cref="T:ImageTools.IImageResizer"/> and
+            returns new image which has the specified maximum
+            extension in x and y direction.
+            </summary>
+            <param name="source">The source image to resize.</param>
+            <param name="size">The maximum size of the image in x and y direction.</param>
+            <param name="resizer">The resizer, which should resize the image.</param>
+            <returns>The resized image.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="image"/> is null
+            (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="size"/> is negative.</exception>
+        </member>
+        <member name="M:ImageTools.Image.Transform(ImageTools.Image,ImageTools.RotationType,ImageTools.FlippingType)">
+            <summary>
+            Transforms the specified image by flipping and rotating it. First the image
+            will be rotated, then the image will be flipped. A new image will be returned. The original image
+            will not be changed.
+            </summary>
+            <param name="image">The image, which should be transformed.</param>
+            <param name="rotationType">Type of the rotation.</param>
+            <param name="flippingType">Type of the flipping.</param>
+            <returns>The new and transformed image.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="source"/> is null
+            (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.Image.SetSource(System.IO.Stream)">
+            <summary>
+            Sets the source of the image to a specified stream.
+            </summary>
+            <param name="stream">A <see cref="T:System.IO.Stream"/> that contains the data for 
+            this <see cref="T:ImageTools.Image"/>. Cannot be null.</param>
+            <remarks>
+            The stream will not be closed or disposed when the loading
+            is finished, so always use a using block or manually dispose
+            the stream, when using the method. 
+            The <see cref="T:ImageTools.Image"/> class does not support alpha
+            transparency in bitmaps. To enable alpha transparency, use
+            PNG images with 32 bits per pixel.
+            </remarks>
+            <exception cref="T:System.ArgumentNullException"><paramref name="stream"/>
+            is null (Nothing in Visual Basic).</exception>
+            <exception cref="T:ImageTools.ImageFormatException">The image has an invalid
+            format.</exception>
+            <exception cref="T:System.NotSupportedException">The image cannot be loaded
+            because loading images of this type are not supported yet.</exception>
+        </member>
+        <member name="M:ImageTools.Image.Load(System.Uri)">
+            <summary>
+            Sets the source of the image to the specified uri.
+            </summary>
+            <param name="uri">The URI, where the image should be loaded from.
+            Cannot be null (Nothing in Visual Basic).</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="uri"/> is
+            null (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.Image.webClient_OpenReadCompleted(System.Object,System.Net.OpenReadCompletedEventArgs)">
+            <summary>
+            Handles the OpenReadCompleted event of the WebClient component.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">The <see cref="T:System.Net.OpenReadCompletedEventArgs"/> instance containing the event data.</param>
+        </member>
+        <member name="M:ImageTools.Image.webClient_DownloadProgressChanged(System.Object,System.Net.DownloadProgressChangedEventArgs)">
+            <summary>
+            Handles the DownloadProgressChanged event of the WebClient component.
+            </summary>
+            <param name="sender">The source of the event.</param>
+            <param name="e">The <see cref="T:System.Net.DownloadProgressChangedEventArgs"/> instance containing the event data.</param>
+        </member>
+        <member name="M:ImageTools.Image.VerifyHasLoaded(ImageTools.Image)">
+            <summary>
+            Verifies that the image and all frames has been loaded.
+            </summary>
+            <param name="image">The image to verify.</param>
+        </member>
+        <member name="M:ImageTools.Image.Clone">
+            <summary>
+            Creates a new object that is a copy of the current instance.
+            </summary>
+            <returns>
+            A new object that is a copy of this instance.
+            </returns>
+        </member>
+        <member name="E:ImageTools.Image.DownloadCompleted">
+            <summary>
+            Occurs when the download is completed.
+            </summary>
+        </member>
+        <member name="E:ImageTools.Image.DownloadProgress">
+            <summary>
+            Occurs when the download progress changed.
+            </summary>
+        </member>
+        <member name="E:ImageTools.Image.LoadingCompleted">
+            <summary>
+            Occurs when the loading is completed.
+            </summary>
+        </member>
+        <member name="E:ImageTools.Image.LoadingFailed">
+            <summary>
+            Occurs when the loading of an image failed.
+            </summary>
+        </member>
+        <member name="P:ImageTools.Image.IsLoadingSynchronously">
+            <summary>
+            Gets or sets a value indicating whether local ressources and streams 
+            should be loaded synchronously
+            </summary>
+            <value>
+            	<c>true</c> to load local ressource synchronously; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:ImageTools.Image.Frames">
+            <summary>
+            Get the other frames for the animation.
+            </summary>
+            <value>The list of frame images.</value>
+        </member>
+        <member name="P:ImageTools.Image.IsAnimated">
+            <summary>
+            Gets a value indicating whether this image is animated.
+            </summary>
+            <value>
+            	<c>true</c> if this image is animated; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:ImageTools.Image.Properties">
+            <summary>
+            Gets the list of properties for storing meta information about this image.
+            </summary>
+            <value>A list of image properties.</value>
+        </member>
+        <member name="P:ImageTools.Image.AnimationSpeed">
+            <summary>
+            Gets or sets the animation speed.
+            </summary>
+            <value>The animation speed for animated images.</value>
+        </member>
+        <member name="P:ImageTools.Image.UriSource">
+            <summary>
+            Gets or sets the <see cref="T:System.Uri"/> source of the <see cref="T:ImageTools.Image"/>.
+            </summary>
+            <value>The <see cref="T:System.Uri"/> source of the <see cref="T:ImageTools.Image"/>. The
+            default value is null (Nothing in Visual Basic).</value>
+            <remarks>If the stream source and the uri source are both set, 
+            the stream source will be ignored.</remarks>
+        </member>
+        <member name="T:ImageTools.IImageResizer">
+            <summary>
+            Interface for all image resizing algorithms.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IImageResizer.Resize(ImageTools.ImageBase,ImageTools.ImageBase,System.Int32,System.Int32)">
+            <summary>
+            Resizes the specified source image by creating a new image with
+            the spezified size which is a resized version of the passed image..
+            </summary>
+            <param name="source">The source image, where the pixel data should be get from.</param>
+            <param name="target">The resized image.</param>
+            <param name="width">The width of the new image. Must be greater than zero.</param>
+            <param name="height">The height of the new image. Must be greater than zero..</param>
+            <exception cref="T:System.ArgumentNullException">
+                <para><paramref name="soure"/> is null (Nothing in Visual Basic).</para>
+                <para>- or -</para>
+                <para><paramref name="target"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+            <exception cref="T:System.ArgumentException">
+            	<para><paramref name="width"/> is negative.</para>
+            	<para>- or -</para>
+            	<para><paramref name="height"/> is negative.</para>
+            </exception>
+        </member>
+        <member name="T:ImageTools.Helpers.Extensions">
+            <summary>
+            A collection of simple helper extension methods.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.AddRange``1(System.Collections.ObjectModel.ObservableCollection{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds the the specified elements to the target collection object.
+            </summary>
+            <typeparam name="TItem">The type of the items in the source and target.</typeparam>
+            <param name="target">The target, where the items should be inserted to.</param>
+            <param name="elements">The elements to add to the collection.</param>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.AddRange``1(System.Collections.ObjectModel.Collection{``0},System.Collections.Generic.IEnumerable{``0})">
+            <summary>
+            Adds the the specified elements to the target collection object.
+            </summary>
+            <typeparam name="TItem">The type of the items in the source and target.</typeparam>
+            <param name="target">The target, where the items should be inserted to.</param>
+            <param name="elements">The elements to add to the collection.</param>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.GetAttribute``1(System.Reflection.MemberInfo)">
+            <summary>
+            Gets the attribute object of a member info instance with the specified type if 
+            exists.
+            </summary>
+            <typeparam name="TAttribute">The type of the attribute.</typeparam>
+            <param name="member">The member, where the attribute should be get from.</param>
+            <returns>The attribute object if exists, otherwise null.</returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.Swap``1(``0@,``0@)">
+            <summary>
+            Swaps two references.
+            </summary>
+            <typeparam name="TRef">The type of the references to swap.</typeparam>
+            <param name="lhs">The first reference.</param>
+            <param name="rhs">The second reference.</param>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.CreateReversed``1(``0[],System.Int32,System.Int32)">
+            <summary>
+            Creates an reversed array of another array.
+            </summary>
+            <typeparam name="TItem">The type of the items in the array.</typeparam>
+            <param name="array">The array, where the reversed copy should be created from.</param>
+            <param name="offset">The starting index of the section to reverse.</param>
+            <param name="length">The number of elements in the section to reverse.</param>
+            <returns>The reversed copy of the array.</returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.IsBetween``1(``0,``0,``0)">
+            <summary>
+            Determines whether the specified value is between two other
+            values.
+            </summary>
+            <typeparam name="TValue">The type of the values to check.
+            Must implement <see cref="T:System.IComparable"/>.</typeparam>
+            <param name="value">The value which should be between the other values.</param>
+            <param name="low">The lower value.</param>
+            <param name="high">The higher value.</param>
+            <returns>
+            	<c>true</c> if the specified value is between the other values; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.IsEqual``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IList{``0})">
+            <summary>
+            Checks if the two passed lists are equal. They are equal if they contains
+            the same number of items and all items are equal in the same order.
+            </summary>
+            <typeparam name="TItem">The type of the items in the lists.</typeparam>
+            <param name="source">The source list for comparison.</param>
+            <param name="target">The target list, which will be compared with the source list.</param>
+            <returns>
+            	<c>true</c> if the specified source is equal to the target; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.IsEqual``2(System.Collections.Generic.IDictionary{``0,``1},System.Collections.Generic.IDictionary{``0,``1})">
+            <summary>
+            Checks if the two passed dictionaries are equal. They are equal if they contains
+            the same keys and have the equal values assigned to the keys.
+            </summary>
+            <typeparam name="TKey">The type of the keys in the dictionary.</typeparam>
+            <typeparam name="TValue">The type of the values in the dictionary.</typeparam>
+            <param name="source">The source dictionary for comparison.</param>
+            <param name="target">The target dictionary, which will be compared 
+            with the source dictionary.</param>
+            <returns>
+            	<c>true</c> if the specified source is equal to the target; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.IsEqual``1(``0[],``0[])">
+            <summary>
+            Checks if the two passed array are equal. They are equal if they contains
+            the same number of items and all items are equal. The items in the two arrays
+            must not be in the same order.
+            </summary>
+            <typeparam name="TItem">The type of the item.</typeparam>
+            <param name="source">The source array for comparison.</param>
+            <param name="target">The target array, which will be compared with the source array.</param>
+            <returns>
+            	<c>true</c> if the specified source array is equal to the target array; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.IsEqualUnsorted``1(System.Collections.Generic.IList{``0},System.Collections.Generic.IList{``0})">
+            <summary>
+            Checks if the two passed lists are equal. They are equal if they contains
+            the same number of items and all items are equal. The items in the two lists
+            must not be in the same order.
+            </summary>
+            <typeparam name="TItem">The type of the items in the lists.</typeparam>
+            <param name="source">The source list for comparison.</param>
+            <param name="target">The target list, which will be compared with the source list.</param>
+            <returns>
+            	<c>true</c> if the specified source is equal to the target; otherwise, <c>false</c>.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.CreateHashCode(System.Collections.IList)">
+            <summary>
+            Creates a hash code for a list be making a bitwise or for each hash code
+            of each item.
+            </summary>
+            <param name="list">The list where the hashCode should be created from.</param>
+            <returns>The hashCode of the list.</returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.CreateHashCode(System.Collections.IDictionary)">
+            <summary>
+            Creates a hash code for a dictionary be making a bitwise or for each hash code
+            of each item.
+            </summary>
+            <param name="dictionary">The dictionary where the hashCode 
+            should be created from.</param>
+            <returns>The hashCode of the list.</returns>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.RemainBetween``1(``0,``0,``0)">
+            <summary>
+            Arranges the value, so that it is not greater than the high value and
+            not lower than the low value and returns the result.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <param name="value">The value.</param>
+            <param name="low">The lower value.</param>
+            <param name="high">The higher value.</param>
+            <returns>The arranged value.</returns>
+            <remarks>If the specified lower value is greater than the higher value. The low value
+            will be returned.</remarks>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.Skip(System.IO.Stream,System.Int32)">
+            <summary>
+            Skips the number of specified bytes in the current stream. The
+            bytes cannot be read anymore, if the <see cref="T:System.IO.Stream"/> does not provide
+            seek.
+            </summary>
+            <param name="stream">The stream where to skip. Cannot be null.</param>
+            <param name="count">The number of bytes to skip. Must be greater than zero.</param>
+            <returns>The number of skiped bytes. Can be less than the requested
+            if the end of the stream is reached.</returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="stream"/> is null
+            (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="count"/> is 
+            a negative number.</exception>
+        </member>
+        <member name="M:ImageTools.Helpers.Extensions.Concat``1(``0[][])">
+            <summary>
+            Concats a list of arrays to one big array without changing the order
+            of the arrays.
+            </summary>
+            <typeparam name="TItem">The type of the array items.</typeparam>
+            <param name="arrays">The arrays to concat.</param>
+            <returns>The resulting array which contains all other arrays.</returns>
+        </member>
+        <member name="T:ImageTools.IO.BufferedStream">
+            <summary>
+            A simple stream which buffers the beginning of another stream to support
+            reading it twice without needing the Seek Method.
+            </summary>
+        </member>
+        <member name="F:ImageTools.IO.BufferedStream._baseStream">
+            <summary>
+            The buffered base stream.
+            </summary>
+        </member>
+        <member name="F:ImageTools.IO.BufferedStream._buffer">
+            <summary>
+            The buffer itself.
+            </summary>
+        </member>
+        <member name="F:ImageTools.IO.BufferedStream._position">
+            <summary>
+            The internal position of the stream.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.BufferedStream.#ctor(System.IO.Stream,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.IO.BufferedStream"/> class
+            by setting the base stream, which should be buffered and the length of the
+            buffer.
+            </summary>
+            <param name="baseStream">The base stream. Cannot be null.</param>
+            <param name="length">The length of the buffer. Must be greater than zero.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="baseStream"/> is null
+            (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="length"/> is zero or less
+            than zero.</exception>
+        </member>
+        <member name="M:ImageTools.IO.BufferedStream.Flush">
+            <summary>
+            When overridden in a derived class, clears all buffers for this stream and causes any buffered data to be written to the underlying device.
+            </summary>
+            <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+        </member>
+        <member name="M:ImageTools.IO.BufferedStream.Read(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Reads a sequence of bytes from the current stream and advances the position within the 
+            stream by the number of bytes read.
+            </summary>
+            <param name="buffer">An array of bytes. When this method returns, the buffer contains the 
+            specified byte array with the values between <paramref name="offset"/> and (<paramref name="offset"/> + <paramref name="count"/> - 1) 
+            replaced by the bytes read from the current source.</param>
+            <param name="offset">The zero-based byte offset in <paramref name="buffer"/> at which to begin storing the data 
+            read from the current stream.</param>
+            <param name="count">The maximum number of bytes to be read from the current stream.</param>
+            <returns>
+            The total number of bytes read into the buffer. This can be less than the number of bytes requested if that many bytes are not currently available, or zero (0) if the end of the stream has been reached.
+            </returns>
+            <exception cref="T:System.ArgumentException">The sum of <paramref name="offset"/> and <paramref name="count"/> 
+            is larger than the buffer length.</exception>
+            <exception cref="T:System.ArgumentNullException"><paramref name="buffer"/> 
+            is null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentOutOfRangeException"><paramref name="offset"/> 
+            or <paramref name="count"/> is negative.</exception>
+            <exception cref="T:System.IO.IOException">An I/O error occurs.</exception>
+            <exception cref="T:System.NotSupportedException">The stream does not support reading.</exception>
+            <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed.</exception>
+        </member>
+        <member name="M:ImageTools.IO.BufferedStream.Seek(System.Int64,System.IO.SeekOrigin)">
+            <summary>
+            Sets the position within the current stream. This method is not currently 
+            supported and always throws a <see cref="T:System.NotSupportedException"/>.
+            </summary>
+            <param name="offset">This parameter is not used.</param>
+            <param name="origin">This parameter is not used.</param>
+            <exception cref="T:System.NotImplementedException">Any use of this method.</exception>
+        </member>
+        <member name="M:ImageTools.IO.BufferedStream.SetLength(System.Int64)">
+            <summary>
+            Sets the length of the current stream. This method is not currently 
+            supported and always throws a <see cref="T:System.NotSupportedException"/>.
+            </summary>
+            <param name="value">This parameter is not used.</param>
+            <exception cref="T:System.NotImplementedException">Any use of this method.</exception>
+        </member>
+        <member name="M:ImageTools.IO.BufferedStream.Write(System.Byte[],System.Int32,System.Int32)">
+            <summary>
+            Writes a sequence of bytes to the current stream. This method is not currently 
+            supported and always throws a <see cref="T:System.NotSupportedException"/>.
+            </summary>
+            <param name="buffer">This parameter is not used.</param>
+            <param name="offset">This parameter is not used.</param>
+            <param name="count">This parameter is not used.</param>
+            <exception cref="T:System.NotImplementedException">Any use of this method.</exception>
+        </member>
+        <member name="P:ImageTools.IO.BufferedStream.CanRead">
+            <summary>
+            When overridden in a derived class, gets a value indicating whether the current stream supports reading.
+            </summary>
+            <value></value>
+            <returns>true if the stream supports reading; otherwise, false.</returns>
+        </member>
+        <member name="P:ImageTools.IO.BufferedStream.CanSeek">
+            <summary>
+            When overridden in a derived class, gets a value indicating whether the current stream supports seeking.
+            </summary>
+            <value></value>
+            <returns>true if the stream supports seeking; otherwise, false.</returns>
+        </member>
+        <member name="P:ImageTools.IO.BufferedStream.CanWrite">
+            <summary>
+            When overridden in a derived class, gets a value indicating whether the current stream supports writing.
+            </summary>
+            <value></value>
+            <returns>true if the stream supports writing; otherwise, false.</returns>
+        </member>
+        <member name="P:ImageTools.IO.BufferedStream.Length">
+            <summary>
+            When overridden in a derived class, gets the length in bytes of the stream.
+            </summary>
+            <value></value>
+            <returns>A long value representing the length of the stream in bytes.</returns>
+            <exception cref="T:System.NotSupportedException">A class derived from Stream does not support seeking. </exception>
+            <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+        </member>
+        <member name="P:ImageTools.IO.BufferedStream.Position">
+            <summary>
+            When overridden in a derived class, gets or sets the position within the current stream.
+            </summary>
+            <value></value>
+            <returns>The current position within the stream.</returns>
+            <exception cref="T:System.IO.IOException">An I/O error occurs. </exception>
+            <exception cref="T:System.NotSupportedException">The stream does not support seeking. </exception>
+            <exception cref="T:System.ObjectDisposedException">Methods were called after the stream was closed. </exception>
+        </member>
+        <member name="T:ImageTools.RotationType">
+            <summary>
+            Defines how the image should be rotated.
+            </summary>
+        </member>
+        <member name="F:ImageTools.RotationType.None">
+            <summary>
+            Do not rotate the image.
+            </summary>
+        </member>
+        <member name="F:ImageTools.RotationType.Rotate90">
+            <summary>
+            Rotate the image by 90 degrees clockwise.
+            </summary>
+        </member>
+        <member name="F:ImageTools.RotationType.Rotate180">
+            <summary>
+            Rotate the image by 180 degrees clockwise.
+            </summary>
+        </member>
+        <member name="F:ImageTools.RotationType.Rotate270">
+            <summary>
+            Rotate the image by 270 degrees clockwise.
+            </summary>
+        </member>
+        <member name="T:ImageTools.IO.Encoders">
+            <summary>
+            Helper methods for encoders.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.Encoders.AddEncoder``1">
+            <summary>
+            Adds the type of the encoder to the list of available image encoder.
+            </summary>
+            <typeparam name="TEncoder">The type of the encoder.</typeparam>
+        </member>
+        <member name="M:ImageTools.IO.Encoders.GetAvailableEncoders">
+            <summary>
+            Gets a list of all available encoders.
+            </summary>
+            <returns>A list of all available encoders.</returns>
+        </member>
+        <member name="T:ImageTools.Helpers.Guard">
+            <summary>
+            A static class with a lot of helper methods, which guards 
+            a method agains invalid parameters.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.Between``1(``0,``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is between a lower and a upper value
+            and throws an exception, if not.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <param name="target">The target value, which should be validated.</param>
+            <param name="lower">The lower value.</param>
+            <param name="upper">The upper value.</param>
+            <param name="parameterName">Name of the parameter, which should will be checked.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is not between
+            the lower and the upper value.</exception>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.Between``1(``0,``0,``0,System.String,System.String)">
+            <summary>
+            Verifies that the specified value is between a lower and a upper value
+            and throws an exception with the passed message, if not.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <param name="target">The target value, which should be validated.</param>
+            <param name="lower">The lower value.</param>
+            <param name="upper">The upper value.</param>
+            <param name="parameterName">Name of the parameter, which should will be checked.</param>
+            <param name="message">The message for the exception.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is not between
+            the lower and the upper value.</exception>
+            <example>
+            Use the following code to validate a parameter:
+            <code>
+            // A method with parameter 'value' which must 
+            // be between four and fifteen.
+            public void MyMethod(int value)
+            {
+               Guard.Between(aNumber, 4, 15, "value", "Value must be between 5 and 15");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.GreaterThan``1(``0,``0,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a lower value
+            and throws an exception, if not.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <param name="target">The target value, which should be validated.</param>
+            <param name="lower">The lower value.</param>
+            <param name="parameterName">Name of the parameter, which should will be checked.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is greater than
+            the lower value.</exception>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.GreaterThan``1(``0,``0,System.String,System.String)">
+            <summary>
+            Verifies that the specified value is greater than a lower value
+            and throws an exception with the passed message, if not.
+            </summary>
+            <typeparam name="TValue">The type of the value.</typeparam>
+            <param name="target">The target value, which should be validated.</param>
+            <param name="lower">The lower value.</param>
+            <param name="parameterName">Name of the parameter, which should will be checked.</param>
+            <param name="message">The message for the exception to throw.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is greater than
+            the lower value.</exception>
+            <example>
+            Use the following code to validate a parameter:
+            <code>
+            // A method with parameter 'value' which must
+            // be greater than hundred.
+            public void MyMethod(int value)
+            {
+               Guard.GreaterThan(value, 100, "value", "Value is too small!");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.NotEmpty``1(System.Collections.Generic.ICollection{``0},System.String)">
+            <summary>
+            Verifies, that the collection method parameter with specified reference
+            contains one or more elements and throws an exception
+            if the object contains no elements.
+            </summary>
+            <typeparam name="TType">The type of the items in the collection.</typeparam>
+            <param name="enumerable">The enumerable.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is
+            empty or contains only blanks.</exception>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.NotEmpty``1(System.Collections.Generic.ICollection{``0},System.String,System.String)">
+            <summary>
+            Verifies, that the collection method parameter with specified reference
+            contains one or more elements and throws an exception with
+            the passed message if the object contains no elements.
+            </summary>
+            <typeparam name="TType">The type of the items in the collection.</typeparam>
+            <param name="enumerable">The enumerable.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <param name="message">The message for the exception to throw.</param>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is
+            empty or contains only blanks.</exception>
+            <example>
+            Use the following code to validate a parameter:
+            <code>
+            // A method with parameter 'list' which must contain
+            // on ore more elements.
+            public void MyMethod(ICollection&lt;int&gt; list)
+            {
+               Guard.NotEmpty(list, "list", "List is empty!");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.NotNull(System.Object,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified object value and message  
+            is not null and throws an exception if the object is null.
+            </summary>
+            <param name="target">The target object, which cannot be null.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is
+            null (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.NotNull(System.Object,System.String,System.String)">
+            <summary>
+            Verifies, that the method parameter with specified object value and message
+            is not null and throws an exception with the passed message if the object is null.
+            </summary>
+            <param name="target">The target object, which cannot be null.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <param name="message">The message for the exception to throw.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is
+            null (Nothing in Visual Basic).</exception>
+            <example>
+            Use the following code to validate a parameter:
+            <code>
+            // A method with parameter 'name' which cannot be null.
+            public void MyMethod(string name)
+            {
+               Guard.NotNull(name, "name", "Name is null!");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.NotNullOrEmpty(System.String,System.String)">
+            <summary>
+            Verifies, that the string method parameter with specified object value and message
+            is not null, not empty and does not contain only blanls and throws an exception 
+            if the object is null.
+            </summary>
+            <param name="target">The target string, which should be checked against being null or empty.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is
+            null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is
+            empty or contains only blanks.</exception>
+        </member>
+        <member name="M:ImageTools.Helpers.Guard.NotNullOrEmpty(System.String,System.String,System.String)">
+            <summary>
+            Verifies, that the string method parameter with specified object value and message
+            is not null, not empty and does not contain only blanls and throws an exception with 
+            the passed message if the object is null.
+            </summary>
+            <param name="target">The target string, which should be checked against being null or empty.</param>
+            <param name="parameterName">Name of the parameter.</param>
+            <param name="message">The message for the exception to throw.</param>
+            <exception cref="T:System.ArgumentNullException"><paramref name="target"/> is
+            null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="target"/> is
+            empty or contains only blanks.</exception>
+            <example>
+            Use the following code to validate a parameter:
+            <code>
+            // A method with parameter 'name' which cannot be null or empty.
+            public void MyMethod(string name)
+            {
+               Guard.NotNullOrEmpty(name, "name", "Name is empty!");
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:ImageTools.IO.IImageDecoder">
+            <summary>
+            Interface for image decoders for loading images from streams.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.IImageDecoder.IsSupportedFileExtension(System.String)">
+            <summary>
+            Indicates if the image decoder supports the specified
+            file extension.
+            </summary>
+            <param name="extension">The file extension.</param>
+            <returns>
+            <c>true</c>, if the decoder supports the specified
+            extensions; otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="extension"/>
+            is null (Nothing in Visual Basic).</exception>
+            <exception cref="T:System.ArgumentException"><paramref name="extension"/> is a string
+            of length zero or contains only blanks.</exception>
+        </member>
+        <member name="M:ImageTools.IO.IImageDecoder.IsSupportedFileFormat(System.Byte[])">
+            <summary>
+            Indicates if the image decoder supports the specified
+            file header.
+            </summary>
+            <param name="header">The file header.</param>
+            <returns>
+            <c>true</c>, if the decoder supports the specified
+            file header; otherwise <c>false</c>.
+            </returns>
+            <exception cref="T:System.ArgumentNullException"><paramref name="header"/>
+            is null (Nothing in Visual Basic).</exception>
+        </member>
+        <member name="M:ImageTools.IO.IImageDecoder.Decode(ImageTools.Image,System.IO.Stream)">
+            <summary>
+            Decodes the image from the specified stream and sets
+            the data to image.
+            </summary>
+            <param name="image">The image, where the data should be set to.
+            Cannot be null (Nothing in Visual Basic).</param>
+            <param name="stream">The stream, where the image should be
+            decoded from. Cannot be null (Nothing in Visual Basic).</param>
+            <exception cref="T:System.ArgumentNullException">
+            	<para><paramref name="image"/> is null (Nothing in Visual Basic).</para>
+            	<para>- or -</para>
+            	<para><paramref name="stream"/> is null (Nothing in Visual Basic).</para>
+            </exception>
+        </member>
+        <member name="P:ImageTools.IO.IImageDecoder.HeaderSize">
+            <summary>
+            Gets the size of the header for this image type.
+            </summary>
+            <value>The size of the header.</value>
+        </member>
+        <member name="T:ImageTools.IO.UnsupportedImageFormatException">
+            <summary>
+            The exception that is thrown when a image should be loaded which format is not supported.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.UnsupportedImageFormatException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.IO.UnsupportedImageFormatException"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.IO.UnsupportedImageFormatException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.IO.UnsupportedImageFormatException"/> class with the name of the 
+            parameter that causes this exception.
+            </summary>
+            <param name="errorMessage">The error message that explains the reason for this exception.</param>
+        </member>
+        <member name="M:ImageTools.IO.UnsupportedImageFormatException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.IO.UnsupportedImageFormatException"/> class with a specified 
+            error message and the exception that is the cause of this exception.
+            </summary>
+            <param name="errorMessage">The error message that explains the reason for this exception.</param>
+            <param name="innerEx">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) 
+            if no inner exception is specified.</param>
+        </member>
+        <member name="T:ImageTools.ImageFormatException">
+            <summary>
+            The exception that is thrown when the library tries to load
+            an iamge, which has an invalid format.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageFormatException.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageFormatException"/> class.
+            </summary>
+        </member>
+        <member name="M:ImageTools.ImageFormatException.#ctor(System.String)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageFormatException"/> class with the name of the 
+            parameter that causes this exception.
+            </summary>
+            <param name="errorMessage">The error message that explains the reason for this exception.</param>
+        </member>
+        <member name="M:ImageTools.ImageFormatException.#ctor(System.String,System.Exception)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.ImageFormatException"/> class with a specified 
+            error message and the exception that is the cause of this exception.
+            </summary>
+            <param name="errorMessage">The error message that explains the reason for this exception.</param>
+            <param name="innerEx">The exception that is the cause of the current exception, or a null reference (Nothing in Visual Basic) 
+            if no inner exception is specified.</param>
+        </member>
+        <member name="T:ImageTools.Rectangle">
+            <summary>
+            Stores a set of four integers that represent the location and 
+            size of a rectangle. 
+            </summary>
+        </member>
+        <member name="F:ImageTools.Rectangle.Zero">
+            <summary>
+            Zero rectangle with no width and no height.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Rectangle._height">
+            <summary>
+            The height of this rectangle.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Rectangle._width">
+            <summary>
+            The width of this rectangle.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Rectangle._x">
+            <summary>
+            The x-coordinate of the upper-left corner.
+            </summary>
+        </member>
+        <member name="F:ImageTools.Rectangle._y">
+            <summary>
+            The y-coordinate of the upper-left corner.
+            </summary>
+        </member>
+        <member name="M:ImageTools.Rectangle.#ctor(System.Int32,System.Int32,System.Int32,System.Int32)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Rectangle"/> struct
+            with the specified location and size.
+            </summary>
+            <param name="x">The x-coordinate of the upper-left corner 
+            of the rectangle.</param>
+            <param name="y">The y-coordinate of the upper-left corner 
+            of the rectangle. </param>
+            <param name="width">The width of the rectangle. </param>
+            <param name="height">The height of the rectangle. </param>
+        </member>
+        <member name="M:ImageTools.Rectangle.#ctor(ImageTools.Rectangle)">
+            <summary>
+            Initializes a new instance of the <see cref="T:ImageTools.Rectangle"/> struct 
+            from a <see cref="T:ImageTools.Rectangle"/>
+            </summary>
+            <param name="other">The other rectangle.</param>
+        </member>
+        <member name="M:ImageTools.Rectangle.Equals(System.Object)">
+            <summary>
+            Indicates whether this instance and a specified object are equal.
+            </summary>
+            <param name="obj">Another object to compare to.</param>
+            <returns>
+            true if <paramref name="obj"/> and this instance are the same 
+            type and represent the same value; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Rectangle.Equals(ImageTools.Rectangle)">
+            <summary>
+            Indicates whether the current object is equal to another object of the same type.
+            </summary>
+            <param name="other">An object to compare with this object.</param>
+            <returns>
+            true if the current object is equal to the 
+            <paramref name="other"/> parameter; otherwise, false.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Rectangle.GetHashCode">
+            <summary>
+            Returns the hash code for this instance.
+            </summary>
+            <returns>
+            A 32-bit signed integer that is the hash code for this instance.
+            </returns>
+        </member>
+        <member name="M:ImageTools.Rectangle.op_Equality(ImageTools.Rectangle,ImageTools.Rectangle)">
+            <summary>
+            Tests whether two <see cref="T:ImageTools.Rectangle"/> structures have 
+            equal location and size.
+            </summary>
+            <param name="left">The <see cref="T:ImageTools.Rectangle"/> structure that is to the 
+            left of the equality operator.</param>
+            <param name="right">The <see cref="T:ImageTools.Rectangle"/> structure that is to the 
+            right of the equality operator.</param>
+            <returns>This operator returns true if the two <see cref="T:ImageTools.Rectangle"/> structures 
+            have equal X, Y, Width, and Height properties.</returns>
+        </member>
+        <member name="M:ImageTools.Rectangle.op_Inequality(ImageTools.Rectangle,ImageTools.Rectangle)">
+            <summary>
+            Tests whether two <see cref="T:ImageTools.Rectangle"/> structures differ
+            in location or size.
+            </summary>
+            <param name="left">The <see cref="T:ImageTools.Rectangle"/> structure that is to the 
+            left of the inequality  operator.</param>
+            <param name="right">The <see cref="T:ImageTools.Rectangle"/> structure that is to the 
+            right of the inequality  operator.</param>
+            <returns>This operator returns true if any of the X, Y, Width or Height 
+            properties of the two <see cref="T:ImageTools.Rectangle"/> structures are unequal; otherwise false.</returns>
+        </member>
+        <member name="P:ImageTools.Rectangle.Bottom">
+            <summary>
+            Gets the y-coordinate of the bottom edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The y-coordinate of the bottom edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.Height">
+            <summary>
+            Gets or sets the height of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The width of this <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.Left">
+            <summary>
+            Gets the x-coordinate of the left edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The x-coordinate of the left edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.Right">
+            <summary>
+            Gets the x-coordinate of the right edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The x-coordinate of the right edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.Top">
+            <summary>
+            Gets the y-coordinate of the top edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The y-coordinate of the top edge of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.Width">
+            <summary>
+            Gets or sets the width of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The width of this <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.X">
+            <summary>
+            Gets or sets the x-coordinate of the upper-left corner of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The x-coordinate of the upper-left corner 
+            of this <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="P:ImageTools.Rectangle.Y">
+            <summary>
+            Gets or sets the y-coordinate of the upper-left corner of this 
+            <see cref="T:ImageTools.Rectangle"/> structure.
+            </summary>
+            <value>The y-coordinate of the upper-left corner 
+            of this <see cref="T:ImageTools.Rectangle"/> structure.</value>
+        </member>
+        <member name="T:ImageTools.FlippingType">
+            <summary>
+            Defines how a image should be flipped.
+            </summary>
+        </member>
+        <member name="F:ImageTools.FlippingType.None">
+            <summary>
+            Dont flip the image.
+            </summary>
+        </member>
+        <member name="F:ImageTools.FlippingType.FlipX">
+            <summary>
+            Flip the image at the x-axis which goes 
+            through the middle of the image.
+            </summary>
+        </member>
+        <member name="F:ImageTools.FlippingType.FlipY">
+            <summary>
+            Flip the image at the y-axis, which goes through the 
+            middle of the image.
+            </summary>
+        </member>
+    </members>
+</doc>

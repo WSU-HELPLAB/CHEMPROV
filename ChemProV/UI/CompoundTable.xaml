@@ -1,0 +1,76 @@
+<!--
+Copyright 2010, 2011 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+-->
+<UserControl xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" x:Class="ChemProV.UI.CompoundTable"
+    d:DesignHeight="328" d:DesignWidth="148" mc:Ignorable="d">
+
+    <Grid x:Name="LayoutRoot" Background="White">
+        <StackPanel>
+            <TextBlock x:Name="Compound_TextBlock" Text="Compound" HorizontalAlignment="Center" FontSize="13.333" Width="148" />
+            <ComboBox x:Name="Compound_ComboBox" SelectionChanged="Compound_ComboBox_SelectionChanged">
+            </ComboBox>
+
+            <sdk:DataGrid x:Name="Compound_DataGrid"
+                          GridLinesVisibility="All"
+                          AreRowDetailsFrozen="True"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          Cursor="Arrow"
+                          CanUserReorderColumns="False"
+                          CanUserSortColumns="False"
+                          ColumnWidth="*"
+                          Width="148">
+                <sdk:DataGrid.Columns>
+                    <sdk:DataGridTextColumn
+                    Header="Elements"
+                        Binding="{Binding ElementName}"
+                    />
+                    <sdk:DataGridTextColumn
+                    Header="Quantity"
+                        Binding="{Binding Quantity}"
+                    />
+                </sdk:DataGrid.Columns>
+            </sdk:DataGrid>
+            <sdk:DataGrid x:Name="Constants_DataGrid"
+                          GridLinesVisibility="All"
+                          AreRowDetailsFrozen="True"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True"
+                          Cursor="Arrow"
+                          CanUserReorderColumns="False"
+                          CanUserSortColumns="False"
+                          LoadingRow="Constants_DataGrid_LoadingRow"
+                          Width="148"
+                          ColumnWidth="Auto">
+                <sdk:DataGrid.Columns>
+                    <sdk:DataGridTextColumn
+                    Header="Constant"
+                        Binding="{Binding Constant}"
+                    />
+                    <sdk:DataGridTemplateColumn
+                        Header="Symbol"
+                       CanUserSort="False"
+                        CanUserResize="False"
+                         CanUserReorder="False"
+                        >
+                        <sdk:DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Button
+                                    Name="Constant_Symbol_Button"
+                                    Content="{Binding Symbol}"
+                                    Click="Constant_Symbol_Button_Click"
+                                    ToolTipService.ToolTip="Click to insert this symbol at the end of the current equation."
+                                    />
+                            </DataTemplate>
+                        </sdk:DataGridTemplateColumn.CellTemplate>
+                    </sdk:DataGridTemplateColumn>
+                </sdk:DataGrid.Columns>
+            </sdk:DataGrid>
+        </StackPanel>
+    </Grid>
+</UserControl>

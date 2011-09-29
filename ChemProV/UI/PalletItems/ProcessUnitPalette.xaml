@@ -1,0 +1,85 @@
+<!--
+Copyright 2010, 2011 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+-->
+<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="clr-namespace:ChemProV.UI.PalletItems"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" x:Class="ChemProV.UI.PalletItems.ProcessUnitPalette"
+    Width="Auto" Height="Auto">
+    <Grid x:Name="MasterGrid">
+        <StackPanel x:Name="LayoutRoot" Orientation="Vertical">
+            <local:GenericPaletteItem x:Name="DefaultSelection" IconSource="/UI/Icons/palette_select.png" Description="Select" Selected="True" />
+            <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
+            <local:GenericPaletteItem x:Name="StickyNote" IconSource="/UI/Icons/palette_stickyNote.png" Description="Sticky Note" Selected="False" />
+            <Grid x:Name="ProcessUnitCategory" Margin="2" d:LayoutOverrides="Width, HorizontalMargin">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="44" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image x:Name="ProcessUnitCategoryIcon"
+				Source="/UI/Icons/pu.png"
+				Grid.Row="0"
+				Grid.Column="0"
+				Stretch="Fill"
+				Width="40"
+				Height="40"
+				Margin="0,0,4,0"
+               />
+                <TextBlock x:Name="ProcessUnitCategoryDescription"
+				Grid.Row="0"
+				Grid.Column="1"
+				VerticalAlignment="Center"
+				Text="Process Units"
+				TextWrapping="Wrap"
+				Width="100"
+                   />
+                <Polygon Fill="Black" Points="0,0 0,10, 5,5" Grid.Column="1" Margin="95,2,0,0" Width="5" Height="10" />
+            </Grid>
+            <Grid x:Name="StreamsCategory" Margin="2" d:LayoutOverrides="Width, HorizontalMargin">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="44" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <Image x:Name="StreamsCategoryIcon"
+				Source="/UI/Icons/pu_stream.png"
+				Grid.Row="0"
+				Grid.Column="0"
+				Stretch="Fill"
+				Width="40"
+				Height="40"
+				Margin="0,0,4,0"
+               />
+                <TextBlock x:Name="StreamsCategoryDescription"
+				Grid.Row="0"
+				Grid.Column="1"
+				VerticalAlignment="Center"
+				TextWrapping="Wrap"
+				Width="100"
+                   ><Run Text="Streams"/><LineBreak/><Run/></TextBlock>
+                <Polygon Fill="Black" Points="0,0 0,10, 5,5" Grid.Column="1" Margin="95,2,0,0" Width="5" Height="10" />
+            </Grid>
+        </StackPanel>
+        <Popup Height="220" Width="148"  x:Name="ProcessUnitFlyOut" Margin="148,100,-154,-69" Canvas.ZIndex="255" IsOpen="False">
+            <Border x:Name="ProcessUnitFlyOutBorder" Background="White" BorderThickness="2" BorderBrush="Black">
+                <StackPanel x:Name="ProcessUnit_StackPanel">
+                    <!--Process Units will go here-->
+                </StackPanel>
+            </Border>
+        </Popup>
+        <Popup Height="220" Width="148"  x:Name="StreamsFlyOut" Margin="148,140,-154,-69" Canvas.ZIndex="255" IsOpen="False" AllowDrop="False" >
+            <Border x:Name="StreamsUnitFlyOutBorder" Background="White" BorderThickness="2" BorderBrush="Black">
+                <StackPanel x:Name="Streams_StackPanel">
+                    <!--Streams will go here-->
+                </StackPanel>
+            </Border>
+        </Popup>
+    </Grid>
+</UserControl>
