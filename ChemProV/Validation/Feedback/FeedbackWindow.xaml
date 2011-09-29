@@ -1,0 +1,47 @@
+<!--
+Copyright 2010 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Open Software License ("OSL") v3.0.
+Consult "LICENSE.txt" included in this package for the complete OSL license.
+-->
+<UserControl x:Class="ChemProV.Validation.Feedback.FeedbackWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:feedback="clr-namespace:ChemProV.Validation.Feedback"
+    mc:Ignorable="d"
+    d:DesignHeight="300" d:DesignWidth="400" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" VerticalAlignment="Top" Height="384"
+
+	>
+    <UserControl.Resources>
+        <feedback:ScollViewerHeightConverter x:Key="ScollViewerHeightConverter" />
+    </UserControl.Resources>
+    <Grid x:Name="LayoutRoot" Background="White">
+        <StackPanel>
+            <StackPanel HorizontalAlignment="Stretch" Background="Silver">
+                <ToolTipService.ToolTip>
+                    <StackPanel Margin="0,5,0,5">
+                        <TextBlock TextWrapping="Wrap" Width="Auto" MaxWidth="320" Text="A red circle indicates that errors were detected. A yellow circle indicates that changes have been made that have not been checked and a green circle means that no errors were detected"/>
+                    </StackPanel>
+                </ToolTipService.ToolTip>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                    <Ellipse Name="FeedbackStatusEllipse" Height="20" Width="20" Fill="Red" Margin="3,0,3,0"/>
+                    <sdk:Label Content="Feedback" FontSize="14" HorizontalContentAlignment="Stretch" Padding="3" />
+                </StackPanel>
+            </StackPanel>
+            <ScrollViewer
+                x:Name="FeedbackScrollViewer"
+                Width="Auto"
+                VerticalScrollBarVisibility="Auto"
+                Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
+
+                >
+                <StackPanel Name="FeedBackStackPanel" Orientation="Vertical" Height="Auto" Width="Auto">
+                </StackPanel>
+            </ScrollViewer>
+        </StackPanel>
+    </Grid>
+</UserControl>

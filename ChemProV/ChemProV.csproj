@@ -1,0 +1,519 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BE128A42-BBE6-4227-A791-0C4A45D55D93}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ChemProV</RootNamespace>
+    <AssemblyName>ChemProV</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures>
+    </SupportedCultures>
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>ChemProV.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>ChemProV.App</SilverlightAppEntry>
+    <TestPageFileName>TestPage.html</TestPageFileName>
+    <CreateTestPage>true</CreateTestPage>
+    <ValidateXaml>true</ValidateXaml>
+    <EnableOutOfBrowser>true</EnableOutOfBrowser>
+    <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
+    <UsePlatformExtensions>false</UsePlatformExtensions>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <LinkedServerProject>
+    </LinkedServerProject>
+    <ExpressionBlendVersion>4.0.20421.0</ExpressionBlendVersion>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <Utf8Output>true</Utf8Output>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <NoWarn>
+    </NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Behaviors">
+      <HintPath>..\Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools">
+      <HintPath>Libraries\ImageTools.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.IO.Png">
+      <HintPath>Libraries\ImageTools.IO.Png.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.Utils">
+      <HintPath>Libraries\ImageTools.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Drawing" />
+    <Reference Include="Silverlight.Controls">
+      <HintPath>Libraries\Silverlight.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations, Version=2.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217" />
+    <Reference Include="System.Windows" />
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Controls, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Data.DataForm.Toolkit.dll">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Toolkit\Nov09\Bin\System.Windows.Controls.Data.DataForm.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Controls.Data.Input, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Input, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Controls.Toolkit.Internals, Version=4.0.5.0, Culture=neutral, PublicKeyToken=2c5c654d367bf4a7" />
+    <Reference Include="System.Windows.Data, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="System.Xml.Linq, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Serialization, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.XPath, Version=2.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ChemProVHolder.xaml.cs">
+      <DependentUpon>ChemProVHolder.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\Equation.xaml.cs">
+      <DependentUpon>Equation.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\EquationData.cs" />
+    <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
+      <DependentUpon>EquationEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\EquationType.cs" />
+    <Compile Include="PFD\EquationEditor\OperationLabels.xaml.cs">
+      <DependentUpon>OperationLabels.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
+    <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
+    <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />
+    <Compile Include="PFD\EquationEditor\Tokens\VariableToken.cs" />
+    <Compile Include="PFD\IPfdElement.cs" />
+    <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
+      <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\ProcessUnits\IProcessUnit.cs" />
+    <Compile Include="PFD\ProcessUnits\ProcessUnitDescriptions.cs" />
+    <Compile Include="PFD\ProcessUnits\TemporaryProcessUnit.cs" />
+    <Compile Include="PFD\StickyNote\StickyNote.xaml.cs">
+      <DependentUpon>StickyNote.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\AbstractStream.xaml.cs">
+      <DependentUpon>AbstractStream.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\ChemicalStream.cs" />
+    <Compile Include="PFD\Streams\HeatStream.cs" />
+    <Compile Include="PFD\Streams\IStream.cs" />
+    <Compile Include="PFD\ProcessUnits\ProcessUnitFactory.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamData.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesTableFactory.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindow.xaml.cs">
+      <DependentUpon>ChemicalStreamPropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindowWithTemperature.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\CompoundFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\DataUpdatedEventArgs.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowGrid.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\TempUnitsFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\UnitsFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Compound.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\CompoundFactory.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Element.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\GenericTableData.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Heat\CompoundFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Heat\HeatStreamData.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Heat\HeatStreamPropertiesWindow.xaml.cs">
+      <DependentUpon>HeatStreamPropertiesWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\PropertiesWindow\Heat\UnitsFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\ICompound.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\IPropertiesWindow.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowFactory.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\View.cs" />
+    <Compile Include="PFD\Streams\StreamDestinationIcon.cs" />
+    <Compile Include="PFD\Streams\StreamEnd.cs" />
+    <Compile Include="PFD\Streams\StreamFactory.cs" />
+    <Compile Include="PFD\Streams\StreamSourceIcon.cs" />
+    <Compile Include="RequestOpenFileArgs.cs" />
+    <Compile Include="UI\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\Behaviors\MovePopupHeader.cs" />
+    <Compile Include="UI\Behaviors\ResizePopupBorder.cs" />
+    <Compile Include="UI\CompoundTable.xaml.cs">
+      <DependentUpon>CompoundTable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CompoundTableData.cs" />
+    <Compile Include="UI\ConstantsTableData.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\RightClickMenu\AddContextMenuToCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\DeleteIPfdElementCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\AddProcessUnitToCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\CommandFactory.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommandEventArgs.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\MoveProcessUnitCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\NullCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\RemoveProcessUnitFromCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\ICommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\RightClickMenu\RemoveContextMenuFromCanvas.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\AddStickyNoteToCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\ChangeColorCommandcs.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\MoveStickyNoteCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\RemoveStickyNoteFromCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\ResizeStickNoteCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\AddStreamToCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\DeleteStreamFromCanvas.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\MoveStreamHeadCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\MoveStreamTailCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\AddPropertiesTableToCanvasCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\MovePropertiesTableCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\RemovePropertiesTableFromCanvas.cs" />
+    <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\ChangeStateCommand.cs" />
+    <Compile Include="UI\DrawingCanvas\PfdUpdatedEventArgs.cs" />
+    <Compile Include="UI\DrawingCanvas\ProcessUnitUndo.cs" />
+    <Compile Include="UI\DrawingCanvas\SavedStateObject.cs" />
+    <Compile Include="UI\DrawingCanvas\DrawingCanvas.cs" />
+    <Compile Include="UI\DrawingCanvas\States\IState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\MenuState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\NullState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\PlacingState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\ResizeingState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\SelectedState.cs" />
+    <Compile Include="UI\DrawingCanvas\StickyNoteUndo.cs" />
+    <Compile Include="UI\DrawingCanvas\StreamUndo.cs" />
+    <Compile Include="UI\OptionWindow.xaml.cs">
+      <DependentUpon>OptionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PalletItems\GenericPaletteItem.xaml.cs">
+      <DependentUpon>GenericPaletteItem.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\PalletItems\IPaletteItem.cs" />
+    <Compile Include="UI\PalletItems\ProcessUnitPaletteFactory.cs" />
+    <Compile Include="UI\PalletItems\ProcessUnitPaletteItem.cs" />
+    <Compile Include="UI\PalletItems\ProcessUnitPaletteMaterialAndEnergyBalance.cs" />
+    <Compile Include="UI\PalletItems\ProcessUnitPalette.xaml.cs">
+      <DependentUpon>ProcessUnitPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\PalletItems\ProcessUnitPaletteMaterialBalances.cs" />
+    <Compile Include="UI\PalletItems\ProcessUnitPaletteMaterialBalancesWithReactors.cs" />
+    <Compile Include="UI\PalletItems\StreamPaletteItem.cs" />
+    <Compile Include="UI\UserDefinedVariableWindow\UserDefinedVariableWindow.xaml.cs">
+      <DependentUpon>UserDefinedVariableWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WorkSpace.xaml.cs">
+      <DependentUpon>WorkSpace.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Validation\ErrorMessageGenerator.cs" />
+    <Compile Include="Validation\Feedback\Feedback.cs" />
+    <Compile Include="Validation\Feedback\FeedbackWindow.xaml.cs">
+      <DependentUpon>FeedbackWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Validation\Feedback\ScollViewerHeightConverter.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\HeatTableAdapter.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\ITableAdapter.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\TableAdapterFactory.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\ChemicalTableAdapter.cs" />
+    <Compile Include="Validation\Rules\EquationRules\AbstractedProcessUnit.cs" />
+    <Compile Include="Validation\Rules\EquationRules\EquationRule.cs" />
+    <Compile Include="Validation\Rules\EquationRules\EquationSemanticsRule.cs" />
+    <Compile Include="Validation\Rules\EquationRules\GraphConnectivity.cs" />
+    <Compile Include="Validation\Rules\EquationRules\PFDAbstraction.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\HeatExchangerWithoutUtilityProcessUnitRule.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\ProcessUnitRuleFactory.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\ReactorProcessUnitRule.cs" />
+    <Compile Include="Validation\Rules\TableRule.cs" />
+    <Compile Include="Validation\Rules\IRule.cs" />
+    <Compile Include="Validation\Rules\NullRule.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\NullTableAdapter.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\GenericProcessUnitRule.cs" />
+    <Compile Include="Validation\Rules\RuleManager.cs" />
+    <Compile Include="Validation\Rules\ValidationResult.cs" />
+    <Compile Include="Validation\Rules\ValidationResultsException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="ChemProVHolder.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\EquationEditor\Equation.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\EquationEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\OperationLabels.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\ProcessUnits\GenericProcessUnit.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\StickyNote\StickyNote.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\Streams\AbstractStream.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\Streams\PropertiesWindow\Heat\HeatStreamPropertiesWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\CompoundTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\PalletItems\GenericPaletteItem.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\PalletItems\ProcessUnitPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\UserDefinedVariableWindow\UserDefinedVariableWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\WorkSpace.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Validation\Feedback\FeedbackWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\AppManifest.xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\OutOfBrowserSettings.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libraries\Behaviors.dll" />
+    <Content Include="Libraries\Behaviors.pdb" />
+    <Content Include="Libraries\ICSharpCode.SharpZipLib.Silverlight.dll" />
+    <Content Include="Libraries\ImageTools.Controls.dll" />
+    <Content Include="Libraries\ImageTools.Controls.pdb" />
+    <Content Include="Libraries\ImageTools.Controls.XML" />
+    <Content Include="Libraries\ImageTools.dll" />
+    <Content Include="Libraries\ImageTools.Filtering.dll" />
+    <Content Include="Libraries\ImageTools.Filtering.pdb" />
+    <Content Include="Libraries\ImageTools.Filtering.XML" />
+    <Content Include="Libraries\ImageTools.IO.Bmp.dll" />
+    <Content Include="Libraries\ImageTools.IO.Bmp.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Bmp.XML" />
+    <Content Include="Libraries\ImageTools.IO.Gif.dll" />
+    <Content Include="Libraries\ImageTools.IO.Gif.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Gif.XML" />
+    <Content Include="Libraries\ImageTools.IO.Jpeg.dll" />
+    <Content Include="Libraries\ImageTools.IO.Jpeg.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Jpeg.XML" />
+    <Content Include="Libraries\ImageTools.IO.Png.dll" />
+    <Content Include="Libraries\ImageTools.IO.Png.pdb" />
+    <Content Include="Libraries\ImageTools.IO.Png.XML" />
+    <Content Include="Libraries\ImageTools.pdb" />
+    <Content Include="Libraries\ImageTools.Utils.dll" />
+    <Content Include="Libraries\ImageTools.Utils.pdb" />
+    <Content Include="Libraries\ImageTools.XML" />
+    <Content Include="Libraries\Silverlight.Controls.dll" />
+    <Content Include="Libraries\Silverlight.Controls.pdb" />
+    <Content Include="UI\Icons\logo128.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo32.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo48.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo_about.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_select.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_stickyNote.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_blank.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_generic.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_heat_exchanger.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_heat_exchanger_no_utility.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_heat_stream.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_mixer.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_reactor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_separator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_sink.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_source.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_stream.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_about.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_install.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_new.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_open.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_print.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_redo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_save.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_save_all.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_settings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_stickynote.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_undo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
