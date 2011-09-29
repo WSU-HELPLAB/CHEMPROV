@@ -87,7 +87,7 @@
     <Reference Include="ImageTools.Utils">
       <HintPath>Libraries\ImageTools.Utils.dll</HintPath>
     </Reference>
-    <Reference Include="Microsoft.Expression.Drawing" />
+    <Reference Include="Microsoft.Expression.Drawing, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="Silverlight.Controls">
       <HintPath>Libraries\Silverlight.Controls.dll</HintPath>
     </Reference>
@@ -407,6 +407,7 @@
     <Content Include="Libraries\ImageTools.Utils.dll" />
     <Content Include="Libraries\ImageTools.Utils.pdb" />
     <Content Include="Libraries\ImageTools.XML" />
+    <Content Include="Libraries\Microsoft.Expression.Drawing.dll" />
     <Content Include="Libraries\Silverlight.Controls.dll" />
     <Content Include="Libraries\Silverlight.Controls.pdb" />
     <Content Include="UI\Icons\logo128.png">
