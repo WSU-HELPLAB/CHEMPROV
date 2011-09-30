@@ -318,8 +318,16 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 tb.Text = ItemSource[row].Label;
                 tb.TextChanged += new TextChangedEventHandler(LabelText_Changed);
                 tb.KeyDown += new KeyEventHandler(TextBox_KeyDown);
+                tb.GotFocus += new RoutedEventHandler(LabelText_GotFocus);
                 return tb;
             }
+        }
+
+        void LabelText_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            tb.Background = new SolidColorBrush(Colors.Yellow);
+            
         }
 
         private void LabelText_Changed(object sender, TextChangedEventArgs e)
@@ -413,8 +421,15 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             tb.LostFocus -= new RoutedEventHandler(QuantityTextBox_LostFocus);
             try
             {
-                double qty = double.Parse(tb.Text);
-                ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
+                double qty;
+                
+                bool isNum = double.TryParse(tb.Text, out qty);
+
+                if (isNum)
+                {
+                    qty = double.Parse(tb.Text);
+                    ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
+                }
             }
             catch
             {
