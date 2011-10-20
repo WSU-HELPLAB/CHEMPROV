@@ -18,6 +18,10 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             <StackPanel Name="stackPanel" Orientation="Horizontal">
                 <ComboBox Height="28" Name="EquationType" MinWidth="100" ItemsSource="{Binding Path=EquationTypes, Mode=OneWay}"/>
                 <TextBox Height="25" Visibility="Collapsed" FontSize="11" IsReadOnly="True" Name="EquationFeedback" AcceptsReturn="False" MinWidth="10" />
+                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
+                    <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200" MaxWidth="270" TextWrapping="Wrap" />
+                    <TextBlock x:Name="EquationTextBlock" FontSize="11" MinWidth="200" MaxWidth="270" Text="{Binding ElementName=EquationTextBox, Path=Text}" Visibility="Collapsed" />
+                </StackPanel>
             </StackPanel>
         </Grid>
     </Border>

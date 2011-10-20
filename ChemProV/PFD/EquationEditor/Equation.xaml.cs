@@ -43,8 +43,6 @@ namespace ChemProV.PFD.EquationEditor
         private static int equationIdCounter = 0;
         private string equationId;
 
-        private FrameworkElement equationTextBox;
-
         private bool isReadOnly = false;
 
         private ObservableCollection<ComboBoxEquationTypeItem> equationTypes = new ObservableCollection<ComboBoxEquationTypeItem>();
@@ -58,12 +56,6 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Properties
 
-        public FrameworkElement EquationTextBox
-        {
-            get { return equationTextBox; }
-            set { equationTextBox = value; }
-        }
-
         public ComboBoxEquationTypeItem SelectedItem
         {
             get { return EquationType.SelectedItem as ComboBoxEquationTypeItem; }
@@ -73,25 +65,11 @@ namespace ChemProV.PFD.EquationEditor
         {
             get
             {
-                if (isReadOnly)
-                {
-                    return (equationTextBox as Label).Content as string;
-                }
-                else
-                {
-                    return (equationTextBox as TextBox).Text;
-                }
+                return EquationTextBox.Text;
             }
             set
             {
-                if (isReadOnly)
-                {
-                    (equationTextBox as Label).Content = value;
-                }
-                else
-                {
-                    (equationTextBox as TextBox).Text = value;
-                }
+                EquationTextBox.Text = value;
             }
         }
 
@@ -101,7 +79,16 @@ namespace ChemProV.PFD.EquationEditor
             set
             {
                 isReadOnly = value;
-                setupEquationTextBox();
+                if (IsReadOnly)
+                {
+                    EquationTextBox.Visibility = System.Windows.Visibility.Collapsed;
+                    EquationTextBlock.Visibility = System.Windows.Visibility.Visible;
+                }
+                else
+                {
+                    EquationTextBox.Visibility = System.Windows.Visibility.Visible;
+                    EquationTextBlock.Visibility = System.Windows.Visibility.Collapsed;
+                }
             }
         }
 
@@ -153,41 +140,24 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Initializes
 
-        private void setupEquationTextBox()
-        {
-            if (equationTextBox != null)
-            {
-                this.stackPanel.Children.Remove(equationTextBox);
-            }
-            if (isReadOnly)
-            {
-                Label lb = new Label() { FontSize = 11, MinWidth = 200, MaxWidth = 270, MinHeight = 20 };
-                equationTextBox = lb;
-                Border br = new Border() { Child = lb, BorderBrush = new SolidColorBrush(Color.FromArgb(255, 70, 130, 180)), BorderThickness = new Thickness(1) };
-                stackPanel.Children.Insert(1, br);
-            }
-            else
-            {
-                TextBox tb = new TextBox() { FontSize = 11, AcceptsReturn = false, MinWidth = 200, MaxWidth = 270, TextWrapping = TextWrapping.Wrap };
-                equationTextBox = tb;
-                stackPanel.Children.Insert(1, tb);
-
-                (EquationTextBox as TextBox).TextChanged += new TextChangedEventHandler(EquationTextBox_TextChanged);
-                EquationTextBox.KeyDown += new KeyEventHandler(EquationTextBox_KeyDown);
-                EquationTextBox.GotFocus += new RoutedEventHandler(EquationTextBox_GotFocus);
-            }
-        }
-
         private void LocalInit(bool isReadOnly)
         {
             this.isReadOnly = isReadOnly;
             this.DataContext = this;
-            setupEquationTextBox();
             equationIdCounter++;
             equationId = "Eq_" + equationIdCounter;
             EquationTokens = new ObservableCollection<IEquationToken>();
             VariableNames = new ObservableCollection<string>();
             EquationType.SelectionChanged += new SelectionChangedEventHandler(EquationType_SelectionChanged);
+            EquationTextBox.TextChanged += new TextChangedEventHandler(EquationTextBox_TextChanged);
+            EquationTextBox.KeyDown += new KeyEventHandler(EquationTextBox_KeyDown);
+            EquationTextBox.GotFocus += new RoutedEventHandler(EquationTextBox_GotFocus);
+            EquationTextBlock.MouseLeftButtonDown += new MouseButtonEventHandler(EquationTextBlock_MouseLeftButtonDown);
+        }
+
+        void EquationTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ReceivedFocus(this, EventArgs.Empty);
         }
 
         #endregion Initializes
@@ -479,8 +449,8 @@ namespace ChemProV.PFD.EquationEditor
             {
                 if (isReadOnly)
                 {
-                    (EquationTextBox as Label).Background = new SolidColorBrush(Colors.White);
-                    (EquationTextBox as Label).Foreground = new SolidColorBrush(Colors.Black);
+                    //(EquationTextBox as Label).Background = new SolidColorBrush(Colors.White);
+                    //(EquationTextBox as Label).Foreground = new SolidColorBrush(Colors.Black);
                 }
                 else
                 {
@@ -492,8 +462,8 @@ namespace ChemProV.PFD.EquationEditor
             {
                 if (isReadOnly)
                 {
-                    (EquationTextBox as Label).Background = new SolidColorBrush(Colors.Red);
-                    (EquationTextBox as Label).Foreground = new SolidColorBrush(Colors.White);
+                    //(EquationTextBox as Label).Background = new SolidColorBrush(Colors.Red);
+                    //(EquationTextBox as Label).Foreground = new SolidColorBrush(Colors.White);
                 }
                 else
                 {
