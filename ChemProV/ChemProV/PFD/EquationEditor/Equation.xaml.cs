@@ -82,12 +82,12 @@ namespace ChemProV.PFD.EquationEditor
                 if (IsReadOnly)
                 {
                     EquationTextBox.Visibility = System.Windows.Visibility.Collapsed;
-                    EquationTextBlock.Visibility = System.Windows.Visibility.Visible;
+                    TokenListControl.Visibility = System.Windows.Visibility.Visible;
                 }
                 else
                 {
                     EquationTextBox.Visibility = System.Windows.Visibility.Visible;
-                    EquationTextBlock.Visibility = System.Windows.Visibility.Collapsed;
+                    TokenListControl.Visibility = System.Windows.Visibility.Collapsed;
                 }
             }
         }
@@ -147,15 +147,16 @@ namespace ChemProV.PFD.EquationEditor
             equationIdCounter++;
             equationId = "Eq_" + equationIdCounter;
             EquationTokens = new ObservableCollection<IEquationToken>();
+            TokenListControl.ItemsSource = EquationTokens;
             VariableNames = new ObservableCollection<string>();
             EquationType.SelectionChanged += new SelectionChangedEventHandler(EquationType_SelectionChanged);
             EquationTextBox.TextChanged += new TextChangedEventHandler(EquationTextBox_TextChanged);
             EquationTextBox.KeyDown += new KeyEventHandler(EquationTextBox_KeyDown);
             EquationTextBox.GotFocus += new RoutedEventHandler(EquationTextBox_GotFocus);
-            EquationTextBlock.MouseLeftButtonDown += new MouseButtonEventHandler(EquationTextBlock_MouseLeftButtonDown);
+            this.MouseLeftButtonDown += new MouseButtonEventHandler(EquationClick);
         }
 
-        void EquationTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        void EquationClick(object sender, MouseButtonEventArgs e)
         {
             ReceivedFocus(this, EventArgs.Empty);
         }
