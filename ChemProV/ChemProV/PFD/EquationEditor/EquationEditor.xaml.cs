@@ -246,9 +246,7 @@ namespace ChemProV.PFD.EquationEditor
         private void eq_MyTextChanged(object sender, EventArgs e)
         {
             Equation eq = new Equation(isReadOnly);
-
-            //eq.equationsTypes = EquationTypes;
-
+            
             //this makes the text box that just fired stop listening since it is no longer the last one
             ((Equation)sender).MyTextChanged -= new EventHandler(eq_MyTextChanged);
 
@@ -262,6 +260,7 @@ namespace ChemProV.PFD.EquationEditor
         private void eq_ReceivedFocus(object sender, EventArgs e)
         {
             selectedEquation = sender as Equation;
+            selectedEquation.IsReadOnly = false;
         }
 
         private void updateCompounds()
@@ -335,6 +334,7 @@ namespace ChemProV.PFD.EquationEditor
                     UnregisterEquationListneres(senderEq);
                 }
             }
+            senderEq.IsReadOnly = true;
         }
 
         private void EquationTextChanged(object sender, EventArgs e)
@@ -353,6 +353,7 @@ namespace ChemProV.PFD.EquationEditor
             eq.EquationTokensChagned += new EventHandler(EquationTextChanged);
             eq.LostFocus += new RoutedEventHandler(eq_LostFocus);
             eq.ReceivedFocus += new EventHandler(eq_ReceivedFocus);
+            eq.LostFocus += new RoutedEventHandler(eq_LostFocus);
         }
 
         /// <summary>
