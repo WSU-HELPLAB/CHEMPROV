@@ -139,6 +139,9 @@
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />
+    <Compile Include="PFD\EquationEditor\Tokens\TokenList.xaml.cs">
+      <DependentUpon>TokenList.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PFD\EquationEditor\Tokens\VariableToken.cs" />
     <Compile Include="PFD\IPfdElement.cs" />
     <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
@@ -310,6 +313,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PFD\EquationEditor\OperationLabels.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\Tokens\TokenList.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
