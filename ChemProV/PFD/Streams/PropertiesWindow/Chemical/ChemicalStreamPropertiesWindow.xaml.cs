@@ -422,17 +422,18 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             tb.LostFocus -= new RoutedEventHandler(QuantityTextBox_LostFocus);
             try
             {
-                double qty;                
+                double qty;
+                //make sure the quantity is numeric to avoid format exception error
                 bool isNum = double.TryParse(tb.Text, out qty);
 
                 if (isNum)
                 {
-                    if(tb.Parent != null)
+                    if(tb.Parent != null) //handles the case where the textbox parent is null
                         ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
                 }
                 else
                 {
-                    if (tb.Parent != null)
+                    if (tb.Parent != null) //handles the case where the textbox parent is null
                         ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = "?";
                 }
             }
