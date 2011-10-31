@@ -127,6 +127,7 @@ namespace ChemProV.Validation.Rules
                 try
                 {
                     float qty;
+                    //make sure quantity is a number to avoid a format exception error
                     bool isNum = float.TryParse(tableAdapter.GetQuantityAtRow(0), out qty);
                     if (isNum)
                         overalQuantity = qty;
