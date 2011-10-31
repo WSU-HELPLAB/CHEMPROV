@@ -326,7 +326,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         void LabelText_GotFocus(object sender, RoutedEventArgs e)
         {
             TextBox tb = sender as TextBox;
-            tb.Background = new SolidColorBrush(Colors.Yellow);
+            tb.Background = highlightFeedbackBrush;
             
         }
 
@@ -399,6 +399,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
             TextBox tb = (sender as TextBox);
             Border br = tb.Parent as Border;
+
             tb.LostFocus -= new RoutedEventHandler(LabelTextBox_LostFocus);
 
             //-1 one to get rid of the header row count
@@ -425,8 +426,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 bool isNum = double.TryParse(tb.Text, out qty);
 
                 if (isNum)
-                {                    
-                    ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
+                {
+                    if(tb.Parent != null)
+                        ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
+                }
+                else
+                {
+                    if (tb.Parent != null)
+                        ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = "?";
                 }
             }
             catch

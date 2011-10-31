@@ -126,7 +126,13 @@ namespace ChemProV.Validation.Rules
             {
                 try
                 {
-                    overalQuantity = float.Parse(tableAdapter.GetQuantityAtRow(0));
+                    float qty;
+                    bool isNum = float.TryParse(tableAdapter.GetQuantityAtRow(0), out qty);
+                    if (isNum)
+                        overalQuantity = qty;
+                    else
+                        return ValidationResult.Empty;
+                    //overalQuantity = float.Parse(tableAdapter.GetQuantityAtRow(0));
                 }
                 catch
                 {
@@ -149,7 +155,13 @@ namespace ChemProV.Validation.Rules
             {
                 try
                 {
-                    sumPartsQuantity += float.Parse(tableAdapter.GetQuantityAtRow(i));
+                    float sumPart;
+                    bool isNum = float.TryParse(tableAdapter.GetQuantityAtRow(i), out sumPart);
+                    if (isNum)
+                        sumPartsQuantity += sumPart;
+                    else
+                        gotQuestionMark = true;
+                    //sumPartsQuantity += float.Parse(tableAdapter.GetQuantityAtRow(i));                    
                 }
                 catch
                 {
