@@ -32,6 +32,8 @@ balance	:	computation NEWLINE 		-> computation
 	|	NEWLINE 		-> 
 	;
 
+	//we need to account for expressions on the left hand side e.g. m2 + m3 = m1
+
 computation
 	:	term (('+'^ | '-'^) term)*;
 
