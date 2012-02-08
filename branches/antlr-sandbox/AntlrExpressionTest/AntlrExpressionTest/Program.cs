@@ -24,15 +24,17 @@ namespace AntlrExpressionTest
             stream.Position = 0;
             
             ANTLRInputStream input = new ANTLRInputStream(stream);
-            EasyExprLexer lexer = new EasyExprLexer(input);
+            ChemProVLexer lexer = new ChemProVLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            EasyExprParser parser = new EasyExprParser(tokens);
+            ChemProVParser parser = new ChemProVParser(tokens);
+            parser.program();
             
-            AstParserRuleReturnScope<CommonTree, IToken> result = parser.prog();
+            AstParserRuleReturnScope<CommonTree, IToken> result = parser.program();
             CommonTree tree = result.Tree;
             CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
-            Eval walker = new Eval(nodes);
-            walker.prog();            
+            ChemProVTree walker = new ChemProVTree(nodes);
+            walker.program();   
+
         }
     }
 }
