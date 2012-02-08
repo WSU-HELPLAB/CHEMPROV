@@ -13,6 +13,10 @@
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile>Client</TargetFrameworkProfile>
     <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
     <PlatformTarget>x86</PlatformTarget>
@@ -46,11 +50,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="EasyExprLexer.cs" />
-    <Compile Include="EasyExprParser.cs" />
-    <Compile Include="Eval.cs" />
-    <Compile Include="ExprLexer.cs" />
-    <Compile Include="ExprParser.cs" />
+    <Compile Include="..\..\antlr_sandbox\output\ChemProVLexer.cs">
+      <Link>ChemProVLexer.cs</Link>
+    </Compile>
+    <Compile Include="..\..\antlr_sandbox\output\ChemProVParser.cs">
+      <Link>ChemProVParser.cs</Link>
+    </Compile>
+    <Compile Include="..\..\antlr_sandbox\output\ChemProVTree.cs">
+      <Link>ChemProVTree.cs</Link>
+    </Compile>
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
