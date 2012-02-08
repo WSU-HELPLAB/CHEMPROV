@@ -59,6 +59,7 @@
     <Compile Include="..\..\antlr_sandbox\output\ChemProVTree.cs">
       <Link>ChemProVTree.cs</Link>
     </Compile>
+    <Compile Include="Line.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

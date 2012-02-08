@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g 2012-02-08 12:52:50
+// $ANTLR 3.4 D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g 2012-02-08 15:33:44
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -37,10 +37,9 @@ using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 public partial class ChemProVParser : Antlr.Runtime.Parser
 {
 	internal static readonly string[] tokenNames = new string[] {
-		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "CONSTANT", "IDENTIFIER", "NEWLINE", "VAR", "WS", "'('", "')'", "'*'", "'+'", "'-'", "'/'", "'='", "'let'"
+		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "FLOAT", "IDENTIFIER", "INTEGER", "NEWLINE", "VAR", "WS", "'('", "')'", "'*'", "'+'", "'-'", "'/'", "'='", "'let'"
 	};
 	public const int EOF=-1;
-	public const int T__9=9;
 	public const int T__10=10;
 	public const int T__11=11;
 	public const int T__12=12;
@@ -48,11 +47,13 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	public const int T__14=14;
 	public const int T__15=15;
 	public const int T__16=16;
-	public const int CONSTANT=4;
+	public const int T__17=17;
+	public const int FLOAT=4;
 	public const int IDENTIFIER=5;
-	public const int NEWLINE=6;
-	public const int VAR=7;
-	public const int WS=8;
+	public const int INTEGER=6;
+	public const int NEWLINE=7;
+	public const int VAR=8;
+	public const int WS=9;
 
 	public ChemProVParser(ITokenStream input)
 		: this(input, new RecognizerSharedState())
@@ -85,7 +86,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	}
 
 	public override string[] TokenNames { get { return ChemProVParser.tokenNames; } }
-	public override string GrammarFileName { get { return "D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g"; } }
+	public override string GrammarFileName { get { return "D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g"; } }
 
 
 		Hashtable memory = new Hashtable();
@@ -100,7 +101,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_program();
 
 	// $ANTLR start "program"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:34:8: public program : ( line )+ ;
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:37:8: public program : ( line )+ ;
 	[GrammarRule("program")]
 	public AstParserRuleReturnScope<CommonTree, IToken> program()
 	{
@@ -115,17 +116,17 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		AstParserRuleReturnScope<CommonTree, IToken> line1 = default(AstParserRuleReturnScope<CommonTree, IToken>);
 
 		try { DebugEnterRule(GrammarFileName, "program");
-		DebugLocation(34, 1);
+		DebugLocation(37, 1);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:2: ( ( line )+ )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:2: ( ( line )+ )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:4: ( line )+
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:4: ( line )+
 			{
 			root_0 = (CommonTree)adaptor.Nil();
 
-			DebugLocation(35, 4);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:4: ( line )+
+			DebugLocation(38, 4);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:4: ( line )+
 			int cnt1=0;
 			try { DebugEnterSubRule(1);
 			while (true)
@@ -134,7 +135,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				try { DebugEnterDecision(1, false);
 				int LA1_0 = input.LA(1);
 
-				if (((LA1_0>=CONSTANT && LA1_0<=NEWLINE)||LA1_0==9||LA1_0==16))
+				if (((LA1_0>=FLOAT && LA1_0<=NEWLINE)||LA1_0==10||LA1_0==17))
 				{
 					alt1 = 1;
 				}
@@ -145,15 +146,15 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:5: line
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:5: line
 					{
-					DebugLocation(35, 5);
-					PushFollow(Follow._line_in_program169);
+					DebugLocation(38, 5);
+					PushFollow(Follow._line_in_program175);
 					line1=line();
 					PopFollow();
 
 					adaptor.AddChild(root_0, line1.Tree);
-					DebugLocation(35, 10);
+					DebugLocation(38, 10);
 					Console.WriteLine((line1!=null?((CommonTree)line1.Tree):default(CommonTree))==null?"null":(line1!=null?((CommonTree)line1.Tree):default(CommonTree)).ToStringTree());
 
 					}
@@ -196,7 +197,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("program", 1);
 			LeaveRule_program();
 		}
-		DebugLocation(36, 1);
+		DebugLocation(39, 1);
 		} finally { DebugExitRule(GrammarFileName, "program"); }
 		return retval;
 
@@ -207,7 +208,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_line();
 
 	// $ANTLR start "line"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:1: line : ( variable | balance );
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:41:1: line : ( variable | balance );
 	[GrammarRule("line")]
 	private AstParserRuleReturnScope<CommonTree, IToken> line()
 	{
@@ -223,19 +224,19 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		AstParserRuleReturnScope<CommonTree, IToken> balance3 = default(AstParserRuleReturnScope<CommonTree, IToken>);
 
 		try { DebugEnterRule(GrammarFileName, "line");
-		DebugLocation(38, 1);
+		DebugLocation(41, 1);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:6: ( variable | balance )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:42:2: ( variable | balance )
 			int alt2=2;
 			try { DebugEnterDecision(2, false);
 			int LA2_0 = input.LA(1);
 
-			if ((LA2_0==16))
+			if ((LA2_0==17))
 			{
 				alt2 = 1;
 			}
-			else if (((LA2_0>=CONSTANT && LA2_0<=NEWLINE)||LA2_0==9))
+			else if (((LA2_0>=FLOAT && LA2_0<=NEWLINE)||LA2_0==10))
 			{
 				alt2 = 2;
 			}
@@ -250,12 +251,12 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:8: variable
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:42:4: variable
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
-				DebugLocation(38, 8);
-				PushFollow(Follow._variable_in_line185);
+				DebugLocation(42, 4);
+				PushFollow(Follow._variable_in_line193);
 				variable2=variable();
 				PopFollow();
 
@@ -265,12 +266,12 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:39:4: balance
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:4: balance
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
-				DebugLocation(39, 4);
-				PushFollow(Follow._balance_in_line190);
+				DebugLocation(43, 4);
+				PushFollow(Follow._balance_in_line198);
 				balance3=balance();
 				PopFollow();
 
@@ -299,7 +300,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("line", 2);
 			LeaveRule_line();
 		}
-		DebugLocation(40, 1);
+		DebugLocation(44, 1);
 		} finally { DebugExitRule(GrammarFileName, "line"); }
 		return retval;
 
@@ -310,7 +311,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_variable();
 
 	// $ANTLR start "variable"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:42:1: variable : 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) ;
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:46:1: variable : 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) ;
 	[GrammarRule("variable")]
 	private AstParserRuleReturnScope<CommonTree, IToken> variable()
 	{
@@ -333,45 +334,45 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		CommonTree char_literal6_tree = default(CommonTree);
 		CommonTree NEWLINE8_tree = default(CommonTree);
 		RewriteRuleITokenStream stream_NEWLINE=new RewriteRuleITokenStream(adaptor,"token NEWLINE");
-		RewriteRuleITokenStream stream_15=new RewriteRuleITokenStream(adaptor,"token 15");
+		RewriteRuleITokenStream stream_17=new RewriteRuleITokenStream(adaptor,"token 17");
 		RewriteRuleITokenStream stream_IDENTIFIER=new RewriteRuleITokenStream(adaptor,"token IDENTIFIER");
 		RewriteRuleITokenStream stream_16=new RewriteRuleITokenStream(adaptor,"token 16");
 		RewriteRuleSubtreeStream stream_computation=new RewriteRuleSubtreeStream(adaptor,"rule computation");
 		try { DebugEnterRule(GrammarFileName, "variable");
-		DebugLocation(42, 1);
+		DebugLocation(46, 1);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:2: ( 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:2: ( 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:4: 'let' IDENTIFIER '=' computation NEWLINE
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:4: 'let' IDENTIFIER '=' computation NEWLINE
 			{
-			DebugLocation(43, 4);
-			string_literal4=(IToken)Match(input,16,Follow._16_in_variable201);  
-			stream_16.Add(string_literal4);
+			DebugLocation(47, 4);
+			string_literal4=(IToken)Match(input,17,Follow._17_in_variable209);  
+			stream_17.Add(string_literal4);
 
-			DebugLocation(43, 10);
-			IDENTIFIER5=(IToken)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_variable203);  
+			DebugLocation(47, 10);
+			IDENTIFIER5=(IToken)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_variable211);  
 			stream_IDENTIFIER.Add(IDENTIFIER5);
 
-			DebugLocation(43, 21);
-			char_literal6=(IToken)Match(input,15,Follow._15_in_variable205);  
-			stream_15.Add(char_literal6);
+			DebugLocation(47, 21);
+			char_literal6=(IToken)Match(input,16,Follow._16_in_variable213);  
+			stream_16.Add(char_literal6);
 
-			DebugLocation(43, 25);
-			PushFollow(Follow._computation_in_variable207);
+			DebugLocation(47, 25);
+			PushFollow(Follow._computation_in_variable215);
 			computation7=computation();
 			PopFollow();
 
 			stream_computation.Add(computation7.Tree);
-			DebugLocation(43, 37);
-			NEWLINE8=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_variable209);  
+			DebugLocation(47, 37);
+			NEWLINE8=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_variable217);  
 			stream_NEWLINE.Add(NEWLINE8);
 
 
 
 			{
 			// AST REWRITE
-			// elements: IDENTIFIER, computation
+			// elements: computation, IDENTIFIER
 			// token labels: 
 			// rule labels: retval
 			// token list labels: 
@@ -381,18 +382,18 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.Tree:null);
 
 			root_0 = (CommonTree)adaptor.Nil();
-			// 43:45: -> ^( VAR IDENTIFIER computation )
+			// 47:45: -> ^( VAR IDENTIFIER computation )
 			{
-				DebugLocation(43, 48);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:48: ^( VAR IDENTIFIER computation )
+				DebugLocation(47, 48);
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:48: ^( VAR IDENTIFIER computation )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.Nil();
-				DebugLocation(43, 50);
+				DebugLocation(47, 50);
 				root_1 = (CommonTree)adaptor.BecomeRoot((CommonTree)adaptor.Create(VAR, "VAR"), root_1);
 
-				DebugLocation(43, 54);
+				DebugLocation(47, 54);
 				adaptor.AddChild(root_1, stream_IDENTIFIER.NextNode());
-				DebugLocation(43, 65);
+				DebugLocation(47, 65);
 				adaptor.AddChild(root_1, stream_computation.NextTree());
 
 				adaptor.AddChild(root_0, root_1);
@@ -424,7 +425,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("variable", 3);
 			LeaveRule_variable();
 		}
-		DebugLocation(44, 1);
+		DebugLocation(48, 1);
 		} finally { DebugExitRule(GrammarFileName, "variable"); }
 		return retval;
 
@@ -435,7 +436,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_balance();
 
 	// $ANTLR start "balance"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:46:1: balance : ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->);
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:50:1: balance : ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->);
 	[GrammarRule("balance")]
 	private AstParserRuleReturnScope<CommonTree, IToken> balance()
 	{
@@ -457,18 +458,18 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		CommonTree NEWLINE12_tree = default(CommonTree);
 		CommonTree NEWLINE13_tree = default(CommonTree);
 		RewriteRuleITokenStream stream_NEWLINE=new RewriteRuleITokenStream(adaptor,"token NEWLINE");
-		RewriteRuleITokenStream stream_15=new RewriteRuleITokenStream(adaptor,"token 15");
+		RewriteRuleITokenStream stream_16=new RewriteRuleITokenStream(adaptor,"token 16");
 		RewriteRuleSubtreeStream stream_computation=new RewriteRuleSubtreeStream(adaptor,"rule computation");
 		try { DebugEnterRule(GrammarFileName, "balance");
-		DebugLocation(46, 1);
+		DebugLocation(50, 1);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:2: ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->)
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:51:2: ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->)
 			int alt3=2;
 			try { DebugEnterDecision(3, false);
 			int LA3_0 = input.LA(1);
 
-			if (((LA3_0>=CONSTANT && LA3_0<=IDENTIFIER)||LA3_0==9))
+			if (((LA3_0>=FLOAT && LA3_0<=INTEGER)||LA3_0==10))
 			{
 				alt3 = 1;
 			}
@@ -487,33 +488,33 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:4: computation '=' computation NEWLINE
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:51:4: computation '=' computation NEWLINE
 				{
-				DebugLocation(47, 4);
-				PushFollow(Follow._computation_in_balance232);
+				DebugLocation(51, 4);
+				PushFollow(Follow._computation_in_balance240);
 				computation9=computation();
 				PopFollow();
 
 				stream_computation.Add(computation9.Tree);
-				DebugLocation(47, 16);
-				char_literal10=(IToken)Match(input,15,Follow._15_in_balance234);  
-				stream_15.Add(char_literal10);
+				DebugLocation(51, 16);
+				char_literal10=(IToken)Match(input,16,Follow._16_in_balance242);  
+				stream_16.Add(char_literal10);
 
-				DebugLocation(47, 20);
-				PushFollow(Follow._computation_in_balance236);
+				DebugLocation(51, 20);
+				PushFollow(Follow._computation_in_balance244);
 				computation11=computation();
 				PopFollow();
 
 				stream_computation.Add(computation11.Tree);
-				DebugLocation(47, 32);
-				NEWLINE12=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance238);  
+				DebugLocation(51, 32);
+				NEWLINE12=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance246);  
 				stream_NEWLINE.Add(NEWLINE12);
 
 
 
 				{
 				// AST REWRITE
-				// elements: computation, 15, computation
+				// elements: computation, 16, computation
 				// token labels: 
 				// rule labels: retval
 				// token list labels: 
@@ -523,18 +524,18 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.Tree:null);
 
 				root_0 = (CommonTree)adaptor.Nil();
-				// 47:41: -> ^( '=' computation computation )
+				// 51:41: -> ^( '=' computation computation )
 				{
-					DebugLocation(47, 44);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:44: ^( '=' computation computation )
+					DebugLocation(51, 44);
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:51:44: ^( '=' computation computation )
 					{
 					CommonTree root_1 = (CommonTree)adaptor.Nil();
-					DebugLocation(47, 46);
-					root_1 = (CommonTree)adaptor.BecomeRoot(stream_15.NextNode(), root_1);
+					DebugLocation(51, 46);
+					root_1 = (CommonTree)adaptor.BecomeRoot(stream_16.NextNode(), root_1);
 
-					DebugLocation(47, 50);
+					DebugLocation(51, 50);
 					adaptor.AddChild(root_1, stream_computation.NextTree());
-					DebugLocation(47, 62);
+					DebugLocation(51, 62);
 					adaptor.AddChild(root_1, stream_computation.NextTree());
 
 					adaptor.AddChild(root_0, root_1);
@@ -549,10 +550,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:48:4: NEWLINE
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:4: NEWLINE
 				{
-				DebugLocation(48, 4);
-				NEWLINE13=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance254);  
+				DebugLocation(52, 4);
+				NEWLINE13=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance262);  
 				stream_NEWLINE.Add(NEWLINE13);
 
 
@@ -569,9 +570,9 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.Tree:null);
 
 				root_0 = (CommonTree)adaptor.Nil();
-				// 48:16: ->
+				// 52:16: ->
 				{
-					DebugLocation(49, 2);
+					DebugLocation(53, 2);
 					root_0 = null;
 				}
 
@@ -601,7 +602,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("balance", 4);
 			LeaveRule_balance();
 		}
-		DebugLocation(49, 1);
+		DebugLocation(53, 1);
 		} finally { DebugExitRule(GrammarFileName, "balance"); }
 		return retval;
 
@@ -612,7 +613,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_computation();
 
 	// $ANTLR start "computation"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:51:1: computation : term ( ( '+' ^| '-' ^) term )* ;
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:1: computation : term ( ( '+' ^| '-' ^) term )* ;
 	[GrammarRule("computation")]
 	private AstParserRuleReturnScope<CommonTree, IToken> computation()
 	{
@@ -632,23 +633,23 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		CommonTree char_literal15_tree = default(CommonTree);
 		CommonTree char_literal16_tree = default(CommonTree);
 		try { DebugEnterRule(GrammarFileName, "computation");
-		DebugLocation(51, 29);
+		DebugLocation(55, 29);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:2: ( term ( ( '+' ^| '-' ^) term )* )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:2: ( term ( ( '+' ^| '-' ^) term )* )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:4: term ( ( '+' ^| '-' ^) term )*
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:4: term ( ( '+' ^| '-' ^) term )*
 			{
 			root_0 = (CommonTree)adaptor.Nil();
 
-			DebugLocation(52, 4);
-			PushFollow(Follow._term_in_computation272);
+			DebugLocation(56, 4);
+			PushFollow(Follow._term_in_computation280);
 			term14=term();
 			PopFollow();
 
 			adaptor.AddChild(root_0, term14.Tree);
-			DebugLocation(52, 9);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:9: ( ( '+' ^| '-' ^) term )*
+			DebugLocation(56, 9);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:9: ( ( '+' ^| '-' ^) term )*
 			try { DebugEnterSubRule(5);
 			while (true)
 			{
@@ -656,7 +657,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				try { DebugEnterDecision(5, false);
 				int LA5_0 = input.LA(1);
 
-				if (((LA5_0>=12 && LA5_0<=13)))
+				if (((LA5_0>=13 && LA5_0<=14)))
 				{
 					alt5 = 1;
 				}
@@ -667,20 +668,20 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:10: ( '+' ^| '-' ^) term
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:10: ( '+' ^| '-' ^) term
 					{
-					DebugLocation(52, 10);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:10: ( '+' ^| '-' ^)
+					DebugLocation(56, 10);
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:10: ( '+' ^| '-' ^)
 					int alt4=2;
 					try { DebugEnterSubRule(4);
 					try { DebugEnterDecision(4, false);
 					int LA4_0 = input.LA(1);
 
-					if ((LA4_0==12))
+					if ((LA4_0==13))
 					{
 						alt4 = 1;
 					}
-					else if ((LA4_0==13))
+					else if ((LA4_0==14))
 					{
 						alt4 = 2;
 					}
@@ -695,10 +696,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:11: '+' ^
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:11: '+' ^
 						{
-						DebugLocation(52, 14);
-						char_literal15=(IToken)Match(input,12,Follow._12_in_computation276); 
+						DebugLocation(56, 14);
+						char_literal15=(IToken)Match(input,13,Follow._13_in_computation284); 
 						char_literal15_tree = (CommonTree)adaptor.Create(char_literal15);
 						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal15_tree, root_0);
 
@@ -706,10 +707,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 						break;
 					case 2:
 						DebugEnterAlt(2);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:18: '-' ^
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:56:18: '-' ^
 						{
-						DebugLocation(52, 21);
-						char_literal16=(IToken)Match(input,13,Follow._13_in_computation281); 
+						DebugLocation(56, 21);
+						char_literal16=(IToken)Match(input,14,Follow._14_in_computation289); 
 						char_literal16_tree = (CommonTree)adaptor.Create(char_literal16);
 						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal16_tree, root_0);
 
@@ -719,8 +720,8 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 					}
 					} finally { DebugExitSubRule(4); }
 
-					DebugLocation(52, 24);
-					PushFollow(Follow._term_in_computation285);
+					DebugLocation(56, 24);
+					PushFollow(Follow._term_in_computation293);
 					term17=term();
 					PopFollow();
 
@@ -761,7 +762,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("computation", 5);
 			LeaveRule_computation();
 		}
-		DebugLocation(52, 29);
+		DebugLocation(56, 29);
 		} finally { DebugExitRule(GrammarFileName, "computation"); }
 		return retval;
 
@@ -772,7 +773,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_term();
 
 	// $ANTLR start "term"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:54:1: term : atom ( ( '*' ^| '/' ^) atom )* ;
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:58:1: term : atom ( ( '*' ^| '/' ^) atom )* ;
 	[GrammarRule("term")]
 	private AstParserRuleReturnScope<CommonTree, IToken> term()
 	{
@@ -786,29 +787,29 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 
 		IToken char_literal19 = default(IToken);
 		IToken char_literal20 = default(IToken);
-		ChemProVParser.atom_return atom18 = default(ChemProVParser.atom_return);
-		ChemProVParser.atom_return atom21 = default(ChemProVParser.atom_return);
+		AstParserRuleReturnScope<CommonTree, IToken> atom18 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+		AstParserRuleReturnScope<CommonTree, IToken> atom21 = default(AstParserRuleReturnScope<CommonTree, IToken>);
 
 		CommonTree char_literal19_tree = default(CommonTree);
 		CommonTree char_literal20_tree = default(CommonTree);
 		try { DebugEnterRule(GrammarFileName, "term");
-		DebugLocation(54, 1);
+		DebugLocation(58, 1);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:2: ( atom ( ( '*' ^| '/' ^) atom )* )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:2: ( atom ( ( '*' ^| '/' ^) atom )* )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:4: atom ( ( '*' ^| '/' ^) atom )*
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:4: atom ( ( '*' ^| '/' ^) atom )*
 			{
 			root_0 = (CommonTree)adaptor.Nil();
 
-			DebugLocation(55, 4);
-			PushFollow(Follow._atom_in_term297);
+			DebugLocation(59, 4);
+			PushFollow(Follow._atom_in_term305);
 			atom18=atom();
 			PopFollow();
 
 			adaptor.AddChild(root_0, atom18.Tree);
-			DebugLocation(55, 9);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:9: ( ( '*' ^| '/' ^) atom )*
+			DebugLocation(59, 9);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:9: ( ( '*' ^| '/' ^) atom )*
 			try { DebugEnterSubRule(7);
 			while (true)
 			{
@@ -816,7 +817,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				try { DebugEnterDecision(7, false);
 				int LA7_0 = input.LA(1);
 
-				if ((LA7_0==11||LA7_0==14))
+				if ((LA7_0==12||LA7_0==15))
 				{
 					alt7 = 1;
 				}
@@ -827,20 +828,20 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:10: ( '*' ^| '/' ^) atom
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:10: ( '*' ^| '/' ^) atom
 					{
-					DebugLocation(55, 10);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:10: ( '*' ^| '/' ^)
+					DebugLocation(59, 10);
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:10: ( '*' ^| '/' ^)
 					int alt6=2;
 					try { DebugEnterSubRule(6);
 					try { DebugEnterDecision(6, false);
 					int LA6_0 = input.LA(1);
 
-					if ((LA6_0==11))
+					if ((LA6_0==12))
 					{
 						alt6 = 1;
 					}
-					else if ((LA6_0==14))
+					else if ((LA6_0==15))
 					{
 						alt6 = 2;
 					}
@@ -855,10 +856,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:11: '*' ^
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:11: '*' ^
 						{
-						DebugLocation(55, 14);
-						char_literal19=(IToken)Match(input,11,Follow._11_in_term301); 
+						DebugLocation(59, 14);
+						char_literal19=(IToken)Match(input,12,Follow._12_in_term309); 
 						char_literal19_tree = (CommonTree)adaptor.Create(char_literal19);
 						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal19_tree, root_0);
 
@@ -866,10 +867,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 						break;
 					case 2:
 						DebugEnterAlt(2);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:18: '/' ^
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:18: '/' ^
 						{
-						DebugLocation(55, 21);
-						char_literal20=(IToken)Match(input,14,Follow._14_in_term306); 
+						DebugLocation(59, 21);
+						char_literal20=(IToken)Match(input,15,Follow._15_in_term314); 
 						char_literal20_tree = (CommonTree)adaptor.Create(char_literal20);
 						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal20_tree, root_0);
 
@@ -879,8 +880,8 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 					}
 					} finally { DebugExitSubRule(6); }
 
-					DebugLocation(55, 24);
-					PushFollow(Follow._atom_in_term310);
+					DebugLocation(59, 24);
+					PushFollow(Follow._atom_in_term318);
 					atom21=atom();
 					PopFollow();
 
@@ -921,68 +922,68 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("term", 6);
 			LeaveRule_term();
 		}
-		DebugLocation(56, 1);
+		DebugLocation(60, 1);
 		} finally { DebugExitRule(GrammarFileName, "term"); }
 		return retval;
 
 	}
 	// $ANTLR end "term"
 
-	private sealed partial class atom_return : AstParserRuleReturnScope<CommonTree, IToken>
-	{
-		public int value;
-		public atom_return(ChemProVParser grammar) {OnCreated(grammar);}
-		partial void OnCreated(ChemProVParser grammar);
-	}
-
 	partial void EnterRule_atom();
 	partial void LeaveRule_atom();
 
 	// $ANTLR start "atom"
-	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:58:1: atom returns [int value] : ( CONSTANT | IDENTIFIER | '(' ! computation ')' !);
+	// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:62:1: atom : ( INTEGER | FLOAT | IDENTIFIER | '(' ! computation ')' !);
 	[GrammarRule("atom")]
-	private ChemProVParser.atom_return atom()
+	private AstParserRuleReturnScope<CommonTree, IToken> atom()
 	{
 		EnterRule_atom();
 		EnterRule("atom", 7);
 		TraceIn("atom", 7);
-		ChemProVParser.atom_return retval = new ChemProVParser.atom_return(this);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
 		retval.Start = (IToken)input.LT(1);
 
 		CommonTree root_0 = default(CommonTree);
 
-		IToken CONSTANT22 = default(IToken);
-		IToken IDENTIFIER23 = default(IToken);
-		IToken char_literal24 = default(IToken);
-		IToken char_literal26 = default(IToken);
-		AstParserRuleReturnScope<CommonTree, IToken> computation25 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+		IToken INTEGER22 = default(IToken);
+		IToken FLOAT23 = default(IToken);
+		IToken IDENTIFIER24 = default(IToken);
+		IToken char_literal25 = default(IToken);
+		IToken char_literal27 = default(IToken);
+		AstParserRuleReturnScope<CommonTree, IToken> computation26 = default(AstParserRuleReturnScope<CommonTree, IToken>);
 
-		CommonTree CONSTANT22_tree = default(CommonTree);
-		CommonTree IDENTIFIER23_tree = default(CommonTree);
-		CommonTree char_literal24_tree = default(CommonTree);
-		CommonTree char_literal26_tree = default(CommonTree);
+		CommonTree INTEGER22_tree = default(CommonTree);
+		CommonTree FLOAT23_tree = default(CommonTree);
+		CommonTree IDENTIFIER24_tree = default(CommonTree);
+		CommonTree char_literal25_tree = default(CommonTree);
+		CommonTree char_literal27_tree = default(CommonTree);
 		try { DebugEnterRule(GrammarFileName, "atom");
-		DebugLocation(58, 1);
+		DebugLocation(62, 1);
 		try
 		{
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:2: ( CONSTANT | IDENTIFIER | '(' ! computation ')' !)
-			int alt8=3;
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:63:2: ( INTEGER | FLOAT | IDENTIFIER | '(' ! computation ')' !)
+			int alt8=4;
 			try { DebugEnterDecision(8, false);
 			switch (input.LA(1))
 			{
-			case CONSTANT:
+			case INTEGER:
 				{
 				alt8 = 1;
 				}
 				break;
-			case IDENTIFIER:
+			case FLOAT:
 				{
 				alt8 = 2;
 				}
 				break;
-			case 9:
+			case IDENTIFIER:
 				{
 				alt8 = 3;
+				}
+				break;
+			case 10:
+				{
+				alt8 = 4;
 				}
 				break;
 			default:
@@ -998,46 +999,59 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:4: CONSTANT
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:63:4: INTEGER
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
-				DebugLocation(59, 4);
-				CONSTANT22=(IToken)Match(input,CONSTANT,Follow._CONSTANT_in_atom327); 
-				CONSTANT22_tree = (CommonTree)adaptor.Create(CONSTANT22);
-				adaptor.AddChild(root_0, CONSTANT22_tree);
+				DebugLocation(63, 4);
+				INTEGER22=(IToken)Match(input,INTEGER,Follow._INTEGER_in_atom331); 
+				INTEGER22_tree = (CommonTree)adaptor.Create(INTEGER22);
+				adaptor.AddChild(root_0, INTEGER22_tree);
 
 				}
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:60:4: IDENTIFIER
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:64:6: FLOAT
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
-				DebugLocation(60, 4);
-				IDENTIFIER23=(IToken)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_atom332); 
-				IDENTIFIER23_tree = (CommonTree)adaptor.Create(IDENTIFIER23);
-				adaptor.AddChild(root_0, IDENTIFIER23_tree);
+				DebugLocation(64, 6);
+				FLOAT23=(IToken)Match(input,FLOAT,Follow._FLOAT_in_atom338); 
+				FLOAT23_tree = (CommonTree)adaptor.Create(FLOAT23);
+				adaptor.AddChild(root_0, FLOAT23_tree);
 
 				}
 				break;
 			case 3:
 				DebugEnterAlt(3);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:61:4: '(' ! computation ')' !
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:65:4: IDENTIFIER
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
-				DebugLocation(61, 7);
-				char_literal24=(IToken)Match(input,9,Follow._9_in_atom337); 
-				DebugLocation(61, 9);
-				PushFollow(Follow._computation_in_atom340);
-				computation25=computation();
+				DebugLocation(65, 4);
+				IDENTIFIER24=(IToken)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_atom343); 
+				IDENTIFIER24_tree = (CommonTree)adaptor.Create(IDENTIFIER24);
+				adaptor.AddChild(root_0, IDENTIFIER24_tree);
+
+				}
+				break;
+			case 4:
+				DebugEnterAlt(4);
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:66:4: '(' ! computation ')' !
+				{
+				root_0 = (CommonTree)adaptor.Nil();
+
+				DebugLocation(66, 7);
+				char_literal25=(IToken)Match(input,10,Follow._10_in_atom348); 
+				DebugLocation(66, 9);
+				PushFollow(Follow._computation_in_atom351);
+				computation26=computation();
 				PopFollow();
 
-				adaptor.AddChild(root_0, computation25.Tree);
-				DebugLocation(61, 24);
-				char_literal26=(IToken)Match(input,10,Follow._10_in_atom342); 
+				adaptor.AddChild(root_0, computation26.Tree);
+				DebugLocation(66, 24);
+				char_literal27=(IToken)Match(input,11,Follow._11_in_atom353); 
 
 				}
 				break;
@@ -1062,7 +1076,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			LeaveRule("atom", 7);
 			LeaveRule_atom();
 		}
-		DebugLocation(63, 1);
+		DebugLocation(67, 1);
 		} finally { DebugExitRule(GrammarFileName, "atom"); }
 		return retval;
 
@@ -1074,32 +1088,33 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	#region Follow sets
 	private static class Follow
 	{
-		public static readonly BitSet _line_in_program169 = new BitSet(new ulong[]{0x10272UL});
-		public static readonly BitSet _variable_in_line185 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _balance_in_line190 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _16_in_variable201 = new BitSet(new ulong[]{0x20UL});
-		public static readonly BitSet _IDENTIFIER_in_variable203 = new BitSet(new ulong[]{0x8000UL});
-		public static readonly BitSet _15_in_variable205 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _computation_in_variable207 = new BitSet(new ulong[]{0x40UL});
-		public static readonly BitSet _NEWLINE_in_variable209 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _computation_in_balance232 = new BitSet(new ulong[]{0x8000UL});
-		public static readonly BitSet _15_in_balance234 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _computation_in_balance236 = new BitSet(new ulong[]{0x40UL});
-		public static readonly BitSet _NEWLINE_in_balance238 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _NEWLINE_in_balance254 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _term_in_computation272 = new BitSet(new ulong[]{0x3002UL});
-		public static readonly BitSet _12_in_computation276 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _13_in_computation281 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _term_in_computation285 = new BitSet(new ulong[]{0x3002UL});
-		public static readonly BitSet _atom_in_term297 = new BitSet(new ulong[]{0x4802UL});
-		public static readonly BitSet _11_in_term301 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _14_in_term306 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _atom_in_term310 = new BitSet(new ulong[]{0x4802UL});
-		public static readonly BitSet _CONSTANT_in_atom327 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _IDENTIFIER_in_atom332 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _9_in_atom337 = new BitSet(new ulong[]{0x230UL});
-		public static readonly BitSet _computation_in_atom340 = new BitSet(new ulong[]{0x400UL});
-		public static readonly BitSet _10_in_atom342 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _line_in_program175 = new BitSet(new ulong[]{0x204F2UL});
+		public static readonly BitSet _variable_in_line193 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _balance_in_line198 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _17_in_variable209 = new BitSet(new ulong[]{0x20UL});
+		public static readonly BitSet _IDENTIFIER_in_variable211 = new BitSet(new ulong[]{0x10000UL});
+		public static readonly BitSet _16_in_variable213 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _computation_in_variable215 = new BitSet(new ulong[]{0x80UL});
+		public static readonly BitSet _NEWLINE_in_variable217 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _computation_in_balance240 = new BitSet(new ulong[]{0x10000UL});
+		public static readonly BitSet _16_in_balance242 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _computation_in_balance244 = new BitSet(new ulong[]{0x80UL});
+		public static readonly BitSet _NEWLINE_in_balance246 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _NEWLINE_in_balance262 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _term_in_computation280 = new BitSet(new ulong[]{0x6002UL});
+		public static readonly BitSet _13_in_computation284 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _14_in_computation289 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _term_in_computation293 = new BitSet(new ulong[]{0x6002UL});
+		public static readonly BitSet _atom_in_term305 = new BitSet(new ulong[]{0x9002UL});
+		public static readonly BitSet _12_in_term309 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _15_in_term314 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _atom_in_term318 = new BitSet(new ulong[]{0x9002UL});
+		public static readonly BitSet _INTEGER_in_atom331 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _FLOAT_in_atom338 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _IDENTIFIER_in_atom343 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _10_in_atom348 = new BitSet(new ulong[]{0x470UL});
+		public static readonly BitSet _computation_in_atom351 = new BitSet(new ulong[]{0x800UL});
+		public static readonly BitSet _11_in_atom353 = new BitSet(new ulong[]{0x2UL});
 	}
 	#endregion Follow sets
 }

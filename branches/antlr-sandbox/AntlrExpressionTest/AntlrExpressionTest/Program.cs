@@ -27,13 +27,23 @@ namespace AntlrExpressionTest
             ChemProVLexer lexer = new ChemProVLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             ChemProVParser parser = new ChemProVParser(tokens);
-            parser.program();
             
             AstParserRuleReturnScope<CommonTree, IToken> result = parser.program();
             CommonTree tree = result.Tree;
             CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+            nodes.TokenStream = tokens;
             ChemProVTree walker = new ChemProVTree(nodes);
-            walker.program();   
+            walker.program();
+
+            /*
+            List<ChemProVLine> lines = new List<ChemProVLine>();
+            int currentLineNumber = 0;
+            if (lines.Count < currentLineNumber)
+            {
+                lines.Add(new ChemProVLine());
+            }
+            lines[currentLineNumber].VariablesUsed.Add("foo");
+             * */
 
         }
     }

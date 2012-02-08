@@ -27,15 +27,19 @@ IDENTIFIER
 	:	('a'..'z'|'A'..'Z')+ | ('a'..'z'|'A'..'Z')+ '0'..'9' ('a'..'z'|'A'..'Z'|'0'..'9')*;
 	
 //Allow both integer and floating-point constants
-CONSTANT
-	:	'0'..'9'+ | '0'..'9'+ '.' '0'..'9'+;
+INTEGER
+	:	'0'..'9'+;
+FLOAT
+	:	'0'..'9'+ '.' '0'..'9'+;
+	
 NEWLINE	:	'\r'? '\n';
 WS	:	(' '|'\t'|'\n'|'\r')+ {Skip();};
 public program	
 	:	(line {Console.WriteLine($line.tree==null?"null":$line.tree.ToStringTree());} )+	
 	;
 
-line	:	variable
+line	
+	:	variable
 	|	balance
 	;
 
@@ -55,9 +59,9 @@ term
 	:	atom (('*'^ | '/'^) atom)*
 	;
 
-atom returns [int value]
-	:	CONSTANT
+atom
+	:	INTEGER
+	|   FLOAT
 	|	IDENTIFIER
 	|	'('! computation ')'!
-	
 	;

@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g 2012-02-08 12:52:50
+// $ANTLR 3.4 D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g 2012-02-08 15:33:44
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -29,7 +29,6 @@ using Antlr.Runtime.Misc;
 public partial class ChemProVLexer : Antlr.Runtime.Lexer
 {
 	public const int EOF=-1;
-	public const int T__9=9;
 	public const int T__10=10;
 	public const int T__11=11;
 	public const int T__12=12;
@@ -37,11 +36,13 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	public const int T__14=14;
 	public const int T__15=15;
 	public const int T__16=16;
-	public const int CONSTANT=4;
+	public const int T__17=17;
+	public const int FLOAT=4;
 	public const int IDENTIFIER=5;
-	public const int NEWLINE=6;
-	public const int VAR=7;
-	public const int WS=8;
+	public const int INTEGER=6;
+	public const int NEWLINE=7;
+	public const int VAR=8;
+	public const int WS=9;
 
     // delegates
     // delegators
@@ -62,47 +63,12 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 
 		OnCreated();
 	}
-	public override string GrammarFileName { get { return "D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g"; } }
+	public override string GrammarFileName { get { return "D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g"; } }
 
 
 	partial void OnCreated();
 	partial void EnterRule(string ruleName, int ruleIndex);
 	partial void LeaveRule(string ruleName, int ruleIndex);
-
-	partial void EnterRule_T__9();
-	partial void LeaveRule_T__9();
-
-	// $ANTLR start "T__9"
-	[GrammarRule("T__9")]
-	private void mT__9()
-	{
-		EnterRule_T__9();
-		EnterRule("T__9", 1);
-		TraceIn("T__9", 1);
-		try
-		{
-			int _type = T__9;
-			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:7:6: ( '(' )
-			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:7:8: '('
-			{
-			DebugLocation(7, 8);
-			Match('('); 
-
-			}
-
-			state.type = _type;
-			state.channel = _channel;
-		}
-		finally
-		{
-			TraceOut("T__9", 1);
-			LeaveRule("T__9", 1);
-			LeaveRule_T__9();
-		}
-	}
-	// $ANTLR end "T__9"
 
 	partial void EnterRule_T__10();
 	partial void LeaveRule_T__10();
@@ -112,18 +78,18 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__10()
 	{
 		EnterRule_T__10();
-		EnterRule("T__10", 2);
-		TraceIn("T__10", 2);
+		EnterRule("T__10", 1);
+		TraceIn("T__10", 1);
 		try
 		{
 			int _type = T__10;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:8:7: ( ')' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:7:7: ( '(' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:8:9: ')'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:7:9: '('
 			{
-			DebugLocation(8, 9);
-			Match(')'); 
+			DebugLocation(7, 9);
+			Match('('); 
 
 			}
 
@@ -132,8 +98,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__10", 2);
-			LeaveRule("T__10", 2);
+			TraceOut("T__10", 1);
+			LeaveRule("T__10", 1);
 			LeaveRule_T__10();
 		}
 	}
@@ -147,18 +113,18 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__11()
 	{
 		EnterRule_T__11();
-		EnterRule("T__11", 3);
-		TraceIn("T__11", 3);
+		EnterRule("T__11", 2);
+		TraceIn("T__11", 2);
 		try
 		{
 			int _type = T__11;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:9:7: ( '*' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:8:7: ( ')' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:9:9: '*'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:8:9: ')'
 			{
-			DebugLocation(9, 9);
-			Match('*'); 
+			DebugLocation(8, 9);
+			Match(')'); 
 
 			}
 
@@ -167,8 +133,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__11", 3);
-			LeaveRule("T__11", 3);
+			TraceOut("T__11", 2);
+			LeaveRule("T__11", 2);
 			LeaveRule_T__11();
 		}
 	}
@@ -182,18 +148,18 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__12()
 	{
 		EnterRule_T__12();
-		EnterRule("T__12", 4);
-		TraceIn("T__12", 4);
+		EnterRule("T__12", 3);
+		TraceIn("T__12", 3);
 		try
 		{
 			int _type = T__12;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:10:7: ( '+' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:9:7: ( '*' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:10:9: '+'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:9:9: '*'
 			{
-			DebugLocation(10, 9);
-			Match('+'); 
+			DebugLocation(9, 9);
+			Match('*'); 
 
 			}
 
@@ -202,8 +168,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__12", 4);
-			LeaveRule("T__12", 4);
+			TraceOut("T__12", 3);
+			LeaveRule("T__12", 3);
 			LeaveRule_T__12();
 		}
 	}
@@ -217,18 +183,18 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__13()
 	{
 		EnterRule_T__13();
-		EnterRule("T__13", 5);
-		TraceIn("T__13", 5);
+		EnterRule("T__13", 4);
+		TraceIn("T__13", 4);
 		try
 		{
 			int _type = T__13;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:11:7: ( '-' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:10:7: ( '+' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:11:9: '-'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:10:9: '+'
 			{
-			DebugLocation(11, 9);
-			Match('-'); 
+			DebugLocation(10, 9);
+			Match('+'); 
 
 			}
 
@@ -237,8 +203,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__13", 5);
-			LeaveRule("T__13", 5);
+			TraceOut("T__13", 4);
+			LeaveRule("T__13", 4);
 			LeaveRule_T__13();
 		}
 	}
@@ -252,18 +218,18 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__14()
 	{
 		EnterRule_T__14();
-		EnterRule("T__14", 6);
-		TraceIn("T__14", 6);
+		EnterRule("T__14", 5);
+		TraceIn("T__14", 5);
 		try
 		{
 			int _type = T__14;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:12:7: ( '/' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:11:7: ( '-' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:12:9: '/'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:11:9: '-'
 			{
-			DebugLocation(12, 9);
-			Match('/'); 
+			DebugLocation(11, 9);
+			Match('-'); 
 
 			}
 
@@ -272,8 +238,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__14", 6);
-			LeaveRule("T__14", 6);
+			TraceOut("T__14", 5);
+			LeaveRule("T__14", 5);
 			LeaveRule_T__14();
 		}
 	}
@@ -287,18 +253,18 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__15()
 	{
 		EnterRule_T__15();
-		EnterRule("T__15", 7);
-		TraceIn("T__15", 7);
+		EnterRule("T__15", 6);
+		TraceIn("T__15", 6);
 		try
 		{
 			int _type = T__15;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:13:7: ( '=' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:12:7: ( '/' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:13:9: '='
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:12:9: '/'
 			{
-			DebugLocation(13, 9);
-			Match('='); 
+			DebugLocation(12, 9);
+			Match('/'); 
 
 			}
 
@@ -307,8 +273,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__15", 7);
-			LeaveRule("T__15", 7);
+			TraceOut("T__15", 6);
+			LeaveRule("T__15", 6);
 			LeaveRule_T__15();
 		}
 	}
@@ -322,15 +288,50 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mT__16()
 	{
 		EnterRule_T__16();
-		EnterRule("T__16", 8);
-		TraceIn("T__16", 8);
+		EnterRule("T__16", 7);
+		TraceIn("T__16", 7);
 		try
 		{
 			int _type = T__16;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:14:7: ( 'let' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:13:7: ( '=' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:14:9: 'let'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:13:9: '='
+			{
+			DebugLocation(13, 9);
+			Match('='); 
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally
+		{
+			TraceOut("T__16", 7);
+			LeaveRule("T__16", 7);
+			LeaveRule_T__16();
+		}
+	}
+	// $ANTLR end "T__16"
+
+	partial void EnterRule_T__17();
+	partial void LeaveRule_T__17();
+
+	// $ANTLR start "T__17"
+	[GrammarRule("T__17")]
+	private void mT__17()
+	{
+		EnterRule_T__17();
+		EnterRule("T__17", 8);
+		TraceIn("T__17", 8);
+		try
+		{
+			int _type = T__17;
+			int _channel = DefaultTokenChannel;
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:14:7: ( 'let' )
+			DebugEnterAlt(1);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:14:9: 'let'
 			{
 			DebugLocation(14, 9);
 			Match("let"); 
@@ -343,12 +344,12 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("T__16", 8);
-			LeaveRule("T__16", 8);
-			LeaveRule_T__16();
+			TraceOut("T__17", 8);
+			LeaveRule("T__17", 8);
+			LeaveRule_T__17();
 		}
 	}
-	// $ANTLR end "T__16"
+	// $ANTLR end "T__17"
 
 	partial void EnterRule_IDENTIFIER();
 	partial void LeaveRule_IDENTIFIER();
@@ -364,7 +365,7 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		{
 			int _type = IDENTIFIER;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:2: ( ( 'a' .. 'z' | 'A' .. 'Z' )+ | ( 'a' .. 'z' | 'A' .. 'Z' )+ '0' .. '9' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )* )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:2: ( ( 'a' .. 'z' | 'A' .. 'Z' )+ | ( 'a' .. 'z' | 'A' .. 'Z' )+ '0' .. '9' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )* )
 			int alt4=2;
 			try { DebugEnterDecision(4, false);
 			try
@@ -381,10 +382,10 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:4: ( 'a' .. 'z' | 'A' .. 'Z' )+
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:4: ( 'a' .. 'z' | 'A' .. 'Z' )+
 				{
 				DebugLocation(27, 4);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:4: ( 'a' .. 'z' | 'A' .. 'Z' )+
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:4: ( 'a' .. 'z' | 'A' .. 'Z' )+
 				int cnt1=0;
 				try { DebugEnterSubRule(1);
 				while (true)
@@ -404,7 +405,7 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
 						{
 						DebugLocation(27, 4);
 						input.Consume();
@@ -433,10 +434,10 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:27: ( 'a' .. 'z' | 'A' .. 'Z' )+ '0' .. '9' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )*
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:27: ( 'a' .. 'z' | 'A' .. 'Z' )+ '0' .. '9' ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )*
 				{
 				DebugLocation(27, 27);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:27: ( 'a' .. 'z' | 'A' .. 'Z' )+
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:27: ( 'a' .. 'z' | 'A' .. 'Z' )+
 				int cnt2=0;
 				try { DebugEnterSubRule(2);
 				while (true)
@@ -456,7 +457,7 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
 						{
 						DebugLocation(27, 27);
 						input.Consume();
@@ -483,7 +484,7 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 				DebugLocation(27, 48);
 				MatchRange('0','9'); 
 				DebugLocation(27, 57);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:57: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )*
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:27:57: ( 'a' .. 'z' | 'A' .. 'Z' | '0' .. '9' )*
 				try { DebugEnterSubRule(3);
 				while (true)
 				{
@@ -502,7 +503,7 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+						// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
 						{
 						DebugLocation(27, 57);
 						input.Consume();
@@ -538,199 +539,208 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	}
 	// $ANTLR end "IDENTIFIER"
 
-	partial void EnterRule_CONSTANT();
-	partial void LeaveRule_CONSTANT();
+	partial void EnterRule_INTEGER();
+	partial void LeaveRule_INTEGER();
 
-	// $ANTLR start "CONSTANT"
-	[GrammarRule("CONSTANT")]
-	private void mCONSTANT()
+	// $ANTLR start "INTEGER"
+	[GrammarRule("INTEGER")]
+	private void mINTEGER()
 	{
-		EnterRule_CONSTANT();
-		EnterRule("CONSTANT", 10);
-		TraceIn("CONSTANT", 10);
+		EnterRule_INTEGER();
+		EnterRule("INTEGER", 10);
+		TraceIn("INTEGER", 10);
 		try
 		{
-			int _type = CONSTANT;
+			int _type = INTEGER;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:2: ( ( '0' .. '9' )+ | ( '0' .. '9' )+ '.' ( '0' .. '9' )+ )
-			int alt8=2;
-			try { DebugEnterDecision(8, false);
-			try
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:2: ( ( '0' .. '9' )+ )
+			DebugEnterAlt(1);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:4: ( '0' .. '9' )+
 			{
-				alt8 = dfa8.Predict(input);
+			DebugLocation(31, 4);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:4: ( '0' .. '9' )+
+			int cnt5=0;
+			try { DebugEnterSubRule(5);
+			while (true)
+			{
+				int alt5=2;
+				try { DebugEnterDecision(5, false);
+				int LA5_0 = input.LA(1);
+
+				if (((LA5_0>='0' && LA5_0<='9')))
+				{
+					alt5 = 1;
+				}
+
+
+				} finally { DebugExitDecision(5); }
+				switch (alt5)
+				{
+				case 1:
+					DebugEnterAlt(1);
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+					{
+					DebugLocation(31, 4);
+					input.Consume();
+
+
+					}
+					break;
+
+				default:
+					if (cnt5 >= 1)
+						goto loop5;
+
+					EarlyExitException eee5 = new EarlyExitException( 5, input );
+					DebugRecognitionException(eee5);
+					throw eee5;
+				}
+				cnt5++;
 			}
-			catch (NoViableAltException nvae)
-			{
-				DebugRecognitionException(nvae);
-				throw;
-			}
-			} finally { DebugExitDecision(8); }
-			switch (alt8)
-			{
-			case 1:
-				DebugEnterAlt(1);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:4: ( '0' .. '9' )+
-				{
-				DebugLocation(31, 4);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:4: ( '0' .. '9' )+
-				int cnt5=0;
-				try { DebugEnterSubRule(5);
-				while (true)
-				{
-					int alt5=2;
-					try { DebugEnterDecision(5, false);
-					int LA5_0 = input.LA(1);
+			loop5:
+				;
 
-					if (((LA5_0>='0' && LA5_0<='9')))
-					{
-						alt5 = 1;
-					}
+			} finally { DebugExitSubRule(5); }
 
-
-					} finally { DebugExitDecision(5); }
-					switch (alt5)
-					{
-					case 1:
-						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
-						{
-						DebugLocation(31, 4);
-						input.Consume();
-
-
-						}
-						break;
-
-					default:
-						if (cnt5 >= 1)
-							goto loop5;
-
-						EarlyExitException eee5 = new EarlyExitException( 5, input );
-						DebugRecognitionException(eee5);
-						throw eee5;
-					}
-					cnt5++;
-				}
-				loop5:
-					;
-
-				} finally { DebugExitSubRule(5); }
-
-
-				}
-				break;
-			case 2:
-				DebugEnterAlt(2);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:16: ( '0' .. '9' )+ '.' ( '0' .. '9' )+
-				{
-				DebugLocation(31, 16);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:16: ( '0' .. '9' )+
-				int cnt6=0;
-				try { DebugEnterSubRule(6);
-				while (true)
-				{
-					int alt6=2;
-					try { DebugEnterDecision(6, false);
-					int LA6_0 = input.LA(1);
-
-					if (((LA6_0>='0' && LA6_0<='9')))
-					{
-						alt6 = 1;
-					}
-
-
-					} finally { DebugExitDecision(6); }
-					switch (alt6)
-					{
-					case 1:
-						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
-						{
-						DebugLocation(31, 16);
-						input.Consume();
-
-
-						}
-						break;
-
-					default:
-						if (cnt6 >= 1)
-							goto loop6;
-
-						EarlyExitException eee6 = new EarlyExitException( 6, input );
-						DebugRecognitionException(eee6);
-						throw eee6;
-					}
-					cnt6++;
-				}
-				loop6:
-					;
-
-				} finally { DebugExitSubRule(6); }
-
-				DebugLocation(31, 26);
-				Match('.'); 
-				DebugLocation(31, 30);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:31:30: ( '0' .. '9' )+
-				int cnt7=0;
-				try { DebugEnterSubRule(7);
-				while (true)
-				{
-					int alt7=2;
-					try { DebugEnterDecision(7, false);
-					int LA7_0 = input.LA(1);
-
-					if (((LA7_0>='0' && LA7_0<='9')))
-					{
-						alt7 = 1;
-					}
-
-
-					} finally { DebugExitDecision(7); }
-					switch (alt7)
-					{
-					case 1:
-						DebugEnterAlt(1);
-						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
-						{
-						DebugLocation(31, 30);
-						input.Consume();
-
-
-						}
-						break;
-
-					default:
-						if (cnt7 >= 1)
-							goto loop7;
-
-						EarlyExitException eee7 = new EarlyExitException( 7, input );
-						DebugRecognitionException(eee7);
-						throw eee7;
-					}
-					cnt7++;
-				}
-				loop7:
-					;
-
-				} finally { DebugExitSubRule(7); }
-
-
-				}
-				break;
 
 			}
+
 			state.type = _type;
 			state.channel = _channel;
 		}
 		finally
 		{
-			TraceOut("CONSTANT", 10);
-			LeaveRule("CONSTANT", 10);
-			LeaveRule_CONSTANT();
+			TraceOut("INTEGER", 10);
+			LeaveRule("INTEGER", 10);
+			LeaveRule_INTEGER();
 		}
 	}
-	// $ANTLR end "CONSTANT"
+	// $ANTLR end "INTEGER"
+
+	partial void EnterRule_FLOAT();
+	partial void LeaveRule_FLOAT();
+
+	// $ANTLR start "FLOAT"
+	[GrammarRule("FLOAT")]
+	private void mFLOAT()
+	{
+		EnterRule_FLOAT();
+		EnterRule("FLOAT", 11);
+		TraceIn("FLOAT", 11);
+		try
+		{
+			int _type = FLOAT;
+			int _channel = DefaultTokenChannel;
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:2: ( ( '0' .. '9' )+ '.' ( '0' .. '9' )+ )
+			DebugEnterAlt(1);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:4: ( '0' .. '9' )+ '.' ( '0' .. '9' )+
+			{
+			DebugLocation(33, 4);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:4: ( '0' .. '9' )+
+			int cnt6=0;
+			try { DebugEnterSubRule(6);
+			while (true)
+			{
+				int alt6=2;
+				try { DebugEnterDecision(6, false);
+				int LA6_0 = input.LA(1);
+
+				if (((LA6_0>='0' && LA6_0<='9')))
+				{
+					alt6 = 1;
+				}
+
+
+				} finally { DebugExitDecision(6); }
+				switch (alt6)
+				{
+				case 1:
+					DebugEnterAlt(1);
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+					{
+					DebugLocation(33, 4);
+					input.Consume();
+
+
+					}
+					break;
+
+				default:
+					if (cnt6 >= 1)
+						goto loop6;
+
+					EarlyExitException eee6 = new EarlyExitException( 6, input );
+					DebugRecognitionException(eee6);
+					throw eee6;
+				}
+				cnt6++;
+			}
+			loop6:
+				;
+
+			} finally { DebugExitSubRule(6); }
+
+			DebugLocation(33, 14);
+			Match('.'); 
+			DebugLocation(33, 18);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:18: ( '0' .. '9' )+
+			int cnt7=0;
+			try { DebugEnterSubRule(7);
+			while (true)
+			{
+				int alt7=2;
+				try { DebugEnterDecision(7, false);
+				int LA7_0 = input.LA(1);
+
+				if (((LA7_0>='0' && LA7_0<='9')))
+				{
+					alt7 = 1;
+				}
+
+
+				} finally { DebugExitDecision(7); }
+				switch (alt7)
+				{
+				case 1:
+					DebugEnterAlt(1);
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+					{
+					DebugLocation(33, 18);
+					input.Consume();
+
+
+					}
+					break;
+
+				default:
+					if (cnt7 >= 1)
+						goto loop7;
+
+					EarlyExitException eee7 = new EarlyExitException( 7, input );
+					DebugRecognitionException(eee7);
+					throw eee7;
+				}
+				cnt7++;
+			}
+			loop7:
+				;
+
+			} finally { DebugExitSubRule(7); }
+
+
+			}
+
+			state.type = _type;
+			state.channel = _channel;
+		}
+		finally
+		{
+			TraceOut("FLOAT", 11);
+			LeaveRule("FLOAT", 11);
+			LeaveRule_FLOAT();
+		}
+	}
+	// $ANTLR end "FLOAT"
 
 	partial void EnterRule_NEWLINE();
 	partial void LeaveRule_NEWLINE();
@@ -740,44 +750,44 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mNEWLINE()
 	{
 		EnterRule_NEWLINE();
-		EnterRule("NEWLINE", 11);
-		TraceIn("NEWLINE", 11);
+		EnterRule("NEWLINE", 12);
+		TraceIn("NEWLINE", 12);
 		try
 		{
 			int _type = NEWLINE;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:32:9: ( ( '\\r' )? '\\n' )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:9: ( ( '\\r' )? '\\n' )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:32:11: ( '\\r' )? '\\n'
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:11: ( '\\r' )? '\\n'
 			{
-			DebugLocation(32, 11);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:32:11: ( '\\r' )?
-			int alt9=2;
-			try { DebugEnterSubRule(9);
-			try { DebugEnterDecision(9, false);
-			int LA9_0 = input.LA(1);
+			DebugLocation(35, 11);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:11: ( '\\r' )?
+			int alt8=2;
+			try { DebugEnterSubRule(8);
+			try { DebugEnterDecision(8, false);
+			int LA8_0 = input.LA(1);
 
-			if ((LA9_0=='\r'))
+			if ((LA8_0=='\r'))
 			{
-				alt9 = 1;
+				alt8 = 1;
 			}
-			} finally { DebugExitDecision(9); }
-			switch (alt9)
+			} finally { DebugExitDecision(8); }
+			switch (alt8)
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:32:11: '\\r'
+				// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:11: '\\r'
 				{
-				DebugLocation(32, 11);
+				DebugLocation(35, 11);
 				Match('\r'); 
 
 				}
 				break;
 
 			}
-			} finally { DebugExitSubRule(9); }
+			} finally { DebugExitSubRule(8); }
 
-			DebugLocation(32, 17);
+			DebugLocation(35, 17);
 			Match('\n'); 
 
 			}
@@ -787,8 +797,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("NEWLINE", 11);
-			LeaveRule("NEWLINE", 11);
+			TraceOut("NEWLINE", 12);
+			LeaveRule("NEWLINE", 12);
 			LeaveRule_NEWLINE();
 		}
 	}
@@ -802,40 +812,40 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 	private void mWS()
 	{
 		EnterRule_WS();
-		EnterRule("WS", 12);
-		TraceIn("WS", 12);
+		EnterRule("WS", 13);
+		TraceIn("WS", 13);
 		try
 		{
 			int _type = WS;
 			int _channel = DefaultTokenChannel;
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:36:4: ( ( ' ' | '\\t' | '\\n' | '\\r' )+ )
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:36:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
 			{
-			DebugLocation(33, 6);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:33:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
-			int cnt10=0;
-			try { DebugEnterSubRule(10);
+			DebugLocation(36, 6);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:36:6: ( ' ' | '\\t' | '\\n' | '\\r' )+
+			int cnt9=0;
+			try { DebugEnterSubRule(9);
 			while (true)
 			{
-				int alt10=2;
-				try { DebugEnterDecision(10, false);
-				int LA10_0 = input.LA(1);
+				int alt9=2;
+				try { DebugEnterDecision(9, false);
+				int LA9_0 = input.LA(1);
 
-				if (((LA10_0>='\t' && LA10_0<='\n')||LA10_0=='\r'||LA10_0==' '))
+				if (((LA9_0>='\t' && LA9_0<='\n')||LA9_0=='\r'||LA9_0==' '))
 				{
-					alt10 = 1;
+					alt9 = 1;
 				}
 
 
-				} finally { DebugExitDecision(10); }
-				switch (alt10)
+				} finally { DebugExitDecision(9); }
+				switch (alt9)
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
+					// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:
 					{
-					DebugLocation(33, 6);
+					DebugLocation(36, 6);
 					input.Consume();
 
 
@@ -843,21 +853,21 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 					break;
 
 				default:
-					if (cnt10 >= 1)
-						goto loop10;
+					if (cnt9 >= 1)
+						goto loop9;
 
-					EarlyExitException eee10 = new EarlyExitException( 10, input );
-					DebugRecognitionException(eee10);
-					throw eee10;
+					EarlyExitException eee9 = new EarlyExitException( 9, input );
+					DebugRecognitionException(eee9);
+					throw eee9;
 				}
-				cnt10++;
+				cnt9++;
 			}
-			loop10:
+			loop9:
 				;
 
-			} finally { DebugExitSubRule(10); }
+			} finally { DebugExitSubRule(9); }
 
-			DebugLocation(33, 28);
+			DebugLocation(36, 28);
 			Skip();
 
 			}
@@ -867,8 +877,8 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 		finally
 		{
-			TraceOut("WS", 12);
-			LeaveRule("WS", 12);
+			TraceOut("WS", 13);
+			LeaveRule("WS", 13);
 			LeaveRule_WS();
 		}
 	}
@@ -876,305 +886,134 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 
 	public override void mTokens()
 	{
-		// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:8: ( T__9 | T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | IDENTIFIER | CONSTANT | NEWLINE | WS )
-		int alt11=12;
-		try { DebugEnterDecision(11, false);
-		switch (input.LA(1))
+		// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:8: ( T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | IDENTIFIER | INTEGER | FLOAT | NEWLINE | WS )
+		int alt10=13;
+		try { DebugEnterDecision(10, false);
+		try
 		{
-		case '(':
-			{
-			alt11 = 1;
-			}
-			break;
-		case ')':
-			{
-			alt11 = 2;
-			}
-			break;
-		case '*':
-			{
-			alt11 = 3;
-			}
-			break;
-		case '+':
-			{
-			alt11 = 4;
-			}
-			break;
-		case '-':
-			{
-			alt11 = 5;
-			}
-			break;
-		case '/':
-			{
-			alt11 = 6;
-			}
-			break;
-		case '=':
-			{
-			alt11 = 7;
-			}
-			break;
-		case 'l':
-			{
-			int LA11_8 = input.LA(2);
-
-			if ((LA11_8=='e'))
-			{
-				int LA11_14 = input.LA(3);
-
-				if ((LA11_14=='t'))
-				{
-					int LA11_16 = input.LA(4);
-
-					if (((LA11_16>='0' && LA11_16<='9')||(LA11_16>='A' && LA11_16<='Z')||(LA11_16>='a' && LA11_16<='z')))
-					{
-						alt11 = 9;
-					}
-					else
-					{
-						alt11 = 8;
-					}
-				}
-				else
-				{
-					alt11 = 9;
-				}
-			}
-			else
-			{
-				alt11 = 9;
-			}
-			}
-			break;
-		case 'A':
-		case 'B':
-		case 'C':
-		case 'D':
-		case 'E':
-		case 'F':
-		case 'G':
-		case 'H':
-		case 'I':
-		case 'J':
-		case 'K':
-		case 'L':
-		case 'M':
-		case 'N':
-		case 'O':
-		case 'P':
-		case 'Q':
-		case 'R':
-		case 'S':
-		case 'T':
-		case 'U':
-		case 'V':
-		case 'W':
-		case 'X':
-		case 'Y':
-		case 'Z':
-		case 'a':
-		case 'b':
-		case 'c':
-		case 'd':
-		case 'e':
-		case 'f':
-		case 'g':
-		case 'h':
-		case 'i':
-		case 'j':
-		case 'k':
-		case 'm':
-		case 'n':
-		case 'o':
-		case 'p':
-		case 'q':
-		case 'r':
-		case 's':
-		case 't':
-		case 'u':
-		case 'v':
-		case 'w':
-		case 'x':
-		case 'y':
-		case 'z':
-			{
-			alt11 = 9;
-			}
-			break;
-		case '0':
-		case '1':
-		case '2':
-		case '3':
-		case '4':
-		case '5':
-		case '6':
-		case '7':
-		case '8':
-		case '9':
-			{
-			alt11 = 10;
-			}
-			break;
-		case '\r':
-			{
-			int LA11_11 = input.LA(2);
-
-			if ((LA11_11=='\n'))
-			{
-				int LA11_12 = input.LA(3);
-
-				if (((LA11_12>='\t' && LA11_12<='\n')||LA11_12=='\r'||LA11_12==' '))
-				{
-					alt11 = 12;
-				}
-				else
-				{
-					alt11 = 11;
-				}
-			}
-			else
-			{
-				alt11 = 12;
-			}
-			}
-			break;
-		case '\n':
-			{
-			int LA11_12 = input.LA(2);
-
-			if (((LA11_12>='\t' && LA11_12<='\n')||LA11_12=='\r'||LA11_12==' '))
-			{
-				alt11 = 12;
-			}
-			else
-			{
-				alt11 = 11;
-			}
-			}
-			break;
-		case '\t':
-		case ' ':
-			{
-			alt11 = 12;
-			}
-			break;
-		default:
-			{
-				NoViableAltException nvae = new NoViableAltException("", 11, 0, input);
-				DebugRecognitionException(nvae);
-				throw nvae;
-			}
+			alt10 = dfa10.Predict(input);
 		}
-
-		} finally { DebugExitDecision(11); }
-		switch (alt11)
+		catch (NoViableAltException nvae)
+		{
+			DebugRecognitionException(nvae);
+			throw;
+		}
+		} finally { DebugExitDecision(10); }
+		switch (alt10)
 		{
 		case 1:
 			DebugEnterAlt(1);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:10: T__9
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:10: T__10
 			{
 			DebugLocation(1, 10);
-			mT__9(); 
+			mT__10(); 
 
 			}
 			break;
 		case 2:
 			DebugEnterAlt(2);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:15: T__10
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:16: T__11
 			{
-			DebugLocation(1, 15);
-			mT__10(); 
+			DebugLocation(1, 16);
+			mT__11(); 
 
 			}
 			break;
 		case 3:
 			DebugEnterAlt(3);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:21: T__11
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:22: T__12
 			{
-			DebugLocation(1, 21);
-			mT__11(); 
+			DebugLocation(1, 22);
+			mT__12(); 
 
 			}
 			break;
 		case 4:
 			DebugEnterAlt(4);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:27: T__12
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:28: T__13
 			{
-			DebugLocation(1, 27);
-			mT__12(); 
+			DebugLocation(1, 28);
+			mT__13(); 
 
 			}
 			break;
 		case 5:
 			DebugEnterAlt(5);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:33: T__13
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:34: T__14
 			{
-			DebugLocation(1, 33);
-			mT__13(); 
+			DebugLocation(1, 34);
+			mT__14(); 
 
 			}
 			break;
 		case 6:
 			DebugEnterAlt(6);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:39: T__14
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:40: T__15
 			{
-			DebugLocation(1, 39);
-			mT__14(); 
+			DebugLocation(1, 40);
+			mT__15(); 
 
 			}
 			break;
 		case 7:
 			DebugEnterAlt(7);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:45: T__15
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:46: T__16
 			{
-			DebugLocation(1, 45);
-			mT__15(); 
+			DebugLocation(1, 46);
+			mT__16(); 
 
 			}
 			break;
 		case 8:
 			DebugEnterAlt(8);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:51: T__16
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:52: T__17
 			{
-			DebugLocation(1, 51);
-			mT__16(); 
+			DebugLocation(1, 52);
+			mT__17(); 
 
 			}
 			break;
 		case 9:
 			DebugEnterAlt(9);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:57: IDENTIFIER
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:58: IDENTIFIER
 			{
-			DebugLocation(1, 57);
+			DebugLocation(1, 58);
 			mIDENTIFIER(); 
 
 			}
 			break;
 		case 10:
 			DebugEnterAlt(10);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:68: CONSTANT
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:69: INTEGER
 			{
-			DebugLocation(1, 68);
-			mCONSTANT(); 
+			DebugLocation(1, 69);
+			mINTEGER(); 
 
 			}
 			break;
 		case 11:
 			DebugEnterAlt(11);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:77: NEWLINE
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:77: FLOAT
 			{
 			DebugLocation(1, 77);
-			mNEWLINE(); 
+			mFLOAT(); 
 
 			}
 			break;
 		case 12:
 			DebugEnterAlt(12);
-			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:85: WS
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:83: NEWLINE
 			{
-			DebugLocation(1, 85);
+			DebugLocation(1, 83);
+			mNEWLINE(); 
+
+			}
+			break;
+		case 13:
+			DebugEnterAlt(13);
+			// D:\\acarter\\code\\chemprov\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:1:91: WS
+			{
+			DebugLocation(1, 91);
 			mWS(); 
 
 			}
@@ -1187,13 +1026,13 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 
 	#region DFA
 	DFA4 dfa4;
-	DFA8 dfa8;
+	DFA10 dfa10;
 
 	protected override void InitDFAs()
 	{
 		base.InitDFAs();
 		dfa4 = new DFA4(this);
-		dfa8 = new DFA8(this);
+		dfa10 = new DFA10(this);
 	}
 
 	private class DFA4 : DFA
@@ -1257,60 +1096,82 @@ public partial class ChemProVLexer : Antlr.Runtime.Lexer
 		}
 	}
 
-	private class DFA8 : DFA
+	private class DFA10 : DFA
 	{
-		private const string DFA8_eotS =
-			"\x1\xFFFF\x1\x2\x2\xFFFF";
-		private const string DFA8_eofS =
-			"\x4\xFFFF";
-		private const string DFA8_minS =
-			"\x1\x30\x1\x2E\x2\xFFFF";
-		private const string DFA8_maxS =
-			"\x2\x39\x2\xFFFF";
-		private const string DFA8_acceptS =
-			"\x2\xFFFF\x1\x1\x1\x2";
-		private const string DFA8_specialS =
-			"\x4\xFFFF}>";
-		private static readonly string[] DFA8_transitionS =
+		private const string DFA10_eotS =
+			"\x8\xFFFF\x1\x9\x1\xFFFF\x1\xF\x1\xD\x1\x11\x1\xFFFF\x1\x9\x3\xFFFF\x1"+
+			"\x13\x1\xFFFF";
+		private const string DFA10_eofS =
+			"\x14\xFFFF";
+		private const string DFA10_minS =
+			"\x1\x9\x7\xFFFF\x1\x65\x1\xFFFF\x1\x2E\x1\xA\x1\x9\x1\xFFFF\x1\x74\x3"+
+			"\xFFFF\x1\x30\x1\xFFFF";
+		private const string DFA10_maxS =
+			"\x1\x7A\x7\xFFFF\x1\x65\x1\xFFFF\x1\x39\x1\xA\x1\x20\x1\xFFFF\x1\x74"+
+			"\x3\xFFFF\x1\x7A\x1\xFFFF";
+		private const string DFA10_acceptS =
+			"\x1\xFFFF\x1\x1\x1\x2\x1\x3\x1\x4\x1\x5\x1\x6\x1\x7\x1\xFFFF\x1\x9\x3"+
+			"\xFFFF\x1\xD\x1\xFFFF\x1\xA\x1\xB\x1\xC\x1\xFFFF\x1\x8";
+		private const string DFA10_specialS =
+			"\x14\xFFFF}>";
+		private static readonly string[] DFA10_transitionS =
 			{
-				"\xA\x1",
-				"\x1\x3\x1\xFFFF\xA\x1",
+				"\x1\xD\x1\xC\x2\xFFFF\x1\xB\x12\xFFFF\x1\xD\x7\xFFFF\x1\x1\x1\x2\x1"+
+				"\x3\x1\x4\x1\xFFFF\x1\x5\x1\xFFFF\x1\x6\xA\xA\x3\xFFFF\x1\x7\x3\xFFFF"+
+				"\x1A\x9\x6\xFFFF\xB\x9\x1\x8\xE\x9",
 				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"",
+				"\x1\xE",
+				"",
+				"\x1\x10\x1\xFFFF\xA\xA",
+				"\x1\xC",
+				"\x2\xD\x2\xFFFF\x1\xD\x12\xFFFF\x1\xD",
+				"",
+				"\x1\x12",
+				"",
+				"",
+				"",
+				"\xA\x9\x7\xFFFF\x1A\x9\x6\xFFFF\x1A\x9",
 				""
 			};
 
-		private static readonly short[] DFA8_eot = DFA.UnpackEncodedString(DFA8_eotS);
-		private static readonly short[] DFA8_eof = DFA.UnpackEncodedString(DFA8_eofS);
-		private static readonly char[] DFA8_min = DFA.UnpackEncodedStringToUnsignedChars(DFA8_minS);
-		private static readonly char[] DFA8_max = DFA.UnpackEncodedStringToUnsignedChars(DFA8_maxS);
-		private static readonly short[] DFA8_accept = DFA.UnpackEncodedString(DFA8_acceptS);
-		private static readonly short[] DFA8_special = DFA.UnpackEncodedString(DFA8_specialS);
-		private static readonly short[][] DFA8_transition;
+		private static readonly short[] DFA10_eot = DFA.UnpackEncodedString(DFA10_eotS);
+		private static readonly short[] DFA10_eof = DFA.UnpackEncodedString(DFA10_eofS);
+		private static readonly char[] DFA10_min = DFA.UnpackEncodedStringToUnsignedChars(DFA10_minS);
+		private static readonly char[] DFA10_max = DFA.UnpackEncodedStringToUnsignedChars(DFA10_maxS);
+		private static readonly short[] DFA10_accept = DFA.UnpackEncodedString(DFA10_acceptS);
+		private static readonly short[] DFA10_special = DFA.UnpackEncodedString(DFA10_specialS);
+		private static readonly short[][] DFA10_transition;
 
-		static DFA8()
+		static DFA10()
 		{
-			int numStates = DFA8_transitionS.Length;
-			DFA8_transition = new short[numStates][];
+			int numStates = DFA10_transitionS.Length;
+			DFA10_transition = new short[numStates][];
 			for ( int i=0; i < numStates; i++ )
 			{
-				DFA8_transition[i] = DFA.UnpackEncodedString(DFA8_transitionS[i]);
+				DFA10_transition[i] = DFA.UnpackEncodedString(DFA10_transitionS[i]);
 			}
 		}
 
-		public DFA8( BaseRecognizer recognizer )
+		public DFA10( BaseRecognizer recognizer )
 		{
 			this.recognizer = recognizer;
-			this.decisionNumber = 8;
-			this.eot = DFA8_eot;
-			this.eof = DFA8_eof;
-			this.min = DFA8_min;
-			this.max = DFA8_max;
-			this.accept = DFA8_accept;
-			this.special = DFA8_special;
-			this.transition = DFA8_transition;
+			this.decisionNumber = 10;
+			this.eot = DFA10_eot;
+			this.eof = DFA10_eof;
+			this.min = DFA10_min;
+			this.max = DFA10_max;
+			this.accept = DFA10_accept;
+			this.special = DFA10_special;
+			this.transition = DFA10_transition;
 		}
 
-		public override string Description { get { return "30:1: CONSTANT : ( ( '0' .. '9' )+ | ( '0' .. '9' )+ '.' ( '0' .. '9' )+ );"; } }
+		public override string Description { get { return "1:1: Tokens : ( T__10 | T__11 | T__12 | T__13 | T__14 | T__15 | T__16 | T__17 | IDENTIFIER | INTEGER | FLOAT | NEWLINE | WS );"; } }
 
 		public override void Error(NoViableAltException nvae)
 		{
