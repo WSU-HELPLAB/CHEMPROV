@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 D:\\acarter\\code\\antlr_sandbox\\ChemProV.g 2011-11-29 11:45:20
+// $ANTLR 3.4 D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g 2012-02-08 12:52:50
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -20,25 +20,39 @@
 #pragma warning disable 3019
 
 
+	using System.Collections;
+	using System;
+
+
 using System.Collections.Generic;
 using Antlr.Runtime;
 using Antlr.Runtime.Misc;
+
+
+using Antlr.Runtime.Tree;
+using RewriteRuleITokenStream = Antlr.Runtime.Tree.RewriteRuleTokenStream;
 
 [System.CodeDom.Compiler.GeneratedCode("ANTLR", "3.4")]
 [System.CLSCompliant(false)]
 public partial class ChemProVParser : Antlr.Runtime.Parser
 {
 	internal static readonly string[] tokenNames = new string[] {
-		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "Constant", "Identifier", "Op", "WS", "'('", "')'", "'='"
+		"<invalid>", "<EOR>", "<DOWN>", "<UP>", "CONSTANT", "IDENTIFIER", "NEWLINE", "VAR", "WS", "'('", "')'", "'*'", "'+'", "'-'", "'/'", "'='", "'let'"
 	};
 	public const int EOF=-1;
-	public const int T__8=8;
 	public const int T__9=9;
 	public const int T__10=10;
-	public const int Constant=4;
-	public const int Identifier=5;
-	public const int Op=6;
-	public const int WS=7;
+	public const int T__11=11;
+	public const int T__12=12;
+	public const int T__13=13;
+	public const int T__14=14;
+	public const int T__15=15;
+	public const int T__16=16;
+	public const int CONSTANT=4;
+	public const int IDENTIFIER=5;
+	public const int NEWLINE=6;
+	public const int VAR=7;
+	public const int WS=8;
 
 	public ChemProVParser(ITokenStream input)
 		: this(input, new RecognizerSharedState())
@@ -47,11 +61,34 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	public ChemProVParser(ITokenStream input, RecognizerSharedState state)
 		: base(input, state)
 	{
+		ITreeAdaptor treeAdaptor = default(ITreeAdaptor);
+		CreateTreeAdaptor(ref treeAdaptor);
+		TreeAdaptor = treeAdaptor ?? new CommonTreeAdaptor();
 		OnCreated();
+	}
+	// Implement this function in your helper file to use a custom tree adaptor
+	partial void CreateTreeAdaptor(ref ITreeAdaptor adaptor);
+
+	private ITreeAdaptor adaptor;
+
+	public ITreeAdaptor TreeAdaptor
+	{
+		get
+		{
+			return adaptor;
+		}
+
+		set
+		{
+			this.adaptor = value;
+		}
 	}
 
 	public override string[] TokenNames { get { return ChemProVParser.tokenNames; } }
-	public override string GrammarFileName { get { return "D:\\acarter\\code\\antlr_sandbox\\ChemProV.g"; } }
+	public override string GrammarFileName { get { return "D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g"; } }
+
+
+		Hashtable memory = new Hashtable();
 
 
 	partial void OnCreated();
@@ -59,335 +96,148 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule(string ruleName, int ruleIndex);
 
 	#region Rules
-	partial void EnterRule_term();
-	partial void LeaveRule_term();
+	partial void EnterRule_program();
+	partial void LeaveRule_program();
 
-	// $ANTLR start "term"
-	// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:12:1: term : ( Identifier | Constant );
-	[GrammarRule("term")]
-	private void term()
+	// $ANTLR start "program"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:34:8: public program : ( line )+ ;
+	[GrammarRule("program")]
+	public AstParserRuleReturnScope<CommonTree, IToken> program()
 	{
-		EnterRule_term();
-		EnterRule("term", 1);
-		TraceIn("term", 1);
-		try { DebugEnterRule(GrammarFileName, "term");
-		DebugLocation(12, 28);
+		EnterRule_program();
+		EnterRule("program", 1);
+		TraceIn("program", 1);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		AstParserRuleReturnScope<CommonTree, IToken> line1 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+
+		try { DebugEnterRule(GrammarFileName, "program");
+		DebugLocation(34, 1);
 		try
 		{
-			// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:12:6: ( Identifier | Constant )
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:2: ( ( line )+ )
 			DebugEnterAlt(1);
-			// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:4: ( line )+
 			{
-			DebugLocation(12, 6);
-			if ((input.LA(1)>=Constant && input.LA(1)<=Identifier))
+			root_0 = (CommonTree)adaptor.Nil();
+
+			DebugLocation(35, 4);
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:4: ( line )+
+			int cnt1=0;
+			try { DebugEnterSubRule(1);
+			while (true)
 			{
-				input.Consume();
-				state.errorRecovery=false;
+				int alt1=2;
+				try { DebugEnterDecision(1, false);
+				int LA1_0 = input.LA(1);
+
+				if (((LA1_0>=CONSTANT && LA1_0<=NEWLINE)||LA1_0==9||LA1_0==16))
+				{
+					alt1 = 1;
+				}
+
+
+				} finally { DebugExitDecision(1); }
+				switch (alt1)
+				{
+				case 1:
+					DebugEnterAlt(1);
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:35:5: line
+					{
+					DebugLocation(35, 5);
+					PushFollow(Follow._line_in_program169);
+					line1=line();
+					PopFollow();
+
+					adaptor.AddChild(root_0, line1.Tree);
+					DebugLocation(35, 10);
+					Console.WriteLine((line1!=null?((CommonTree)line1.Tree):default(CommonTree))==null?"null":(line1!=null?((CommonTree)line1.Tree):default(CommonTree)).ToStringTree());
+
+					}
+					break;
+
+				default:
+					if (cnt1 >= 1)
+						goto loop1;
+
+					EarlyExitException eee1 = new EarlyExitException( 1, input );
+					DebugRecognitionException(eee1);
+					throw eee1;
+				}
+				cnt1++;
 			}
-			else
-			{
-				MismatchedSetException mse = new MismatchedSetException(null,input);
-				DebugRecognitionException(mse);
-				throw mse;
-			}
+			loop1:
+				;
+
+			} finally { DebugExitSubRule(1); }
 
 
 			}
+
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
 
 		}
 		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
 		}
 		finally
 		{
-			TraceOut("term", 1);
-			LeaveRule("term", 1);
-			LeaveRule_term();
+			TraceOut("program", 1);
+			LeaveRule("program", 1);
+			LeaveRule_program();
 		}
-		DebugLocation(12, 28);
-		} finally { DebugExitRule(GrammarFileName, "term"); }
-		return;
+		DebugLocation(36, 1);
+		} finally { DebugExitRule(GrammarFileName, "program"); }
+		return retval;
 
 	}
-	// $ANTLR end "term"
+	// $ANTLR end "program"
 
-	partial void EnterRule_subComputation();
-	partial void LeaveRule_subComputation();
+	partial void EnterRule_line();
+	partial void LeaveRule_line();
 
-	// $ANTLR start "subComputation"
-	// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:13:1: subComputation : ( term Op term | '(' term Op term ')' );
-	[GrammarRule("subComputation")]
-	private void subComputation()
+	// $ANTLR start "line"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:1: line : ( variable | balance );
+	[GrammarRule("line")]
+	private AstParserRuleReturnScope<CommonTree, IToken> line()
 	{
-		EnterRule_subComputation();
-		EnterRule("subComputation", 2);
-		TraceIn("subComputation", 2);
-		try { DebugEnterRule(GrammarFileName, "subComputation");
-		DebugLocation(13, 38);
+		EnterRule_line();
+		EnterRule("line", 2);
+		TraceIn("line", 2);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		AstParserRuleReturnScope<CommonTree, IToken> variable2 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+		AstParserRuleReturnScope<CommonTree, IToken> balance3 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+
+		try { DebugEnterRule(GrammarFileName, "line");
+		DebugLocation(38, 1);
 		try
 		{
-			// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:14:2: ( term Op term | '(' term Op term ')' )
-			int alt1=2;
-			try { DebugEnterDecision(1, false);
-			int LA1_0 = input.LA(1);
-
-			if (((LA1_0>=Constant && LA1_0<=Identifier)))
-			{
-				alt1 = 1;
-			}
-			else if ((LA1_0==8))
-			{
-				alt1 = 2;
-			}
-			else
-			{
-				NoViableAltException nvae = new NoViableAltException("", 1, 0, input);
-				DebugRecognitionException(nvae);
-				throw nvae;
-			}
-			} finally { DebugExitDecision(1); }
-			switch (alt1)
-			{
-			case 1:
-				DebugEnterAlt(1);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:14:4: term Op term
-				{
-				DebugLocation(14, 4);
-				PushFollow(Follow._term_in_subComputation112);
-				term();
-				PopFollow();
-
-				DebugLocation(14, 9);
-				Match(input,Op,Follow._Op_in_subComputation114); 
-				DebugLocation(14, 12);
-				PushFollow(Follow._term_in_subComputation116);
-				term();
-				PopFollow();
-
-
-				}
-				break;
-			case 2:
-				DebugEnterAlt(2);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:14:19: '(' term Op term ')'
-				{
-				DebugLocation(14, 19);
-				Match(input,8,Follow._8_in_subComputation120); 
-				DebugLocation(14, 23);
-				PushFollow(Follow._term_in_subComputation122);
-				term();
-				PopFollow();
-
-				DebugLocation(14, 28);
-				Match(input,Op,Follow._Op_in_subComputation124); 
-				DebugLocation(14, 31);
-				PushFollow(Follow._term_in_subComputation126);
-				term();
-				PopFollow();
-
-				DebugLocation(14, 36);
-				Match(input,9,Follow._9_in_subComputation128); 
-
-				}
-				break;
-
-			}
-		}
-		catch (RecognitionException re)
-		{
-			ReportError(re);
-			Recover(input,re);
-		}
-		finally
-		{
-			TraceOut("subComputation", 2);
-			LeaveRule("subComputation", 2);
-			LeaveRule_subComputation();
-		}
-		DebugLocation(14, 38);
-		} finally { DebugExitRule(GrammarFileName, "subComputation"); }
-		return;
-
-	}
-	// $ANTLR end "subComputation"
-
-	partial void EnterRule_computation();
-	partial void LeaveRule_computation();
-
-	// $ANTLR start "computation"
-	// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:15:1: computation : ( subComputation Op subComputation | subComputation Op term );
-	[GrammarRule("computation")]
-	private void computation()
-	{
-		EnterRule_computation();
-		EnterRule("computation", 3);
-		TraceIn("computation", 3);
-		try { DebugEnterRule(GrammarFileName, "computation");
-		DebugLocation(15, 60);
-		try
-		{
-			// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:16:2: ( subComputation Op subComputation | subComputation Op term )
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:6: ( variable | balance )
 			int alt2=2;
 			try { DebugEnterDecision(2, false);
 			int LA2_0 = input.LA(1);
 
-			if (((LA2_0>=Constant && LA2_0<=Identifier)))
+			if ((LA2_0==16))
 			{
-				int LA2_1 = input.LA(2);
-
-				if ((LA2_1==Op))
-				{
-					int LA2_3 = input.LA(3);
-
-					if (((LA2_3>=Constant && LA2_3<=Identifier)))
-					{
-						int LA2_5 = input.LA(4);
-
-						if ((LA2_5==Op))
-						{
-							int LA2_7 = input.LA(5);
-
-							if (((LA2_7>=Constant && LA2_7<=Identifier)))
-							{
-								int LA2_9 = input.LA(6);
-
-								if ((LA2_9==Op))
-								{
-									alt2 = 1;
-								}
-								else if ((LA2_9==EOF||LA2_9==10))
-								{
-									alt2 = 2;
-								}
-								else
-								{
-									NoViableAltException nvae = new NoViableAltException("", 2, 9, input);
-									DebugRecognitionException(nvae);
-									throw nvae;
-								}
-							}
-							else if ((LA2_7==8))
-							{
-								alt2 = 1;
-							}
-							else
-							{
-								NoViableAltException nvae = new NoViableAltException("", 2, 7, input);
-								DebugRecognitionException(nvae);
-								throw nvae;
-							}
-						}
-						else
-						{
-							NoViableAltException nvae = new NoViableAltException("", 2, 5, input);
-							DebugRecognitionException(nvae);
-							throw nvae;
-						}
-					}
-					else
-					{
-						NoViableAltException nvae = new NoViableAltException("", 2, 3, input);
-						DebugRecognitionException(nvae);
-						throw nvae;
-					}
-				}
-				else
-				{
-					NoViableAltException nvae = new NoViableAltException("", 2, 1, input);
-					DebugRecognitionException(nvae);
-					throw nvae;
-				}
+				alt2 = 1;
 			}
-			else if ((LA2_0==8))
+			else if (((LA2_0>=CONSTANT && LA2_0<=NEWLINE)||LA2_0==9))
 			{
-				int LA2_2 = input.LA(2);
-
-				if (((LA2_2>=Constant && LA2_2<=Identifier)))
-				{
-					int LA2_4 = input.LA(3);
-
-					if ((LA2_4==Op))
-					{
-						int LA2_6 = input.LA(4);
-
-						if (((LA2_6>=Constant && LA2_6<=Identifier)))
-						{
-							int LA2_8 = input.LA(5);
-
-							if ((LA2_8==9))
-							{
-								int LA2_11 = input.LA(6);
-
-								if ((LA2_11==Op))
-								{
-									int LA2_7 = input.LA(7);
-
-									if (((LA2_7>=Constant && LA2_7<=Identifier)))
-									{
-										int LA2_9 = input.LA(8);
-
-										if ((LA2_9==Op))
-										{
-											alt2 = 1;
-										}
-										else if ((LA2_9==EOF||LA2_9==10))
-										{
-											alt2 = 2;
-										}
-										else
-										{
-											NoViableAltException nvae = new NoViableAltException("", 2, 9, input);
-											DebugRecognitionException(nvae);
-											throw nvae;
-										}
-									}
-									else if ((LA2_7==8))
-									{
-										alt2 = 1;
-									}
-									else
-									{
-										NoViableAltException nvae = new NoViableAltException("", 2, 7, input);
-										DebugRecognitionException(nvae);
-										throw nvae;
-									}
-								}
-								else
-								{
-									NoViableAltException nvae = new NoViableAltException("", 2, 11, input);
-									DebugRecognitionException(nvae);
-									throw nvae;
-								}
-							}
-							else
-							{
-								NoViableAltException nvae = new NoViableAltException("", 2, 8, input);
-								DebugRecognitionException(nvae);
-								throw nvae;
-							}
-						}
-						else
-						{
-							NoViableAltException nvae = new NoViableAltException("", 2, 6, input);
-							DebugRecognitionException(nvae);
-							throw nvae;
-						}
-					}
-					else
-					{
-						NoViableAltException nvae = new NoViableAltException("", 2, 4, input);
-						DebugRecognitionException(nvae);
-						throw nvae;
-					}
-				}
-				else
-				{
-					NoViableAltException nvae = new NoViableAltException("", 2, 2, input);
-					DebugRecognitionException(nvae);
-					throw nvae;
-				}
+				alt2 = 2;
 			}
 			else
 			{
@@ -400,576 +250,231 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:16:4: subComputation Op subComputation
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:38:8: variable
 				{
-				DebugLocation(16, 4);
-				PushFollow(Follow._subComputation_in_computation136);
-				subComputation();
+				root_0 = (CommonTree)adaptor.Nil();
+
+				DebugLocation(38, 8);
+				PushFollow(Follow._variable_in_line185);
+				variable2=variable();
 				PopFollow();
 
-				DebugLocation(16, 19);
-				Match(input,Op,Follow._Op_in_computation138); 
-				DebugLocation(16, 22);
-				PushFollow(Follow._subComputation_in_computation140);
-				subComputation();
-				PopFollow();
-
+				adaptor.AddChild(root_0, variable2.Tree);
 
 				}
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:16:39: subComputation Op term
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:39:4: balance
 				{
-				DebugLocation(16, 39);
-				PushFollow(Follow._subComputation_in_computation144);
-				subComputation();
+				root_0 = (CommonTree)adaptor.Nil();
+
+				DebugLocation(39, 4);
+				PushFollow(Follow._balance_in_line190);
+				balance3=balance();
 				PopFollow();
 
-				DebugLocation(16, 54);
-				Match(input,Op,Follow._Op_in_computation146); 
-				DebugLocation(16, 57);
-				PushFollow(Follow._term_in_computation148);
-				term();
-				PopFollow();
-
+				adaptor.AddChild(root_0, balance3.Tree);
 
 				}
 				break;
 
 			}
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
 		}
 		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
 		}
 		finally
 		{
-			TraceOut("computation", 3);
-			LeaveRule("computation", 3);
-			LeaveRule_computation();
+			TraceOut("line", 2);
+			LeaveRule("line", 2);
+			LeaveRule_line();
 		}
-		DebugLocation(16, 60);
-		} finally { DebugExitRule(GrammarFileName, "computation"); }
-		return;
+		DebugLocation(40, 1);
+		} finally { DebugExitRule(GrammarFileName, "line"); }
+		return retval;
 
 	}
-	// $ANTLR end "computation"
+	// $ANTLR end "line"
 
-	partial void EnterRule_materialBalance();
-	partial void LeaveRule_materialBalance();
+	partial void EnterRule_variable();
+	partial void LeaveRule_variable();
 
-	// $ANTLR start "materialBalance"
-	// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:17:1: materialBalance : ( computation '=' computation | computation '=' term | term '=' term );
-	[GrammarRule("materialBalance")]
-	private void materialBalance()
+	// $ANTLR start "variable"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:42:1: variable : 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) ;
+	[GrammarRule("variable")]
+	private AstParserRuleReturnScope<CommonTree, IToken> variable()
 	{
-		EnterRule_materialBalance();
-		EnterRule("materialBalance", 4);
-		TraceIn("materialBalance", 4);
-		try { DebugEnterRule(GrammarFileName, "materialBalance");
-		DebugLocation(17, 69);
+		EnterRule_variable();
+		EnterRule("variable", 3);
+		TraceIn("variable", 3);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		IToken string_literal4 = default(IToken);
+		IToken IDENTIFIER5 = default(IToken);
+		IToken char_literal6 = default(IToken);
+		IToken NEWLINE8 = default(IToken);
+		AstParserRuleReturnScope<CommonTree, IToken> computation7 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+
+		CommonTree string_literal4_tree = default(CommonTree);
+		CommonTree IDENTIFIER5_tree = default(CommonTree);
+		CommonTree char_literal6_tree = default(CommonTree);
+		CommonTree NEWLINE8_tree = default(CommonTree);
+		RewriteRuleITokenStream stream_NEWLINE=new RewriteRuleITokenStream(adaptor,"token NEWLINE");
+		RewriteRuleITokenStream stream_15=new RewriteRuleITokenStream(adaptor,"token 15");
+		RewriteRuleITokenStream stream_IDENTIFIER=new RewriteRuleITokenStream(adaptor,"token IDENTIFIER");
+		RewriteRuleITokenStream stream_16=new RewriteRuleITokenStream(adaptor,"token 16");
+		RewriteRuleSubtreeStream stream_computation=new RewriteRuleSubtreeStream(adaptor,"rule computation");
+		try { DebugEnterRule(GrammarFileName, "variable");
+		DebugLocation(42, 1);
 		try
 		{
-			// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:18:2: ( computation '=' computation | computation '=' term | term '=' term )
-			int alt3=3;
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:2: ( 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) )
+			DebugEnterAlt(1);
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:4: 'let' IDENTIFIER '=' computation NEWLINE
+			{
+			DebugLocation(43, 4);
+			string_literal4=(IToken)Match(input,16,Follow._16_in_variable201);  
+			stream_16.Add(string_literal4);
+
+			DebugLocation(43, 10);
+			IDENTIFIER5=(IToken)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_variable203);  
+			stream_IDENTIFIER.Add(IDENTIFIER5);
+
+			DebugLocation(43, 21);
+			char_literal6=(IToken)Match(input,15,Follow._15_in_variable205);  
+			stream_15.Add(char_literal6);
+
+			DebugLocation(43, 25);
+			PushFollow(Follow._computation_in_variable207);
+			computation7=computation();
+			PopFollow();
+
+			stream_computation.Add(computation7.Tree);
+			DebugLocation(43, 37);
+			NEWLINE8=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_variable209);  
+			stream_NEWLINE.Add(NEWLINE8);
+
+
+
+			{
+			// AST REWRITE
+			// elements: IDENTIFIER, computation
+			// token labels: 
+			// rule labels: retval
+			// token list labels: 
+			// rule list labels: 
+			// wildcard labels: 
+			retval.Tree = root_0;
+			RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.Tree:null);
+
+			root_0 = (CommonTree)adaptor.Nil();
+			// 43:45: -> ^( VAR IDENTIFIER computation )
+			{
+				DebugLocation(43, 48);
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:43:48: ^( VAR IDENTIFIER computation )
+				{
+				CommonTree root_1 = (CommonTree)adaptor.Nil();
+				DebugLocation(43, 50);
+				root_1 = (CommonTree)adaptor.BecomeRoot((CommonTree)adaptor.Create(VAR, "VAR"), root_1);
+
+				DebugLocation(43, 54);
+				adaptor.AddChild(root_1, stream_IDENTIFIER.NextNode());
+				DebugLocation(43, 65);
+				adaptor.AddChild(root_1, stream_computation.NextTree());
+
+				adaptor.AddChild(root_0, root_1);
+				}
+
+			}
+
+			retval.Tree = root_0;
+			}
+
+			}
+
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("variable", 3);
+			LeaveRule("variable", 3);
+			LeaveRule_variable();
+		}
+		DebugLocation(44, 1);
+		} finally { DebugExitRule(GrammarFileName, "variable"); }
+		return retval;
+
+	}
+	// $ANTLR end "variable"
+
+	partial void EnterRule_balance();
+	partial void LeaveRule_balance();
+
+	// $ANTLR start "balance"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:46:1: balance : ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->);
+	[GrammarRule("balance")]
+	private AstParserRuleReturnScope<CommonTree, IToken> balance()
+	{
+		EnterRule_balance();
+		EnterRule("balance", 4);
+		TraceIn("balance", 4);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		IToken char_literal10 = default(IToken);
+		IToken NEWLINE12 = default(IToken);
+		IToken NEWLINE13 = default(IToken);
+		AstParserRuleReturnScope<CommonTree, IToken> computation9 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+		AstParserRuleReturnScope<CommonTree, IToken> computation11 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+
+		CommonTree char_literal10_tree = default(CommonTree);
+		CommonTree NEWLINE12_tree = default(CommonTree);
+		CommonTree NEWLINE13_tree = default(CommonTree);
+		RewriteRuleITokenStream stream_NEWLINE=new RewriteRuleITokenStream(adaptor,"token NEWLINE");
+		RewriteRuleITokenStream stream_15=new RewriteRuleITokenStream(adaptor,"token 15");
+		RewriteRuleSubtreeStream stream_computation=new RewriteRuleSubtreeStream(adaptor,"rule computation");
+		try { DebugEnterRule(GrammarFileName, "balance");
+		DebugLocation(46, 1);
+		try
+		{
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:2: ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->)
+			int alt3=2;
 			try { DebugEnterDecision(3, false);
 			int LA3_0 = input.LA(1);
 
-			if (((LA3_0>=Constant && LA3_0<=Identifier)))
+			if (((LA3_0>=CONSTANT && LA3_0<=IDENTIFIER)||LA3_0==9))
 			{
-				int LA3_1 = input.LA(2);
-
-				if ((LA3_1==Op))
-				{
-					int LA3_3 = input.LA(3);
-
-					if (((LA3_3>=Constant && LA3_3<=Identifier)))
-					{
-						int LA3_6 = input.LA(4);
-
-						if ((LA3_6==Op))
-						{
-							int LA3_8 = input.LA(5);
-
-							if (((LA3_8>=Constant && LA3_8<=Identifier)))
-							{
-								int LA3_10 = input.LA(6);
-
-								if ((LA3_10==Op))
-								{
-									int LA3_13 = input.LA(7);
-
-									if (((LA3_13>=Constant && LA3_13<=Identifier)))
-									{
-										int LA3_16 = input.LA(8);
-
-										if ((LA3_16==10))
-										{
-											int LA3_14 = input.LA(9);
-
-											if (((LA3_14>=Constant && LA3_14<=Identifier)))
-											{
-												int LA3_17 = input.LA(10);
-
-												if ((LA3_17==Op))
-												{
-													alt3 = 1;
-												}
-												else if ((LA3_17==EOF))
-												{
-													alt3 = 2;
-												}
-												else
-												{
-													NoViableAltException nvae = new NoViableAltException("", 3, 17, input);
-													DebugRecognitionException(nvae);
-													throw nvae;
-												}
-											}
-											else if ((LA3_14==8))
-											{
-												alt3 = 1;
-											}
-											else
-											{
-												NoViableAltException nvae = new NoViableAltException("", 3, 14, input);
-												DebugRecognitionException(nvae);
-												throw nvae;
-											}
-										}
-										else
-										{
-											NoViableAltException nvae = new NoViableAltException("", 3, 16, input);
-											DebugRecognitionException(nvae);
-											throw nvae;
-										}
-									}
-									else
-									{
-										NoViableAltException nvae = new NoViableAltException("", 3, 13, input);
-										DebugRecognitionException(nvae);
-										throw nvae;
-									}
-								}
-								else if ((LA3_10==10))
-								{
-									int LA3_14 = input.LA(7);
-
-									if (((LA3_14>=Constant && LA3_14<=Identifier)))
-									{
-										int LA3_17 = input.LA(8);
-
-										if ((LA3_17==Op))
-										{
-											alt3 = 1;
-										}
-										else if ((LA3_17==EOF))
-										{
-											alt3 = 2;
-										}
-										else
-										{
-											NoViableAltException nvae = new NoViableAltException("", 3, 17, input);
-											DebugRecognitionException(nvae);
-											throw nvae;
-										}
-									}
-									else if ((LA3_14==8))
-									{
-										alt3 = 1;
-									}
-									else
-									{
-										NoViableAltException nvae = new NoViableAltException("", 3, 14, input);
-										DebugRecognitionException(nvae);
-										throw nvae;
-									}
-								}
-								else
-								{
-									NoViableAltException nvae = new NoViableAltException("", 3, 10, input);
-									DebugRecognitionException(nvae);
-									throw nvae;
-								}
-							}
-							else if ((LA3_8==8))
-							{
-								int LA3_11 = input.LA(6);
-
-								if (((LA3_11>=Constant && LA3_11<=Identifier)))
-								{
-									int LA3_15 = input.LA(7);
-
-									if ((LA3_15==Op))
-									{
-										int LA3_19 = input.LA(8);
-
-										if (((LA3_19>=Constant && LA3_19<=Identifier)))
-										{
-											int LA3_21 = input.LA(9);
-
-											if ((LA3_21==9))
-											{
-												int LA3_22 = input.LA(10);
-
-												if ((LA3_22==10))
-												{
-													int LA3_14 = input.LA(11);
-
-													if (((LA3_14>=Constant && LA3_14<=Identifier)))
-													{
-														int LA3_17 = input.LA(12);
-
-														if ((LA3_17==Op))
-														{
-															alt3 = 1;
-														}
-														else if ((LA3_17==EOF))
-														{
-															alt3 = 2;
-														}
-														else
-														{
-															NoViableAltException nvae = new NoViableAltException("", 3, 17, input);
-															DebugRecognitionException(nvae);
-															throw nvae;
-														}
-													}
-													else if ((LA3_14==8))
-													{
-														alt3 = 1;
-													}
-													else
-													{
-														NoViableAltException nvae = new NoViableAltException("", 3, 14, input);
-														DebugRecognitionException(nvae);
-														throw nvae;
-													}
-												}
-												else
-												{
-													NoViableAltException nvae = new NoViableAltException("", 3, 22, input);
-													DebugRecognitionException(nvae);
-													throw nvae;
-												}
-											}
-											else
-											{
-												NoViableAltException nvae = new NoViableAltException("", 3, 21, input);
-												DebugRecognitionException(nvae);
-												throw nvae;
-											}
-										}
-										else
-										{
-											NoViableAltException nvae = new NoViableAltException("", 3, 19, input);
-											DebugRecognitionException(nvae);
-											throw nvae;
-										}
-									}
-									else
-									{
-										NoViableAltException nvae = new NoViableAltException("", 3, 15, input);
-										DebugRecognitionException(nvae);
-										throw nvae;
-									}
-								}
-								else
-								{
-									NoViableAltException nvae = new NoViableAltException("", 3, 11, input);
-									DebugRecognitionException(nvae);
-									throw nvae;
-								}
-							}
-							else
-							{
-								NoViableAltException nvae = new NoViableAltException("", 3, 8, input);
-								DebugRecognitionException(nvae);
-								throw nvae;
-							}
-						}
-						else
-						{
-							NoViableAltException nvae = new NoViableAltException("", 3, 6, input);
-							DebugRecognitionException(nvae);
-							throw nvae;
-						}
-					}
-					else
-					{
-						NoViableAltException nvae = new NoViableAltException("", 3, 3, input);
-						DebugRecognitionException(nvae);
-						throw nvae;
-					}
-				}
-				else if ((LA3_1==10))
-				{
-					alt3 = 3;
-				}
-				else
-				{
-					NoViableAltException nvae = new NoViableAltException("", 3, 1, input);
-					DebugRecognitionException(nvae);
-					throw nvae;
-				}
+				alt3 = 1;
 			}
-			else if ((LA3_0==8))
+			else if ((LA3_0==NEWLINE))
 			{
-				int LA3_2 = input.LA(2);
-
-				if (((LA3_2>=Constant && LA3_2<=Identifier)))
-				{
-					int LA3_5 = input.LA(3);
-
-					if ((LA3_5==Op))
-					{
-						int LA3_7 = input.LA(4);
-
-						if (((LA3_7>=Constant && LA3_7<=Identifier)))
-						{
-							int LA3_9 = input.LA(5);
-
-							if ((LA3_9==9))
-							{
-								int LA3_12 = input.LA(6);
-
-								if ((LA3_12==Op))
-								{
-									int LA3_8 = input.LA(7);
-
-									if (((LA3_8>=Constant && LA3_8<=Identifier)))
-									{
-										int LA3_10 = input.LA(8);
-
-										if ((LA3_10==Op))
-										{
-											int LA3_13 = input.LA(9);
-
-											if (((LA3_13>=Constant && LA3_13<=Identifier)))
-											{
-												int LA3_16 = input.LA(10);
-
-												if ((LA3_16==10))
-												{
-													int LA3_14 = input.LA(11);
-
-													if (((LA3_14>=Constant && LA3_14<=Identifier)))
-													{
-														int LA3_17 = input.LA(12);
-
-														if ((LA3_17==Op))
-														{
-															alt3 = 1;
-														}
-														else if ((LA3_17==EOF))
-														{
-															alt3 = 2;
-														}
-														else
-														{
-															NoViableAltException nvae = new NoViableAltException("", 3, 17, input);
-															DebugRecognitionException(nvae);
-															throw nvae;
-														}
-													}
-													else if ((LA3_14==8))
-													{
-														alt3 = 1;
-													}
-													else
-													{
-														NoViableAltException nvae = new NoViableAltException("", 3, 14, input);
-														DebugRecognitionException(nvae);
-														throw nvae;
-													}
-												}
-												else
-												{
-													NoViableAltException nvae = new NoViableAltException("", 3, 16, input);
-													DebugRecognitionException(nvae);
-													throw nvae;
-												}
-											}
-											else
-											{
-												NoViableAltException nvae = new NoViableAltException("", 3, 13, input);
-												DebugRecognitionException(nvae);
-												throw nvae;
-											}
-										}
-										else if ((LA3_10==10))
-										{
-											int LA3_14 = input.LA(9);
-
-											if (((LA3_14>=Constant && LA3_14<=Identifier)))
-											{
-												int LA3_17 = input.LA(10);
-
-												if ((LA3_17==Op))
-												{
-													alt3 = 1;
-												}
-												else if ((LA3_17==EOF))
-												{
-													alt3 = 2;
-												}
-												else
-												{
-													NoViableAltException nvae = new NoViableAltException("", 3, 17, input);
-													DebugRecognitionException(nvae);
-													throw nvae;
-												}
-											}
-											else if ((LA3_14==8))
-											{
-												alt3 = 1;
-											}
-											else
-											{
-												NoViableAltException nvae = new NoViableAltException("", 3, 14, input);
-												DebugRecognitionException(nvae);
-												throw nvae;
-											}
-										}
-										else
-										{
-											NoViableAltException nvae = new NoViableAltException("", 3, 10, input);
-											DebugRecognitionException(nvae);
-											throw nvae;
-										}
-									}
-									else if ((LA3_8==8))
-									{
-										int LA3_11 = input.LA(8);
-
-										if (((LA3_11>=Constant && LA3_11<=Identifier)))
-										{
-											int LA3_15 = input.LA(9);
-
-											if ((LA3_15==Op))
-											{
-												int LA3_19 = input.LA(10);
-
-												if (((LA3_19>=Constant && LA3_19<=Identifier)))
-												{
-													int LA3_21 = input.LA(11);
-
-													if ((LA3_21==9))
-													{
-														int LA3_22 = input.LA(12);
-
-														if ((LA3_22==10))
-														{
-															int LA3_14 = input.LA(13);
-
-															if (((LA3_14>=Constant && LA3_14<=Identifier)))
-															{
-																int LA3_17 = input.LA(14);
-
-																if ((LA3_17==Op))
-																{
-																	alt3 = 1;
-																}
-																else if ((LA3_17==EOF))
-																{
-																	alt3 = 2;
-																}
-																else
-																{
-																	NoViableAltException nvae = new NoViableAltException("", 3, 17, input);
-																	DebugRecognitionException(nvae);
-																	throw nvae;
-																}
-															}
-															else if ((LA3_14==8))
-															{
-																alt3 = 1;
-															}
-															else
-															{
-																NoViableAltException nvae = new NoViableAltException("", 3, 14, input);
-																DebugRecognitionException(nvae);
-																throw nvae;
-															}
-														}
-														else
-														{
-															NoViableAltException nvae = new NoViableAltException("", 3, 22, input);
-															DebugRecognitionException(nvae);
-															throw nvae;
-														}
-													}
-													else
-													{
-														NoViableAltException nvae = new NoViableAltException("", 3, 21, input);
-														DebugRecognitionException(nvae);
-														throw nvae;
-													}
-												}
-												else
-												{
-													NoViableAltException nvae = new NoViableAltException("", 3, 19, input);
-													DebugRecognitionException(nvae);
-													throw nvae;
-												}
-											}
-											else
-											{
-												NoViableAltException nvae = new NoViableAltException("", 3, 15, input);
-												DebugRecognitionException(nvae);
-												throw nvae;
-											}
-										}
-										else
-										{
-											NoViableAltException nvae = new NoViableAltException("", 3, 11, input);
-											DebugRecognitionException(nvae);
-											throw nvae;
-										}
-									}
-									else
-									{
-										NoViableAltException nvae = new NoViableAltException("", 3, 8, input);
-										DebugRecognitionException(nvae);
-										throw nvae;
-									}
-								}
-								else
-								{
-									NoViableAltException nvae = new NoViableAltException("", 3, 12, input);
-									DebugRecognitionException(nvae);
-									throw nvae;
-								}
-							}
-							else
-							{
-								NoViableAltException nvae = new NoViableAltException("", 3, 9, input);
-								DebugRecognitionException(nvae);
-								throw nvae;
-							}
-						}
-						else
-						{
-							NoViableAltException nvae = new NoViableAltException("", 3, 7, input);
-							DebugRecognitionException(nvae);
-							throw nvae;
-						}
-					}
-					else
-					{
-						NoViableAltException nvae = new NoViableAltException("", 3, 5, input);
-						DebugRecognitionException(nvae);
-						throw nvae;
-					}
-				}
-				else
-				{
-					NoViableAltException nvae = new NoViableAltException("", 3, 2, input);
-					DebugRecognitionException(nvae);
-					throw nvae;
-				}
+				alt3 = 2;
 			}
 			else
 			{
@@ -982,110 +487,619 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:18:4: computation '=' computation
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:4: computation '=' computation NEWLINE
 				{
-				DebugLocation(18, 4);
-				PushFollow(Follow._computation_in_materialBalance156);
-				computation();
+				DebugLocation(47, 4);
+				PushFollow(Follow._computation_in_balance232);
+				computation9=computation();
 				PopFollow();
 
-				DebugLocation(18, 16);
-				Match(input,10,Follow._10_in_materialBalance158); 
-				DebugLocation(18, 20);
-				PushFollow(Follow._computation_in_materialBalance160);
-				computation();
+				stream_computation.Add(computation9.Tree);
+				DebugLocation(47, 16);
+				char_literal10=(IToken)Match(input,15,Follow._15_in_balance234);  
+				stream_15.Add(char_literal10);
+
+				DebugLocation(47, 20);
+				PushFollow(Follow._computation_in_balance236);
+				computation11=computation();
 				PopFollow();
 
+				stream_computation.Add(computation11.Tree);
+				DebugLocation(47, 32);
+				NEWLINE12=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance238);  
+				stream_NEWLINE.Add(NEWLINE12);
+
+
+
+				{
+				// AST REWRITE
+				// elements: computation, 15, computation
+				// token labels: 
+				// rule labels: retval
+				// token list labels: 
+				// rule list labels: 
+				// wildcard labels: 
+				retval.Tree = root_0;
+				RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.Tree:null);
+
+				root_0 = (CommonTree)adaptor.Nil();
+				// 47:41: -> ^( '=' computation computation )
+				{
+					DebugLocation(47, 44);
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:47:44: ^( '=' computation computation )
+					{
+					CommonTree root_1 = (CommonTree)adaptor.Nil();
+					DebugLocation(47, 46);
+					root_1 = (CommonTree)adaptor.BecomeRoot(stream_15.NextNode(), root_1);
+
+					DebugLocation(47, 50);
+					adaptor.AddChild(root_1, stream_computation.NextTree());
+					DebugLocation(47, 62);
+					adaptor.AddChild(root_1, stream_computation.NextTree());
+
+					adaptor.AddChild(root_0, root_1);
+					}
+
+				}
+
+				retval.Tree = root_0;
+				}
 
 				}
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:18:34: computation '=' term
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:48:4: NEWLINE
 				{
-				DebugLocation(18, 34);
-				PushFollow(Follow._computation_in_materialBalance164);
-				computation();
-				PopFollow();
-
-				DebugLocation(18, 46);
-				Match(input,10,Follow._10_in_materialBalance166); 
-				DebugLocation(18, 50);
-				PushFollow(Follow._term_in_materialBalance168);
-				term();
-				PopFollow();
+				DebugLocation(48, 4);
+				NEWLINE13=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance254);  
+				stream_NEWLINE.Add(NEWLINE13);
 
 
+
+				{
+				// AST REWRITE
+				// elements: 
+				// token labels: 
+				// rule labels: retval
+				// token list labels: 
+				// rule list labels: 
+				// wildcard labels: 
+				retval.Tree = root_0;
+				RewriteRuleSubtreeStream stream_retval=new RewriteRuleSubtreeStream(adaptor,"rule retval",retval!=null?retval.Tree:null);
+
+				root_0 = (CommonTree)adaptor.Nil();
+				// 48:16: ->
+				{
+					DebugLocation(49, 2);
+					root_0 = null;
 				}
-				break;
-			case 3:
-				DebugEnterAlt(3);
-				// D:\\acarter\\code\\antlr_sandbox\\ChemProV.g:18:57: term '=' term
-				{
-				DebugLocation(18, 57);
-				PushFollow(Follow._term_in_materialBalance172);
-				term();
-				PopFollow();
 
-				DebugLocation(18, 62);
-				Match(input,10,Follow._10_in_materialBalance174); 
-				DebugLocation(18, 66);
-				PushFollow(Follow._term_in_materialBalance176);
-				term();
-				PopFollow();
-
+				retval.Tree = root_0;
+				}
 
 				}
 				break;
 
 			}
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
 		}
 		catch (RecognitionException re)
 		{
 			ReportError(re);
 			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
 		}
 		finally
 		{
-			TraceOut("materialBalance", 4);
-			LeaveRule("materialBalance", 4);
-			LeaveRule_materialBalance();
+			TraceOut("balance", 4);
+			LeaveRule("balance", 4);
+			LeaveRule_balance();
 		}
-		DebugLocation(18, 69);
-		} finally { DebugExitRule(GrammarFileName, "materialBalance"); }
-		return;
+		DebugLocation(49, 1);
+		} finally { DebugExitRule(GrammarFileName, "balance"); }
+		return retval;
 
 	}
-	// $ANTLR end "materialBalance"
+	// $ANTLR end "balance"
+
+	partial void EnterRule_computation();
+	partial void LeaveRule_computation();
+
+	// $ANTLR start "computation"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:51:1: computation : term ( ( '+' ^| '-' ^) term )* ;
+	[GrammarRule("computation")]
+	private AstParserRuleReturnScope<CommonTree, IToken> computation()
+	{
+		EnterRule_computation();
+		EnterRule("computation", 5);
+		TraceIn("computation", 5);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		IToken char_literal15 = default(IToken);
+		IToken char_literal16 = default(IToken);
+		AstParserRuleReturnScope<CommonTree, IToken> term14 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+		AstParserRuleReturnScope<CommonTree, IToken> term17 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+
+		CommonTree char_literal15_tree = default(CommonTree);
+		CommonTree char_literal16_tree = default(CommonTree);
+		try { DebugEnterRule(GrammarFileName, "computation");
+		DebugLocation(51, 29);
+		try
+		{
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:2: ( term ( ( '+' ^| '-' ^) term )* )
+			DebugEnterAlt(1);
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:4: term ( ( '+' ^| '-' ^) term )*
+			{
+			root_0 = (CommonTree)adaptor.Nil();
+
+			DebugLocation(52, 4);
+			PushFollow(Follow._term_in_computation272);
+			term14=term();
+			PopFollow();
+
+			adaptor.AddChild(root_0, term14.Tree);
+			DebugLocation(52, 9);
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:9: ( ( '+' ^| '-' ^) term )*
+			try { DebugEnterSubRule(5);
+			while (true)
+			{
+				int alt5=2;
+				try { DebugEnterDecision(5, false);
+				int LA5_0 = input.LA(1);
+
+				if (((LA5_0>=12 && LA5_0<=13)))
+				{
+					alt5 = 1;
+				}
+
+
+				} finally { DebugExitDecision(5); }
+				switch ( alt5 )
+				{
+				case 1:
+					DebugEnterAlt(1);
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:10: ( '+' ^| '-' ^) term
+					{
+					DebugLocation(52, 10);
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:10: ( '+' ^| '-' ^)
+					int alt4=2;
+					try { DebugEnterSubRule(4);
+					try { DebugEnterDecision(4, false);
+					int LA4_0 = input.LA(1);
+
+					if ((LA4_0==12))
+					{
+						alt4 = 1;
+					}
+					else if ((LA4_0==13))
+					{
+						alt4 = 2;
+					}
+					else
+					{
+						NoViableAltException nvae = new NoViableAltException("", 4, 0, input);
+						DebugRecognitionException(nvae);
+						throw nvae;
+					}
+					} finally { DebugExitDecision(4); }
+					switch (alt4)
+					{
+					case 1:
+						DebugEnterAlt(1);
+						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:11: '+' ^
+						{
+						DebugLocation(52, 14);
+						char_literal15=(IToken)Match(input,12,Follow._12_in_computation276); 
+						char_literal15_tree = (CommonTree)adaptor.Create(char_literal15);
+						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal15_tree, root_0);
+
+						}
+						break;
+					case 2:
+						DebugEnterAlt(2);
+						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:52:18: '-' ^
+						{
+						DebugLocation(52, 21);
+						char_literal16=(IToken)Match(input,13,Follow._13_in_computation281); 
+						char_literal16_tree = (CommonTree)adaptor.Create(char_literal16);
+						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal16_tree, root_0);
+
+						}
+						break;
+
+					}
+					} finally { DebugExitSubRule(4); }
+
+					DebugLocation(52, 24);
+					PushFollow(Follow._term_in_computation285);
+					term17=term();
+					PopFollow();
+
+					adaptor.AddChild(root_0, term17.Tree);
+
+					}
+					break;
+
+				default:
+					goto loop5;
+				}
+			}
+
+			loop5:
+				;
+
+			} finally { DebugExitSubRule(5); }
+
+
+			}
+
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("computation", 5);
+			LeaveRule("computation", 5);
+			LeaveRule_computation();
+		}
+		DebugLocation(52, 29);
+		} finally { DebugExitRule(GrammarFileName, "computation"); }
+		return retval;
+
+	}
+	// $ANTLR end "computation"
+
+	partial void EnterRule_term();
+	partial void LeaveRule_term();
+
+	// $ANTLR start "term"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:54:1: term : atom ( ( '*' ^| '/' ^) atom )* ;
+	[GrammarRule("term")]
+	private AstParserRuleReturnScope<CommonTree, IToken> term()
+	{
+		EnterRule_term();
+		EnterRule("term", 6);
+		TraceIn("term", 6);
+		AstParserRuleReturnScope<CommonTree, IToken> retval = new AstParserRuleReturnScope<CommonTree, IToken>();
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		IToken char_literal19 = default(IToken);
+		IToken char_literal20 = default(IToken);
+		ChemProVParser.atom_return atom18 = default(ChemProVParser.atom_return);
+		ChemProVParser.atom_return atom21 = default(ChemProVParser.atom_return);
+
+		CommonTree char_literal19_tree = default(CommonTree);
+		CommonTree char_literal20_tree = default(CommonTree);
+		try { DebugEnterRule(GrammarFileName, "term");
+		DebugLocation(54, 1);
+		try
+		{
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:2: ( atom ( ( '*' ^| '/' ^) atom )* )
+			DebugEnterAlt(1);
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:4: atom ( ( '*' ^| '/' ^) atom )*
+			{
+			root_0 = (CommonTree)adaptor.Nil();
+
+			DebugLocation(55, 4);
+			PushFollow(Follow._atom_in_term297);
+			atom18=atom();
+			PopFollow();
+
+			adaptor.AddChild(root_0, atom18.Tree);
+			DebugLocation(55, 9);
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:9: ( ( '*' ^| '/' ^) atom )*
+			try { DebugEnterSubRule(7);
+			while (true)
+			{
+				int alt7=2;
+				try { DebugEnterDecision(7, false);
+				int LA7_0 = input.LA(1);
+
+				if ((LA7_0==11||LA7_0==14))
+				{
+					alt7 = 1;
+				}
+
+
+				} finally { DebugExitDecision(7); }
+				switch ( alt7 )
+				{
+				case 1:
+					DebugEnterAlt(1);
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:10: ( '*' ^| '/' ^) atom
+					{
+					DebugLocation(55, 10);
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:10: ( '*' ^| '/' ^)
+					int alt6=2;
+					try { DebugEnterSubRule(6);
+					try { DebugEnterDecision(6, false);
+					int LA6_0 = input.LA(1);
+
+					if ((LA6_0==11))
+					{
+						alt6 = 1;
+					}
+					else if ((LA6_0==14))
+					{
+						alt6 = 2;
+					}
+					else
+					{
+						NoViableAltException nvae = new NoViableAltException("", 6, 0, input);
+						DebugRecognitionException(nvae);
+						throw nvae;
+					}
+					} finally { DebugExitDecision(6); }
+					switch (alt6)
+					{
+					case 1:
+						DebugEnterAlt(1);
+						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:11: '*' ^
+						{
+						DebugLocation(55, 14);
+						char_literal19=(IToken)Match(input,11,Follow._11_in_term301); 
+						char_literal19_tree = (CommonTree)adaptor.Create(char_literal19);
+						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal19_tree, root_0);
+
+						}
+						break;
+					case 2:
+						DebugEnterAlt(2);
+						// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:55:18: '/' ^
+						{
+						DebugLocation(55, 21);
+						char_literal20=(IToken)Match(input,14,Follow._14_in_term306); 
+						char_literal20_tree = (CommonTree)adaptor.Create(char_literal20);
+						root_0 = (CommonTree)adaptor.BecomeRoot(char_literal20_tree, root_0);
+
+						}
+						break;
+
+					}
+					} finally { DebugExitSubRule(6); }
+
+					DebugLocation(55, 24);
+					PushFollow(Follow._atom_in_term310);
+					atom21=atom();
+					PopFollow();
+
+					adaptor.AddChild(root_0, atom21.Tree);
+
+					}
+					break;
+
+				default:
+					goto loop7;
+				}
+			}
+
+			loop7:
+				;
+
+			} finally { DebugExitSubRule(7); }
+
+
+			}
+
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("term", 6);
+			LeaveRule("term", 6);
+			LeaveRule_term();
+		}
+		DebugLocation(56, 1);
+		} finally { DebugExitRule(GrammarFileName, "term"); }
+		return retval;
+
+	}
+	// $ANTLR end "term"
+
+	private sealed partial class atom_return : AstParserRuleReturnScope<CommonTree, IToken>
+	{
+		public int value;
+		public atom_return(ChemProVParser grammar) {OnCreated(grammar);}
+		partial void OnCreated(ChemProVParser grammar);
+	}
+
+	partial void EnterRule_atom();
+	partial void LeaveRule_atom();
+
+	// $ANTLR start "atom"
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:58:1: atom returns [int value] : ( CONSTANT | IDENTIFIER | '(' ! computation ')' !);
+	[GrammarRule("atom")]
+	private ChemProVParser.atom_return atom()
+	{
+		EnterRule_atom();
+		EnterRule("atom", 7);
+		TraceIn("atom", 7);
+		ChemProVParser.atom_return retval = new ChemProVParser.atom_return(this);
+		retval.Start = (IToken)input.LT(1);
+
+		CommonTree root_0 = default(CommonTree);
+
+		IToken CONSTANT22 = default(IToken);
+		IToken IDENTIFIER23 = default(IToken);
+		IToken char_literal24 = default(IToken);
+		IToken char_literal26 = default(IToken);
+		AstParserRuleReturnScope<CommonTree, IToken> computation25 = default(AstParserRuleReturnScope<CommonTree, IToken>);
+
+		CommonTree CONSTANT22_tree = default(CommonTree);
+		CommonTree IDENTIFIER23_tree = default(CommonTree);
+		CommonTree char_literal24_tree = default(CommonTree);
+		CommonTree char_literal26_tree = default(CommonTree);
+		try { DebugEnterRule(GrammarFileName, "atom");
+		DebugLocation(58, 1);
+		try
+		{
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:2: ( CONSTANT | IDENTIFIER | '(' ! computation ')' !)
+			int alt8=3;
+			try { DebugEnterDecision(8, false);
+			switch (input.LA(1))
+			{
+			case CONSTANT:
+				{
+				alt8 = 1;
+				}
+				break;
+			case IDENTIFIER:
+				{
+				alt8 = 2;
+				}
+				break;
+			case 9:
+				{
+				alt8 = 3;
+				}
+				break;
+			default:
+				{
+					NoViableAltException nvae = new NoViableAltException("", 8, 0, input);
+					DebugRecognitionException(nvae);
+					throw nvae;
+				}
+			}
+
+			} finally { DebugExitDecision(8); }
+			switch (alt8)
+			{
+			case 1:
+				DebugEnterAlt(1);
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:59:4: CONSTANT
+				{
+				root_0 = (CommonTree)adaptor.Nil();
+
+				DebugLocation(59, 4);
+				CONSTANT22=(IToken)Match(input,CONSTANT,Follow._CONSTANT_in_atom327); 
+				CONSTANT22_tree = (CommonTree)adaptor.Create(CONSTANT22);
+				adaptor.AddChild(root_0, CONSTANT22_tree);
+
+				}
+				break;
+			case 2:
+				DebugEnterAlt(2);
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:60:4: IDENTIFIER
+				{
+				root_0 = (CommonTree)adaptor.Nil();
+
+				DebugLocation(60, 4);
+				IDENTIFIER23=(IToken)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_atom332); 
+				IDENTIFIER23_tree = (CommonTree)adaptor.Create(IDENTIFIER23);
+				adaptor.AddChild(root_0, IDENTIFIER23_tree);
+
+				}
+				break;
+			case 3:
+				DebugEnterAlt(3);
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\ChemProV.g:61:4: '(' ! computation ')' !
+				{
+				root_0 = (CommonTree)adaptor.Nil();
+
+				DebugLocation(61, 7);
+				char_literal24=(IToken)Match(input,9,Follow._9_in_atom337); 
+				DebugLocation(61, 9);
+				PushFollow(Follow._computation_in_atom340);
+				computation25=computation();
+				PopFollow();
+
+				adaptor.AddChild(root_0, computation25.Tree);
+				DebugLocation(61, 24);
+				char_literal26=(IToken)Match(input,10,Follow._10_in_atom342); 
+
+				}
+				break;
+
+			}
+			retval.Stop = (IToken)input.LT(-1);
+
+			retval.Tree = (CommonTree)adaptor.RulePostProcessing(root_0);
+			adaptor.SetTokenBoundaries(retval.Tree, retval.Start, retval.Stop);
+
+		}
+		catch (RecognitionException re)
+		{
+			ReportError(re);
+			Recover(input,re);
+		retval.Tree = (CommonTree)adaptor.ErrorNode(input, retval.Start, input.LT(-1), re);
+
+		}
+		finally
+		{
+			TraceOut("atom", 7);
+			LeaveRule("atom", 7);
+			LeaveRule_atom();
+		}
+		DebugLocation(63, 1);
+		} finally { DebugExitRule(GrammarFileName, "atom"); }
+		return retval;
+
+	}
+	// $ANTLR end "atom"
 	#endregion Rules
 
 
 	#region Follow sets
 	private static class Follow
 	{
-		public static readonly BitSet _term_in_subComputation112 = new BitSet(new ulong[]{0x40UL});
-		public static readonly BitSet _Op_in_subComputation114 = new BitSet(new ulong[]{0x30UL});
-		public static readonly BitSet _term_in_subComputation116 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _8_in_subComputation120 = new BitSet(new ulong[]{0x30UL});
-		public static readonly BitSet _term_in_subComputation122 = new BitSet(new ulong[]{0x40UL});
-		public static readonly BitSet _Op_in_subComputation124 = new BitSet(new ulong[]{0x30UL});
-		public static readonly BitSet _term_in_subComputation126 = new BitSet(new ulong[]{0x200UL});
-		public static readonly BitSet _9_in_subComputation128 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _subComputation_in_computation136 = new BitSet(new ulong[]{0x40UL});
-		public static readonly BitSet _Op_in_computation138 = new BitSet(new ulong[]{0x130UL});
-		public static readonly BitSet _subComputation_in_computation140 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _subComputation_in_computation144 = new BitSet(new ulong[]{0x40UL});
-		public static readonly BitSet _Op_in_computation146 = new BitSet(new ulong[]{0x30UL});
-		public static readonly BitSet _term_in_computation148 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _computation_in_materialBalance156 = new BitSet(new ulong[]{0x400UL});
-		public static readonly BitSet _10_in_materialBalance158 = new BitSet(new ulong[]{0x130UL});
-		public static readonly BitSet _computation_in_materialBalance160 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _computation_in_materialBalance164 = new BitSet(new ulong[]{0x400UL});
-		public static readonly BitSet _10_in_materialBalance166 = new BitSet(new ulong[]{0x30UL});
-		public static readonly BitSet _term_in_materialBalance168 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _term_in_materialBalance172 = new BitSet(new ulong[]{0x400UL});
-		public static readonly BitSet _10_in_materialBalance174 = new BitSet(new ulong[]{0x30UL});
-		public static readonly BitSet _term_in_materialBalance176 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _line_in_program169 = new BitSet(new ulong[]{0x10272UL});
+		public static readonly BitSet _variable_in_line185 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _balance_in_line190 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _16_in_variable201 = new BitSet(new ulong[]{0x20UL});
+		public static readonly BitSet _IDENTIFIER_in_variable203 = new BitSet(new ulong[]{0x8000UL});
+		public static readonly BitSet _15_in_variable205 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _computation_in_variable207 = new BitSet(new ulong[]{0x40UL});
+		public static readonly BitSet _NEWLINE_in_variable209 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _computation_in_balance232 = new BitSet(new ulong[]{0x8000UL});
+		public static readonly BitSet _15_in_balance234 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _computation_in_balance236 = new BitSet(new ulong[]{0x40UL});
+		public static readonly BitSet _NEWLINE_in_balance238 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _NEWLINE_in_balance254 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _term_in_computation272 = new BitSet(new ulong[]{0x3002UL});
+		public static readonly BitSet _12_in_computation276 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _13_in_computation281 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _term_in_computation285 = new BitSet(new ulong[]{0x3002UL});
+		public static readonly BitSet _atom_in_term297 = new BitSet(new ulong[]{0x4802UL});
+		public static readonly BitSet _11_in_term301 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _14_in_term306 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _atom_in_term310 = new BitSet(new ulong[]{0x4802UL});
+		public static readonly BitSet _CONSTANT_in_atom327 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _IDENTIFIER_in_atom332 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _9_in_atom337 = new BitSet(new ulong[]{0x230UL});
+		public static readonly BitSet _computation_in_atom340 = new BitSet(new ulong[]{0x400UL});
+		public static readonly BitSet _10_in_atom342 = new BitSet(new ulong[]{0x2UL});
 	}
 	#endregion Follow sets
 }

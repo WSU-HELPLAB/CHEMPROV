@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 D:\\acarter\\code\\antlr_sandbox\\Eval.g 2012-01-25 14:26:42
+// $ANTLR 3.4 D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g 2012-02-08 11:12:49
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -60,7 +60,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 	}
 
 	public override string[] TokenNames { get { return Eval.tokenNames; } }
-	public override string GrammarFileName { get { return "D:\\acarter\\code\\antlr_sandbox\\Eval.g"; } }
+	public override string GrammarFileName { get { return "D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g"; } }
 
 
 		Hashtable memory = new Hashtable();
@@ -75,7 +75,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_expr();
 
 	// $ANTLR start "expr"
-	// D:\\acarter\\code\\antlr_sandbox\\Eval.g:17:1: expr returns [int value] : ( ^( '+' a= expr b= expr ) | ^( '-' a= expr b= expr ) | ^( '*' a= expr b= expr ) | ID | INT );
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:17:1: expr returns [int value] : ( ^( '+' a= expr b= expr ) | ^( '-' a= expr b= expr ) | ^( '*' a= expr b= expr ) | ID | INT );
 	[GrammarRule("expr")]
 	private int expr()
 	{
@@ -94,7 +94,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(17, 1);
 		try
 		{
-			// D:\\acarter\\code\\antlr_sandbox\\Eval.g:18:2: ( ^( '+' a= expr b= expr ) | ^( '-' a= expr b= expr ) | ^( '*' a= expr b= expr ) | ID | INT )
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:18:2: ( ^( '+' a= expr b= expr ) | ^( '-' a= expr b= expr ) | ^( '*' a= expr b= expr ) | ID | INT )
 			int alt1=5;
 			try { DebugEnterDecision(1, false);
 			switch (input.LA(1))
@@ -137,7 +137,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:18:4: ^( '+' a= expr b= expr )
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:18:4: ^( '+' a= expr b= expr )
 				{
 				DebugLocation(18, 4);
 				DebugLocation(18, 6);
@@ -164,7 +164,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:19:4: ^( '-' a= expr b= expr )
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:19:4: ^( '-' a= expr b= expr )
 				{
 				DebugLocation(19, 4);
 				DebugLocation(19, 6);
@@ -191,7 +191,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 3:
 				DebugEnterAlt(3);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:20:4: ^( '*' a= expr b= expr )
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:20:4: ^( '*' a= expr b= expr )
 				{
 				DebugLocation(20, 4);
 				DebugLocation(20, 6);
@@ -218,7 +218,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 4:
 				DebugEnterAlt(4);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:21:4: ID
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:21:4: ID
 				{
 				DebugLocation(21, 4);
 				ID1=(CommonTree)Match(input,ID,Follow._ID_in_expr99); 
@@ -239,7 +239,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 5:
 				DebugEnterAlt(5);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:33:4: INT
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:33:4: INT
 				{
 				DebugLocation(33, 4);
 				INT2=(CommonTree)Match(input,INT,Follow._INT_in_expr111); 
@@ -273,7 +273,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_prog();
 
 	// $ANTLR start "prog"
-	// D:\\acarter\\code\\antlr_sandbox\\Eval.g:36:8: public prog : ( stat )+ ;
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:36:8: public prog : ( stat )+ ;
 	[GrammarRule("prog")]
 	public void prog()
 	{
@@ -284,12 +284,12 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(36, 20);
 		try
 		{
-			// D:\\acarter\\code\\antlr_sandbox\\Eval.g:36:13: ( ( stat )+ )
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:36:13: ( ( stat )+ )
 			DebugEnterAlt(1);
-			// D:\\acarter\\code\\antlr_sandbox\\Eval.g:36:16: ( stat )+
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:36:16: ( stat )+
 			{
 			DebugLocation(36, 16);
-			// D:\\acarter\\code\\antlr_sandbox\\Eval.g:36:16: ( stat )+
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:36:16: ( stat )+
 			int cnt2=0;
 			try { DebugEnterSubRule(2);
 			while (true)
@@ -309,7 +309,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\acarter\\code\\antlr_sandbox\\Eval.g:36:16: stat
+					// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:36:16: stat
 					{
 					DebugLocation(36, 16);
 					PushFollow(Follow._stat_in_prog126);
@@ -361,7 +361,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_stat();
 
 	// $ANTLR start "stat"
-	// D:\\acarter\\code\\antlr_sandbox\\Eval.g:37:1: stat : ( expr | ^( '=' ID expr ) );
+	// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:37:1: stat : ( expr | ^( '=' ID expr ) );
 	[GrammarRule("stat")]
 	private void stat()
 	{
@@ -376,7 +376,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(37, 1);
 		try
 		{
-			// D:\\acarter\\code\\antlr_sandbox\\Eval.g:37:6: ( expr | ^( '=' ID expr ) )
+			// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:37:6: ( expr | ^( '=' ID expr ) )
 			int alt3=2;
 			try { DebugEnterDecision(3, false);
 			int LA3_0 = input.LA(1);
@@ -400,7 +400,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:37:8: expr
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:37:8: expr
 				{
 				DebugLocation(37, 8);
 				PushFollow(Follow._expr_in_stat134);
@@ -414,7 +414,7 @@ public partial class Eval : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\antlr_sandbox\\Eval.g:38:4: ^( '=' ID expr )
+				// D:\\code\\chemprov_codeplex\\branches\\antlr-sandbox\\antlr_sandbox\\Eval.g:38:4: ^( '=' ID expr )
 				{
 				DebugLocation(38, 4);
 				DebugLocation(38, 6);
