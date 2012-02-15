@@ -5,9 +5,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV", "ChemProV\ChemPr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Web", "ChemProV.Web\ChemProV.Web.csproj", "{55A67B1F-DFD8-4B50-A99C-89B8B4948A42}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.UnitTests", "ChemProV.UnitTests\ChemProV.UnitTests.csproj", "{1D1967A6-7438-4146-A502-0CE5478DA1C1}"
+EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 3
+		SccNumberOfProjects = 4
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -17,6 +19,9 @@ Global
 		SccProjectUniqueName2 = ChemProV.Web\\ChemProV.Web.csproj
 		SccProjectName2 = ChemProV.Web
 		SccLocalPath2 = ChemProV.Web
+		SccProjectUniqueName3 = ChemProV.UnitTests\\ChemProV.UnitTests.csproj
+		SccProjectName3 = ChemProV.UnitTests
+		SccLocalPath3 = ChemProV.UnitTests
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +36,10 @@ Global
 		{55A67B1F-DFD8-4B50-A99C-89B8B4948A42}.Debug|Any CPU.Build.0 = Release|Any CPU
 		{55A67B1F-DFD8-4B50-A99C-89B8B4948A42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{55A67B1F-DFD8-4B50-A99C-89B8B4948A42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D1967A6-7438-4146-A502-0CE5478DA1C1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D1967A6-7438-4146-A502-0CE5478DA1C1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D1967A6-7438-4146-A502-0CE5478DA1C1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D1967A6-7438-4146-A502-0CE5478DA1C1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
