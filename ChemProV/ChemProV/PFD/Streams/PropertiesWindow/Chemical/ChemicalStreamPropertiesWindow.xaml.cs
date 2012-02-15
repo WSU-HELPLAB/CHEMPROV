@@ -539,13 +539,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 //we only care about changes between made on the "overall" row, which should be row 1
                 if (row == 0)
                 {
-                    cb.SelectionChanged += new SelectionChangedEventHandler(HeaderRowUnitsChanged);
+                    ItemSource[row].PropertyChanged += new PropertyChangedEventHandler(HeaderRowUnitsChanged);
                 }
                 return cb;
             }
         }
 
-        private void HeaderRowUnitsChanged(object sender, SelectionChangedEventArgs e)
+        private void HeaderRowUnitsChanged(object sender, PropertyChangedEventArgs e)
         {
             //Check to see if we're using moles.  Subtracting 1 because the header doesn't contain the % option
             if (ItemSource[0].Units == (int)Units.Moles - 1 || ItemSource[0].Units == (int)Units.MolesPerSecond - 1)
