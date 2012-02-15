@@ -32,7 +32,7 @@ namespace ChemProV
             if (e.UpdateAvailable)
             {
                 //UNCOMMENT THIS WHEN RELEASE VERSION
-                MessageBox.Show("Downloaded and installed update for ChemProV please restart the application");
+                MessageBox.Show("A new version of ChemProV is available and will be installed when you next restart the application.");
             }
         }
 

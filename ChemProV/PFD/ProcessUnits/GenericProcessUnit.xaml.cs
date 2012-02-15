@@ -124,7 +124,7 @@ namespace ChemProV.PFD.ProcessUnits
         /// <summary>
         /// Gets/Sets the icon dependency property
         /// </summary>
-        public Image Icon
+        public virtual Image Icon
         {
             get
             {
@@ -133,6 +133,21 @@ namespace ChemProV.PFD.ProcessUnits
             set
             {
                 ProcessUnitImage.Source = value.Source;
+            }
+        }
+
+        /// <summary>
+        /// Use to reference the border around the process unit's icon.  
+        /// </summary>
+        public virtual Border IconBorder
+        {
+            get
+            {
+                return ProcessUnitBorder;
+            }
+            set
+            {
+                ProcessUnitBorder = value;
             }
         }
 
@@ -313,16 +328,8 @@ namespace ChemProV.PFD.ProcessUnits
             {
                 brush = TransparentBorderBrush;
             }
-
-            if (brush != TransparentBorderBrush)
-            {
-                ProcessUnitBorder.BorderThickness = new Thickness(2);
-            }
-            else
-            {
-                ProcessUnitBorder.BorderThickness = new Thickness(0);
-            }
-            ProcessUnitBorder.BorderBrush = brush;
+            IconBorder.BorderThickness = new Thickness(2);
+            IconBorder.BorderBrush = brush;
         }
 
         /// <summary>
