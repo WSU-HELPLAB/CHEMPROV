@@ -20,6 +20,10 @@ using System.Xml;
 using System.Xml.Serialization;
 using ChemProV.PFD.EquationEditor.Tokens;
 using ChemProV.Validation;
+using Antlr.Runtime;
+using System.IO;
+using ChemProV.Grammars;
+using Antlr.Runtime.Tree;
 
 namespace ChemProV.PFD.EquationEditor
 {

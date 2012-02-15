@@ -75,6 +75,9 @@
     </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr3.Runtime.Silverlight">
+      <HintPath>..\packages\Antlr.Silverlight\Antlr3.Runtime.Silverlight.dll</HintPath>
+    </Reference>
     <Reference Include="Behaviors">
       <HintPath>..\Behaviors.dll</HintPath>
     </Reference>
@@ -122,6 +125,10 @@
     <Compile Include="ChemProVHolder.xaml.cs">
       <DependentUpon>ChemProVHolder.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Grammars\ChemProVLexer.cs" />
+    <Compile Include="Grammars\ChemProVParser.cs" />
+    <Compile Include="Grammars\ChemProVTree.cs" />
+    <Compile Include="Grammars\Line.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -388,7 +395,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Grammars\ChemProV.g" />
+    <None Include="Grammars\ChemProV.tokens" />
     <None Include="Grammars\ChemProVTree.g" />
+    <None Include="Grammars\ChemProVTree.tokens" />
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>

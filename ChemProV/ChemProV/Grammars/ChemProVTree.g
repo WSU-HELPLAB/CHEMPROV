@@ -11,13 +11,13 @@ options
 	using System.Collections;
 	using System;
 	using System.Collections.Generic;
-	using AntlrExpressionTest;
 }
 @members
 {
 	public List<ChemProVLine> lines = new List<ChemProVLine>();
 	private int currentLineNumber = 0;
 }
+@namespace { ChemProV.Grammars }
 public program	
 	:	 (line 
 	{
@@ -42,7 +42,7 @@ computation returns [int token, int value]
 	: ^('+' left=computation right=computation) {}//$value = a+b;}
 	| ^('-' left=computation right=computation) {}//$value = a-b;}
 	| ^('*' left=computation right=computation) {}//$value = a*b;}
-	| ^('/' left=computation right=computation) {Console.WriteLine("left: " + left.token + " right: " + right.value);}//$value = a/b;}
+	| ^('/' left=computation right=computation) {}//$value = a/b;}
 	| IDENTIFIER
 	    {
 	            if (lines.Count <= currentLineNumber)
