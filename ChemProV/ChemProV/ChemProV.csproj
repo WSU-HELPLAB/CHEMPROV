@@ -148,6 +148,9 @@
       <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\ProcessUnits\IProcessUnit.cs" />
+    <Compile Include="PFD\ProcessUnits\LabeledProcessUnit.xaml.cs">
+      <DependentUpon>LabeledProcessUnit.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PFD\ProcessUnits\ProcessUnitDescriptions.cs" />
     <Compile Include="PFD\ProcessUnits\TemporaryProcessUnit.cs" />
     <Compile Include="PFD\StickyNote\StickyNote.xaml.cs">
@@ -325,6 +328,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\ProcessUnits\LabeledProcessUnit.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PFD\StickyNote\StickyNote.xaml">
       <SubType>Designer</SubType>
