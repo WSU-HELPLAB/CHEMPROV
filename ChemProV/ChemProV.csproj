@@ -387,6 +387,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <None Include="Grammars\ChemProV.g" />
+    <None Include="Grammars\ChemProVTree.g" />
     <None Include="Properties\AppManifest.xml" />
   </ItemGroup>
   <ItemGroup>
