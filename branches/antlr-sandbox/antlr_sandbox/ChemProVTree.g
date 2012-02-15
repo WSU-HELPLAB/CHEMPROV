@@ -3,7 +3,7 @@ tree grammar ChemProVTree;
 options
 {
 	language=CSharp3;
-	tokenVocab=ChemProv;
+	tokenVocab=ChemProV;
 	ASTLabelType=CommonTree;
 }
 @header
@@ -16,7 +16,9 @@ options
 @members
 {
 	public List<ChemProVLine> lines = new List<ChemProVLine>();
+	public Dictionary<string, EquationVariable> varList = new Dictionary<string, EquationVariable>();
 	private int currentLineNumber = 0;
+	
 }
 public program	
 	:	 (line 
@@ -48,6 +50,10 @@ computation returns [int token, int value]
 	            if (lines.Count <= currentLineNumber)
 	            {
 	                lines.Add(new ChemProVLine());
+	            }
+	            if(!varList.ContainsKey($IDENTIFIER.text))
+	            {
+	            	varList.add($IDENTIFIER.text, new EquationVariable(){
 	            }
 	            lines[currentLineNumber].VariablesUsed.Add($IDENTIFIER.text);
 	            $token = $IDENTIFIER.type;
