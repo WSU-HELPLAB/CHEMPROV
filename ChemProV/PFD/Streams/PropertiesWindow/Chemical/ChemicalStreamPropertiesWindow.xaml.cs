@@ -18,9 +18,21 @@ using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
+using System.Text.RegularExpressions;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
+    public enum Units : byte 
+    {
+        Percent = 0, 
+        Grams = 1, 
+        GramsPerSecond = 2, 
+        Kilograms = 3, 
+        KilogramsPerSecond = 4,
+        Moles = 5, 
+        MolesPerSecond = 6
+    };
+
     public partial class ChemicalStreamPropertiesWindow : UserControl, IPropertiesWindow, IComparable
     {
         public event EventHandler SelectionChanged = delegate { };
@@ -39,8 +51,11 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                                     "methanol", "n-butane", "n-hexane", "n-octane", "nitrogen",
                                     "oxygen", "phosphoric acid", "propane", "sodium hydroxide",
                                     "sulfuric acid", "toluene", "water" };
-
-        private string[] Units = {
+        
+        /// <summary>
+        /// Make sure that the order here matches the Units enumeration
+        /// </summary>
+        private string[] UnitsArray = {
                                     "%", "g", "g/sec",
                                     "kg", "kg/sec", "mol",
                                     "mol/sec"
@@ -85,7 +100,11 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         protected static int NumberOfTables = 1;
 
         //this keeps the record of what table number the table is when it is created
-        private string tableName = "M";
+        private const string massTablePrefix = "M";
+        private const string moleTablePrefix = "N";
+
+        //start with assuming a mass table
+        private string tableName = massTablePrefix;
 
         /// <summary>
         /// This a list of Data which is exactly what is in the table
@@ -288,7 +307,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             PropertiesGrid.PlaceUIElement(CreateLabelCell(row), 1, row + 1);
 
             if (collapsedRow == false)
-            {
+            { 
                 PropertiesGrid.PlaceUIElement(CreateQuantityCell(row), 2, row + 1);
 
                 PropertiesGrid.PlaceUIElement(CreateUnitsCell(row), 3, row + 1);
@@ -315,7 +334,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 TextBox tb = new TextBox();
                 tb.BorderBrush = new SolidColorBrush(Colors.Transparent);
                 tb.Style = this.Resources["TextBoxWithNoMouseOverBorder"] as Style;
-                tb.Text = ItemSource[row].Label;
+                
+                //use data binding to keep the labe in sync with the model
+                Binding textBinding = new Binding("Label")
+                {
+                    Source = ItemSource[row],
+                    Mode = BindingMode.TwoWay
+                };
+                tb.SetBinding(TextBox.TextProperty, textBinding);
                 tb.TextChanged += new TextChangedEventHandler(LabelText_Changed);
                 tb.KeyDown += new KeyEventHandler(TextBox_KeyDown);
                 tb.GotFocus += new RoutedEventHandler(LabelText_GotFocus);
@@ -380,8 +406,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
         private void LabelText_Changed(object sender, TextChangedEventArgs e)
         {
-            TextBox tb = sender as TextBox;
-            tb.LostFocus += new RoutedEventHandler(LabelTextBox_LostFocus);
             TableDataChanging(this, EventArgs.Empty);
         }
 
@@ -434,36 +458,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        private bool validLabel(string text)
-        {
-            if (text.Length < 2 || text[0] == 'T' || text[0].ToString() + text[1] == "Hf" || text[0].ToString() + text[1] == "Cp" || text.Contains(' '))
-            {
-                return false;
-            }
-            return true;
-        }
-
-        private void LabelTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox tb = (sender as TextBox);
-            Border br = tb.Parent as Border;
-
-            tb.LostFocus -= new RoutedEventHandler(LabelTextBox_LostFocus);
-
-            //-1 one to get rid of the header row count
-            int row = (int)br.GetValue(Grid.RowProperty) - 1;
-
-            if (validLabel(tb.Text))
-            {
-                tb.Text = ItemSource[row].Label = tb.Text;
-            }
-            else
-            {
-                ItemSource[row].Label = tb.Text;
-            }
-            UpdateGrid();
-        }
-
         private void QuantityTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             TextBox tb = (sender as TextBox);
@@ -514,7 +508,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             if (isReadOnly)
             {
                 TextBlock tb = new TextBlock();
-                tb.Text = Units[ItemSource[row].Units];
+                tb.Text = UnitsArray[ItemSource[row].Units];
                 return tb;
             }
             else
@@ -522,7 +516,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 ComboBox cb = new ComboBox();
                 cb.Background = new SolidColorBrush(Colors.White);
                 cb.BorderBrush = new SolidColorBrush(Colors.White);
-                foreach (string s in Units)
+                foreach (string s in UnitsArray)
                 {
                     ComboBoxItem cbi = new ComboBoxItem();
                     cbi.Content = s;
@@ -533,25 +527,69 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                     //Overall Units cannot be % so if row 0 remove first element which is %
                     cb.Items.RemoveAt(0);
                 }
-                cb.SelectedIndex = ItemSource[row].Units;
-                cb.SelectionChanged += new SelectionChangedEventHandler(UnitsComboBox_SelectionChanged);
 
+                //use data binding to keep the units in sync with the model
+                Binding indexBinding = new Binding("Units")
+                {
+                    Source = ItemSource[row],
+                    Mode = BindingMode.TwoWay
+                };
+                cb.SetBinding(ComboBox.SelectedIndexProperty, indexBinding);
+
+                //we only care about changes between made on the "overall" row, which should be row 1
+                if (row == 0)
+                {
+                    cb.SelectionChanged += new SelectionChangedEventHandler(HeaderRowUnitsChanged);
+                }
                 return cb;
             }
         }
 
-        private void UnitsComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void HeaderRowUnitsChanged(object sender, SelectionChangedEventArgs e)
         {
-            //This fucntion assumes this is true:
-            //---Grid (baseGrid)
-            //----Border which PlaceUIElement puts around it
-            //-----ComboBox
-            Border border = (sender as ComboBox).Parent as Border;
+            //Check to see if we're using moles.  Subtracting 1 because the header doesn't contain the % option
+            if (ItemSource[0].Units == (int)Units.Moles - 1 || ItemSource[0].Units == (int)Units.MolesPerSecond - 1)
+            {
+                ConvertModelLabels("^([mM])(\\d+)$", moleTablePrefix);                
+            }
+            else
+            {
+                //switch to mass labels
+                ConvertModelLabels("^([nN])(\\d+)$", massTablePrefix);                
+            }
+        }
 
-            //minus one to get rid of the header row in the count
-            int row = (int)border.GetValue(Grid.RowProperty) - 1;
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="pattern">Assuming that the pattern will return three parts: 1 = overall match (m12), 2 = type match (m/n), 3 = numeric match (12)</param>
+        /// <param name="newLabel"></param>
+        private void ConvertModelLabels(string pattern, string newLabel)
+        {
+            //switching to mole lables.  Change table name if left to default
+            Match match = Regex.Match(TableName, pattern);
+            if (match.Success)
+            {
+                TableName = newLabel.ToUpper() + match.Groups[2].Value;
+            }
 
-            ItemSource[row].Units = (sender as ComboBox).SelectedIndex;
+            //Overwrite anything with a defalut mass label (ex: "M1", "m11", etc.)
+            foreach (ChemicalStreamData data in ItemSource)
+            {
+                match = Regex.Match(data.Label, pattern);
+                if (match.Success)
+                {
+                    char prefix = Convert.ToChar(match.Groups[1].Value);
+                    if (char.IsLower(prefix))
+                    {
+                        data.Label = newLabel.ToLower() + match.Groups[2].Value;
+                    }
+                    else
+                    {
+                        data.Label = newLabel.ToUpper() + match.Groups[2].Value;
+                    }
+                }
+            }
         }
 
         private UIElement CreateCompoundCell(int row)
@@ -799,6 +837,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         private void LocalInit(bool isReadOnly)
         {
             this.isReadOnly = isReadOnly;
+            
             //set header bush
             headerBrush = new LinearGradientBrush();
             GradientStopCollection gsc = new GradientStopCollection();
