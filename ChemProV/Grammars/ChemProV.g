@@ -18,8 +18,9 @@ tokens {
 }
 @members
 {
-	Hashtable memory = new Hashtable();
 }
+@namespace { ChemProV.Grammars }
+@lexer::namespace { ChemProV.Grammars }
 
 //IDs can be either standard variable names (ex: 'foo') or a string followed by a number followed by one or more numbers or characters
 //(ex: 'M1' or 'm23' or 'm5Ab'
@@ -35,7 +36,7 @@ FLOAT
 NEWLINE	:	'\r'? '\n';
 WS	:	(' '|'\t'|'\n'|'\r')+ {Skip();};
 public program	
-	:	(line {Console.WriteLine($line.tree==null?"null":$line.tree.ToStringTree());} )+	
+	:	(line {} )+	
 	;
 
 line	
