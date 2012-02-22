@@ -138,7 +138,7 @@ namespace ChemProV
             return true;
         }
 
-        public List<Tuple<string, Equation>> UserDefinedVaraibles
+        public List<Tuple<string, EquationControl>> UserDefinedVaraibles
         {
             get
             {

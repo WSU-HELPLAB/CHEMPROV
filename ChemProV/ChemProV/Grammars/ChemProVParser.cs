@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g 2012-02-15 14:28:48
+// $ANTLR 3.4 E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g 2012-02-22 12:12:02
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -88,7 +88,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	}
 
 	public override string[] TokenNames { get { return ChemProVParser.tokenNames; } }
-	public override string GrammarFileName { get { return "D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g"; } }
+	public override string GrammarFileName { get { return "E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g"; } }
 
 
 
@@ -102,7 +102,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_program();
 
 	// $ANTLR start "program"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:38:8: public program : ( line )+ ;
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:38:8: public program : ( line )+ ;
 	[GrammarRule("program")]
 	public AstParserRuleReturnScope<CommonTree, IToken> program()
 	{
@@ -120,14 +120,14 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(38, 1);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:2: ( ( line )+ )
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:2: ( ( line )+ )
 			DebugEnterAlt(1);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:4: ( line )+
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:4: ( line )+
 			{
 			root_0 = (CommonTree)adaptor.Nil();
 
 			DebugLocation(39, 4);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:4: ( line )+
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:4: ( line )+
 			int cnt1=0;
 			try { DebugEnterSubRule(1);
 			while (true)
@@ -147,7 +147,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:5: line
+					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:39:5: line
 					{
 					DebugLocation(39, 5);
 					PushFollow(Follow._line_in_program188);
@@ -209,7 +209,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_line();
 
 	// $ANTLR start "line"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:42:1: line : ( variable | balance );
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:42:1: line : ( variable | balance );
 	[GrammarRule("line")]
 	private AstParserRuleReturnScope<CommonTree, IToken> line()
 	{
@@ -228,7 +228,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(42, 1);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:43:2: ( variable | balance )
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:43:2: ( variable | balance )
 			int alt2=2;
 			try { DebugEnterDecision(2, false);
 			int LA2_0 = input.LA(1);
@@ -252,7 +252,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:43:4: variable
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:43:4: variable
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
@@ -267,7 +267,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:44:4: balance
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:44:4: balance
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
@@ -312,7 +312,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_variable();
 
 	// $ANTLR start "variable"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:47:1: variable : 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) ;
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:47:1: variable : 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) ;
 	[GrammarRule("variable")]
 	private AstParserRuleReturnScope<CommonTree, IToken> variable()
 	{
@@ -343,9 +343,9 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(47, 1);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:48:2: ( 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) )
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:48:2: ( 'let' IDENTIFIER '=' computation NEWLINE -> ^( VAR IDENTIFIER computation ) )
 			DebugEnterAlt(1);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:48:4: 'let' IDENTIFIER '=' computation NEWLINE
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:48:4: 'let' IDENTIFIER '=' computation NEWLINE
 			{
 			DebugLocation(48, 4);
 			string_literal4=(IToken)Match(input,17,Follow._17_in_variable222);  
@@ -386,7 +386,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			// 48:45: -> ^( VAR IDENTIFIER computation )
 			{
 				DebugLocation(48, 48);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:48:48: ^( VAR IDENTIFIER computation )
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:48:48: ^( VAR IDENTIFIER computation )
 				{
 				CommonTree root_1 = (CommonTree)adaptor.Nil();
 				DebugLocation(48, 50);
@@ -437,7 +437,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_balance();
 
 	// $ANTLR start "balance"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:51:1: balance : ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->);
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:51:1: balance : ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->);
 	[GrammarRule("balance")]
 	private AstParserRuleReturnScope<CommonTree, IToken> balance()
 	{
@@ -465,7 +465,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(51, 1);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:52:2: ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->)
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:52:2: ( computation '=' computation NEWLINE -> ^( '=' computation computation ) | NEWLINE ->)
 			int alt3=2;
 			try { DebugEnterDecision(3, false);
 			int LA3_0 = input.LA(1);
@@ -489,7 +489,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:52:4: computation '=' computation NEWLINE
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:52:4: computation '=' computation NEWLINE
 				{
 				DebugLocation(52, 4);
 				PushFollow(Follow._computation_in_balance253);
@@ -528,7 +528,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				// 52:41: -> ^( '=' computation computation )
 				{
 					DebugLocation(52, 44);
-					// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:52:44: ^( '=' computation computation )
+					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:52:44: ^( '=' computation computation )
 					{
 					CommonTree root_1 = (CommonTree)adaptor.Nil();
 					DebugLocation(52, 46);
@@ -551,7 +551,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:53:4: NEWLINE
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:53:4: NEWLINE
 				{
 				DebugLocation(53, 4);
 				NEWLINE13=(IToken)Match(input,NEWLINE,Follow._NEWLINE_in_balance275);  
@@ -614,7 +614,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_computation();
 
 	// $ANTLR start "computation"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:56:1: computation : term ( ( '+' ^| '-' ^) term )* ;
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:56:1: computation : term ( ( '+' ^| '-' ^) term )* ;
 	[GrammarRule("computation")]
 	private AstParserRuleReturnScope<CommonTree, IToken> computation()
 	{
@@ -637,9 +637,9 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(56, 29);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:2: ( term ( ( '+' ^| '-' ^) term )* )
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:2: ( term ( ( '+' ^| '-' ^) term )* )
 			DebugEnterAlt(1);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:4: term ( ( '+' ^| '-' ^) term )*
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:4: term ( ( '+' ^| '-' ^) term )*
 			{
 			root_0 = (CommonTree)adaptor.Nil();
 
@@ -650,7 +650,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 
 			adaptor.AddChild(root_0, term14.Tree);
 			DebugLocation(57, 9);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:9: ( ( '+' ^| '-' ^) term )*
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:9: ( ( '+' ^| '-' ^) term )*
 			try { DebugEnterSubRule(5);
 			while (true)
 			{
@@ -669,10 +669,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:10: ( '+' ^| '-' ^) term
+					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:10: ( '+' ^| '-' ^) term
 					{
 					DebugLocation(57, 10);
-					// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:10: ( '+' ^| '-' ^)
+					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:10: ( '+' ^| '-' ^)
 					int alt4=2;
 					try { DebugEnterSubRule(4);
 					try { DebugEnterDecision(4, false);
@@ -697,7 +697,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:11: '+' ^
+						// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:11: '+' ^
 						{
 						DebugLocation(57, 14);
 						char_literal15=(IToken)Match(input,13,Follow._13_in_computation297); 
@@ -708,7 +708,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 						break;
 					case 2:
 						DebugEnterAlt(2);
-						// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:18: '-' ^
+						// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:57:18: '-' ^
 						{
 						DebugLocation(57, 21);
 						char_literal16=(IToken)Match(input,14,Follow._14_in_computation302); 
@@ -774,7 +774,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_term();
 
 	// $ANTLR start "term"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:59:1: term : atom ( ( '*' ^| '/' ^) atom )* ;
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:59:1: term : atom ( ( '*' ^| '/' ^) atom )* ;
 	[GrammarRule("term")]
 	private AstParserRuleReturnScope<CommonTree, IToken> term()
 	{
@@ -797,9 +797,9 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(59, 1);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:2: ( atom ( ( '*' ^| '/' ^) atom )* )
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:2: ( atom ( ( '*' ^| '/' ^) atom )* )
 			DebugEnterAlt(1);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:4: atom ( ( '*' ^| '/' ^) atom )*
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:4: atom ( ( '*' ^| '/' ^) atom )*
 			{
 			root_0 = (CommonTree)adaptor.Nil();
 
@@ -810,7 +810,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 
 			adaptor.AddChild(root_0, atom18.Tree);
 			DebugLocation(60, 9);
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:9: ( ( '*' ^| '/' ^) atom )*
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:9: ( ( '*' ^| '/' ^) atom )*
 			try { DebugEnterSubRule(7);
 			while (true)
 			{
@@ -829,10 +829,10 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:10: ( '*' ^| '/' ^) atom
+					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:10: ( '*' ^| '/' ^) atom
 					{
 					DebugLocation(60, 10);
-					// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:10: ( '*' ^| '/' ^)
+					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:10: ( '*' ^| '/' ^)
 					int alt6=2;
 					try { DebugEnterSubRule(6);
 					try { DebugEnterDecision(6, false);
@@ -857,7 +857,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 					{
 					case 1:
 						DebugEnterAlt(1);
-						// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:11: '*' ^
+						// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:11: '*' ^
 						{
 						DebugLocation(60, 14);
 						char_literal19=(IToken)Match(input,12,Follow._12_in_term322); 
@@ -868,7 +868,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 						break;
 					case 2:
 						DebugEnterAlt(2);
-						// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:18: '/' ^
+						// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:60:18: '/' ^
 						{
 						DebugLocation(60, 21);
 						char_literal20=(IToken)Match(input,15,Follow._15_in_term327); 
@@ -934,7 +934,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 	partial void LeaveRule_atom();
 
 	// $ANTLR start "atom"
-	// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:63:1: atom : ( INTEGER | FLOAT | IDENTIFIER | '(' ! computation ')' !);
+	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:63:1: atom : ( INTEGER | FLOAT | IDENTIFIER | '(' ! computation ')' !);
 	[GrammarRule("atom")]
 	private AstParserRuleReturnScope<CommonTree, IToken> atom()
 	{
@@ -962,7 +962,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 		DebugLocation(63, 1);
 		try
 		{
-			// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:64:2: ( INTEGER | FLOAT | IDENTIFIER | '(' ! computation ')' !)
+			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:64:2: ( INTEGER | FLOAT | IDENTIFIER | '(' ! computation ')' !)
 			int alt8=4;
 			try { DebugEnterDecision(8, false);
 			switch (input.LA(1))
@@ -1000,7 +1000,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:64:4: INTEGER
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:64:4: INTEGER
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
@@ -1013,7 +1013,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:65:6: FLOAT
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:65:6: FLOAT
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
@@ -1026,7 +1026,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 3:
 				DebugEnterAlt(3);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:66:4: IDENTIFIER
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:66:4: IDENTIFIER
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 
@@ -1039,7 +1039,7 @@ public partial class ChemProVParser : Antlr.Runtime.Parser
 				break;
 			case 4:
 				DebugEnterAlt(4);
-				// D:\\acarter\\code\\chemprov\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:67:4: '(' ! computation ')' !
+				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProV.g:67:4: '(' ! computation ')' !
 				{
 				root_0 = (CommonTree)adaptor.Nil();
 

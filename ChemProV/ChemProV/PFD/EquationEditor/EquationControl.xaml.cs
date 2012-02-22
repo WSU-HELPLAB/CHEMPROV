@@ -27,7 +27,7 @@ using Antlr.Runtime.Tree;
 
 namespace ChemProV.PFD.EquationEditor
 {
-    public partial class Equation : UserControl, IXmlSerializable, IComparable, INotifyPropertyChanged
+    public partial class EquationControl : UserControl, IXmlSerializable, IComparable, INotifyPropertyChanged
     {
         #region Delegates
 
@@ -127,14 +127,14 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Constructor
 
-        public Equation()
+        public EquationControl()
         {
             InitializeComponent();
 
             LocalInit(false);
         }
 
-        public Equation(bool isReadOnly)
+        public EquationControl(bool isReadOnly)
         {
             InitializeComponent();
             LocalInit(isReadOnly);
@@ -306,147 +306,6 @@ namespace ChemProV.PFD.EquationEditor
             ReceivedFocus(this, e);
         }
 
-        private List<string> parseText(string text)
-        {
-            string unit = "";
-            List<string> parsedText = new List<string>();
-            Stack<char> parenStack = new Stack<char>();
-            Regex operationTerminal = new Regex("[+|//|-|*]");
-            bool foundEqualSign = false;
-            int i = 0;
-            while (i < text.Length)
-            {
-                if ((operationTerminal.IsMatch(text[i] + "")) || text[i] == ' ' || text[i] == '-')
-                {
-                    parsedText.Add(unit);
-                    parsedText.Add(text[i] + "");
-                    unit = "";
-                }
-                else if (text[i] == '=')
-                {
-                    if (foundEqualSign == false)
-                    {
-                        parsedText.Add(unit);
-                        parsedText.Add(text[i] + "");
-                        unit = "";
-                        foundEqualSign = true;
-                    }
-                    else
-                    {
-                        highlightText(false);
-                    }
-                }
-                else if (text[i] == '(')
-                {
-                    parenStack.Push(text[i]);
-                    i++;
-                    parsedText.Add(unit);
-                    unit = "(";
-                    while (i < text.Length && parenStack.Count != 0)
-                    {
-                        if (text[i] == '(')
-                        {
-                            parenStack.Push(text[i]);
-                        }
-                        else if (text[i] == ')')
-                        {
-                            parenStack.Pop();
-                        }
-                        unit += text[i];
-                        if (parenStack.Count != 0)
-                        {
-                            i++;
-                        }
-                    }
-                    if (parenStack.Count != 0)
-                    {
-                        //PARENS NOT RIGHT
-                        parsedText.Clear();
-                        highlightText(false);
-                        return parsedText;
-                    }
-                    else
-                    {
-                        parsedText.Add(unit);
-                        unit = "";
-                    }
-                }
-                else
-                {
-                    unit += text[i];
-                }
-                i++;
-            }
-            parsedText.Add(unit);
-            return trim(parsedText);
-        }
-
-        private List<string> trim(List<string> parsedText)
-        {
-            int i = 0;
-            while (i < parsedText.Count)
-            {
-                if (parsedText[i] == "" || parsedText[i] == " ")
-                {
-                    parsedText.RemoveAt(i);
-                }
-
-                //else because if we remove index it will automatically set index to the next 1 don't want to increment twice
-                else
-                {
-                    i++;
-                }
-            }
-            return parsedText;
-        }
-
-        private bool isOperation(string text)
-        {
-            if (text[0] == '-' || text[0] == '*' || text[0] == '+' || text[0] == '/' || text[0] == '=')
-            {
-                EquationTokens.Add(new OperatorToken(text));
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        private bool recersiveVar(List<string> parsedText)
-        {
-            bool isValid = true;
-            int i = 0;
-
-            if (parsedText.Count > 0)
-            {
-                isValid = isVar(parsedText[i]);
-                if (isValid == false)
-                {
-                    return false;
-                }
-            }
-            i++;
-            while (i < parsedText.Count)
-            {
-                if (isOperation(parsedText[i]) == false)
-                {
-                    return false;
-                }
-                i++;
-                if (i >= parsedText.Count)
-                {
-                    return false;
-                }
-                if (isVar(parsedText[i]) == false)
-                {
-                    return false;
-                }
-                i++;
-            }
-            return isValid;
-        }
-
         private void highlightText(bool isValid)
         {
             //set the color of the background and foreground based on if it is valid or not.
@@ -478,72 +337,40 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        private bool isVar(string text)
-        {
-            //if parentese this means it is recursive so we got to deal with it.
-            if (text[0] == '(')
-            {
-                //set it to 1 past the first element to cut of the (
-                text = text.Remove(0, 1);
-                text = text.Remove(text.Length - 1, 1);
-                //NEED TO TRIM OF '(' before giving to parseText
-                return recersiveVar(parseText(text));
-            }
-            else
-            {
-                //if no parentese then we just assume it is a variable if it isn't then we will flag it later when we check again the table names.
-                VariableNames.Add(text);
-                EquationTokens.Add(new VariableToken(text));
-                return true;
-            }
-        }
-
         private void EquationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
             //we fire MyTextChanged because SL's textChanged may not have fired if cntrl-V was used
             MyTextChanged(this, EventArgs.Empty);
 
-            string text = (sender as TextBox).Text;
+            //convert the equation text box into a memory stream to be consumed by the parser
+            MemoryStream stream = new MemoryStream();
+            StreamWriter writer = new StreamWriter(stream);
+            writer.WriteLine(this.EquationTextBox.Text);
+            writer.Flush();
+            stream.Position = 0;
 
-            //assume validity / set the color back to normal so we only need to change it if it is wrong
-            highlightText(true);
-
-            //we got to clear EquationTokens because we are about to go find them again.
-            EquationTokens.Clear();
-
-            List<string> parsedText = parseText(text);
-            int i = 0;
-            if (parsedText.Count > 0)
+            //Use our ANTLR grammar to parse the text
+            try
             {
-                if (isVar(parsedText[i]) == false)
-                {
-                    //raise flag not valid
-                    highlightText(false);
-                    return;
-                }
-                i++;
-                while (i < parsedText.Count)
-                {
-                    if (isOperation(parsedText[i]) == false)
-                    {
-                        //raise flag not valid
-                        highlightText(false);
-                        return;
-                    }
-                    i++;
-                    if (i >= parsedText.Count)
-                    {
-                        return;
-                    }
-                    if (isVar(parsedText[i]) == false)
-                    {
-                        //raise flag not valid
-                        highlightText(false);
-                        return;
-                    }
-                    i++;
-                }
+                ANTLRInputStream input = new ANTLRInputStream(stream);
+                ChemProVLexer lexer = new ChemProVLexer(input);
+                CommonTokenStream tokens = new CommonTokenStream(lexer);
+                ChemProVParser parser = new ChemProVParser(tokens);
+                AstParserRuleReturnScope<CommonTree, IToken> result = parser.program();
+                CommonTree tree = result.Tree;
+                CommonTreeNodeStream nodes = new CommonTreeNodeStream(tree);
+                nodes.TokenStream = tokens;
+                ChemProVTree walker = new ChemProVTree(nodes);
+                walker.program();
             }
+            catch (Exception ex)
+            {
+                //ignore failed parse
+            }
+
+            //close stream writer and memory stream
+            writer.Close();
+            stream.Close();
 
             EquationTokensChagned(this, new EventArgs());
         }
@@ -582,9 +409,9 @@ namespace ChemProV.PFD.EquationEditor
 
         public int CompareTo(object obj)
         {
-            if (obj is Equation)
+            if (obj is EquationControl)
             {
-                Equation other = obj as Equation;
+                EquationControl other = obj as EquationControl;
                 return Id.CompareTo(other.Id);
             }
             else

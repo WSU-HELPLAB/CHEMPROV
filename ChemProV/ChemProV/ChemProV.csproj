@@ -128,12 +128,12 @@
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
-    <Compile Include="Grammars\Line.cs" />
+    <Compile Include="Grammars\Equation.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\EquationEditor\Equation.xaml.cs">
-      <DependentUpon>Equation.xaml</DependentUpon>
+    <Compile Include="PFD\EquationEditor\EquationControl.xaml.cs">
+      <DependentUpon>EquationControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\EquationData.cs" />
     <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
@@ -314,7 +314,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PFD\EquationEditor\Equation.xaml">
+    <Page Include="PFD\EquationEditor\EquationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
