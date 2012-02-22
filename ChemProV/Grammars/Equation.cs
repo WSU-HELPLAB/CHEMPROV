@@ -14,10 +14,12 @@ namespace ChemProV.Grammars
 {
     public class Equation
     {
-        public List<string> Tokens { get; set; }
+        public Dictionary<int, Variable> Tokens { get; set; }
+        public bool IsVariableDefinition { get; set; }
         public Equation()
         {
-            Tokens = new List<string>();
+            Tokens = new Dictionary<int, Variable>();
+            IsVariableDefinition = false;
         }
     }
 }

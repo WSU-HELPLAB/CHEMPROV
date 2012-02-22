@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-// $ANTLR 3.4 E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g 2012-02-22 12:17:09
+// $ANTLR 3.4 D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g 2012-02-22 14:56:26
 
 // The variable 'variable' is assigned but its value is never used.
 #pragma warning disable 219
@@ -67,7 +67,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 	}
 
 	public override string[] TokenNames { get { return ChemProVTree.tokenNames; } }
-	public override string GrammarFileName { get { return "E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g"; } }
+	public override string GrammarFileName { get { return "D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g"; } }
 
 
 		public List<Equation> Lines = new List<Equation>();
@@ -83,7 +83,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_program();
 
 	// $ANTLR start "program"
-	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:21:8: public program : ( line )+ ;
+	// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:21:8: public program : ( line )+ ;
 	[GrammarRule("program")]
 	public void program()
 	{
@@ -94,12 +94,12 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(21, 1);
 		try
 		{
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:2: ( ( line )+ )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:2: ( ( line )+ )
 			DebugEnterAlt(1);
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:5: ( line )+
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:5: ( line )+
 			{
 			DebugLocation(22, 5);
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:5: ( line )+
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:5: ( line )+
 			int cnt1=0;
 			try { DebugEnterSubRule(1);
 			while (true)
@@ -119,7 +119,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 				{
 				case 1:
 					DebugEnterAlt(1);
-					// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:6: line
+					// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:22:6: line
 					{
 					DebugLocation(22, 6);
 					PushFollow(Follow._line_in_program55);
@@ -175,7 +175,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_line();
 
 	// $ANTLR start "line"
-	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:28:1: line : ( variable | balance );
+	// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:28:1: line : ( variable | balance );
 	[GrammarRule("line")]
 	private void line()
 	{
@@ -186,7 +186,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(28, 1);
 		try
 		{
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:29:2: ( variable | balance )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:29:2: ( variable | balance )
 			int alt2=2;
 			try { DebugEnterDecision(2, false);
 			int LA2_0 = input.LA(1);
@@ -210,7 +210,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:29:4: variable
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:29:4: variable
 				{
 				DebugLocation(29, 4);
 				PushFollow(Follow._variable_in_line73);
@@ -224,7 +224,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:30:4: balance
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:30:4: balance
 				{
 				DebugLocation(30, 4);
 				PushFollow(Follow._balance_in_line80);
@@ -261,7 +261,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_variable();
 
 	// $ANTLR start "variable"
-	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:33:1: variable : ^( VAR IDENTIFIER computation ) ;
+	// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:33:1: variable : ^( VAR IDENTIFIER computation ) ;
 	[GrammarRule("variable")]
 	private void variable()
 	{
@@ -272,9 +272,9 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(33, 1);
 		try
 		{
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:34:2: ( ^( VAR IDENTIFIER computation ) )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:34:2: ( ^( VAR IDENTIFIER computation ) )
 			DebugEnterAlt(1);
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:34:4: ^( VAR IDENTIFIER computation )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:34:4: ^( VAR IDENTIFIER computation )
 			{
 			DebugLocation(34, 4);
 			DebugLocation(34, 6);
@@ -317,40 +317,43 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_balance();
 
 	// $ANTLR start "balance"
-	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:37:1: balance : ^( '=' computation computation ) ;
+	// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:37:1: balance : ^( '=' left= computation right= computation ) ;
 	[GrammarRule("balance")]
 	private void balance()
 	{
 		EnterRule_balance();
 		EnterRule("balance", 4);
 		TraceIn("balance", 4);
+		ChemProVTree.computation_return left = default(ChemProVTree.computation_return);
+		ChemProVTree.computation_return right = default(ChemProVTree.computation_return);
+
 		try { DebugEnterRule(GrammarFileName, "balance");
 		DebugLocation(37, 1);
 		try
 		{
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:38:2: ( ^( '=' computation computation ) )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:38:2: ( ^( '=' left= computation right= computation ) )
 			DebugEnterAlt(1);
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:38:4: ^( '=' computation computation )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:38:4: ^( '=' left= computation right= computation )
 			{
 			DebugLocation(38, 4);
 			DebugLocation(38, 6);
 			Match(input,16,Follow._16_in_balance112); 
 
 			Match(input, TokenTypes.Down, null); 
-			DebugLocation(38, 10);
-			PushFollow(Follow._computation_in_balance114);
-			computation();
+			DebugLocation(38, 14);
+			PushFollow(Follow._computation_in_balance116);
+			left=computation();
 			PopFollow();
 
-			DebugLocation(38, 22);
-			PushFollow(Follow._computation_in_balance116);
-			computation();
+			DebugLocation(38, 32);
+			PushFollow(Follow._computation_in_balance120);
+			right=computation();
 			PopFollow();
 
 
 			Match(input, TokenTypes.Up, null); 
 
-			DebugLocation(38, 35);
+			DebugLocation(38, 46);
 
 
 			}
@@ -376,8 +379,9 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 
 	private sealed partial class computation_return : TreeRuleReturnScope<CommonTree>
 	{
-		public int token;
-		public int value;
+		public int lexerType;
+		public int integerValue;
+		public int equationTokenId;
 		public computation_return(ChemProVTree grammar) {OnCreated(grammar);}
 		partial void OnCreated(ChemProVTree grammar);
 	}
@@ -386,7 +390,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 	partial void LeaveRule_computation();
 
 	// $ANTLR start "computation"
-	// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:41:1: computation returns [int token, int value] : ( ^( '+' left= computation right= computation ) | ^( '-' left= computation right= computation ) | ^( '*' left= computation right= computation ) | ^( '/' left= computation right= computation ) | IDENTIFIER | INTEGER | FLOAT );
+	// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:41:1: computation returns [int lexerType, int integerValue, int equationTokenId] : ( ^( '+' left= computation right= computation ) | ^( '-' left= computation right= computation ) | ^( '*' left= computation right= computation ) | ^( '/' left= computation right= computation ) | IDENTIFIER | INTEGER | FLOAT );
 	[GrammarRule("computation")]
 	private ChemProVTree.computation_return computation()
 	{
@@ -406,7 +410,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 		DebugLocation(41, 1);
 		try
 		{
-			// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:42:2: ( ^( '+' left= computation right= computation ) | ^( '-' left= computation right= computation ) | ^( '*' left= computation right= computation ) | ^( '/' left= computation right= computation ) | IDENTIFIER | INTEGER | FLOAT )
+			// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:42:2: ( ^( '+' left= computation right= computation ) | ^( '-' left= computation right= computation ) | ^( '*' left= computation right= computation ) | ^( '/' left= computation right= computation ) | IDENTIFIER | INTEGER | FLOAT )
 			int alt3=7;
 			try { DebugEnterDecision(3, false);
 			switch (input.LA(1))
@@ -459,20 +463,20 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 			{
 			case 1:
 				DebugEnterAlt(1);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:42:4: ^( '+' left= computation right= computation )
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:42:4: ^( '+' left= computation right= computation )
 				{
 				DebugLocation(42, 4);
 				DebugLocation(42, 6);
-				Match(input,13,Follow._13_in_computation136); 
+				Match(input,13,Follow._13_in_computation140); 
 
 				Match(input, TokenTypes.Down, null); 
 				DebugLocation(42, 14);
-				PushFollow(Follow._computation_in_computation140);
+				PushFollow(Follow._computation_in_computation144);
 				left=computation();
 				PopFollow();
 
 				DebugLocation(42, 32);
-				PushFollow(Follow._computation_in_computation144);
+				PushFollow(Follow._computation_in_computation148);
 				right=computation();
 				PopFollow();
 
@@ -486,20 +490,20 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 2:
 				DebugEnterAlt(2);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:43:4: ^( '-' left= computation right= computation )
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:43:4: ^( '-' left= computation right= computation )
 				{
 				DebugLocation(43, 4);
 				DebugLocation(43, 6);
-				Match(input,14,Follow._14_in_computation153); 
+				Match(input,14,Follow._14_in_computation157); 
 
 				Match(input, TokenTypes.Down, null); 
 				DebugLocation(43, 14);
-				PushFollow(Follow._computation_in_computation157);
+				PushFollow(Follow._computation_in_computation161);
 				left=computation();
 				PopFollow();
 
 				DebugLocation(43, 32);
-				PushFollow(Follow._computation_in_computation161);
+				PushFollow(Follow._computation_in_computation165);
 				right=computation();
 				PopFollow();
 
@@ -513,20 +517,20 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 3:
 				DebugEnterAlt(3);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:44:4: ^( '*' left= computation right= computation )
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:44:4: ^( '*' left= computation right= computation )
 				{
 				DebugLocation(44, 4);
 				DebugLocation(44, 6);
-				Match(input,12,Follow._12_in_computation170); 
+				Match(input,12,Follow._12_in_computation174); 
 
 				Match(input, TokenTypes.Down, null); 
 				DebugLocation(44, 14);
-				PushFollow(Follow._computation_in_computation174);
+				PushFollow(Follow._computation_in_computation178);
 				left=computation();
 				PopFollow();
 
 				DebugLocation(44, 32);
-				PushFollow(Follow._computation_in_computation178);
+				PushFollow(Follow._computation_in_computation182);
 				right=computation();
 				PopFollow();
 
@@ -540,72 +544,79 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 				break;
 			case 4:
 				DebugEnterAlt(4);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:45:4: ^( '/' left= computation right= computation )
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:45:4: ^( '/' left= computation right= computation )
 				{
 				DebugLocation(45, 4);
 				DebugLocation(45, 6);
-				Match(input,15,Follow._15_in_computation187); 
+				Match(input,15,Follow._15_in_computation191); 
 
 				Match(input, TokenTypes.Down, null); 
 				DebugLocation(45, 14);
-				PushFollow(Follow._computation_in_computation191);
+				PushFollow(Follow._computation_in_computation195);
 				left=computation();
 				PopFollow();
 
 				DebugLocation(45, 32);
-				PushFollow(Follow._computation_in_computation195);
+				PushFollow(Follow._computation_in_computation199);
 				right=computation();
 				PopFollow();
 
 
 				Match(input, TokenTypes.Up, null); 
 
-				DebugLocation(45, 46);
+				DebugLocation(46, 3);
 
+						if(left.lexerType == IDENTIFIER && right.lexerType == INTEGER && right.integerValue == 100)
+						{
+							Lines[currentLineNumber].Tokens[left.equationTokenId].IsPercent = true;
+						}
+						
 
 				}
 				break;
 			case 5:
 				DebugEnterAlt(5);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:46:4: IDENTIFIER
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:52:4: IDENTIFIER
 				{
-				DebugLocation(46, 4);
-				IDENTIFIER1=(CommonTree)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_computation203); 
-				DebugLocation(47, 6);
+				DebugLocation(52, 4);
+				IDENTIFIER1=(CommonTree)Match(input,IDENTIFIER,Follow._IDENTIFIER_in_computation210); 
+				DebugLocation(53, 6);
 
 					            if (Lines.Count <= currentLineNumber)
 					            {
 					                Lines.Add(new Equation());
 					            }
-					            Lines[currentLineNumber].Tokens.Add((IDENTIFIER1!=null?IDENTIFIER1.Text:null));
-					            retval.token = (IDENTIFIER1!=null?IDENTIFIER1.Type:0);
+					            Variable token = new Variable((IDENTIFIER1!=null?IDENTIFIER1.Text:null));
+					            retval.equationTokenId = token.Id;
+					            Lines[currentLineNumber].Tokens.Add(retval.equationTokenId, token);
+					            retval.lexerType = (IDENTIFIER1!=null?IDENTIFIER1.Type:0);
 					    
 
 				}
 				break;
 			case 6:
 				DebugEnterAlt(6);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:55:4: INTEGER
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:63:4: INTEGER
 				{
-				DebugLocation(55, 4);
-				INTEGER2=(CommonTree)Match(input,INTEGER,Follow._INTEGER_in_computation215); 
-				DebugLocation(56, 3);
+				DebugLocation(63, 4);
+				INTEGER2=(CommonTree)Match(input,INTEGER,Follow._INTEGER_in_computation222); 
+				DebugLocation(64, 3);
 
-							retval.token = (INTEGER2!=null?INTEGER2.Type:0);
-							Int32.TryParse((INTEGER2!=null?INTEGER2.Text:null), out retval.value);
+							retval.lexerType = (INTEGER2!=null?INTEGER2.Type:0);
+							Int32.TryParse((INTEGER2!=null?INTEGER2.Text:null), out retval.integerValue);
 						
 
 				}
 				break;
 			case 7:
 				DebugEnterAlt(7);
-				// E:\\dolivares\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:60:4: FLOAT
+				// D:\\code\\chemprov_codeplex\\ChemProV\\ChemProV\\Grammars\\ChemProVTree.g:68:4: FLOAT
 				{
-				DebugLocation(60, 4);
-				FLOAT3=(CommonTree)Match(input,FLOAT,Follow._FLOAT_in_computation225); 
-				DebugLocation(61, 3);
+				DebugLocation(68, 4);
+				FLOAT3=(CommonTree)Match(input,FLOAT,Follow._FLOAT_in_computation232); 
+				DebugLocation(69, 3);
 
-							retval.token = (FLOAT3!=null?FLOAT3.Type:0);
+							retval.lexerType = (FLOAT3!=null?FLOAT3.Type:0);
 						
 
 				}
@@ -624,7 +635,7 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 			LeaveRule("computation", 5);
 			LeaveRule_computation();
 		}
-		DebugLocation(64, 1);
+		DebugLocation(72, 1);
 		} finally { DebugExitRule(GrammarFileName, "computation"); }
 		return retval;
 
@@ -643,23 +654,23 @@ public partial class ChemProVTree : Antlr.Runtime.Tree.TreeParser
 		public static readonly BitSet _IDENTIFIER_in_variable96 = new BitSet(new ulong[]{0xF070UL});
 		public static readonly BitSet _computation_in_variable98 = new BitSet(new ulong[]{0x8UL});
 		public static readonly BitSet _16_in_balance112 = new BitSet(new ulong[]{0x4UL});
-		public static readonly BitSet _computation_in_balance114 = new BitSet(new ulong[]{0xF070UL});
-		public static readonly BitSet _computation_in_balance116 = new BitSet(new ulong[]{0x8UL});
-		public static readonly BitSet _13_in_computation136 = new BitSet(new ulong[]{0x4UL});
-		public static readonly BitSet _computation_in_computation140 = new BitSet(new ulong[]{0xF070UL});
-		public static readonly BitSet _computation_in_computation144 = new BitSet(new ulong[]{0x8UL});
-		public static readonly BitSet _14_in_computation153 = new BitSet(new ulong[]{0x4UL});
-		public static readonly BitSet _computation_in_computation157 = new BitSet(new ulong[]{0xF070UL});
-		public static readonly BitSet _computation_in_computation161 = new BitSet(new ulong[]{0x8UL});
-		public static readonly BitSet _12_in_computation170 = new BitSet(new ulong[]{0x4UL});
-		public static readonly BitSet _computation_in_computation174 = new BitSet(new ulong[]{0xF070UL});
-		public static readonly BitSet _computation_in_computation178 = new BitSet(new ulong[]{0x8UL});
-		public static readonly BitSet _15_in_computation187 = new BitSet(new ulong[]{0x4UL});
-		public static readonly BitSet _computation_in_computation191 = new BitSet(new ulong[]{0xF070UL});
-		public static readonly BitSet _computation_in_computation195 = new BitSet(new ulong[]{0x8UL});
-		public static readonly BitSet _IDENTIFIER_in_computation203 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _INTEGER_in_computation215 = new BitSet(new ulong[]{0x2UL});
-		public static readonly BitSet _FLOAT_in_computation225 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _computation_in_balance116 = new BitSet(new ulong[]{0xF070UL});
+		public static readonly BitSet _computation_in_balance120 = new BitSet(new ulong[]{0x8UL});
+		public static readonly BitSet _13_in_computation140 = new BitSet(new ulong[]{0x4UL});
+		public static readonly BitSet _computation_in_computation144 = new BitSet(new ulong[]{0xF070UL});
+		public static readonly BitSet _computation_in_computation148 = new BitSet(new ulong[]{0x8UL});
+		public static readonly BitSet _14_in_computation157 = new BitSet(new ulong[]{0x4UL});
+		public static readonly BitSet _computation_in_computation161 = new BitSet(new ulong[]{0xF070UL});
+		public static readonly BitSet _computation_in_computation165 = new BitSet(new ulong[]{0x8UL});
+		public static readonly BitSet _12_in_computation174 = new BitSet(new ulong[]{0x4UL});
+		public static readonly BitSet _computation_in_computation178 = new BitSet(new ulong[]{0xF070UL});
+		public static readonly BitSet _computation_in_computation182 = new BitSet(new ulong[]{0x8UL});
+		public static readonly BitSet _15_in_computation191 = new BitSet(new ulong[]{0x4UL});
+		public static readonly BitSet _computation_in_computation195 = new BitSet(new ulong[]{0xF070UL});
+		public static readonly BitSet _computation_in_computation199 = new BitSet(new ulong[]{0x8UL});
+		public static readonly BitSet _IDENTIFIER_in_computation210 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _INTEGER_in_computation222 = new BitSet(new ulong[]{0x2UL});
+		public static readonly BitSet _FLOAT_in_computation232 = new BitSet(new ulong[]{0x2UL});
 	}
 	#endregion Follow sets
 }
