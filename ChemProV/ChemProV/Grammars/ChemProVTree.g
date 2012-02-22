@@ -35,31 +35,39 @@ variable
 	;
 
 balance	
-	:	^('=' computation computation) {}//memory.Add($IDENTIFIER.text, Convert.ToInt32($computation.value));}
+	:	^('=' left=computation right=computation) {}//memory.Add($IDENTIFIER.text, Convert.ToInt32($computation.value));}
 	;	
 
-computation returns [int token, int value]
+computation returns [int lexerType, int integerValue, int equationTokenId]
 	: ^('+' left=computation right=computation) {}//$value = a+b;}
 	| ^('-' left=computation right=computation) {}//$value = a-b;}
 	| ^('*' left=computation right=computation) {}//$value = a*b;}
-	| ^('/' left=computation right=computation) {}//$value = a/b;}
+	| ^('/' left=computation right=computation) 
+		{
+		if(left.lexerType == IDENTIFIER && right.lexerType == INTEGER && right.integerValue == 100)
+		{
+			Lines[currentLineNumber].Tokens[left.equationTokenId].IsPercent = true;
+		}
+		}
 	| IDENTIFIER
 	    {
 	            if (Lines.Count <= currentLineNumber)
 	            {
 	                Lines.Add(new Equation());
 	            }
-	            Lines[currentLineNumber].Tokens.Add($IDENTIFIER.text);
-	            $token = $IDENTIFIER.type;
+	            Variable token = new Variable($IDENTIFIER.text);
+	            $equationTokenId = token.Id;
+	            Lines[currentLineNumber].Tokens.Add($equationTokenId, token);
+	            $lexerType = $IDENTIFIER.type;
 	    }
 	| INTEGER 
 		{
-			$token = $INTEGER.type;
-			Int32.TryParse($INTEGER.text, out $value);
+			$lexerType = $INTEGER.type;
+			Int32.TryParse($INTEGER.text, out $integerValue);
 		}
 	| FLOAT
 		{
-			$token = $FLOAT.type;
+			$lexerType = $FLOAT.type;
 		}
 	;
 

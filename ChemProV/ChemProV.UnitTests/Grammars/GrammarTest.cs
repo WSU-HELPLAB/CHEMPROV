@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -14,18 +15,18 @@ using System.IO;
 using Antlr.Runtime;
 using ChemProV.Grammars;
 using Antlr.Runtime.Tree;
+using System.Linq;
 
 namespace ChemProV.UnitTests.Grammars
 {
     [TestClass]
     public class GrammarTest
     {
-        [TestMethod]
-        public void TestOverallEquation()
+        private ChemProVTree ParseText(string text)
         {
             MemoryStream stream = new MemoryStream();
             StreamWriter writer = new StreamWriter(stream);
-            writer.WriteLine("M1 + M2 = M3");
+            writer.WriteLine(text);
             writer.Flush();
             stream.Position = 0;
 
@@ -39,11 +40,25 @@ namespace ChemProV.UnitTests.Grammars
             nodes.TokenStream = tokens;
             ChemProVTree walker = new ChemProVTree(nodes);
             walker.program();
-
-            Assert.AreEqual(1, walker.Lines.Count);
-            Assert.AreEqual(true, walker.Lines[0].Tokens.Contains("M1"));
-            Assert.AreEqual(true, walker.Lines[0].Tokens.Contains("M2"));
-            Assert.AreEqual(true, walker.Lines[0].Tokens.Contains("M3"));
+            return walker;
         }
+
+        [TestMethod]
+        public void TestOverallEquation()
+        {
+            ChemProVTree tree = ParseText("M1 + M2 = M3");
+            Assert.AreEqual(1, tree.Lines.Count);
+            Assert.AreEqual(3, tree.Lines[0].Tokens.Keys.Count);
+        }
+
+        [TestMethod]
+        public void TestPercent()
+        {
+            ChemProVTree tree = ParseText("M1 / 100 = 0");
+            Dictionary<int, Variable>.ValueCollection values = tree.Lines[0].Tokens.Values;
+            Assert.AreEqual(true, values.First().IsPercent);
+        }
+        
+
     }
 }

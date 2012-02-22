@@ -40,8 +40,12 @@ namespace ChemProV.PFD.ProcessUnits
             }
             set
             {
-                processUnitLabel = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("ProcessUnitLabel"));
+                //don't allow empty names
+                if (value.Length > 0)
+                {
+                    processUnitLabel = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("ProcessUnitLabel"));
+                }
             }
         }
 

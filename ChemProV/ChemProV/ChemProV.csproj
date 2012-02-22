@@ -129,6 +129,7 @@
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
     <Compile Include="Grammars\Equation.cs" />
+    <Compile Include="Grammars\Variable.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
