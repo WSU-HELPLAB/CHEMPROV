@@ -28,7 +28,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     </StackPanel>
                 </ToolTipService.ToolTip>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <Ellipse Label="FeedbackStatusEllipse" Height="20" Width="20" Fill="Red" Margin="3,0,3,0"/>
+                    <Ellipse x:Name="FeedbackStatusEllipse" Height="20" Width="20" Fill="Red" Margin="3,0,3,0"/>
                     <sdk:Label Content="Feedback" FontSize="14" HorizontalContentAlignment="Stretch" Padding="3" />
                 </StackPanel>
             </StackPanel>
@@ -39,7 +39,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
 
                 >
-                <StackPanel Label="FeedBackStackPanel" Orientation="Vertical" Height="Auto" Width="Auto">
+                <StackPanel x:Name="FeedBackStackPanel" Orientation="Vertical" Height="Auto" Width="Auto">
                 </StackPanel>
             </ScrollViewer>
         </StackPanel>

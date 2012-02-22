@@ -8,11 +8,11 @@
     Width="50" Height="69">
     <Border>
         <StackPanel Orientation="Vertical">
-            <Border Label="ProcessUnitBorder"
+            <Border x:Name="ProcessUnitBorder"
                 BorderThickness="2"
                 Width="45" Height="45"
                 BorderBrush="Transparent">
-                <Image Label="ProcessUnitImage"
+                <Image x:Name="ProcessUnitImage"
                Source="/UI/Icons/pu_generic.png"
                Stretch="None"
                />

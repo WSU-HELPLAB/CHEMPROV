@@ -213,6 +213,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
         </Style>
     </UserControl.Resources>
     <Border>
-        <StackPanel Height="Auto" Label="LayoutRoot" Orientation="Horizontal" Background="White"></StackPanel>
+        <StackPanel Height="Auto" x:Name="LayoutRoot" Orientation="Horizontal" Background="White"></StackPanel>
     </Border>
 </UserControl>
