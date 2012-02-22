@@ -9,15 +9,70 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace ChemProV.PFD.ProcessUnits
 {
     public partial class LabeledProcessUnit : GenericProcessUnit
     {
+        private string processUnitLabel;
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
         public LabeledProcessUnit() : base()
         {
             InitializeComponent();
             this.DataContext = this;
+            ProcessUnitNameText.MouseLeftButtonDown += new MouseButtonEventHandler(ProcessUnitNameText_MouseLeftButtonDown);
+            ProcessUnitNameBox.MouseLeftButtonDown += new MouseButtonEventHandler(ProcessUnitNameBox_MouseLeftButtonDown);
+            ProcessUnitNameBox.LostFocus += new RoutedEventHandler(ProcessUnitNameBox_LostFocus);
+            ProcessUnitNameBox.KeyDown += new KeyEventHandler(ProcessUnitNameBox_KeyDown);
+        }
+
+        /// <summary>
+        /// Used to track the process unit's label (name)
+        /// </summary>
+        public String Label
+        {
+            get
+            {
+                return processUnitLabel;
+            }
+            set
+            {
+                processUnitLabel = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Label"));
+            }
+        }
+
+        void ProcessUnitNameBox_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                ProcessUnitNameBox_LostFocus(this, new RoutedEventArgs());
+            }
+            if (e.Key == Key.Space)
+            {
+                e.Handled = true;
+            }
+        }
+
+        void ProcessUnitNameBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            ProcessUnitNameText.Visibility = System.Windows.Visibility.Visible;
+            ProcessUnitNameBox.Visibility = System.Windows.Visibility.Collapsed;
+        }
+
+        void ProcessUnitNameBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            e.Handled = true;
+        }
+
+        void ProcessUnitNameText_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            ProcessUnitNameText.Visibility = System.Windows.Visibility.Collapsed;
+            ProcessUnitNameBox.Visibility = System.Windows.Visibility.Visible;
+            ProcessUnitNameBox.Focus();
+            e.Handled = true;
         }
 
         #region GenericProcessUnitOverrides

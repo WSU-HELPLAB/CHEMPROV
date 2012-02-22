@@ -44,7 +44,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Click="RedoClick_Click" ToolTipService.ToolTip="Redo action">
                     <Image Source="/UI/Icons/toolbar_redo.png" />
                 </Button>
-                <Button Name="Install_Button"  Margin="0,0,5,0" Click="InstallButton_Click" ToolTipService.ToolTip="Install ChemProV to your local machine">
+                <Button Label="Install_Button"  Margin="0,0,5,0" Click="InstallButton_Click" ToolTipService.ToolTip="Install ChemProV to your local machine">
                     <Image Source="/UI/Icons/toolbar_install.png" />
                 </Button>
                 <Button Margin="0,0,5,0" Click="OptionsButton_Click" ToolTipService.ToolTip="Options" >

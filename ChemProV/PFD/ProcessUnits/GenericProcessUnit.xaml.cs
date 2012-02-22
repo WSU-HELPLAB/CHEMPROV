@@ -178,6 +178,19 @@ namespace ChemProV.PFD.ProcessUnits
         }
 
         /// <summary>
+        /// Shorthand for getting the IProcessUnit's integer component of its id
+        /// </summary>
+        public int ProcessUnitId
+        {
+            get
+            {
+                int id = 0;
+                Int32.TryParse(this.Id.Split('_')[1], out id);
+                return id;
+            }
+        }
+
+        /// <summary>
         /// A short description of the process unit.  Not more than a few words in length.
         /// </summary>
         public string Description
