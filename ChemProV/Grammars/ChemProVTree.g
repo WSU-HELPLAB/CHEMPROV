@@ -14,7 +14,7 @@ options
 }
 @members
 {
-	public List<ChemProVLine> lines = new List<ChemProVLine>();
+	public List<Equation> Lines = new List<Equation>();
 	private int currentLineNumber = 0;
 }
 @namespace { ChemProV.Grammars }
@@ -45,11 +45,11 @@ computation returns [int token, int value]
 	| ^('/' left=computation right=computation) {}//$value = a/b;}
 	| IDENTIFIER
 	    {
-	            if (lines.Count <= currentLineNumber)
+	            if (Lines.Count <= currentLineNumber)
 	            {
-	                lines.Add(new ChemProVLine());
+	                Lines.Add(new Equation());
 	            }
-	            lines[currentLineNumber].VariablesUsed.Add($IDENTIFIER.text);
+	            Lines[currentLineNumber].Tokens.Add($IDENTIFIER.text);
 	            $token = $IDENTIFIER.type;
 	    }
 	| INTEGER 

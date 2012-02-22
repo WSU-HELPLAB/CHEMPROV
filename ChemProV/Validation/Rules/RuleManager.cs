@@ -225,7 +225,7 @@ namespace ChemProV.Validation.Rules
         /// This is called when we want to check the semantics of the equations.  The syntax is checked within the equation
         /// editor code already.  It keeps a list to all the equations so we do not have to pass it anything.
         /// </summary>
-        private void CheckEquationSemantics(ObservableCollection<EquationData> equations, IList<Tuple<string, Equation>> userDefinedVariables, List<IProcessUnit> processUnits)
+        private void CheckEquationSemantics(ObservableCollection<EquationData> equations, IList<Tuple<string, EquationControl>> userDefinedVariables, List<IProcessUnit> processUnits)
         {
             EquationRule rule = new EquationRule();
 
@@ -258,7 +258,7 @@ namespace ChemProV.Validation.Rules
         /// </summary>
         /// <param name="pfdElements">list of all pfdElements that need to be checked</param>
         /// <param name="equations">list of all equations that need to be checked</param>
-        public void Validate(IEnumerable<IPfdElement> pfdElements, ObservableCollection<EquationData> equations, IList<Tuple<string, Equation>> userDefinedVariables)
+        public void Validate(IEnumerable<IPfdElement> pfdElements, ObservableCollection<EquationData> equations, IList<Tuple<string, EquationControl>> userDefinedVariables)
         {
             //clear out the dictionary before we begin adding new stuff
             EveryoneDict.Clear();

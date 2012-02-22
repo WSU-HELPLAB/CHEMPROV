@@ -248,9 +248,9 @@ namespace ChemProV.Validation.Feedback
                     ipfd.RemoveFeedback();
                 }
             }
-            else if (target is Equation)
+            else if (target is EquationControl)
             {
-                Equation equation = target as Equation;
+                EquationControl equation = target as EquationControl;
                 if (action == changeFeedback.HighlightFeedback)
                 {
                     equation.HighlightFeedback(highlight);
@@ -435,9 +435,9 @@ namespace ChemProV.Validation.Feedback
                 {
                     targetIds = (target as IPfdElement).Id;
                 }
-                else if (target is Equation)
+                else if (target is EquationControl)
                 {
-                    targetIds = (target as Equation).Id;
+                    targetIds = (target as EquationControl).Id;
                 }
 
                 writer.WriteAttributeString("id", feedback.Id);

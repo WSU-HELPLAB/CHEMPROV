@@ -18,7 +18,7 @@ namespace ChemProV.PFD.EquationEditor
     {
         #region Fields
 
-        private Equation equationReference;
+        private EquationControl equationReference;
 
         private ObservableCollection<IEquationToken> equationTokens;
 
@@ -49,7 +49,7 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        public Equation EquationReference
+        public EquationControl EquationReference
         {
             get { return equationReference; }
         }
@@ -72,7 +72,7 @@ namespace ChemProV.PFD.EquationEditor
             get { return equationReference.EquationTokens; }
         }
 
-        public EquationData(Equation equation)
+        public EquationData(EquationControl equation)
         {
             equationReference = equation;
             equationTokens = equationReference.EquationTokens;

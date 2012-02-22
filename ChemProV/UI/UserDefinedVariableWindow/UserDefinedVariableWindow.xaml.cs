@@ -29,9 +29,9 @@ namespace ChemProV.UI.UserDefinedVariableWindow
 
         private bool isReadOnly;
 
-        private List<Tuple<string, Equation>> variableDictionary = new List<Tuple<string, Equation>>();
+        private List<Tuple<string, EquationControl>> variableDictionary = new List<Tuple<string, EquationControl>>();
 
-        public List<Tuple<string, Equation>> VariableDictionary
+        public List<Tuple<string, EquationControl>> VariableDictionary
         {
             get { return variableDictionary; }
             set { variableDictionary = value; }
@@ -69,7 +69,7 @@ namespace ChemProV.UI.UserDefinedVariableWindow
             propertiesWindowGrid.PlaceUIElement(new TextBlock() { HorizontalAlignment = HorizontalAlignment.Center, Text = "Data" }, 2, i);
             i++;
 
-            foreach (Tuple<string, Equation> keyPair in variableDictionary)
+            foreach (Tuple<string, EquationControl> keyPair in variableDictionary)
             {
                 if (!isReadOnly)
                 {
@@ -92,7 +92,7 @@ namespace ChemProV.UI.UserDefinedVariableWindow
 
                 propertiesWindowGrid.PlaceUIElement(tb, 1, i);
 
-                Equation eq = keyPair.Item2;
+                EquationControl eq = keyPair.Item2;
 
                 propertiesWindowGrid.PlaceUIElement(eq, 2, i);
                 i++;
@@ -134,7 +134,7 @@ namespace ChemProV.UI.UserDefinedVariableWindow
             }
             else
             {
-                variableDictionary[index] = new Tuple<string, Equation>(tb.Text, variableDictionary[index].Item2);
+                variableDictionary[index] = new Tuple<string, EquationControl>(tb.Text, variableDictionary[index].Item2);
             }
         }
 
@@ -152,7 +152,7 @@ namespace ChemProV.UI.UserDefinedVariableWindow
 
         private void addNewRow_Click(object sender, RoutedEventArgs e)
         {
-            variableDictionary.Add(new Tuple<string, Equation>("", new Equation(false)));
+            variableDictionary.Add(new Tuple<string, EquationControl>("", new EquationControl(false)));
             UpdateTable();
             Application.Current.RootVisual.SetValue(Control.IsEnabledProperty, true);
         }
@@ -194,7 +194,7 @@ namespace ChemProV.UI.UserDefinedVariableWindow
                 string variableName = variableDefinition.Attribute("variableName").Value;
                 string variableData = variableDefinition.Attribute("variableData").Value;
 
-                Tuple<string, Equation> tuple = new Tuple<string, Equation>(variableName, new Equation());
+                Tuple<string, EquationControl> tuple = new Tuple<string, EquationControl>(variableName, new EquationControl());
                 tuple.Item2.EquationText = variableData;
 
                 variableDictionary.Add(tuple);
@@ -218,7 +218,7 @@ namespace ChemProV.UI.UserDefinedVariableWindow
 
         public void WriteXml(XmlWriter writer)
         {
-            foreach (Tuple<string, Equation> variableDefinition in VariableDictionary)
+            foreach (Tuple<string, EquationControl> variableDefinition in VariableDictionary)
             {
                 writer.WriteStartElement("variableDefinition");
                 writer.WriteAttributeString("variableName", variableDefinition.Item1);

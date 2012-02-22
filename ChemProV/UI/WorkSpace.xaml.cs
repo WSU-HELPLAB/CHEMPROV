@@ -41,7 +41,7 @@ namespace ChemProV.UI
 
         private bool isReadOnly = false;
 
-        private List<Tuple<string, Equation>> userDefinedVaraibles = new List<Tuple<string, Equation>>();
+        private List<Tuple<string, EquationControl>> userDefinedVaraibles = new List<Tuple<string, EquationControl>>();
 
         private RuleManager ruleManager = RuleManager.GetInstance();
 
@@ -206,7 +206,7 @@ namespace ChemProV.UI
             EquationEditor.CurrentDifficultySetting = newValue;
         }
 
-        public void UserDefinedVariablesUpdated(List<Tuple<string, Equation>> newVariables)
+        public void UserDefinedVariablesUpdated(List<Tuple<string, EquationControl>> newVariables)
         {
             userDefinedVaraibles = newVariables;
             CheckRulesForPFD(null, EventArgs.Empty);
