@@ -16,9 +16,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     d:DesignHeight="300" d:DesignWidth="400" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <Border>
         <Grid x:Name="LayoutRoot" Background="White">
-            <StackPanel Label="stackPanel" Orientation="Horizontal">
-                <ComboBox Height="28" Label="EquationType" MinWidth="100" ItemsSource="{Binding Path=EquationTypes, Mode=OneWay}"/>
-                <TextBox Height="25" Visibility="Collapsed" FontSize="11" IsReadOnly="True" Label="EquationFeedback" AcceptsReturn="False" MinWidth="10" />
+            <StackPanel x:Name="stackPanel" Orientation="Horizontal">
+                <ComboBox Height="28" x:Name="EquationType" MinWidth="100" ItemsSource="{Binding Path=EquationTypes, Mode=OneWay}"/>
+                <TextBox Height="25" Visibility="Collapsed" FontSize="11" IsReadOnly="True" x:Name="EquationFeedback" AcceptsReturn="False" MinWidth="10" />
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">
                     <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200" MaxWidth="270" TextWrapping="Wrap" />
                     <tokens:TokenList x:Name="TokenListControl" Visibility="Collapsed"  MinWidth="200" />
