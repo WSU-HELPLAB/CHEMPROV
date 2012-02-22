@@ -25,6 +25,14 @@ namespace ChemProV.PFD.ProcessUnits
         event EventHandler StreamsChanged;
 
         /// <summary>
+        /// Shorthand for getting the IProcessUnit's integer component of its id
+        /// </summary>
+        int ProcessUnitId
+        {
+            get;
+        }
+
+        /// <summary>
         /// All process units need an icon so they can be represented in a drawing drawing_canvas
         /// </summary>
         Image Icon

@@ -224,6 +224,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.HeatExchanger:
                     pu = new LabeledProcessUnit();
+                    (pu as LabeledProcessUnit).Name = "Exchanger" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = 1;
                     pu.MaxOutgoingStreams = 1;
                     pu.MaxIncomingHeatStreams = 1;
@@ -233,6 +234,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.HeatExchangerNoUtility:
                     pu = new LabeledProcessUnit();
+                    (pu as LabeledProcessUnit).Name = "Exchanger" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = 2;
                     pu.MaxOutgoingStreams = 2;
                     pu.MaxIncomingHeatStreams = 0;
@@ -242,6 +244,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.Mixer:
                     pu = new LabeledProcessUnit();
+                    (pu as LabeledProcessUnit).Name = "Mixer" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = -1;
                     pu.MaxOutgoingStreams = 1;
                     pu.MaxIncomingHeatStreams = 0;
@@ -251,6 +254,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.Reactor:
                     pu = new LabeledProcessUnit();
+                    (pu as LabeledProcessUnit).Name = "Reactor" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = -1;
                     pu.MaxOutgoingStreams = 1;
                     pu.MaxIncomingHeatStreams = 1;
@@ -260,6 +264,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.Separator:
                     pu = new LabeledProcessUnit();
+                    (pu as LabeledProcessUnit).Name = "Separator" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = 1;
                     pu.MaxOutgoingStreams = -1;
                     pu.MaxIncomingHeatStreams = 0;

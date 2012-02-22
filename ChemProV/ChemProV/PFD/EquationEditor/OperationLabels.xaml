@@ -15,6 +15,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     d:DesignHeight="300" d:DesignWidth="400" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" Width="20" Height="23">
 
     <Grid x:Name="LayoutRoot" Background="White" Height="23" Width="20">
-        <sdk:Label Background="Silver" Content=" ? " Height="23" Name="Operation" Width="20" />
+        <sdk:Label Background="Silver" Content=" ? " Height="23" Label="Operation" Width="20" />
     </Grid>
 </UserControl>

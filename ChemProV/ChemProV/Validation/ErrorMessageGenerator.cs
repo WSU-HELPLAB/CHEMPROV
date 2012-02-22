@@ -201,7 +201,7 @@ namespace ChemProV.Validation
                     resultMessage = "The sum of the quantities of all individual compounds is not equal to the quantity of the overall stream, or 100%.  Make sure that the quantities of all individual compounds add up to the quantity of overall stream, or 100%";
                     break;
                 case ErrorMessages.Inconsistant_Units:
-                    resultMessage = "The units: {0} and {1} where used, but these units are not allowed to be mix matched change one of these units";
+                    resultMessage = "The units: \"{0}\" and \"{1}\" where used together, which is invalid";
 
                     resultMessage = String.Format(resultMessage, list[0], list[1]);
                     break;

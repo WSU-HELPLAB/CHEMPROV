@@ -8,16 +8,17 @@
     Width="50" Height="69">
     <Border>
         <StackPanel Orientation="Vertical">
-            <Border Name="ProcessUnitBorder"
+            <Border Label="ProcessUnitBorder"
                 BorderThickness="2"
                 Width="45" Height="45"
                 BorderBrush="Transparent">
-                <Image Name="ProcessUnitImage"
+                <Image Label="ProcessUnitImage"
                Source="/UI/Icons/pu_generic.png"
                Stretch="None"
                />
             </Border>
-            <TextBox x:Name="ProcessUnitName" Width="50" Height="24" Text="{Binding Path=Id, Mode=TwoWay}" />
+            <TextBlock x:Name="ProcessUnitNameText" Text="{Binding Path=Label, Mode=TwoWay}" HorizontalAlignment="Center" />
+            <TextBox x:Name="ProcessUnitNameBox" Width="50" Height="24" Text="{Binding Path=Label, Mode=TwoWay}" Visibility="Collapsed" />
         </StackPanel>
     </Border>
 </processUnits:GenericProcessUnit>
