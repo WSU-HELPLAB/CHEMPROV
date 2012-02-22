@@ -17,8 +17,8 @@
                Stretch="None"
                />
             </Border>
-            <TextBlock x:Name="ProcessUnitNameText" Text="{Binding Path=Label, Mode=TwoWay}" HorizontalAlignment="Center" />
-            <TextBox x:Name="ProcessUnitNameBox" Width="50" Height="24" Text="{Binding Path=Label, Mode=TwoWay}" Visibility="Collapsed" />
+            <TextBlock x:Name="ProcessUnitNameText" Text="{Binding Path=ProcessUnitLabel, Mode=TwoWay}" HorizontalAlignment="Center" />
+            <TextBox x:Name="ProcessUnitNameBox" Width="50" Height="24" Text="{Binding Path=ProcessUnitLabel, Mode=TwoWay}" Visibility="Collapsed" />
         </StackPanel>
     </Border>
 </processUnits:GenericProcessUnit>
