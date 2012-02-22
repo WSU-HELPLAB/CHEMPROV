@@ -10,12 +10,13 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using System.Windows.Data;
 
 namespace ChemProV.PFD.ProcessUnits
 {
-    public partial class LabeledProcessUnit : GenericProcessUnit
+    public partial class LabeledProcessUnit : GenericProcessUnit, INotifyPropertyChanged
     {
-        private string processUnitLabel;
+        private string processUnitLabel = "foo";
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
         public LabeledProcessUnit() : base()
@@ -31,7 +32,7 @@ namespace ChemProV.PFD.ProcessUnits
         /// <summary>
         /// Used to track the process unit's label (name)
         /// </summary>
-        public String Label
+        public String ProcessUnitLabel
         {
             get
             {
@@ -40,7 +41,7 @@ namespace ChemProV.PFD.ProcessUnits
             set
             {
                 processUnitLabel = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("Label"));
+                PropertyChanged(this, new PropertyChangedEventArgs("ProcessUnitLabel"));
             }
         }
 
