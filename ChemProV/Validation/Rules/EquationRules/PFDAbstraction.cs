@@ -15,6 +15,7 @@ using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 using ChemProV.Validation.Rules.Adapters.Table;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.Validation.Rules.EquationRules
 {
@@ -60,7 +61,7 @@ namespace ChemProV.Validation.Rules.EquationRules
             Dictionary<List<IProcessUnit>, List<EquationData>> matchedGraphsAndEquations = new Dictionary<List<IProcessUnit>, List<EquationData>>();
             foreach (EquationData eqData in equations)
             {
-                if (eqData.Type != null && eqData.IsValid && eqData.Type.Classification != EquationClassification.VariableDefinition)
+                if (eqData.Type != null && eqData.IsValid && eqData.Type.Classification != EquationTypeClassification.VariableDefinition)
                 {
                     if (eqData.VariableNames.Item1[0].Count() >= 1 && eqData.VariableNames.Item2[0].Count() >= 1)
                     {
@@ -136,7 +137,7 @@ namespace ChemProV.Validation.Rules.EquationRules
                 {
                     //Elements and Compounds cannot be mixed so if one is Element it overrides compound
                     //maybe throw an error if they try to mix em (Overall is still allowed
-                    if (eqData.Type.Classification == EquationClassification.Element)
+                    if (eqData.Type.Classification == EquationTypeClassification.Atom)
                     {
                         usingElements = true;
                     }
@@ -218,7 +219,7 @@ namespace ChemProV.Validation.Rules.EquationRules
 
         private bool isValidEquation(EquationData eqData, List<IProcessUnit> graph, Dictionary<string, GenericTableData> dictionaryOfTableData)
         {
-            if (eqData.Type.Classification == EquationClassification.Overall || eqData.Type.Classification == EquationClassification.Energy || eqData.Type.Classification == EquationClassification.Compound || eqData.Type.Classification == EquationClassification.Element)
+            if (eqData.Type.Classification == EquationTypeClassification.Total || eqData.Type.Classification == EquationTypeClassification.Energy || eqData.Type.Classification == EquationTypeClassification.Compound || eqData.Type.Classification == EquationTypeClassification.Atom)
             {
                 AbstractedProcessUnit apu = (from c in graph where c is AbstractedProcessUnit select c as AbstractedProcessUnit).FirstOrDefault();
                 bool lhsIsIncomming = true;
@@ -230,7 +231,7 @@ namespace ChemProV.Validation.Rules.EquationRules
                     lhsIsIncomming = false;
                 }
 
-                if (eqData.Type.Classification == EquationClassification.Overall)
+                if (eqData.Type.Classification == EquationTypeClassification.Total)
                 {
                     if (lhsIsIncomming)
                     {

@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using ChemProV.PFD.EquationEditor.Tokens;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -59,7 +60,7 @@ namespace ChemProV.PFD.EquationEditor
             get { return isValid; }
         }
 
-        public ComboBoxEquationTypeItem Type
+        public EquationType Type
         {
             get
             {

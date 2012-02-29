@@ -141,7 +141,10 @@
       <DependentUpon>EquationEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\EquationViewModel.cs" />
-    <Compile Include="PFD\EquationEditor\EquationType.cs" />
+    <Compile Include="PFD\EquationEditor\Models\EquationScopeClassification.cs" />
+    <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />
+    <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
+    <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
     <Compile Include="PFD\EquationEditor\OperationLabels.xaml.cs">
       <DependentUpon>OperationLabels.xaml</DependentUpon>
     </Compile>
@@ -329,8 +332,8 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PFD\EquationEditor\EquationControl.xaml">
-      <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="PFD\EquationEditor\EquationEditor.xaml">
       <SubType>Designer</SubType>

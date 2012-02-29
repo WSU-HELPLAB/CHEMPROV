@@ -14,6 +14,7 @@ using ChemProV.PFD.EquationEditor;
 using ChemProV.PFD.EquationEditor.Tokens;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.Validation.Rules.EquationRules
 {
@@ -44,7 +45,7 @@ namespace ChemProV.Validation.Rules.EquationRules
                     if (eqData.IsValid)
                     {
                         foundOneValid = true;
-                        if (eqData.Type != null && eqData.Type.Classification != EquationClassification.VariableDefinition)
+                        if (eqData.Type != null && eqData.Type.Classification != EquationTypeClassification.VariableDefinition)
                         {
                             ObservableCollection<IEquationToken> equation = eqData.EquationTokens;
                             List<string> variablesNames = new List<string>();
@@ -101,7 +102,7 @@ namespace ChemProV.Validation.Rules.EquationRules
             Dictionary<string, EquationData> variableDefinitions = new Dictionary<string, EquationData>();
             foreach (EquationData eqData in listOfEquations)
             {
-                if (eqData.Type.Classification == EquationClassification.VariableDefinition)
+                if (eqData.Type.Classification == EquationTypeClassification.VariableDefinition)
                 {
                     if (eqData.IsValid && eqData.VariableNames.Item1.Count == 1)
                     {

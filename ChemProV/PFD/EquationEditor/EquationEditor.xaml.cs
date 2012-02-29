@@ -20,6 +20,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.EquationEditor.Views;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -39,7 +40,7 @@ namespace ChemProV.PFD.EquationEditor
         private ObservableCollection<EquationData> equationData = new ObservableCollection<EquationData>();
         private IList<string> compounds;
         private List<string> elements = new List<string>();
-        private ObservableCollection<ComboBoxEquationTypeItem> equationTypes = new ObservableCollection<ComboBoxEquationTypeItem>();
+        private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
 
         private bool isReadOnly = false;
 
@@ -49,7 +50,9 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Properties
 
-        public ObservableCollection<ComboBoxEquationTypeItem> EquationTypes
+        public List<IPfdElement> PfdElements { get; set; }
+
+        public ObservableCollection<EquationType> EquationTypes
         {
             get { return equationTypes; }
         }
@@ -97,12 +100,12 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
+        [Obsolete("EquationControl class is on its way out")]
         public List<EquationControl> Equations
         {
             get
             {
-                var eqs = from c in EquationStackPanel.Children where c is EquationControl select c as EquationControl;
-                return new List<EquationControl>(eqs);
+                return new List<EquationControl>();
             }
         }
 
@@ -112,10 +115,6 @@ namespace ChemProV.PFD.EquationEditor
             set
             {
                 isReadOnly = value;
-                foreach (EquationControl eq in EquationStackPanel.Children)
-                {
-                    eq.IsReadOnly = value;
-                }
             }
         }
 
@@ -126,23 +125,23 @@ namespace ChemProV.PFD.EquationEditor
         public EquationEditor()
         {
             InitializeComponent();
-            EquationControl eq = new EquationControl(isReadOnly);
+
+            PfdElements = new List<IPfdElement>();
 
             //create our first row
             AddNewEquationRow();
-
-            //this makes the first text box listen for when it has been changed and when it is it makes a new text box and sets that one to listen for the same thing
-            RegisterEquationListeners(eq);
-            selectedEquation = eq;
-            eq.MyTextChanged += new EventHandler(eq_MyTextChanged);
-            EquationStackPanel.Children.Add(eq);
-            EquationScrollViewer.DataContext = this;
         }
 
+        /// <summary>
+        /// Adds a new equation row to the equations grid.
+        /// </summary>
         private void AddNewEquationRow()
         {
             EquationViewModel newRowModel = new EquationViewModel();
+            newRowModel.TypeOptions = EquationTypes;
             newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationViewModelPropertyChanged);
+            viewModels.Add(newRowModel);
+
             int rowNumber = EquationsGrid.RowDefinitions.Count;
             EquationsGrid.RowDefinitions.Add(new RowDefinition());
 
@@ -168,6 +167,11 @@ namespace ChemProV.PFD.EquationEditor
 
         }
 
+        /// <summary>
+        /// Called whenever the user makes a change to one of the equations
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void EquationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             EquationViewModel model = sender as EquationViewModel;
@@ -179,7 +183,7 @@ namespace ChemProV.PFD.EquationEditor
                                  where (int)child.GetValue(Grid.RowProperty) == maxRowCount
                                  select child).FirstOrDefault();
             EquationViewModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationViewModel);
-            if (elementVm.Id == model.Id)
+            if (elementVm.Id == model.Id && model.Equation.Length != 0)
             {
                 AddNewEquationRow();
             }
@@ -189,16 +193,10 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Methods
 
+        [Obsolete("Does nothing")]
         public void InsertConstant(string constant)
         {
-            selectedEquation.EquationText += " " + constant;
-            EquationTextChanged(selectedEquation, EventArgs.Empty);
 
-            //check to see if it is the last one if so need to call the eq_TextInputStart
-            if (EquationStackPanel.Children[EquationStackPanel.Children.Count - 1] == selectedEquation)
-            {
-                eq_MyTextChanged(selectedEquation, EventArgs.Empty as TextCompositionEventArgs);
-            }
         }
 
         public void ChangeSolveabiltyStatus(bool solvable)
@@ -211,35 +209,17 @@ namespace ChemProV.PFD.EquationEditor
         /// <summary>
         /// Will remove all existing equations currently listed in the equation editor.
         /// </summary>
+        [Obsolete("Does nothing")]
         public void ClearEquations()
         {
-            //remove event handlers
-            foreach (UIElement element in EquationStackPanel.Children)
-            {
-                if (element is EquationControl)
-                {
-                    EquationControl eq = element as EquationControl;
-                    UnregisterEquationListneres(eq);
-                }
-            }
-
-            this.EquationStackPanel.Children.Clear();
-
-            //add new child
-            EquationControl newEq = new EquationControl(isReadOnly);
-
-            //attach event listeners
-            RegisterEquationListeners(newEq);
-            newEq.MyTextChanged += new EventHandler(eq_MyTextChanged);
-
-            //add to the list of equations
-            EquationStackPanel.Children.Add(newEq);
+            
         }
 
+        [Obsolete("Needs to be reworked")]
         public void LoadXmlElements(XElement doc)
         {
             //clear the equation stack
-            EquationStackPanel.Children.Clear();
+            //EquationStackPanel.Children.Clear();
 
             //pull out the equations
             XElement equations = doc.Descendants("Equations").ElementAt(0);
@@ -249,10 +229,10 @@ namespace ChemProV.PFD.EquationEditor
                 EquationControl eq = new EquationControl(isReadOnly);
 
                 //attach event listeners
-                RegisterEquationListeners(eq);
+                //RegisterEquationListeners(eq);
 
                 //add to the list of equations
-                EquationStackPanel.Children.Add(eq);
+                //EquationStackPanel.Children.Add(eq);
 
                 //set the equation's value
                 eq.EquationText = xmlEquation.Attribute("EquationText").Value;
@@ -263,13 +243,13 @@ namespace ChemProV.PFD.EquationEditor
                 //    This is kind of a quick hack, and as such, I'm not sure whether or not
                 //    there are constants that I could be using instead of my strings.
                 string content = "Overall";
-                EquationClassification classification = EquationClassification.Overall;
+                EquationTypeClassification classification = EquationTypeClassification.Total;
                 if (xmlEquationType.HasAttributes)
                 {
                     content = xmlEquationType.Attribute("SelectedItemContent").Value;
-                    classification = (EquationClassification)Int32.Parse(xmlEquationType.Attribute("SelectedItemClassification").Value);
+                    classification = (EquationTypeClassification)Int32.Parse(xmlEquationType.Attribute("SelectedItemClassification").Value);
                 }
-                ComboBoxEquationTypeItem item = new ComboBoxEquationTypeItem(classification, content);
+                EquationType item = new EquationType(classification, content);
 
                 eq.EquationTypes.Add(item);
                 eq.EquationType.SelectedItem = item;
@@ -281,42 +261,24 @@ namespace ChemProV.PFD.EquationEditor
             EquationControl lastEq = new EquationControl(isReadOnly);
 
             //attach event listeners
-            RegisterEquationListeners(lastEq);
+            //RegisterEquationListeners(lastEq);
 
             //add to the list of equations
-            EquationStackPanel.Children.Add(lastEq);
+            //EquationStackPanel.Children.Add(lastEq);
 
             //the last equation added needs to have a special event listener attached
-            lastEq.MyTextChanged += new EventHandler(eq_MyTextChanged);
+            //lastEq.MyTextChanged += new EventHandler(eq_MyTextChanged);
         }
 
         #endregion Methods
 
         #region Private Helpers
 
-        private void eq_MyTextChanged(object sender, EventArgs e)
-        {
-            EquationControl eq = new EquationControl(isReadOnly);
-            
-            //this makes the text box that just fired stop listening since it is no longer the last one
-            ((EquationControl)sender).MyTextChanged -= new EventHandler(eq_MyTextChanged);
-
-            //this makes the new text box start listening whenever it has been fired
-            eq.MyTextChanged += new EventHandler(eq_MyTextChanged);
-            RegisterEquationListeners(eq);
-            EquationStackPanel.Children.Add(eq);
-            EquationTokensChanged(this, EventArgs.Empty);
-        }
-
-        private void eq_ReceivedFocus(object sender, EventArgs e)
-        {
-            selectedEquation = sender as EquationControl;
-            selectedEquation.IsReadOnly = false;
-        }
 
         private void updateCompounds()
         {
-            equationTypes = new ObservableCollection<ComboBoxEquationTypeItem>();
+            equationTypes = new ObservableCollection<EquationType>();
+            ObservableCollection<EquationType> types = new ObservableCollection<EquationType>();
             elements.Clear();
             foreach (string compoundstr in compounds)
             {
@@ -327,34 +289,35 @@ namespace ChemProV.PFD.EquationEditor
                     if (!elements.Contains(element.Key.Name))
                     {
                         elements.Add(element.Key.Name);
+                        
                     }
                 }
             }
 
             //equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.VariableDefinition));
-            equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Overall));
+            equationTypes.Add(new EquationType(EquationTypeClassification.Total, "Overall"));
 
             foreach (string compound in compounds)
             {
-                equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Compound, compound));
+                equationTypes.Add(new EquationType(EquationTypeClassification.Compound, compound));
             }
 
             if (CurrentDifficultySetting != OptionDifficultySetting.MaterialBalance)
             {
                 foreach (string element in elements)
                 {
-                    equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Element, element + "(e)"));
+                    equationTypes.Add(new EquationType(EquationTypeClassification.Atom, element + "(e)"));
                 }
             }
 
             if (CurrentDifficultySetting == OptionDifficultySetting.MaterialAndEnergyBalance)
             {
-                equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.Energy));
+                equationTypes.Add(new EquationType(EquationTypeClassification.Atom, ""));
             }
 
-            foreach (EquationControl eq in Equations)
+            foreach (EquationViewModel vm in viewModels)
             {
-                eq.UpdateEquationTypeComboBox(equationTypes);
+                vm.TypeOptions = EquationTypes;
             }
         }
 
@@ -364,70 +327,22 @@ namespace ChemProV.PFD.EquationEditor
             //EquationTokensChanged(sender, new EventArgs());
         }
 
-        /// <summary>
-        /// Called whenever a user navigates away from an equation
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void eq_LostFocus(object sender, RoutedEventArgs e)
-        {
-            EquationControl senderEq = sender as EquationControl;
-
-            //if the sender is not the last equation in the list  and it empty, remove it
-            if (senderEq.CompareTo(EquationStackPanel.Children.ElementAt(EquationStackPanel.Children.Count - 1)) != 0)
-            {
-                if (senderEq.EquationText.Trim().Length == 0)
-                {
-                    //remove from the stack panel
-                    EquationStackPanel.Children.Remove(senderEq);
-
-                    //remove event handlers
-                    UnregisterEquationListneres(senderEq);
-                }
-            }
-            senderEq.IsReadOnly = true;
-        }
-
         private void EquationTextChanged(object sender, EventArgs e)
         {
             //Not needed because I turned off equation validation
             //EquationTokensChanged(sender, e);
         }
 
-        /// <summary>
-        /// Created to consolidate all event listener attachments into a single location
-        /// rather than having it spread all over the file.
-        /// </summary>
-        /// <param name="eq">The equation that we'd like to attach events to.</param>
-        private void RegisterEquationListeners(EquationControl eq)
-        {
-            eq.EquationTokensChagned += new EventHandler(EquationTextChanged);
-            eq.LostFocus += new RoutedEventHandler(eq_LostFocus);
-            eq.ReceivedFocus += new EventHandler(eq_ReceivedFocus);
-            eq.LostFocus += new RoutedEventHandler(eq_LostFocus);
-        }
-
-        /// <summary>
-        /// The inverse of RegisterEquationListeners: unregisters all event listeners from
-        /// a given equation
-        /// </summary>
-        /// <param name="eq"></param>
-        private void UnregisterEquationListneres(EquationControl eq)
-        {
-            eq.LostFocus -= new RoutedEventHandler(eq_LostFocus);
-            eq.EquationTokensChagned -= new EventHandler(EquationTextChanged);
-            eq.MyTextChanged -= new EventHandler(eq_MyTextChanged);
-            eq.ReceivedFocus -= new EventHandler(eq_ReceivedFocus);
-        }
-
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             if (!(double.IsNaN(this.ActualWidth)))
             {
+                /*
                 foreach (EquationControl eq in EquationStackPanel.Children)
                 {
                     eq.MaxWidth = this.ActualWidth;
                 }
+                 * */
             }
         }
 
@@ -451,6 +366,7 @@ namespace ChemProV.PFD.EquationEditor
 
             writer.WriteStartElement("Equations");
 
+            /*
             var equations = from c in this.EquationStackPanel.Children where c is EquationControl select c as EquationControl;
             //loop through our list of equations except the last one
             foreach (EquationControl equation in equations)
@@ -461,6 +377,7 @@ namespace ChemProV.PFD.EquationEditor
                     serializer.Serialize(writer, equation);
                 }
             }
+             * */
             writer.WriteEndElement();
         }
 

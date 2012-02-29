@@ -24,6 +24,7 @@ using Antlr.Runtime;
 using System.IO;
 using ChemProV.Grammars;
 using Antlr.Runtime.Tree;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -49,9 +50,9 @@ namespace ChemProV.PFD.EquationEditor
 
         private bool isReadOnly = false;
 
-        private ObservableCollection<ComboBoxEquationTypeItem> equationTypes = new ObservableCollection<ComboBoxEquationTypeItem>();
+        private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
 
-        public ObservableCollection<ComboBoxEquationTypeItem> EquationTypes
+        public ObservableCollection<EquationType> EquationTypes
         {
             get { return equationTypes; }
         }
@@ -60,9 +61,9 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Properties
 
-        public ComboBoxEquationTypeItem SelectedItem
+        public EquationType SelectedItem
         {
-            get { return EquationType.SelectedItem as ComboBoxEquationTypeItem; }
+            get { return EquationType.SelectedItem as EquationType; }
         }
 
         public string EquationText
@@ -169,7 +170,8 @@ namespace ChemProV.PFD.EquationEditor
 
         #region Public Methods
 
-        public void UpdateEquationTypeComboBox(ObservableCollection<ComboBoxEquationTypeItem> newItems)
+        /*
+        public void UpdateEquationTypeComboBox(ObservableCollection<EquationType> newItems)
         {
             ComboBoxEquationTypeItem currentSelected = EquationType.SelectedItem as ComboBoxEquationTypeItem;
 
@@ -204,6 +206,7 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
         }
+         * */
 
         /// <summary>
         /// highlight or unhighlights the feedback area
@@ -398,8 +401,8 @@ namespace ChemProV.PFD.EquationEditor
             //simply write what's in our equation text box
             writer.WriteAttributeString("EquationText", EquationText);
             writer.WriteStartElement("EquationType");
-            writer.WriteAttributeString("SelectedItemContent", (EquationType.SelectedItem as ComboBoxEquationTypeItem).Content as string);
-            writer.WriteAttributeString("SelectedItemClassification", ((int)(EquationType.SelectedItem as ComboBoxEquationTypeItem).Classification).ToString());
+            writer.WriteAttributeString("SelectedItemContent", (EquationType.SelectedItem as EquationType).Name as string);
+            writer.WriteAttributeString("SelectedItemClassification", ((int)(EquationType.SelectedItem as EquationType).Classification).ToString());
             writer.WriteEndElement();
         }
 
