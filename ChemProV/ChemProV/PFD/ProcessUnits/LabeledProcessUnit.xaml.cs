@@ -59,6 +59,10 @@ namespace ChemProV.PFD.ProcessUnits
             {
                 e.Handled = true;
             }
+            if (e.Key == Key.Delete)
+            {
+                e.Handled = true;
+            }
         }
 
         void ProcessUnitNameBox_LostFocus(object sender, RoutedEventArgs e)
