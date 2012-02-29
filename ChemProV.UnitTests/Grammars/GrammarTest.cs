@@ -16,6 +16,9 @@ using Antlr.Runtime;
 using ChemProV.Grammars;
 using Antlr.Runtime.Tree;
 using System.Linq;
+using ChemProV.PFD;
+using ChemProV.PFD.ProcessUnits;
+using ChemProV.PFD.Streams;
 
 namespace ChemProV.UnitTests.Grammars
 {
@@ -43,6 +46,24 @@ namespace ChemProV.UnitTests.Grammars
             return walker;
         }
 
+        private List<IPfdElement> GetSamplePfd()
+        {
+            List<IPfdElement> graph = new List<IPfdElement>();
+
+            IProcessUnit source = ProcessUnitFactory.ProcessUnitFromUnitType(ProcessUnitType.Source);
+            IProcessUnit mixer = ProcessUnitFactory.ProcessUnitFromUnitType(ProcessUnitType.Mixer);
+            IStream incomingStream = StreamFactory.StreamFromStreamType(StreamType.Chemical);
+            incomingStream.Destination = mixer;
+            incomingStream.Source = source;
+            
+            //figure out how to populate the incoming stream's data
+
+            mixer.AttachIncomingStream(incomingStream);
+            source.AttachOutgoingStream(incomingStream);
+
+            return graph;
+        }
+        
         [TestMethod]
         public void TestOverallEquation()
         {
@@ -58,7 +79,5 @@ namespace ChemProV.UnitTests.Grammars
             Dictionary<int, Variable>.ValueCollection values = tree.Lines[0].Tokens.Values;
             Assert.AreEqual(true, values.First().IsPercent);
         }
-        
-
     }
 }
