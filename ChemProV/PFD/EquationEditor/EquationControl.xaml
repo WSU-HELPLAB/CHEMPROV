@@ -17,6 +17,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     <Border>
         <Grid x:Name="LayoutRoot" Background="White">
             <StackPanel x:Name="stackPanel" Orientation="Horizontal">
+                <ComboBox Height="28" x:Name="ScopeComboBox" MinWidth="100" ItemsSource="{Binding Path=foo, Mode=OneWay}"/>
                 <ComboBox Height="28" x:Name="EquationType" MinWidth="100" ItemsSource="{Binding Path=EquationTypes, Mode=OneWay}"/>
                 <TextBox Height="25" Visibility="Collapsed" FontSize="11" IsReadOnly="True" x:Name="EquationFeedback" AcceptsReturn="False" MinWidth="10" />
                 <StackPanel Orientation="Vertical" VerticalAlignment="Center">

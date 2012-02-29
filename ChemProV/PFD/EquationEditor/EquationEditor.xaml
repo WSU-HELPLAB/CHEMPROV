@@ -21,10 +21,39 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     <Grid x:Name="LayoutRoot" Background="White">
         <StackPanel>
             <StackPanel Background="Silver" HorizontalAlignment="Stretch">
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
-                    <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Left" Width="211" />
-                </StackPanel>
+                    <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
             </StackPanel>
+            <ScrollViewer
+                Width="Auto"
+                VerticalScrollBarVisibility="Auto"
+                HorizontalScrollBarVisibility="Auto"
+                Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
+                >
+                <Grid x:Name="EquationsGrid">
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <!-- header row -->
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                    
+                    
+                    <!--starter row 
+                    <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Path=Errors, Mode=OneWay}" />
+                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Path=ScopeOptions}" SelectedItem="{Binding Path=Scope, Mode=TwoWay}" />
+                    <ComboBox Grid.Row="1" Grid.Column="2" ItemsSource="{Binding Path=TypeOptions}" SelectedItem="{Binding Path=Type, Mode=TwoWay}" />
+                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Path=Equation, Mode=TwoWay}" />
+                    -->
+                </Grid>
+            </ScrollViewer>
             <ScrollViewer
             x:Name="EquationScrollViewer"
             Width="Auto"
@@ -33,7 +62,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
             >
                 <StackPanel
-
                 Height="Auto"
                 HorizontalAlignment="Left"
                 Margin="0,5,0,0"

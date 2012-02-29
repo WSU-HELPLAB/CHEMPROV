@@ -1,4 +1,4 @@
-/*
+/* 
 Copyright 2010, 2011 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
@@ -19,6 +19,7 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.PFD.EquationEditor.Views;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -41,6 +42,8 @@ namespace ChemProV.PFD.EquationEditor
         private ObservableCollection<ComboBoxEquationTypeItem> equationTypes = new ObservableCollection<ComboBoxEquationTypeItem>();
 
         private bool isReadOnly = false;
+
+        private List<EquationViewModel> viewModels = new List<EquationViewModel>();
 
         #endregion Fields
 
@@ -124,7 +127,9 @@ namespace ChemProV.PFD.EquationEditor
         {
             InitializeComponent();
             EquationControl eq = new EquationControl(isReadOnly);
-            //variableNameExisitanceRule.ListofEquationsFromEquations = EquationTokens;
+
+            //create our first row
+            AddNewEquationRow();
 
             //this makes the first text box listen for when it has been changed and when it is it makes a new text box and sets that one to listen for the same thing
             RegisterEquationListeners(eq);
@@ -132,6 +137,52 @@ namespace ChemProV.PFD.EquationEditor
             eq.MyTextChanged += new EventHandler(eq_MyTextChanged);
             EquationStackPanel.Children.Add(eq);
             EquationScrollViewer.DataContext = this;
+        }
+
+        private void AddNewEquationRow()
+        {
+            EquationViewModel newRowModel = new EquationViewModel();
+            newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationViewModelPropertyChanged);
+            int rowNumber = EquationsGrid.RowDefinitions.Count;
+            EquationsGrid.RowDefinitions.Add(new RowDefinition());
+
+            ErrorControl errorControl = new ErrorControl();
+            errorControl.SetValue(Grid.RowProperty, rowNumber);
+            errorControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(errorControl);
+
+            ScopeControl scopeControl = new ScopeControl();
+            scopeControl.SetValue(Grid.RowProperty, rowNumber);
+            scopeControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(scopeControl);
+
+            TypeControl typeControl = new TypeControl();
+            typeControl.SetValue(Grid.RowProperty, rowNumber);
+            typeControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(typeControl);
+
+            Views.EquationControl equationControl = new Views.EquationControl();
+            equationControl.SetValue(Grid.RowProperty, rowNumber);
+            equationControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(equationControl);
+
+        }
+
+        private void EquationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            EquationViewModel model = sender as EquationViewModel;
+
+            //is the data being modified the last row in our equations grid?  If so, 
+            //add a new one
+            int maxRowCount = EquationsGrid.RowDefinitions.Count - 1; //subtract 1 because rows start at 0
+            UIElement element = (from child in EquationsGrid.Children
+                                 where (int)child.GetValue(Grid.RowProperty) == maxRowCount
+                                 select child).FirstOrDefault();
+            EquationViewModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationViewModel);
+            if (elementVm.Id == model.Id)
+            {
+                AddNewEquationRow();
+            }
         }
 
         #endregion Constructor

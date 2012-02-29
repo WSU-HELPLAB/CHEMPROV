@@ -11,10 +11,15 @@ options
 	using System.Collections;
 	using System;
 	using System.Collections.Generic;
+	using ChemProV.PFD;
+	using ChemProV.PFD.ProcessUnits;
+	using ChemProV.PFD.Streams;
+	using ChemProV.PFD.Streams.PropertiesWindow;
 }
 @members
 {
 	public List<Equation> Lines = new List<Equation>();
+	public List<IPfdElement> PfdElements = new List<IPfdElement>();
 	private int currentLineNumber = 0;
 }
 @namespace { ChemProV.Grammars }
