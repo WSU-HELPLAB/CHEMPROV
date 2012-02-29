@@ -140,6 +140,7 @@
     <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
       <DependentUpon>EquationEditor.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PFD\EquationEditor\EquationViewModel.cs" />
     <Compile Include="PFD\EquationEditor\EquationType.cs" />
     <Compile Include="PFD\EquationEditor\OperationLabels.xaml.cs">
       <DependentUpon>OperationLabels.xaml</DependentUpon>
@@ -151,6 +152,18 @@
       <DependentUpon>TokenList.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\Tokens\VariableToken.cs" />
+    <Compile Include="PFD\EquationEditor\Views\EquationControl.xaml.cs">
+      <DependentUpon>EquationControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\Views\ErrorControl.xaml.cs">
+      <DependentUpon>ErrorControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\Views\ScopeControl.xaml.cs">
+      <DependentUpon>ScopeControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\Views\TypeControl.xaml.cs">
+      <DependentUpon>TypeControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PFD\IPfdElement.cs" />
     <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
       <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
@@ -328,6 +341,22 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PFD\EquationEditor\Tokens\TokenList.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\EquationEditor\Views\EquationControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\Views\ErrorControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\Views\ScopeControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\Views\TypeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
