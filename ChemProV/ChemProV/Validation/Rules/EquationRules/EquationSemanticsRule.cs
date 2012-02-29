@@ -14,6 +14,7 @@ using System.Linq;
 using ChemProV.PFD.EquationEditor;
 using ChemProV.PFD.EquationEditor.Tokens;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.Validation.Rules.EquationRules
 {
@@ -78,7 +79,7 @@ namespace ChemProV.Validation.Rules.EquationRules
             ValidationResult vr;
 
             //aka is 'supposed' to be a heat equation?
-            if (EquationData.Type.Classification == EquationClassification.Energy)
+            if (EquationData.Type.Classification == EquationTypeClassification.Energy)
             {
                 vr = NameValidation();
                 if (!vr.IsEmpty)
@@ -467,24 +468,24 @@ namespace ChemProV.Validation.Rules.EquationRules
             {
                 return vr;
             }
-            if (equationData.Type.Classification == EquationClassification.Overall)
+            if (equationData.Type.Classification == EquationTypeClassification.Total)
             {
                 if (OverallSum() != true)
                 {
                     return new ValidationResult(equationData.EquationReference, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Not_Overall));
                 }
             }
-            else if (equationData.Type.Classification == EquationClassification.Compound)
+            else if (equationData.Type.Classification == EquationTypeClassification.Compound)
             {
-                vr = CheckSameCompound(equationData.Type.Content as string);
+                vr = CheckSameCompound(equationData.Type.Name as string);
                 if (vr != ValidationResult.Empty)
                 {
                     return vr;
                 }
             }
-            else if (equationData.Type.Classification == EquationClassification.Element)
+            else if (equationData.Type.Classification == EquationTypeClassification.Atom)
             {
-                string elementName = (equationData.Type.Content as string);
+                string elementName = (equationData.Type.Name as string);
 
                 elementName = elementName.Remove(elementName.Length - 3);
 

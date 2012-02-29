@@ -11,6 +11,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -22,16 +23,40 @@ namespace ChemProV.PFD.EquationEditor
 
         #region private members
         private static int _id = 0;
-        private string _scope;
-        private string _type;
-        private string _equation;
+        private EquationScope _scope = new EquationScope();
+        private EquationType _type = new EquationType();
+        private string _equation = "";
+        private ObservableCollection<EquationScope> _scopeOptions = new ObservableCollection<EquationScope>();
+        private ObservableCollection<EquationType> _typeOptions = new ObservableCollection<EquationType>();
         #endregion
 
         #region properties
         public int Id { get; private set; }
-        public ObservableCollection<string> ScopeOptions { get; set; }
-        public ObservableCollection<string> TypeOptions { get; set; }
-        public string Scope
+        public ObservableCollection<EquationScope> ScopeOptions
+        {
+            get
+            {
+                return _scopeOptions;
+            }
+            set
+            {
+                _scopeOptions = value;
+                OnPropertyChanged("ScopeOptions");
+            }
+        }
+        public ObservableCollection<EquationType> TypeOptions
+        {
+            get
+            {
+                return _typeOptions;
+            }
+            set
+            {
+                _typeOptions = value;
+                OnPropertyChanged("TypeOptions");
+            }
+        }
+        public EquationScope Scope
         {
             get
             {
@@ -43,7 +68,7 @@ namespace ChemProV.PFD.EquationEditor
                 OnPropertyChanged("Scope");
             }
         }
-        public string Type
+        public EquationType Type
         {
             get
             {
@@ -74,8 +99,6 @@ namespace ChemProV.PFD.EquationEditor
         {
             _id++;
             Id = _id;
-            ScopeOptions = new ObservableCollection<string>();
-            TypeOptions = new ObservableCollection<string>();
         }
         #endregion
 

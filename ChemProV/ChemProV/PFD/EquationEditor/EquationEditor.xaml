@@ -29,15 +29,15 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 HorizontalScrollBarVisibility="Auto"
                 Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
                 >
-                <Grid x:Name="EquationsGrid">
+                <Grid x:Name="EquationsGrid" MinWidth="400">
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="20" />
-                        <ColumnDefinition />
-                        <ColumnDefinition />
+                        <ColumnDefinition Width="100"  />
+                        <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
                     <!-- header row -->
@@ -45,29 +45,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <TextBlock Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
                     <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
                     
-                    
-                    <!--starter row 
-                    <TextBox Grid.Row="1" Grid.Column="0" Text="{Binding Path=Errors, Mode=OneWay}" />
-                    <ComboBox Grid.Row="1" Grid.Column="1" ItemsSource="{Binding Path=ScopeOptions}" SelectedItem="{Binding Path=Scope, Mode=TwoWay}" />
-                    <ComboBox Grid.Row="1" Grid.Column="2" ItemsSource="{Binding Path=TypeOptions}" SelectedItem="{Binding Path=Type, Mode=TwoWay}" />
-                    <TextBox Grid.Row="1" Grid.Column="3" Text="{Binding Path=Equation, Mode=TwoWay}" />
-                    -->
                 </Grid>
-            </ScrollViewer>
-            <ScrollViewer
-            x:Name="EquationScrollViewer"
-            Width="Auto"
-            VerticalScrollBarVisibility="Auto"
-            HorizontalScrollBarVisibility="Auto"
-            Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
-            >
-                <StackPanel
-                Height="Auto"
-                HorizontalAlignment="Left"
-                Margin="0,5,0,0"
-                x:Name="EquationStackPanel"
-                VerticalAlignment="Top"
-                Width="Auto"></StackPanel>
             </ScrollViewer>
         </StackPanel>
     </Grid>

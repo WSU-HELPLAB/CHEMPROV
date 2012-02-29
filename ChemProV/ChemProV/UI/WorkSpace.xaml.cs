@@ -310,6 +310,7 @@ namespace ChemProV.UI
             }
 
             EquationEditor.Compounds = compounds;
+            EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
             CompoundsUpdated(this, EventArgs.Empty);
         }
 

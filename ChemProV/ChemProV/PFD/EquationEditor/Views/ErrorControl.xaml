@@ -9,6 +9,6 @@
     Grid.Column="0"
     >
     <Grid x:Name="LayoutRoot" Background="White">
-        <TextBox Text="{Binding Path=Errors, Mode=OneWay}" />
+        <TextBlock Text="" />
     </Grid>
 </UserControl>
