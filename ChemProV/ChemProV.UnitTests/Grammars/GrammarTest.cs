@@ -19,6 +19,8 @@ using System.Linq;
 using ChemProV.PFD;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
+using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
+using ChemProV.PFD.Streams.PropertiesWindow;
 
 namespace ChemProV.UnitTests.Grammars
 {
@@ -46,17 +48,34 @@ namespace ChemProV.UnitTests.Grammars
             return walker;
         }
 
-        private List<IPfdElement> GetSamplePfd()
+        [TestMethod]
+        public List<IPfdElement> GetSamplePfd()
         {
             List<IPfdElement> graph = new List<IPfdElement>();
 
             IProcessUnit source = ProcessUnitFactory.ProcessUnitFromUnitType(ProcessUnitType.Source);
             IProcessUnit mixer = ProcessUnitFactory.ProcessUnitFromUnitType(ProcessUnitType.Mixer);
             IStream incomingStream = StreamFactory.StreamFromStreamType(StreamType.Chemical);
+
             incomingStream.Destination = mixer;
             incomingStream.Source = source;
             
-            //figure out how to populate the incoming stream's data
+            //populate the incoming stream's data
+            ChemicalStreamData d = new ChemicalStreamData();
+            d.Label = "SampleTable";
+            d.Quantity = "42";
+            d.Units = 5;
+            d.Compound = 1;
+            d.TempUnits = 1;
+            d.Temperature = "32";
+
+            incomingStream.Table = PropertiesWindowFactory.TableFromStreamType(StreamType.Chemical, OptionDifficultySetting.MaterialBalance, false);
+            //add ChemicalStreamData to the first (not header) row
+            (incomingStream.Table as ChemicalStreamPropertiesWindow).ItemSource[1] = d;
+            
+            //populate additional row data
+            //add additional ChemicalStreamData rows
+            (incomingStream.Table as ChemicalStreamPropertiesWindow).ItemSource.Add(d);
 
             mixer.AttachIncomingStream(incomingStream);
             source.AttachOutgoingStream(incomingStream);
