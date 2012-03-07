@@ -31,5 +31,31 @@ namespace ChemProV.PFD.EquationEditor.Models
             Classification = classification;
             Name = name;
         }
+
+        public int CompareTo(object obj)
+        {
+            EquationScope other = obj as EquationScope;
+            if (this.Name.CompareTo(other.Name) == 0)
+            {
+                return this.Classification.CompareTo(other.Classification);
+            }
+            else
+            {
+                return this.Name.CompareTo(other.Name);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (this.CompareTo(obj) == 0)
+            {
+                return true;
+            }
+            return false;
+        }
     }
 }

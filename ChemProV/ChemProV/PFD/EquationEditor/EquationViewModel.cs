@@ -12,6 +12,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using ChemProV.PFD.EquationEditor.Models;
+using System.Linq;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -40,7 +41,25 @@ namespace ChemProV.PFD.EquationEditor
             }
             set
             {
-                _scopeOptions = value;
+                ObservableCollection<EquationScope> newScopes = value;
+
+                //remove any invalid scopes
+                foreach (EquationScope scope in _scopeOptions.ToArray())
+                {
+                    if (!newScopes.Contains(scope))
+                    {
+                        _scopeOptions.Remove(scope);
+                    }
+                }
+
+                //add in new scopes
+                foreach (EquationScope scope in newScopes)
+                {
+                    if (!_scopeOptions.Contains(scope))
+                    {
+                        _scopeOptions.Add(scope);
+                    }
+                }
                 OnPropertyChanged("ScopeOptions");
             }
         }
@@ -52,7 +71,25 @@ namespace ChemProV.PFD.EquationEditor
             }
             set
             {
-                _typeOptions = value;
+                ObservableCollection<EquationType> newTypes = value;
+                
+                //remove any invalid types
+                foreach (EquationType type in _typeOptions.ToArray())
+                {
+                    if (!newTypes.Contains(type))
+                    {
+                        _typeOptions.Remove(type);
+                    }
+                }
+
+                //add in new types
+                foreach (EquationType type in newTypes)
+                {
+                    if (!_typeOptions.Contains(type))
+                    {
+                        _typeOptions.Add(type);
+                    }
+                }
                 OnPropertyChanged("TypeOptions");
             }
         }
