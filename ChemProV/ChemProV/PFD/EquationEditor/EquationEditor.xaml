@@ -14,7 +14,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:eq="clr-namespace:ChemProV.PFD.EquationEditor"
     mc:Ignorable="d"
     d:DesignHeight="150" d:DesignWidth="321"
-             xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" SizeChanged="UserControl_SizeChanged">
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
+             x:Name="Base"
+             >
     <UserControl.Resources>
         <eq:ScollViewerHeightConverter x:Key="ScollViewerHeightConverter" />
     </UserControl.Resources>
@@ -27,9 +29,12 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 Width="Auto"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Auto"
-                Height="{Binding Height, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
+                Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
                 >
-                <Grid x:Name="EquationsGrid" MinWidth="400">
+                <Grid x:Name="EquationsGrid" 
+                      MinWidth="400" 
+                      VerticalAlignment="Top"
+                      >
                     <Grid.RowDefinitions>
                         <RowDefinition />
                         <RowDefinition />

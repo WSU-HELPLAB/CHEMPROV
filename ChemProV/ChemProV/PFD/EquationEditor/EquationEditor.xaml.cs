@@ -36,9 +36,8 @@ namespace ChemProV.PFD.EquationEditor
 
         private object selectedTool;
 
-        private EquationControl selectedEquation;
         private ObservableCollection<EquationData> equationData = new ObservableCollection<EquationData>();
-        private IList<string> compounds;
+        private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
 
@@ -69,27 +68,6 @@ namespace ChemProV.PFD.EquationEditor
             set;
         }
 
-        /// <summary>
-        /// Creates a list of EquationData for everything equation it has and returns that.
-        /// </summary>
-        public ObservableCollection<EquationData> EquationsData
-        {
-            get
-            {
-                foreach (EquationData data in equationData)
-                {
-                    data.Dispose();
-                }
-                ObservableCollection<EquationData> newEquationDatas = new ObservableCollection<EquationData>();
-                foreach (EquationControl eq in Equations)
-                {
-                    newEquationDatas.Add(new EquationData(eq));
-                }
-                equationData = newEquationDatas;
-                return newEquationDatas;
-            }
-        }
-
         public IList<string> Compounds
         {
             get { return compounds; }
@@ -97,15 +75,6 @@ namespace ChemProV.PFD.EquationEditor
             {
                 compounds = value;
                 updateCompounds();
-            }
-        }
-
-        [Obsolete("EquationControl class is on its way out")]
-        public List<EquationControl> Equations
-        {
-            get
-            {
-                return new List<EquationControl>();
             }
         }
 
@@ -131,6 +100,10 @@ namespace ChemProV.PFD.EquationEditor
             //create our first row
             AddNewEquationRow();
         }
+        #endregion Constructor
+
+        #region Methods
+
 
         /// <summary>
         /// Adds a new equation row to the equations grid.
@@ -189,16 +162,13 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        #endregion Constructor
-
-        #region Methods
-
         [Obsolete("Does nothing")]
         public void InsertConstant(string constant)
         {
 
         }
 
+        [Obsolete("Does nothing")]
         public void ChangeSolveabiltyStatus(bool solvable)
         {
             //Empty since solvability is turned off.
@@ -294,7 +264,6 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
-            //equationTypes.Add(new ComboBoxEquationTypeItem(EquationClassification.VariableDefinition));
             equationTypes.Add(new EquationType(EquationTypeClassification.Total, "Overall"));
 
             foreach (string compound in compounds)
@@ -321,31 +290,6 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        private void EquationTokens_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
-        {
-            //AC: Since I'm gutting the equation validation process, we don't need this any more.
-            //EquationTokensChanged(sender, new EventArgs());
-        }
-
-        private void EquationTextChanged(object sender, EventArgs e)
-        {
-            //Not needed because I turned off equation validation
-            //EquationTokensChanged(sender, e);
-        }
-
-        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            if (!(double.IsNaN(this.ActualWidth)))
-            {
-                /*
-                foreach (EquationControl eq in EquationStackPanel.Children)
-                {
-                    eq.MaxWidth = this.ActualWidth;
-                }
-                 * */
-            }
-        }
-
         #endregion Private Helpers
 
         #region IXmlSerializable Members
@@ -366,7 +310,7 @@ namespace ChemProV.PFD.EquationEditor
 
             writer.WriteStartElement("Equations");
 
-            /*
+            /* AC TODO: Rewrite
             var equations = from c in this.EquationStackPanel.Children where c is EquationControl select c as EquationControl;
             //loop through our list of equations except the last one
             foreach (EquationControl equation in equations)
