@@ -145,9 +145,6 @@
     <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
-    <Compile Include="PFD\EquationEditor\OperationLabels.xaml.cs">
-      <DependentUpon>OperationLabels.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />
@@ -336,10 +333,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PFD\EquationEditor\EquationEditor.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PFD\EquationEditor\OperationLabels.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
