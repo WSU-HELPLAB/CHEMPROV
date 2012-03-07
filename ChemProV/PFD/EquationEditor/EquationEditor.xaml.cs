@@ -45,7 +45,7 @@ namespace ChemProV.PFD.EquationEditor
         private List<EquationViewModel> viewModels = new List<EquationViewModel>();
         private List<IPfdElement> pfdElements = new List<IPfdElement>();
 
-        #endregion 
+        #endregion
 
         #region Properties
 
@@ -137,7 +137,7 @@ namespace ChemProV.PFD.EquationEditor
         [Obsolete("Does nothing")]
         public void ClearEquations()
         {
-            
+
         }
 
         [Obsolete("Needs to be reworked")]
@@ -245,6 +245,7 @@ namespace ChemProV.PFD.EquationEditor
                                     select child).ToArray();
             foreach (UIElement element in elements)
             {
+                //element.Visibility = System.Windows.Visibility.Collapsed;
                 EquationsGrid.Children.Remove(element);
             }
         }
@@ -271,11 +272,10 @@ namespace ChemProV.PFD.EquationEditor
                 {
                     AddNewEquationRow();
                 }
-                else if(maxRowCount > 2)
+                else if( elementVm.Id != model.Id )
                 {
-                    /* AC: Not working correctly
                     //if not, perhaps its empty and we need to remove the row
-                    if (model.Equation.Length == 0)
+                    if (maxRowCount > 2 && model.Equation.Length == 0)
                     {
                         FrameworkElement[] controls = (from child in EquationsGrid.Children
                                                        where (child as FrameworkElement).DataContext is EquationViewModel //make sure that the child has the correct view model (header row doesn't)
@@ -283,9 +283,11 @@ namespace ChemProV.PFD.EquationEditor
                         element = (from control in controls
                                    where (control.DataContext as EquationViewModel).Id == model.Id
                                    select control).FirstOrDefault();
-                        RemoveEquationRow((int)element.GetValue(Grid.RowProperty));
+                        if (element != null)
+                        {
+                            RemoveEquationRow((int)element.GetValue(Grid.RowProperty));
+                        }
                     }
-                     * */
                 }
             }
         }
@@ -298,7 +300,10 @@ namespace ChemProV.PFD.EquationEditor
             EquationScopes = new ObservableCollection<EquationScope>();
 
             //add "overall" scope
-            EquationScopes.Add(new EquationScope(EquationScopeClassification.Overall, Name = "Overall");
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Overall, Name = "Overall"));
+
+            //add "unspecified" scope
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unspecified, Name = "Unspecified"));
 
             //add any process units to the list of possible scopes
             foreach (IPfdElement element in PfdElements)
@@ -306,12 +311,9 @@ namespace ChemProV.PFD.EquationEditor
                 LabeledProcessUnit unit = element as LabeledProcessUnit;
                 if (unit != null)
                 {
-                    EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = unit.ProcessUnitLabel);
+                    EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = unit.ProcessUnitLabel));
                 }
             }
-
-            //add "unspecified" scope
-            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unspecified, Name = "Unspecified");
 
             //update all view models
             foreach (EquationViewModel vm in viewModels)
@@ -336,7 +338,7 @@ namespace ChemProV.PFD.EquationEditor
                     if (!elements.Contains(element.Key.Name))
                     {
                         elements.Add(element.Key.Name);
-                        
+
                     }
                 }
             }

@@ -25,11 +25,23 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             <StackPanel Background="Silver" HorizontalAlignment="Stretch">
                     <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
             </StackPanel>
+            <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="20" />
+                    <ColumnDefinition Width="100"  />
+                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition />
+                </Grid.ColumnDefinitions>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+            </Grid>
             <ScrollViewer
                 Width="Auto"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Auto"
                 Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
+                BorderThickness="0" BorderBrush="Transparent"
                 >
                 <Grid x:Name="EquationsGrid" 
                       MinWidth="400" 
@@ -45,11 +57,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                         <ColumnDefinition Width="100" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
-                    <!-- header row -->
-                    <TextBlock Grid.Row="0" Grid.Column="1" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                    <TextBlock Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                    <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                    
+
                 </Grid>
             </ScrollViewer>
         </StackPanel>

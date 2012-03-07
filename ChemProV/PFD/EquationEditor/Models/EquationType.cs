@@ -11,13 +11,16 @@ using System.Windows.Shapes;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
-    public class EquationType : IComparable
+    public class EquationType : IEquationModifier, IComparable
     {
         public EquationTypeClassification Classification { get; set; }
         public string Name { get; set; }
-        public override string ToString()
+        public int ClassificationId
         {
-            return Name;
+            get
+            {
+                return (int)Classification;
+            }
         }
 
         public EquationType()
@@ -30,6 +33,11 @@ namespace ChemProV.PFD.EquationEditor.Models
         {
             Classification = classification;
             Name = name;
+        }
+
+        public override string ToString()
+        {
+            return Name;
         }
 
         public int CompareTo(object obj)
@@ -56,6 +64,11 @@ namespace ChemProV.PFD.EquationEditor.Models
                 return true;
             }
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }
