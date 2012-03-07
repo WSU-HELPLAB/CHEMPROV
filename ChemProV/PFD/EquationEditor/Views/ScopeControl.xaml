@@ -9,6 +9,6 @@
     Grid.Column="1"
              >
     <Grid x:Name="LayoutRoot" Background="White">
-        <ComboBox ItemsSource="{Binding Path=ScopeOptions}" DisplayMemberPath="Name" SelectedItem="{Binding Path=Scope}" />
+        <ComboBox ItemsSource="{Binding Path=ScopeOptions}" DisplayMemberPath="Name" SelectedItem="{Binding Path=Scope, Mode=TwoWay}" />
     </Grid>
 </UserControl>

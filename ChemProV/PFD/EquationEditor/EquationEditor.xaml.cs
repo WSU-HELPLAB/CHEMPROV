@@ -21,6 +21,7 @@ using System.Xml.Serialization;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.EquationEditor.Views;
 using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.PFD.ProcessUnits;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -32,7 +33,7 @@ namespace ChemProV.PFD.EquationEditor
 
         #endregion Delegates
 
-        #region Fields
+        #region instance variables
 
         private object selectedTool;
 
@@ -40,21 +41,33 @@ namespace ChemProV.PFD.EquationEditor
         private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
-
         private bool isReadOnly = false;
-
         private List<EquationViewModel> viewModels = new List<EquationViewModel>();
+        private List<IPfdElement> pfdElements = new List<IPfdElement>();
 
-        #endregion Fields
+        #endregion 
 
         #region Properties
 
-        public List<IPfdElement> PfdElements { get; set; }
+        public List<IPfdElement> PfdElements
+        {
+            get
+            {
+                return pfdElements;
+            }
+            set
+            {
+                pfdElements = value;
+                updateScopes();
+            }
+        }
 
         public ObservableCollection<EquationType> EquationTypes
         {
             get { return equationTypes; }
         }
+
+        public ObservableCollection<EquationScope> EquationScopes { get; private set; }
 
         public object SelectedTool
         {
@@ -102,93 +115,7 @@ namespace ChemProV.PFD.EquationEditor
         }
         #endregion Constructor
 
-        #region Methods
-
-
-        /// <summary>
-        /// Adds a new equation row to the equations grid.
-        /// </summary>
-        private void AddNewEquationRow()
-        {
-            EquationViewModel newRowModel = new EquationViewModel();
-            newRowModel.TypeOptions = EquationTypes;
-            newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationViewModelPropertyChanged);
-            viewModels.Add(newRowModel);
-
-            int rowNumber = EquationsGrid.RowDefinitions.Count;
-            EquationsGrid.RowDefinitions.Add(new RowDefinition());
-
-            ErrorControl errorControl = new ErrorControl();
-            errorControl.SetValue(Grid.RowProperty, rowNumber);
-            errorControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(errorControl);
-
-            ScopeControl scopeControl = new ScopeControl();
-            scopeControl.SetValue(Grid.RowProperty, rowNumber);
-            scopeControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(scopeControl);
-
-            TypeControl typeControl = new TypeControl();
-            typeControl.SetValue(Grid.RowProperty, rowNumber);
-            typeControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(typeControl);
-
-            Views.EquationControl equationControl = new Views.EquationControl();
-            equationControl.SetValue(Grid.RowProperty, rowNumber);
-            equationControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(equationControl);
-
-        }
-
-        /// <summary>
-        /// Removes an equation row from the list of equations
-        /// </summary>
-        private void RemoveEquationRow(int rowNumber)
-        {
-            UIElement[] elements = (from child in EquationsGrid.Children
-                                    where (int)child.GetValue(Grid.RowProperty) == rowNumber
-                                    select child).ToArray();
-            foreach (UIElement element in elements)
-            {
-                EquationsGrid.Children.Remove(element);
-            }
-        }
-
-        /// <summary>
-        /// Called whenever the user makes a change to one of the equations
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void EquationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            EquationViewModel model = sender as EquationViewModel;
-
-            //is the data being modified the last row in our equations grid?  If so, 
-            //add a new one
-            int maxRowCount = EquationsGrid.RowDefinitions.Count - 1; //subtract 1 because rows start at 0
-            UIElement element = (from child in EquationsGrid.Children
-                                 where (int)child.GetValue(Grid.RowProperty) == maxRowCount
-                                 select child).FirstOrDefault();
-            EquationViewModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationViewModel);
-            if (elementVm.Id == model.Id && model.Equation.Length != 0)
-            {
-                AddNewEquationRow();
-            }
-            else
-            {
-                //if not, perhaps its empty and we need to remove the row
-                if (model.Equation.Length == 0)
-                {
-                    FrameworkElement[] controls = (from child in EquationsGrid.Children
-                                                   where (child as FrameworkElement).DataContext is EquationViewModel //make sure that the child has the correct view model (header row doesn't)
-                                                   select child as FrameworkElement).ToArray();
-                    element = (from control in controls
-                               where (control.DataContext as EquationViewModel).Id == model.Id
-                               select control).FirstOrDefault();
-                    RemoveEquationRow((int)element.GetValue(Grid.RowProperty));
-                }
-            }
-        }
+        #region public methods
 
         [Obsolete("Does nothing")]
         public void InsertConstant(string constant)
@@ -268,15 +195,152 @@ namespace ChemProV.PFD.EquationEditor
             //lastEq.MyTextChanged += new EventHandler(eq_MyTextChanged);
         }
 
-        #endregion Methods
+        #endregion
 
         #region Private Helpers
 
+        /// <summary>
+        /// Adds a new equation row to the equations grid.
+        /// </summary>
+        private void AddNewEquationRow()
+        {
+            EquationViewModel newRowModel = new EquationViewModel();
+            newRowModel.TypeOptions = EquationTypes;
+            newRowModel.ScopeOptions = EquationScopes;
+            newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationViewModelPropertyChanged);
+            viewModels.Add(newRowModel);
 
+            int rowNumber = EquationsGrid.RowDefinitions.Count;
+            EquationsGrid.RowDefinitions.Add(new RowDefinition());
+
+            ErrorControl errorControl = new ErrorControl();
+            errorControl.SetValue(Grid.RowProperty, rowNumber);
+            errorControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(errorControl);
+
+            ScopeControl scopeControl = new ScopeControl();
+            scopeControl.SetValue(Grid.RowProperty, rowNumber);
+            scopeControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(scopeControl);
+
+            TypeControl typeControl = new TypeControl();
+            typeControl.SetValue(Grid.RowProperty, rowNumber);
+            typeControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(typeControl);
+
+            Views.EquationControl equationControl = new Views.EquationControl();
+            equationControl.SetValue(Grid.RowProperty, rowNumber);
+            equationControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(equationControl);
+
+        }
+
+        /// <summary>
+        /// Removes an equation row from the list of equations
+        /// </summary>
+        private void RemoveEquationRow(int rowNumber)
+        {
+            UIElement[] elements = (from child in EquationsGrid.Children
+                                    where (int)child.GetValue(Grid.RowProperty) == rowNumber
+                                    select child).ToArray();
+            foreach (UIElement element in elements)
+            {
+                EquationsGrid.Children.Remove(element);
+            }
+        }
+
+        /// <summary>
+        /// Called whenever the user makes a change to one of the equations
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void EquationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            EquationViewModel model = sender as EquationViewModel;
+
+            //is the data being modified the last row in our equations grid?  If so, 
+            //add a new one
+            int maxRowCount = EquationsGrid.RowDefinitions.Count - 1; //subtract 1 because rows start at 0
+            UIElement element = (from child in EquationsGrid.Children
+                                 where (int)child.GetValue(Grid.RowProperty) == maxRowCount
+                                 select child).FirstOrDefault();
+            if (element != null)
+            {
+                EquationViewModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationViewModel);
+                if (elementVm.Id == model.Id && model.Equation.Length != 0)
+                {
+                    AddNewEquationRow();
+                }
+                else if(maxRowCount > 2)
+                {
+                    /* AC: Not working correctly
+                    //if not, perhaps its empty and we need to remove the row
+                    if (model.Equation.Length == 0)
+                    {
+                        FrameworkElement[] controls = (from child in EquationsGrid.Children
+                                                       where (child as FrameworkElement).DataContext is EquationViewModel //make sure that the child has the correct view model (header row doesn't)
+                                                       select child as FrameworkElement).ToArray();
+                        element = (from control in controls
+                                   where (control.DataContext as EquationViewModel).Id == model.Id
+                                   select control).FirstOrDefault();
+                        RemoveEquationRow((int)element.GetValue(Grid.RowProperty));
+                    }
+                     * */
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the list of scoes that an equation can reference
+        /// </summary>
+        private void updateScopes()
+        {
+            EquationScopes = new ObservableCollection<EquationScope>();
+
+            //add "overall" scope
+            EquationScopes.Add(new EquationScope()
+                                    {
+                                        Classification = EquationScopeClassification.Overall,
+                                        Name = "Overall"
+                                    }
+                                );
+
+            //add any process units to the list of possible scopes
+            foreach (IPfdElement element in PfdElements)
+            {
+                LabeledProcessUnit unit = element as LabeledProcessUnit;
+                if (unit != null)
+                {
+                    EquationScopes.Add(new EquationScope()
+                                    {
+                                        Classification = EquationScopeClassification.SingleUnit,
+                                        Name = unit.ProcessUnitLabel
+                                    }
+                                );
+                }
+            }
+
+            //add "unspecified" scope
+            EquationScopes.Add(new EquationScope()
+                                    {
+                                        Classification = EquationScopeClassification.Unspecified,
+                                        Name = "Unspecified"
+                                    }
+                                );
+
+            //update all view models
+            foreach (EquationViewModel vm in viewModels)
+            {
+                vm.ScopeOptions = EquationScopes;
+            }
+        }
+
+        /// <summary>
+        /// Updates the list of available compounds that an equation can balance across
+        /// </summary>
         private void updateCompounds()
         {
             equationTypes = new ObservableCollection<EquationType>();
-            ObservableCollection<EquationType> types = new ObservableCollection<EquationType>();
             elements.Clear();
             foreach (string compoundstr in compounds)
             {
@@ -292,7 +356,7 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
-            equationTypes.Add(new EquationType(EquationTypeClassification.Total, "Overall"));
+            equationTypes.Add(new EquationType(EquationTypeClassification.Total, "Total"));
 
             foreach (string compound in compounds)
             {

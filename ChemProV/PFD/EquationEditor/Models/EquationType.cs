@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
-    public class EquationType
+    public class EquationType : IComparable
     {
         public EquationTypeClassification Classification { get; set; }
         public string Name { get; set; }
@@ -30,6 +30,32 @@ namespace ChemProV.PFD.EquationEditor.Models
         {
             Classification = classification;
             Name = name;
+        }
+
+        public int CompareTo(object obj)
+        {
+            EquationType other = obj as EquationType;
+            if(this.Name.CompareTo(other.Name) == 0)
+            {
+                return this.Classification.CompareTo(other.Classification);
+            }
+            else
+            {
+                return this.Name.CompareTo(other.Name);
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null)
+            {
+                return false;
+            }
+            if (this.CompareTo(obj) == 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }

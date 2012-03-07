@@ -237,6 +237,7 @@ namespace ChemProV.UI
                 {
                     pfdElement.RemoveFeedback();
                 }
+
                 //AC TODO: Update rules validation for equations
                 //ruleManager.Validate(pfdElements, EquationEditor.EquationsData, userDefinedVaraibles);
                 FeedbackWindow.updateFeedbackWindow(ruleManager.ErrorMessages);
@@ -309,9 +310,7 @@ namespace ChemProV.UI
                     }
                 }
             }
-
             EquationEditor.Compounds = compounds;
-            EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
             CompoundsUpdated(this, EventArgs.Empty);
         }
 
@@ -327,6 +326,8 @@ namespace ChemProV.UI
 
         private void DrawingCanvas_ToolPlaced(object sender, EventArgs e)
         {
+            //update equation scope options
+            EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
             ToolPlaced(this, EventArgs.Empty);
         }
 
