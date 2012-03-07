@@ -142,9 +142,11 @@
     </Compile>
     <Compile Include="PFD\EquationEditor\EquationViewModel.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScopeClassification.cs" />
+    <Compile Include="PFD\EquationEditor\Models\EquationModifierComparer.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
+    <Compile Include="PFD\EquationEditor\Models\IEquationModifier.cs" />
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />

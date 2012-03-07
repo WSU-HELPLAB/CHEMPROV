@@ -17,17 +17,17 @@ namespace ChemProV.PFD.EquationEditor
         public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             double originalValue = (double)value;
-            if (originalValue < 33)
+            if (originalValue < 50)
             {
                 return 0;
             }
-            return originalValue - 33;
+            return originalValue - 50;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
         {
             double originalValue = (double)value;
-            return originalValue + 33;
+            return originalValue + 50;
         }
     }
 }

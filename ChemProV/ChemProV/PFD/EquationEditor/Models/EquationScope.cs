@@ -11,10 +11,18 @@ using System.Windows.Shapes;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
-    public class EquationScope
+    public class EquationScope : IEquationModifier, IComparable
     {
         public EquationScopeClassification Classification { get; set; }
         public string Name { get; set; }
+        public int ClassificationId
+        {
+            get
+            {
+                return (int)Classification;
+            }
+        }
+
         public override string ToString()
         {
             return Name;
@@ -56,6 +64,11 @@ namespace ChemProV.PFD.EquationEditor.Models
                 return true;
             }
             return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }
