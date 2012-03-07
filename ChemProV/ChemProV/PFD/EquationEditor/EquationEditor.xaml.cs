@@ -298,12 +298,7 @@ namespace ChemProV.PFD.EquationEditor
             EquationScopes = new ObservableCollection<EquationScope>();
 
             //add "overall" scope
-            EquationScopes.Add(new EquationScope()
-                                    {
-                                        Classification = EquationScopeClassification.Overall,
-                                        Name = "Overall"
-                                    }
-                                );
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Overall, Name = "Overall");
 
             //add any process units to the list of possible scopes
             foreach (IPfdElement element in PfdElements)
@@ -311,22 +306,12 @@ namespace ChemProV.PFD.EquationEditor
                 LabeledProcessUnit unit = element as LabeledProcessUnit;
                 if (unit != null)
                 {
-                    EquationScopes.Add(new EquationScope()
-                                    {
-                                        Classification = EquationScopeClassification.SingleUnit,
-                                        Name = unit.ProcessUnitLabel
-                                    }
-                                );
+                    EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = unit.ProcessUnitLabel);
                 }
             }
 
             //add "unspecified" scope
-            EquationScopes.Add(new EquationScope()
-                                    {
-                                        Classification = EquationScopeClassification.Unspecified,
-                                        Name = "Unspecified"
-                                    }
-                                );
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unspecified, Name = "Unspecified");
 
             //update all view models
             foreach (EquationViewModel vm in viewModels)
@@ -357,6 +342,7 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             equationTypes.Add(new EquationType(EquationTypeClassification.Total, "Total"));
+            equationTypes.Add(new EquationType(EquationTypeClassification.Specification, "Specification"));
 
             foreach (string compound in compounds)
             {
@@ -369,11 +355,6 @@ namespace ChemProV.PFD.EquationEditor
                 {
                     equationTypes.Add(new EquationType(EquationTypeClassification.Atom, element + "(e)"));
                 }
-            }
-
-            if (CurrentDifficultySetting == OptionDifficultySetting.MaterialAndEnergyBalance)
-            {
-                equationTypes.Add(new EquationType(EquationTypeClassification.Atom, ""));
             }
 
             foreach (EquationViewModel vm in viewModels)
