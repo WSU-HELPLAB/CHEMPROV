@@ -141,6 +141,20 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
+        /// Removes an equation row from the list of equations
+        /// </summary>
+        private void RemoveEquationRow(int rowNumber)
+        {
+            UIElement[] elements = (from child in EquationsGrid.Children
+                                    where (int)child.GetValue(Grid.RowProperty) == rowNumber
+                                    select child).ToArray();
+            foreach (UIElement element in elements)
+            {
+                EquationsGrid.Children.Remove(element);
+            }
+        }
+
+        /// <summary>
         /// Called whenever the user makes a change to one of the equations
         /// </summary>
         /// <param name="sender"></param>
@@ -159,6 +173,20 @@ namespace ChemProV.PFD.EquationEditor
             if (elementVm.Id == model.Id && model.Equation.Length != 0)
             {
                 AddNewEquationRow();
+            }
+            else
+            {
+                //if not, perhaps its empty and we need to remove the row
+                if (model.Equation.Length == 0)
+                {
+                    FrameworkElement[] controls = (from child in EquationsGrid.Children
+                                                   where (child as FrameworkElement).DataContext is EquationViewModel //make sure that the child has the correct view model (header row doesn't)
+                                                   select child as FrameworkElement).ToArray();
+                    element = (from control in controls
+                               where (control.DataContext as EquationViewModel).Id == model.Id
+                               select control).FirstOrDefault();
+                    RemoveEquationRow((int)element.GetValue(Grid.RowProperty));
+                }
             }
         }
 
