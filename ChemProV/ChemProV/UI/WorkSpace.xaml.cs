@@ -237,7 +237,8 @@ namespace ChemProV.UI
                 {
                     pfdElement.RemoveFeedback();
                 }
-                ruleManager.Validate(pfdElements, EquationEditor.EquationsData, userDefinedVaraibles);
+                //AC TODO: Update rules validation for equations
+                //ruleManager.Validate(pfdElements, EquationEditor.EquationsData, userDefinedVaraibles);
                 FeedbackWindow.updateFeedbackWindow(ruleManager.ErrorMessages);
                 ValidationChecked(this, EventArgs.Empty);
             }
