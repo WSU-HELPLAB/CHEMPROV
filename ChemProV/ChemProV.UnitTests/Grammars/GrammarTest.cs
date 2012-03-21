@@ -65,7 +65,7 @@ namespace ChemProV.UnitTests.Grammars
         ///             m33: benzene
         /// </summary>
         /// <returns></returns>
-        [TestMethod]
+        
         public List<IPfdElement> GetSamplePfd()
         {
             //will hold the finished PFD graph
@@ -88,6 +88,8 @@ namespace ChemProV.UnitTests.Grammars
             incoming1.Table = stream1Window;
             graph.Add(stream1Window);
             stream1Window.ItemSource[0].Label = "M1";
+            //Remove the default item at index 1
+            stream1Window.ItemSource.RemoveAt(1);
             stream1Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m11",
@@ -99,9 +101,11 @@ namespace ChemProV.UnitTests.Grammars
             IStream incoming2 = StreamFactory.StreamFromStreamType(StreamType.Chemical);
             graph.Add(incoming2);
             ChemicalStreamPropertiesWindow stream2Window = (ChemicalStreamPropertiesWindow)PropertiesWindowFactory.TableFromStreamType(StreamType.Chemical, OptionDifficultySetting.MaterialBalance, false);
-            incoming1.Table = stream2Window;
-            graph.Add(stream2Window);
+            incoming2.Table = stream2Window;
+            graph.Add(stream2Window);            
             stream2Window.ItemSource[0].Label = "M2";
+            //Remove the default item at index 1
+            stream2Window.ItemSource.RemoveAt(1);
             stream2Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m21",
@@ -124,6 +128,8 @@ namespace ChemProV.UnitTests.Grammars
             outgoing.Table = outgoingWindow;
             graph.Add(outgoingWindow);
             outgoingWindow.ItemSource[0].Label = "M3";
+            //Remove the default item at index 1
+            outgoingWindow.ItemSource.RemoveAt(1);
             outgoingWindow.ItemSource[0].Quantity = "300";
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
@@ -170,6 +176,7 @@ namespace ChemProV.UnitTests.Grammars
             ChemProVTree tree = ParseText("M1 + M2 = M3");
             Assert.AreEqual(1, tree.Lines.Count);
             Assert.AreEqual(3, tree.Lines[0].Tokens.Keys.Count);
+            GetSamplePfd();
         }
 
         [TestMethod]
