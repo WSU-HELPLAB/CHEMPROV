@@ -22,7 +22,8 @@ using ChemProV.Validation.Rules.ProcessUnitRules;
 namespace ChemProV.Validation.Rules
 {
     /// <summary>
-    /// This class is responsible for checking all rules it needs to when passed a list of iprocessUnits or tables or equations. And then reporting the errors in a list of strings
+    /// This class is responsible for checking all rules it needs to when passed a list of iprocessUnits or tables or equations. 
+    /// And then reporting the errors in a list of strings
     /// </summary>
     public class RuleManager
     {
