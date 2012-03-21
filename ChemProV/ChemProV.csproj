@@ -140,7 +140,7 @@
     <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
       <DependentUpon>EquationEditor.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\EquationEditor\EquationViewModel.cs" />
+    <Compile Include="PFD\EquationEditor\Models\EquationModel.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScopeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationModifierComparer.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />

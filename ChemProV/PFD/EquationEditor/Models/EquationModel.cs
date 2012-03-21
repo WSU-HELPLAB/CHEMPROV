@@ -16,7 +16,7 @@ using System.Linq;
 
 namespace ChemProV.PFD.EquationEditor
 {
-    public class EquationViewModel : INotifyPropertyChanged
+    public class EquationModel : INotifyPropertyChanged
     {
         #region public members
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -133,7 +133,7 @@ namespace ChemProV.PFD.EquationEditor
         #endregion
 
         #region public methods
-        public EquationViewModel()
+        public EquationModel()
         {
             _id++;
             Id = _id;

@@ -42,7 +42,7 @@ namespace ChemProV.PFD.EquationEditor
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
         private bool isReadOnly = false;
-        private List<EquationViewModel> viewModels = new List<EquationViewModel>();
+        private List<EquationModel> equationModels = new List<EquationModel>();
         private List<IPfdElement> pfdElements = new List<IPfdElement>();
 
         #endregion
@@ -224,12 +224,12 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         private void AddNewEquationRow()
         {
-            EquationViewModel newRowModel = new EquationViewModel();
+            EquationModel newRowModel = new EquationModel();
             newRowModel.TypeOptions = EquationTypes;
             newRowModel.ScopeOptions = EquationScopes;
             newRowModel.RelatedElements = PfdElements;
-            newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationViewModelPropertyChanged);
-            viewModels.Add(newRowModel);
+            newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
+            equationModels.Add(newRowModel);
 
             int rowNumber = EquationsGrid.RowDefinitions.Count;
             EquationsGrid.RowDefinitions.Add(new RowDefinition());
@@ -295,7 +295,7 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             //update all view models
-            foreach (EquationViewModel vm in viewModels)
+            foreach (EquationModel vm in equationModels)
             {
                 vm.ScopeOptions = EquationScopes;
                 UpdateViewModelElements(vm);
@@ -339,32 +339,79 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
-            foreach (EquationViewModel vm in viewModels)
+            foreach (EquationModel vm in equationModels)
             {
                 vm.TypeOptions = EquationTypes;
             }
         }
 
-        private void UpdateViewModelElements(EquationViewModel vm)
+        private List<IPfdElement> GetElementAndStreams(IProcessUnit unit)
         {
-            //supply different PFD elements to the view model depending on its scope
-            switch (vm.Scope.Classification)
+            List<IPfdElement> elements = new List<IPfdElement>();
+            
+            //add the process unit as well as its incoming and outgoing streams
+            elements.Add(unit);
+            foreach (IPfdElement element in unit.IncomingStreams)
             {
+                elements.Add(element);
+            }
+            foreach (IPfdElement element in unit.OutgoingStreams)
+            {
+                elements.Add(element);
+            }
+            return elements;
+        }
 
+        private void UpdateViewModelElements(EquationModel equation)
+        {
+            List<IPfdElement> relevantUnits = new List<IPfdElement>();
+
+            //supply different PFD elements to the view model depending on its scope
+            switch (equation.Scope.Classification)
+            {
+                //With a single unit, all we care about is that unit and its related streams
                 case EquationScopeClassification.SingleUnit:
-                    
+                    LabeledProcessUnit selectedUnit = (from element in PfdElements
+                                                      where element is LabeledProcessUnit
+                                                      &&
+                                                      (element as LabeledProcessUnit).ProcessUnitLabel == equation.Scope.Name
+                                                      select element).FirstOrDefault() as LabeledProcessUnit;
+                    if (selectedUnit != null)
+                    {
+                        relevantUnits = GetElementAndStreams(selectedUnit);
+                    }
                     break;
 
+                //ChemProV doesn't currently support sub processes, but this is where
+                //that logic would go
                 case EquationScopeClassification.SubProcess:
                     break;
 
+                //AC: Not sure what should happen here
                 case EquationScopeClassification.Unspecified:
                     break;
+
+                //Pull all source and sink units as well as their streams
                 case EquationScopeClassification.Overall:
                 default:
-
+                    List<IProcessUnit> units = (from element in PfdElements
+                                                where element is IProcessUnit
+                                                &&
+                                                (
+                                                 (element as IProcessUnit).Description == ProcessUnitDescriptions.Sink
+                                                 ||
+                                                 (element as IProcessUnit).Description == ProcessUnitDescriptions.Source
+                                                )
+                                                select element as IProcessUnit).ToList();
+                    foreach (IProcessUnit unit in units)
+                    {
+                        relevantUnits = relevantUnits.Union(GetElementAndStreams(unit)).ToList();
+                    }
                     break;
             }
+
+            //assign the updated list to the equation
+            equation.RelatedElements = relevantUnits;
         }
 
         #endregion Private Helpers
@@ -386,9 +433,9 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void EquationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void EquationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            EquationViewModel model = sender as EquationViewModel;
+            EquationModel model = sender as EquationModel;
             
             //if the scope changed, then update the property units that are visible to the particular view model
             if (e.PropertyName == "Scope")
@@ -403,7 +450,7 @@ namespace ChemProV.PFD.EquationEditor
                                  select child).FirstOrDefault();
             if (element != null)
             {
-                EquationViewModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationViewModel);
+                EquationModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationModel);
                 if (elementVm.Id == model.Id && model.Equation.Length != 0)
                 {
                     AddNewEquationRow();
@@ -414,10 +461,10 @@ namespace ChemProV.PFD.EquationEditor
                     if (maxRowCount > 2 && model.Equation.Length == 0)
                     {
                         FrameworkElement[] controls = (from child in EquationsGrid.Children
-                                                       where (child as FrameworkElement).DataContext is EquationViewModel //make sure that the child has the correct view model (header row doesn't)
+                                                       where (child as FrameworkElement).DataContext is EquationModel //make sure that the child has the correct view model (header row doesn't)
                                                        select child as FrameworkElement).ToArray();
                         element = (from control in controls
-                                   where (control.DataContext as EquationViewModel).Id == model.Id
+                                   where (control.DataContext as EquationModel).Id == model.Id
                                    select control).FirstOrDefault();
                         if (element != null)
                         {
