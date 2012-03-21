@@ -244,7 +244,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.Mixer:
                     pu = new LabeledProcessUnit();
-                    (pu as LabeledProcessUnit).ProcessUnitLabel = "Mixer" + pu.ProcessUnitId;
+                    (pu as LabeledProcessUnit).ProcessUnitLabel = "Mix" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = -1;
                     pu.MaxOutgoingStreams = 1;
                     pu.MaxIncomingHeatStreams = 0;
@@ -254,7 +254,7 @@ namespace ChemProV.PFD.ProcessUnits
 
                 case ProcessUnitType.Reactor:
                     pu = new LabeledProcessUnit();
-                    (pu as LabeledProcessUnit).ProcessUnitLabel = "React" + pu.ProcessUnitId;
+                    (pu as LabeledProcessUnit).ProcessUnitLabel = "Rct" + pu.ProcessUnitId;
                     pu.MaxIncomingStreams = -1;
                     pu.MaxOutgoingStreams = 1;
                     pu.MaxIncomingHeatStreams = 1;

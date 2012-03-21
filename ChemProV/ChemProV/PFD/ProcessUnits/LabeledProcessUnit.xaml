@@ -5,20 +5,32 @@
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:processUnits="clr-namespace:ChemProV.PFD.ProcessUnits"
     mc:Ignorable="d"
-    Width="50" Height="69">
-    <Border>
-        <StackPanel Orientation="Vertical">
-            <Border x:Name="ProcessUnitBorder"
+    Width="45" Height="45">
+    <Border x:Name="ProcessUnitBorder"
                 BorderThickness="2"
                 Width="45" Height="45"
                 BorderBrush="Transparent">
-                <Image x:Name="ProcessUnitImage"
+        <Grid>
+            <Image x:Name="ProcessUnitImage"
                Source="/UI/Icons/pu_generic.png"
                Stretch="None"
                />
-            </Border>
-            <TextBlock x:Name="ProcessUnitNameText" Text="{Binding Path=ProcessUnitLabel, Mode=TwoWay}" HorizontalAlignment="Center" />
-            <TextBox x:Name="ProcessUnitNameBox" MaxLength="6" Width="50" Height="24" Text="{Binding Path=ProcessUnitLabel, Mode=TwoWay}" Visibility="Collapsed" />
-        </StackPanel>
+            <Rectangle Fill="White" Opacity="0.6" IsHitTestVisible="False" Height="14" Width="39" VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+            <TextBlock 
+                x:Name="ProcessUnitNameText" 
+                Text="{Binding Path=ProcessUnitLabel, Mode=TwoWay}" 
+                HorizontalAlignment="Center" 
+                VerticalAlignment="Bottom"
+                />
+            <TextBox 
+                x:Name="ProcessUnitNameBox" 
+                MaxLength="6" 
+                Width="50" 
+                Height="24" 
+                Text="{Binding Path=ProcessUnitLabel, Mode=TwoWay}" 
+                Visibility="Collapsed"
+                VerticalAlignment="Bottom"
+                />
+        </Grid>
     </Border>
 </processUnits:GenericProcessUnit>
