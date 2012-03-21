@@ -20,6 +20,7 @@ namespace ChemProV.PFD.EquationEditor
     {
         #region public members
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public IList<IPfdElement> RelatedElements { get; set; }
         #endregion
 
         #region private members
@@ -136,6 +137,7 @@ namespace ChemProV.PFD.EquationEditor
         {
             _id++;
             Id = _id;
+            RelatedElements = new List<IPfdElement>();
         }
         #endregion
 

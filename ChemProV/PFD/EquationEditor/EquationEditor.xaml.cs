@@ -227,6 +227,7 @@ namespace ChemProV.PFD.EquationEditor
             EquationViewModel newRowModel = new EquationViewModel();
             newRowModel.TypeOptions = EquationTypes;
             newRowModel.ScopeOptions = EquationScopes;
+            newRowModel.RelatedElements = PfdElements;
             newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationViewModelPropertyChanged);
             viewModels.Add(newRowModel);
 
@@ -297,6 +298,7 @@ namespace ChemProV.PFD.EquationEditor
             foreach (EquationViewModel vm in viewModels)
             {
                 vm.ScopeOptions = EquationScopes;
+                UpdateViewModelElements(vm);
             }
         }
 
@@ -343,6 +345,28 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
+        private void UpdateViewModelElements(EquationViewModel vm)
+        {
+            //supply different PFD elements to the view model depending on its scope
+            switch (vm.Scope.Classification)
+            {
+
+                case EquationScopeClassification.SingleUnit:
+                    
+                    break;
+
+                case EquationScopeClassification.SubProcess:
+                    break;
+
+                case EquationScopeClassification.Unspecified:
+                    break;
+                case EquationScopeClassification.Overall:
+                default:
+
+                    break;
+            }
+        }
+
         #endregion Private Helpers
 
         #region event handlers
@@ -365,7 +389,12 @@ namespace ChemProV.PFD.EquationEditor
         private void EquationViewModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             EquationViewModel model = sender as EquationViewModel;
-
+            
+            //if the scope changed, then update the property units that are visible to the particular view model
+            if (e.PropertyName == "Scope")
+            {
+                UpdateViewModelElements(model);
+            }
             //is the data being modified the last row in our equations grid?  If so, 
             //add a new one
             int maxRowCount = EquationsGrid.RowDefinitions.Count - 1; //subtract 1 because rows start at 0
