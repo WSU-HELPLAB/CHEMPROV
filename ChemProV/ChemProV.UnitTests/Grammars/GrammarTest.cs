@@ -65,7 +65,6 @@ namespace ChemProV.UnitTests.Grammars
         ///             m33: benzene
         /// </summary>
         /// <returns></returns>
-        
         public List<IPfdElement> GetSamplePfd()
         {
             //will hold the finished PFD graph
@@ -93,7 +92,7 @@ namespace ChemProV.UnitTests.Grammars
             stream1Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m11",
-                                                Compound = 1
+                                                CompoundId = 1
                                             }
                                         );
 
@@ -109,14 +108,14 @@ namespace ChemProV.UnitTests.Grammars
             stream2Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m21",
-                                                Compound = 0,
+                                                CompoundId = 0,
                                                 Quantity = "33"
                                             }
                                         );
             stream2Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m22",
-                                                Compound = 2,
+                                                CompoundId = 2,
                                                 Quantity = "67"
                                             }
                                         );
@@ -134,19 +133,19 @@ namespace ChemProV.UnitTests.Grammars
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m31",
-                                                Compound = 0
+                                                CompoundId = 0
                                             }
                                         );
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m32",
-                                                Compound = 1
+                                                CompoundId = 1
                                             }
                                         );
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m33",
-                                                Compound = 2
+                                                CompoundId = 2
                                             }
                                         );
 

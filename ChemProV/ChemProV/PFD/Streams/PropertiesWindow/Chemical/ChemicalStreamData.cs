@@ -17,7 +17,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
     /// Object representation of the data present in the PropertiesWindow for
     /// chemical streams.
     /// </summary>
-    public class ChemicalStreamData : INotifyPropertyChanged, IComparable
+    public class ChemicalStreamData : IStreamData, INotifyPropertyChanged, IComparable
     {
         private string label = "";
         private string quantity = "?";
@@ -55,7 +55,19 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        public int Units
+        public ChemicalUnits Unit
+        {
+            get
+            {
+                return (ChemicalUnits)UnitId;
+            }
+            set
+            {
+                UnitId = (int)value;
+            }
+        }
+
+        public int UnitId
         {
             get
             {
@@ -68,7 +80,19 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        public int Compound
+        public ChemicalCompounds Compound
+        {
+            get
+            {
+                return (ChemicalCompounds)CompoundId;
+            }
+            set
+            {
+                CompoundId = (int)value;
+            }
+        }
+
+        public int CompoundId
         {
             get
             {
@@ -135,7 +159,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
         private void CheckIfEnabled(string propertyName = "")
         {
-            if (Compound != 24)
+            if (CompoundId != 24)
             {
                 Enabled = true;
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
