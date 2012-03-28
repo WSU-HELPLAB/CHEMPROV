@@ -16,6 +16,6 @@ namespace ChemProV.PFD.EquationEditor.Models
         Overall,
         SubProcess,
         SingleUnit,
-        Unspecified
+        Unknown
     }
 }

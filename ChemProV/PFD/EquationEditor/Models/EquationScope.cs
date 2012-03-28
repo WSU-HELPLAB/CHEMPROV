@@ -34,6 +34,12 @@ namespace ChemProV.PFD.EquationEditor.Models
             Name = "Overall";
         }
 
+        public EquationScope(EquationScope scope)
+        {
+            Classification = scope.Classification;
+            Name = scope.Name;
+        }
+
         public EquationScope(EquationScopeClassification classification, string name)
         {
             Classification = classification;

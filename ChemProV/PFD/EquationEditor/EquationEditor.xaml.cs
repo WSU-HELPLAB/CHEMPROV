@@ -131,6 +131,8 @@ namespace ChemProV.PFD.EquationEditor
             PfdElements = new List<IPfdElement>();
 
             //create our first row
+            updateCompounds();
+            updateScopes();
             AddNewEquationRow();
         }
         #endregion Constructor
@@ -236,21 +238,25 @@ namespace ChemProV.PFD.EquationEditor
 
             ErrorControl errorControl = new ErrorControl();
             errorControl.SetValue(Grid.RowProperty, rowNumber);
+            errorControl.SetValue(Grid.ColumnProperty, 0);
             errorControl.DataContext = newRowModel;
             EquationsGrid.Children.Add(errorControl);
 
-            ScopeControl scopeControl = new ScopeControl();
-            scopeControl.SetValue(Grid.RowProperty, rowNumber);
-            scopeControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(scopeControl);
-
             TypeControl typeControl = new TypeControl();
             typeControl.SetValue(Grid.RowProperty, rowNumber);
+            typeControl.SetValue(Grid.ColumnProperty, 1);
             typeControl.DataContext = newRowModel;
             EquationsGrid.Children.Add(typeControl);
 
+            ScopeControl scopeControl = new ScopeControl();
+            scopeControl.SetValue(Grid.RowProperty, rowNumber);
+            scopeControl.SetValue(Grid.ColumnProperty, 2);
+            scopeControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(scopeControl);
+
             Views.EquationControl equationControl = new Views.EquationControl();
             equationControl.SetValue(Grid.RowProperty, rowNumber);
+            equationControl.SetValue(Grid.ColumnProperty, 3);
             equationControl.DataContext = newRowModel;
             EquationsGrid.Children.Add(equationControl);
 
@@ -282,7 +288,7 @@ namespace ChemProV.PFD.EquationEditor
             EquationScopes.Add(new EquationScope(EquationScopeClassification.Overall, Name = "Overall"));
 
             //add "unspecified" scope
-            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unspecified, Name = "Unspecified"));
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unknown, Name = "Unknown"));
 
             //add any process units to the list of possible scopes
             foreach (IPfdElement element in PfdElements)
@@ -298,7 +304,7 @@ namespace ChemProV.PFD.EquationEditor
             foreach (EquationModel vm in equationModels)
             {
                 vm.ScopeOptions = EquationScopes;
-                UpdateViewModelElements(vm);
+                UpdateEquationModelElements(vm);
             }
         }
 
@@ -362,11 +368,11 @@ namespace ChemProV.PFD.EquationEditor
             return elements;
         }
 
-        private void UpdateViewModelElements(EquationModel equation)
+        private void UpdateEquationModelElements(EquationModel equation)
         {
             List<IPfdElement> relevantUnits = new List<IPfdElement>();
 
-            //supply different PFD elements to the view model depending on its scope
+            //supply different PFD elements to the model depending on its scope
             switch (equation.Scope.Classification)
             {
                 //With a single unit, all we care about is that unit and its related streams
@@ -388,7 +394,7 @@ namespace ChemProV.PFD.EquationEditor
                     break;
 
                 //AC: Not sure what should happen here
-                case EquationScopeClassification.Unspecified:
+                case EquationScopeClassification.Unknown:
                     break;
 
                 //Pull all source and sink units as well as their streams
@@ -440,7 +446,7 @@ namespace ChemProV.PFD.EquationEditor
             //if the scope changed, then update the property units that are visible to the particular view model
             if (e.PropertyName == "Scope")
             {
-                UpdateViewModelElements(model);
+                UpdateEquationModelElements(model);
             }
             //is the data being modified the last row in our equations grid?  If so, 
             //add a new one

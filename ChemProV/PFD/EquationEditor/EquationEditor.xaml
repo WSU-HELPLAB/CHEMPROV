@@ -32,8 +32,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                <TextBlock Grid.Row="0" Grid.Column="2" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
                 <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
             </Grid>
             <ScrollViewer
