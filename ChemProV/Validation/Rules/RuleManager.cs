@@ -16,7 +16,6 @@ using ChemProV.PFD.EquationEditor;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.Validation.Rules.Adapters.Table;
-using ChemProV.Validation.Rules.EquationRules;
 using ChemProV.Validation.Rules.ProcessUnitRules;
 
 namespace ChemProV.Validation.Rules
@@ -223,30 +222,11 @@ namespace ChemProV.Validation.Rules
         }
 
         /// <summary>
-        /// This is called when we want to check the semantics of the equations.  The syntax is checked within the equation
-        /// editor code already.  It keeps a list to all the equations so we do not have to pass it anything.
+        /// AC TODO: Reimplement equation checking rules.
         /// </summary>
         private void CheckEquationSemantics(ObservableCollection<EquationData> equations, IList<Tuple<string, EquationControl>> userDefinedVariables, List<IProcessUnit> processUnits)
         {
-            EquationRule rule = new EquationRule();
-
-            replaceUserDefinedVariables(equations);
-
-            rule.listOfEquations = equations;
-            rule.Target = equations;
-            rule.DictionaryOfTableData = tableDict;
-            rule.ProcessUnits = processUnits;
-            rule.CheckRule();
-
-            foreach (ValidationResult vr in rule.ValidationResults)
-            {
-                if (!EveryoneDict.ContainsKey(vr.Target))
-                {
-                    EveryoneDict.Add(vr.Target, new List<string>());
-                }
-                EveryoneDict[vr.Target].Add("[" + ruleNumber + "]\n-" + vr.Message + "\n");
-                ruleNumber++;
-            }
+            
         }
 
         private void Equations_Solvable(object sender, EventArgs e)
@@ -297,36 +277,6 @@ namespace ChemProV.Validation.Rules
                  * */
             }
         }
-
-        /*
-        private IList<Tuple<string, Equation>> deepCopy(IList<Tuple<string, Equation>> equations)
-        {
-            foreach (Tuple<string, Equation> tuple in equations)
-            {
-                Tuple<string, Equation> tupleDeepCopy;
-
-                foreach (IEquationToken token in tuple.Item2)
-                {
-                    if (token is OperatorToken)
-                    {
-                        equationDeepCopy.Add(new OperatorToken(token.Value));
-                    }
-                    else if (token is VariableToken)
-                    {
-                        equationDeepCopy.Add(new VariableToken(token.Value));
-                    }
-                    else
-                    {
-                        throw new Exception("Unknown token");
-                    }
-                }
-            }
-
-            tupleDeepCopy = new Tuple<object, ObservableCollection<IEquationToken>>(tuple.Item1, equationDeepCopy);
-
-            equationsDeepCopy.Add(tupleDeepCopy);
-        }
-        */
 
         /// <summary>
         /// This returns a Dictionary which as its key is an object that broke one or more rule.
