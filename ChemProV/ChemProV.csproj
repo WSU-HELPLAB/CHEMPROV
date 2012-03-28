@@ -193,7 +193,10 @@
     </Compile>
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindowWithTemperature.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\CompoundFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\Compounds.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\DataUpdatedEventArgs.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\Units.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\IStreamData.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowGrid.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\TempUnitsFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\UnitsFormatter.cs" />
@@ -296,6 +299,7 @@
     <Compile Include="Validation\Rules\Adapters\Table\ITableAdapter.cs" />
     <Compile Include="Validation\Rules\Adapters\Table\TableAdapterFactory.cs" />
     <Compile Include="Validation\Rules\Adapters\Table\ChemicalTableAdapter.cs" />
+    <Compile Include="Validation\Rules\EquationRules\EquationRule.cs" />
     <Compile Include="Validation\Rules\ProcessUnitRules\HeatExchangerWithoutUtilityProcessUnitRule.cs" />
     <Compile Include="Validation\Rules\ProcessUnitRules\ProcessUnitRuleFactory.cs" />
     <Compile Include="Validation\Rules\ProcessUnitRules\ReactorProcessUnitRule.cs" />
@@ -550,9 +554,7 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Validation\Rules\EquationRules\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

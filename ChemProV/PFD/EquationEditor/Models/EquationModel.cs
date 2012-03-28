@@ -14,7 +14,7 @@ using System.ComponentModel;
 using ChemProV.PFD.EquationEditor.Models;
 using System.Linq;
 
-namespace ChemProV.PFD.EquationEditor
+namespace ChemProV.PFD.EquationEditor.Models
 {
     public class EquationModel : INotifyPropertyChanged
     {

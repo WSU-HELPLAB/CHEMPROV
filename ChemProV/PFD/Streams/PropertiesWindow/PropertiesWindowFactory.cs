@@ -131,8 +131,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                     ChemicalStreamData d = new ChemicalStreamData();
                     d.Label = xmlData.ElementAt(i).label;
                     d.Quantity = xmlData.ElementAt(i).quantity;
-                    d.Units = Convert.ToInt32(xmlData.ElementAt(i).units);
-                    d.Compound = Convert.ToInt32(xmlData.ElementAt(i).compound);
+                    d.UnitId = Convert.ToInt32(xmlData.ElementAt(i).units);
+                    d.CompoundId = Convert.ToInt32(xmlData.ElementAt(i).compound);
                     d.Enabled = Convert.ToBoolean(xmlData.ElementAt(i).enabled);
                     d.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler((table as ChemicalStreamPropertiesWindow).DataUpdated);
                     (table as ChemicalStreamPropertiesWindow).ItemSource.Add(d);
