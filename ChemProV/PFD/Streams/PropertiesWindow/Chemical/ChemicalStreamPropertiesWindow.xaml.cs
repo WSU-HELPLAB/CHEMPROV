@@ -1063,6 +1063,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
         }
 
+        //AC TODO: This seems broken.  Needs to be investigated.
         public virtual void WriteXml(System.Xml.XmlWriter writer)
         {
             //serializer for our data class
