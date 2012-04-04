@@ -33,6 +33,7 @@ using ChemProV.UI.UserDefinedVariableWindow;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
+using ChemProv.Library.OSBLE.Views;
 
 namespace ChemProV
 {
@@ -666,6 +667,12 @@ namespace ChemProV
                     MessageBox.Show("Installation Failed: is it installed already? Try refressing this page");
                 }
             }
+        }
+
+        private void OsbleButton_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWindow login = new LoginWindow();
+            //login.Show();
         }
 
         private void UserDefinedVariableButton_Click(object sender, RoutedEventArgs e)
