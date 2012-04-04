@@ -34,6 +34,7 @@ using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
 using ChemProv.Library.OSBLE.Views;
+using ChemProv.Library.OsbleServices;
 
 namespace ChemProV
 {
@@ -672,7 +673,7 @@ namespace ChemProV
         private void OsbleButton_Click(object sender, RoutedEventArgs e)
         {
             LoginWindow login = new LoginWindow();
-            //login.Show();
+            login.Show();
         }
 
         private void UserDefinedVariableButton_Click(object sender, RoutedEventArgs e)
