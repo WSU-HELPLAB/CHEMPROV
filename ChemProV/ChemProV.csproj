@@ -95,6 +95,8 @@
       <HintPath>Libraries\Silverlight.Controls.dll</HintPath>
     </Reference>
     <Reference Include="System.ComponentModel.DataAnnotations, Version=5.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
     <Reference Include="System.Windows" />
     <Reference Include="mscorlib" />
     <Reference Include="system" />
@@ -426,6 +428,8 @@
     <None Include="Grammars\ChemProVTree.g" />
     <None Include="Grammars\ChemProVTree.tokens" />
     <None Include="Properties\AppManifest.xml" />
+    <None Include="Properties\DataSources\ChemProv.Library.OsbleServices.UserProfile.datasource" />
+    <Content Include="ServiceReferences.ClientConfig" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\OutOfBrowserSettings.xml">
@@ -532,6 +536,9 @@
     <Content Include="UI\Icons\toolbar_open.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="UI\Icons\toolbar_osble.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UI\Icons\toolbar_print.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -554,7 +561,15 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ChemProv.Library\ChemProv.Library.csproj">
+      <Project>{DF61D940-8605-4098-AFA7-26823E579870}</Project>
+      <Name>ChemProv.Library</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
