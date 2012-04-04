@@ -19,12 +19,19 @@
         <TextBox x:Name="UserNameTextBox" Grid.Row="0" Grid.Column="1" Margin="3,3,3,3" Text="{Binding Path=UserName, Mode=TwoWay}"  />
         
         <TextBlock Text="Password:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <PasswordBox x:Name="PasswordBox" Grid.Row="1" Grid.Column="1" Margin="3,3,3,3" Password="{Binding Path=Password, Mode=TwoWay}" />
+        <PasswordBox 
+            x:Name="PasswordBox" 
+            Grid.Row="1" 
+            Grid.Column="1" 
+            Margin="3,3,3,3" 
+            Password="{Binding Path=Password, Mode=TwoWay}" 
+            KeyUp="PasswordBox_KeyUp"
+            />
         
         <TextBlock Text="Remember Me:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <CheckBox x:Name="RememberCredentialsCheckBox" Grid.Row="2" Grid.Column="1" Margin="3,3,3,3" IsChecked="{Binding Path=RememberMe, Mode=TwoWay}" />
 
-        <TextBlock Visibility="{Binding Path=ErrorVisibility, Mode=TwoWay}" x:Name="ErrorTextBlock" Grid.Row="3" Grid.Column="0" Text="The password you entered is invalid" TextWrapping="Wrap" Foreground="Red" />
+        <TextBlock Visibility="{Binding Path=ErrorVisibility, Mode=TwoWay}" x:Name="ErrorTextBlock" Grid.Row="3" Grid.Column="0" Text="{Binding Path=ErrorText}" TextWrapping="Wrap" Foreground="Red" />
         <Button 
             x:Name="OKButton" 
             Content="Login" 

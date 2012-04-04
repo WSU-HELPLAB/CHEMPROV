@@ -10,25 +10,50 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProv.Library.OSBLE.ViewModels;
+using System.Windows.Threading;
 
 namespace ChemProv.Library.OSBLE.Views
 {
     public partial class LoginWindow : ChildWindow
     {
+        public LoginWindowViewModel ViewModel 
+        {
+            get
+            {
+                return this.DataContext as LoginWindowViewModel;
+            }
+            private set
+            {
+                this.DataContext = value;
+            }
+        }
+
         public LoginWindow()
         {
             InitializeComponent();
-            this.DataContext = new LoginWindowViewModel();
+            ViewModel = new LoginWindowViewModel();
+            ViewModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ViewModel_PropertyChanged);    
         }
 
-        private void OKButton_Click(object sender, RoutedEventArgs e)
+        void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            this.DialogResult = true;
+            if (e.PropertyName.CompareTo("IsProcessingLogin") == 0)
+            {
+                OKButton.IsEnabled = !ViewModel.IsProcessingLogin;
+                if (ViewModel.IsLoggedIn)
+                {
+                    this.DialogResult = true;
+                }
+            }
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void PasswordBox_KeyUp(object sender, KeyEventArgs e)
         {
-            this.DialogResult = false;
+            //shortcut for logon
+            if (e.Key == Key.Enter)
+            {
+                OKButton.Command.Execute(this);
+            }
         }
     }
 }
