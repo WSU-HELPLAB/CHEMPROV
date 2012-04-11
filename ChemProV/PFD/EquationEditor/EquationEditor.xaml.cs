@@ -172,49 +172,14 @@ namespace ChemProV.PFD.EquationEditor
             XElement equations = doc.Descendants("Equations").ElementAt(0);
             foreach (XElement xmlEquation in equations.Elements())
             {
-                //create the equation
-                EquationControl eq = new EquationControl(isReadOnly);
+                EquationModel modelFromXml = EquationModel.FromXml(xmlEquation);
+                EquationModel rowModel = AddNewEquationRow();
 
-                //attach event listeners
-                //RegisterEquationListeners(eq);
-
-                //add to the list of equations
-                //EquationStackPanel.Children.Add(eq);
-
-                //set the equation's value
-                eq.EquationText = xmlEquation.Attribute("EquationText").Value;
-
-                XElement xmlEquationType = xmlEquation.Element("EquationType");
-
-                //AC: Default to an overall balance if the EquationType element has no children.
-                //    This is kind of a quick hack, and as such, I'm not sure whether or not
-                //    there are constants that I could be using instead of my strings.
-                string content = "Overall";
-                EquationTypeClassification classification = EquationTypeClassification.Total;
-                if (xmlEquationType.HasAttributes)
-                {
-                    content = xmlEquationType.Attribute("SelectedItemContent").Value;
-                    classification = (EquationTypeClassification)Int32.Parse(xmlEquationType.Attribute("SelectedItemClassification").Value);
-                }
-                EquationType item = new EquationType(classification, content);
-
-                eq.EquationTypes.Add(item);
-                eq.EquationType.SelectedItem = item;
-
-                eq.EquationTextChanged();
+                rowModel.Annotation = modelFromXml.Annotation;
+                rowModel.Equation = modelFromXml.Equation;
+                rowModel.Scope = modelFromXml.Scope;
+                rowModel.Type = modelFromXml.Type;
             }
-
-            //create the equation
-            EquationControl lastEq = new EquationControl(isReadOnly);
-
-            //attach event listeners
-            //RegisterEquationListeners(lastEq);
-
-            //add to the list of equations
-            //EquationStackPanel.Children.Add(lastEq);
-
-            //the last equation added needs to have a special event listener attached
-            //lastEq.MyTextChanged += new EventHandler(eq_MyTextChanged);
         }
 
         #endregion
@@ -224,7 +189,7 @@ namespace ChemProV.PFD.EquationEditor
         /// <summary>
         /// Adds a new equation row to the equations grid.
         /// </summary>
-        private void AddNewEquationRow()
+        private EquationModel AddNewEquationRow()
         {
             EquationModel newRowModel = new EquationModel();
             newRowModel.TypeOptions = EquationTypes;
@@ -236,11 +201,11 @@ namespace ChemProV.PFD.EquationEditor
             int rowNumber = EquationsGrid.RowDefinitions.Count;
             EquationsGrid.RowDefinitions.Add(new RowDefinition());
 
-            ErrorControl errorControl = new ErrorControl();
-            errorControl.SetValue(Grid.RowProperty, rowNumber);
-            errorControl.SetValue(Grid.ColumnProperty, 0);
-            errorControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(errorControl);
+            AnnotateControl annotateControl = new AnnotateControl();
+            annotateControl.SetValue(Grid.RowProperty, rowNumber);
+            annotateControl.SetValue(Grid.ColumnProperty, 0);
+            annotateControl.DataContext = newRowModel;
+            EquationsGrid.Children.Add(annotateControl);
 
             TypeControl typeControl = new TypeControl();
             typeControl.SetValue(Grid.RowProperty, rowNumber);
@@ -259,7 +224,7 @@ namespace ChemProV.PFD.EquationEditor
             equationControl.SetValue(Grid.ColumnProperty, 3);
             equationControl.DataContext = newRowModel;
             EquationsGrid.Children.Add(equationControl);
-
+            return newRowModel;
         }
 
         /// <summary>
@@ -497,22 +462,13 @@ namespace ChemProV.PFD.EquationEditor
 
         public void WriteXml(XmlWriter writer)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(EquationControl));
+            XmlSerializer serializer = new XmlSerializer(typeof(EquationModel));
 
             writer.WriteStartElement("Equations");
-
-            /* AC TODO: Rewrite
-            var equations = from c in this.EquationStackPanel.Children where c is EquationControl select c as EquationControl;
-            //loop through our list of equations except the last one
-            foreach (EquationControl equation in equations)
+            foreach (EquationModel model in equationModels)
             {
-                //if it is just empty or whitespace don't save it
-                if (equation.EquationText.Trim() != "")
-                {
-                    serializer.Serialize(writer, equation);
-                }
+                serializer.Serialize(writer, model);
             }
-             * */
             writer.WriteEndElement();
         }
 

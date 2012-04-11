@@ -27,9 +27,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             </StackPanel>
             <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20" />
-                    <ColumnDefinition Width="100"  />
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="20" />                    
+                    <ColumnDefinition Width="150"  />
+                    <ColumnDefinition Width="150" />
                     <ColumnDefinition />
                 </Grid.ColumnDefinitions>
                 <TextBlock Grid.Row="0" Grid.Column="1" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
@@ -53,8 +53,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="100"  />
-                        <ColumnDefinition Width="100" />
+                        <ColumnDefinition Width="150"  />
+                        <ColumnDefinition Width="150" />
                         <ColumnDefinition />
                     </Grid.ColumnDefinitions>
 

@@ -61,8 +61,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="2*" />
             </Grid.ColumnDefinitions>
-            <ChemProV_Validation_Feedback:FeedbackWindow x:Name="FeedbackWindow"/>
-            <ChemProV_EquationEditor:EquationEditor Grid.Column="1" x:Name="EquationEditor"/>
+            <ChemProV_Validation_Feedback:FeedbackWindow x:Name="FeedbackWindow" Visibility="Collapsed" />
+            <ChemProV_EquationEditor:EquationEditor Grid.Column="0" Grid.ColumnSpan="2" x:Name="EquationEditor"/>
         </Grid>
     </Grid>
 </UserControl>

@@ -665,15 +665,9 @@ namespace ChemProV
                 }
                 catch
                 {
-                    MessageBox.Show("Installation Failed: is it installed already? Try refressing this page");
+                    MessageBox.Show("Installation Failed: is it installed already? Try refreshing this page");
                 }
             }
-        }
-
-        private void OsbleButton_Click(object sender, RoutedEventArgs e)
-        {
-            LoginWindow login = new LoginWindow();
-            login.Show();
         }
 
         private void UserDefinedVariableButton_Click(object sender, RoutedEventArgs e)

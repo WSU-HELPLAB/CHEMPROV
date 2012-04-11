@@ -10,6 +10,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System;
 using System.ComponentModel;
 using System.Windows.Media;
+using System.Xml.Serialization;
+using System.Xml;
+using System.Xml.Linq;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
@@ -17,7 +20,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
     /// Object representation of the data present in the PropertiesWindow for
     /// chemical streams.
     /// </summary>
-    public class ChemicalStreamData : IStreamData, INotifyPropertyChanged, IComparable
+    public class ChemicalStreamData : IStreamData, INotifyPropertyChanged, IComparable, IXmlSerializable
     {
         private string label = "";
         private string quantity = "?";
@@ -197,5 +200,88 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             ChemicalStreamData other = obj as ChemicalStreamData;
             return this.Label.CompareTo(other.Label);
         }
+
+        #region IXmlSerializable Members
+
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        /// <summary>
+        /// This isn't used as the IProcessUnitFactory is responsible for the creation
+        /// of new process units.
+        /// </summary>
+        /// <param name="reader"></param>
+        public void ReadXml(XmlReader reader)
+        {
+        }
+
+        public void WriteXml(XmlWriter writer)
+        {
+            writer.WriteStartElement("Label");
+            writer.WriteString(Label);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Quantity");
+            writer.WriteString(Quantity);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("UnitId");
+            writer.WriteString(UnitId.ToString());
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("CompoundId");
+            writer.WriteString(CompoundId.ToString());
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Temperature");
+            writer.WriteString(Temperature);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("TemperatureUnits");
+            writer.WriteString(TempUnits.ToString());
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Feedback");
+            writer.WriteString(Feedback);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("ToolTipMessage");
+            writer.WriteString(ToolTipMessage);
+            writer.WriteEndElement();
+        }
+
+        /// <summary>
+        /// Creates a new StickyNote based on the supplied XML element
+        /// </summary>
+        /// <param name="xmlNote">The xml for a StickyNote</param>
+        /// <returns></returns>
+        public static ChemicalStreamData FromXml(XElement xmlNote)
+        {
+            /*
+            StickyNote note = new StickyNote();
+
+            //pull out content & color
+            note.Note.Text = xmlNote.Element("Content").Value;
+            note.ColorChange(StickyNoteColorsFromString(xmlNote.Element("Color").Value));
+
+            //use LINQ to find us the X,Y coords
+            var location = from c in xmlNote.Elements("Location")
+                           select new
+                           {
+                               x = (string)c.Element("X"),
+                               y = (string)c.Element("Y")
+                           };
+            note.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
+            note.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
+
+            //return the processed note
+            return note;
+             * */
+            return new ChemicalStreamData();
+        }
+
+        #endregion IXmlSerializable Members
     }
 }
