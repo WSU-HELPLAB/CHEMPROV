@@ -13,10 +13,12 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using ChemProV.PFD.EquationEditor.Models;
 using System.Linq;
+using System.Xml.Serialization;
+using System.Xml.Linq;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
-    public class EquationModel : INotifyPropertyChanged
+    public class EquationModel : INotifyPropertyChanged, IXmlSerializable
     {
         #region public members
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
@@ -28,12 +30,27 @@ namespace ChemProV.PFD.EquationEditor.Models
         private EquationScope _scope = new EquationScope();
         private EquationType _type = new EquationType();
         private string _equation = "";
+        private string _annotation = "";
         private ObservableCollection<EquationScope> _scopeOptions = new ObservableCollection<EquationScope>();
         private ObservableCollection<EquationType> _typeOptions = new ObservableCollection<EquationType>();
         #endregion
 
         #region properties
         public int Id { get; private set; }
+
+        public string Annotation
+        {
+            get
+            {
+                return _annotation;
+            }
+            set
+            {
+                _annotation = value;
+                OnPropertyChanged("Annotation");
+            }
+        }
+
         public ObservableCollection<EquationScope> ScopeOptions
         {
             get
@@ -139,6 +156,65 @@ namespace ChemProV.PFD.EquationEditor.Models
             Id = _id;
             RelatedElements = new List<IPfdElement>();
         }
+
+        #region serialization methods
+        public System.Xml.Schema.XmlSchema GetSchema()
+        {
+            return null;
+        }
+
+        public void ReadXml(System.Xml.XmlReader reader)
+        {
+            //not needed
+        }
+
+        public void WriteXml(System.Xml.XmlWriter writer)
+        {
+            writer.WriteStartElement("Scope");
+            writer.WriteAttributeString("Name", Scope.Name);
+            writer.WriteAttributeString("ClassificationId", Scope.ClassificationId.ToString());
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Type");
+            writer.WriteAttributeString("Name", Type.Name);
+            writer.WriteAttributeString("ClassificationId", Type.ClassificationId.ToString());
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Equation");
+            writer.WriteString(Equation);
+            writer.WriteEndElement();
+
+            writer.WriteStartElement("Annotation");
+            writer.WriteString(Annotation);
+            writer.WriteEndElement();
+        }
+
+        public static EquationModel FromXml(XElement xmlModel)
+        {
+            EquationModel model = new EquationModel();
+
+            //easy stuff first
+            model.Equation = xmlModel.Element("Equation").Value;
+            model.Annotation = xmlModel.Element("Annotation").Value;
+
+            //scope
+            XElement scope = xmlModel.Element("Scope");
+            int scopeId = 0;
+            string scopeName = scope.Attribute("Name").Value;
+            Int32.TryParse(scope.Attribute("ClassificationId").Value, out scopeId);
+            model.Scope = new EquationScope( (EquationScopeClassification)scopeId, scopeName);
+
+            //type
+            XElement type = xmlModel.Element("Type");
+            int typeId = 0;
+            string typeName = type.Attribute("Name").Value;
+            Int32.TryParse(scope.Attribute("ClassificationId").Value, out typeId);
+            model.Type = new EquationType((EquationTypeClassification)typeId, typeName);
+
+            return model;
+        }
+        #endregion
+
         #endregion
 
         #region private methods
@@ -147,5 +223,7 @@ namespace ChemProV.PFD.EquationEditor.Models
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
+
+        
     }
 }

@@ -50,9 +50,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Click="OptionsButton_Click" ToolTipService.ToolTip="Options" >
                     <Image Source="/UI/Icons/toolbar_settings.png" />
                 </Button>
-                <Button Margin="0,0,5,0" Click="OsbleButton_Click" ToolTipService.ToolTip="Connect to OSBLE" >
-                    <Image Source="/UI/Icons/toolbar_osble.png" />
-                </Button>
                 <Button Margin="0,0,5,0" Click="HelpButton_Click" ToolTipService.ToolTip="About ChemProV" >
                     <Image Source="/UI/Icons/toolbar_about.png" />
                 </Button>

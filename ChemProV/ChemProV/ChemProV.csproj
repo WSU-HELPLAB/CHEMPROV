@@ -156,6 +156,12 @@
       <DependentUpon>TokenList.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\Tokens\VariableToken.cs" />
+    <Compile Include="PFD\EquationEditor\Views\AnnotateControl.xaml.cs">
+      <DependentUpon>AnnotateControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\Views\AnnotateWindow.xaml.cs">
+      <DependentUpon>AnnotateWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PFD\EquationEditor\Views\EquationControl.xaml.cs">
       <DependentUpon>EquationControl.xaml</DependentUpon>
     </Compile>
@@ -343,6 +349,14 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Page Include="PFD\EquationEditor\Views\AnnotateControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\EquationEditor\Views\AnnotateWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PFD\EquationEditor\Views\EquationControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -486,6 +500,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UI\Icons\palette_stickyNote.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_stickyNote_16x16.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UI\Icons\pu.png">
