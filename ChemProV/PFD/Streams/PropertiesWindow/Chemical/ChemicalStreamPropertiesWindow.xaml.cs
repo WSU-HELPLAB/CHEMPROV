@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml.Serialization;
 using System.Text.RegularExpressions;
+using System.Collections.Generic;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
@@ -487,25 +488,27 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 ComboBox cb = new ComboBox();
                 cb.Background = new SolidColorBrush(Colors.White);
                 cb.BorderBrush = new SolidColorBrush(Colors.White);
+                ObservableCollection<string> units = new ObservableCollection<string>();
                 foreach (ChemicalUnits unit in Enum.GetValues(typeof(ChemicalUnits)))
                 {
-                    ComboBoxItem cbi = new ComboBoxItem();
-                    cbi.Content = unit.ToPrettyString();
-                    cb.Items.Add(cbi);
+                    units.Add(unit.ToPrettyString());
                 }
                 if (row == 0)
                 {
                     //Overall Units cannot be % so if row 0 remove first element which is %
-                    cb.Items.RemoveAt(0);
+                    units.RemoveAt(0);
                 }
 
+                cb.ItemsSource = units;
+
+                //AC ToDo: Get units and compounds bound to stream data.
                 //use data binding to keep the units in sync with the model
-                Binding indexBinding = new Binding("Units")
+                Binding valueBinding = new Binding("Unit")
                 {
                     Source = ItemSource[row],
                     Mode = BindingMode.TwoWay
                 };
-                cb.SetBinding(ComboBox.SelectedIndexProperty, indexBinding);
+                cb.SetBinding(ComboBox.SelectedValueProperty, valueBinding);
 
                 //we only care about changes between made on the "overall" row, which should be row 1
                 if (row == 0)
@@ -1063,7 +1066,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
         }
 
-        //AC TODO: This seems broken.  Needs to be investigated.
         public virtual void WriteXml(System.Xml.XmlWriter writer)
         {
             //serializer for our data class

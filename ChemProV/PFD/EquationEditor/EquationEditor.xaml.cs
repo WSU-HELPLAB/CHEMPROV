@@ -156,13 +156,15 @@ namespace ChemProV.PFD.EquationEditor
         /// <summary>
         /// Will remove all existing equations currently listed in the equation editor.
         /// </summary>
-        [Obsolete("Does nothing")]
         public void ClearEquations()
         {
-
+            int rowCount = EquationsGrid.RowDefinitions.Count;
+            for (int i = 0; i < rowCount; i++)
+            {
+                RemoveEquationRow(i);
+            }
         }
 
-        [Obsolete("Needs to be reworked")]
         public void LoadXmlElements(XElement doc)
         {
             //clear the equation stack

@@ -310,26 +310,14 @@ namespace ChemProV.PFD.ProcessUnits
 
         public static IProcessUnit ProcessUnitFromXml(XElement element)
         {
-            //pull the attribute
-            string id = (string)element.Attribute("Id");
-
             //pull the process unit type
             string unitType = (string)element.Attribute("ProcessUnitType");
 
             //call the factory to create a new object for us
             IProcessUnit pu = ProcessUnitFromUnitType(unitType);
-            UIElement puElement = pu as UIElement;
-            pu.Id = id;
 
-            //set the correct coordinates for the object
-            var location = from c in element.Elements("Location")
-                           select new
-                           {
-                               x = (string)c.Element("X"),
-                               y = (string)c.Element("Y")
-                           };
-            puElement.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
-            puElement.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
+            //hand the heavy lifting off to the individual process unit
+            pu = pu.FromXml(element, pu);
             return pu;
         }
     }

@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Xml;
 
 using ChemProV.PFD.Streams;
+using System.Xml.Linq;
 
 namespace ChemProV.PFD.ProcessUnits
 {
@@ -495,7 +496,7 @@ namespace ChemProV.PFD.ProcessUnits
         {
         }
 
-        public void WriteXml(XmlWriter writer)
+        public virtual void WriteXml(XmlWriter writer)
         {
             //the process unit's id number
             writer.WriteAttributeString("Id", Id);
@@ -514,6 +515,26 @@ namespace ChemProV.PFD.ProcessUnits
         }
 
         #endregion IXmlSerializable Members
+
+        public virtual IProcessUnit FromXml(XElement xpu, IProcessUnit targetUnit)
+        {
+            UIElement puElement = targetUnit as UIElement;
+
+            //pull the attribute
+            string id = (string)xpu.Attribute("Id");
+            targetUnit.Id = id;
+
+            //set the correct coordinates for the object
+            var location = from c in xpu.Elements("Location")
+                           select new
+                           {
+                               x = (string)c.Element("X"),
+                               y = (string)c.Element("Y")
+                           };
+            puElement.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
+            puElement.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
+            return targetUnit;
+        }
 
         #region non-inherited properties
 

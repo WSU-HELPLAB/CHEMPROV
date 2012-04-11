@@ -116,6 +116,19 @@ namespace ChemProV.PFD.ProcessUnits
             }
         }
 
+        public override void WriteXml(System.Xml.XmlWriter writer)
+        {
+            writer.WriteAttributeString("Name", ProcessUnitLabel);
+            base.WriteXml(writer);
+        }
+
+        public override IProcessUnit FromXml(System.Xml.Linq.XElement xpu, IProcessUnit targetUnit)
+        {
+            (targetUnit as LabeledProcessUnit).ProcessUnitLabel = xpu.Attribute("Name").Value;
+            targetUnit = base.FromXml(xpu, targetUnit);
+            return targetUnit;
+        }
+
         #endregion
 
     }

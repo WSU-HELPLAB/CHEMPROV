@@ -259,9 +259,6 @@ namespace ChemProV.UI
             //tell the drawing drawing_canvas to load its new children
             DrawingCanvas.LoadXmlElements(doc.Descendants("DrawingCanvas").ElementAt(0));
 
-            //load the equations
-            EquationEditor.LoadXmlElements(doc.Descendants("EquationEditor").ElementAt(0));
-
             //some items don't have feedback so there might not be a feedbackwindow element.
             if (doc.Descendants("FeedbackWindow").Count() > 0)
             {
@@ -271,8 +268,16 @@ namespace ChemProV.UI
             //done loading the file so set isLoadingFile to false and call the CheckRulesForPFD to check the rules
             isLoadingFile = false;
 
-            //clear any existing messages in the feedback window and rerun the error checker
+            //AC: The function will update the equation editor's list of scope and type options.  This needs to be up to date
+            //before we can load the equation editor.
             CheckRulesForPFD(this, EventArgs.Empty);
+
+            //Now, update the list of PFD elements
+            EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
+
+            //load the equations
+            EquationEditor.LoadXmlElements(doc.Descendants("EquationEditor").ElementAt(0));
+
         }
 
         public object GetobjectFromId(string id)
@@ -299,7 +304,7 @@ namespace ChemProV.UI
                     while (i < tableAdapter.GetRowCount())
                     {
                         string compound = tableAdapter.GetCompoundAtRow(i);
-                        if (compound != "Select" && compound != "Overall")
+                        if (compound != "Select" && compound != "Overall" && compound.Length > 0)
                         {
                             if (!compounds.Contains(compound))
                             {

@@ -122,8 +122,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                               {
                                   label = (string)c.Element("Label"),
                                   quantity = (string)c.Element("Quantity"),
-                                  units = (string)c.Element("Units"),
-                                  compound = (string)c.Element("Compound"),
+                                  unitId = (string)c.Element("UnitId"),
+                                  compoundId = (string)c.Element("CompoundId"),
                                   enabled = (string)c.Element("Enabled")
                               };
                 for (int i = 0; i < xmlData.Count(); i++)
@@ -131,8 +131,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                     ChemicalStreamData d = new ChemicalStreamData();
                     d.Label = xmlData.ElementAt(i).label;
                     d.Quantity = xmlData.ElementAt(i).quantity;
-                    d.UnitId = Convert.ToInt32(xmlData.ElementAt(i).units);
-                    d.CompoundId = Convert.ToInt32(xmlData.ElementAt(i).compound);
+                    d.UnitId = Convert.ToInt32(xmlData.ElementAt(i).unitId);
+                    d.CompoundId = Convert.ToInt32(xmlData.ElementAt(i).compoundId);
                     d.Enabled = Convert.ToBoolean(xmlData.ElementAt(i).enabled);
                     d.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler((table as ChemicalStreamPropertiesWindow).DataUpdated);
                     (table as ChemicalStreamPropertiesWindow).ItemSource.Add(d);

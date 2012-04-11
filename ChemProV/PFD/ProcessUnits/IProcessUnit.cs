@@ -13,6 +13,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Serialization;
 using ChemProV.PFD.Streams;
+using System.Xml.Linq;
 
 namespace ChemProV.PFD.ProcessUnits
 {
@@ -146,5 +147,12 @@ namespace ChemProV.PFD.ProcessUnits
         {
             get;
         }
+
+        /// <summary>
+        /// All process units must support parsing from XML
+        /// </summary>
+        /// <param name="xpu"></param>
+        /// <returns></returns>
+        IProcessUnit FromXml(XElement xpu, IProcessUnit targetUnit);
     }
 }
