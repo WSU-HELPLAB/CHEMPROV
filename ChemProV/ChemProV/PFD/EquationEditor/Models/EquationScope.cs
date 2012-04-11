@@ -11,7 +11,7 @@ using System.Windows.Shapes;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
-    public class EquationScope : IEquationModifier, IComparable
+    public class EquationScope : IEquationModifier, IComparable, IEquatable<EquationScope>
     {
         public EquationScopeClassification Classification { get; set; }
         public string Name { get; set; }
@@ -75,6 +75,15 @@ namespace ChemProV.PFD.EquationEditor.Models
         public override int GetHashCode()
         {
             return base.GetHashCode();
+        }
+
+        public bool Equals(EquationScope other)
+        {
+            if (this.CompareTo(other) == 0)
+            {
+                return true;
+            }
+            return false;
         }
     }
 }
