@@ -282,14 +282,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             { 
                 PropertiesGrid.PlaceUIElement(CreateQuantityCell(row), 2, row + 1);
 
-                PropertiesGrid.PlaceUIElement(CreateUnitsCell(row), 3, row + 1);
+                PropertiesGrid.PlaceUIElement(CreateUnitsCell(row, data), 3, row + 1);
 
-                PropertiesGrid.PlaceUIElement(CreateCompoundCell(row), 4, row + 1);
+                PropertiesGrid.PlaceUIElement(CreateCompoundCell(row, data), 4, row + 1);
             }
 
             else
             {
-                PropertiesGrid.PlaceUIElement(CreateCompoundCell(row), 2, row + 1);
+                PropertiesGrid.PlaceUIElement(CreateCompoundCell(row, data), 2, row + 1);
             }
         }
 
@@ -307,7 +307,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 tb.BorderBrush = new SolidColorBrush(Colors.Transparent);
                 tb.Style = this.Resources["TextBoxWithNoMouseOverBorder"] as Style;
                 
-                //use data binding to keep the labe in sync with the model
+                //use data binding to keep the label in sync with the model
                 Binding textBinding = new Binding("Label")
                 {
                     Source = ItemSource[row],
@@ -475,12 +475,12 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             UpdateGrid();
         }
 
-        private UIElement CreateUnitsCell(int row)
+        private UIElement CreateUnitsCell(int row, ChemicalStreamData data)
         {
             if (isReadOnly)
             {
                 TextBlock tb = new TextBlock();
-                tb.Text = ItemSource[row].Unit.ToPrettyString();
+                tb.Text = ItemSource[row].SelectedUnit.ToPrettyString();
                 return tb;
             }
             else
@@ -488,24 +488,12 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 ComboBox cb = new ComboBox();
                 cb.Background = new SolidColorBrush(Colors.White);
                 cb.BorderBrush = new SolidColorBrush(Colors.White);
-                ObservableCollection<string> units = new ObservableCollection<string>();
-                foreach (ChemicalUnits unit in Enum.GetValues(typeof(ChemicalUnits)))
-                {
-                    units.Add(unit.ToPrettyString());
-                }
-                if (row == 0)
-                {
-                    //Overall Units cannot be % so if row 0 remove first element which is %
-                    units.RemoveAt(0);
-                }
-
-                cb.ItemsSource = units;
-
-                //AC ToDo: Get units and compounds bound to stream data.
+                cb.ItemsSource = data.Units;
+                
                 //use data binding to keep the units in sync with the model
-                Binding valueBinding = new Binding("Unit")
+                Binding valueBinding = new Binding("SelectedUnit")
                 {
-                    Source = ItemSource[row],
+                    Source = data,
                     Mode = BindingMode.TwoWay
                 };
                 cb.SetBinding(ComboBox.SelectedValueProperty, valueBinding);
@@ -522,7 +510,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         private void HeaderRowUnitsChanged(object sender, PropertyChangedEventArgs e)
         {
             //Check to see if we're using moles.  Subtracting 1 because the header doesn't contain the % option
-            if (ItemSource[0].Unit == ChemicalUnits.Moles - 1 || ItemSource[0].Unit == ChemicalUnits.MolesPerSecond - 1)
+            if (ItemSource[0].SelectedUnit == ChemicalUnits.Moles - 1 || ItemSource[0].SelectedUnit == ChemicalUnits.MolesPerSecond - 1)
             {
                 ConvertModelLabels("^([mM])(\\d+)$", moleTablePrefix);                
             }
@@ -566,7 +554,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        private UIElement CreateCompoundCell(int row)
+        private UIElement CreateCompoundCell(int row, ChemicalStreamData data)
         {
             if (row == 0)
             {
@@ -581,13 +569,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 if (isReadOnly)
                 {
                     TextBlock tb = new TextBlock();
-                    if (ItemSource[row].CompoundId == -1)
+                    if (data.SelectedCompoundId == -1)
                     {
                         tb.Text = "";
                     }
                     else
                     {
-                        tb.Text = ItemSource[row].Compound.ToPrettyString();
+                        tb.Text = data.SelectedCompound.ToPrettyString();
                     }
                     return tb;
                 }
@@ -596,55 +584,21 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                     ComboBox cb = new ComboBox();
                     cb.Background = new SolidColorBrush(Colors.White);
                     cb.BorderBrush = new SolidColorBrush(Colors.White);
-                    foreach (ChemicalCompounds compound in Enum.GetValues(typeof(ChemicalCompounds)))
-                    {
-                        ComboBoxItem cbi = new ComboBoxItem();
-                        cbi.Content = compound.ToPrettyString();
-                        cb.Items.Add(cbi);
-                    }
+                    cb.ItemsSource = data.Compounds;
 
-                    cb.SelectedIndex = ItemSource[row].CompoundId;
-
-                    //this is a bit of hack since when compound is not set we want
-                    //it to say Select but we dont want Select to in the options list
-                    if (cb.SelectedIndex == -1)
+                    //use data binding to keep the units in sync with the model
+                    Binding valueBinding = new Binding("SelectedCompound")
                     {
-                        ComboBoxItem cbi = new ComboBoxItem();
-                        cbi.Content = "Select";
-                        cb.Items.Add(cbi);
-                        cb.SelectedIndex = cb.Items.Count - 1;
-                        if (!isReadOnly)
-                        {
-                            cb.DropDownOpened += new EventHandler(CompoundComboBox_DropDownOpened);
-                        }
-                    }
-                    cb.SelectionChanged += new SelectionChangedEventHandler(CompoundComboBox_SelectionChanged);
+                        Source = data,
+                        Mode = BindingMode.TwoWay
+                    };
+                    cb.SetBinding(ComboBox.SelectedValueProperty, valueBinding);
+
+                    cb.SelectedIndex = data.SelectedCompoundId;
 
                     return cb;
                 }
             }
-        }
-
-        private void CompoundComboBox_DropDownOpened(object sender, EventArgs e)
-        {
-            ComboBox cb = (sender as ComboBox);
-            cb.DropDownOpened -= new EventHandler(CompoundComboBox_DropDownOpened);
-            cb.Items.RemoveAt(cb.Items.Count - 1);
-            cb.SelectedIndex = 0;
-        }
-
-        private void CompoundComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //This fucntion assumes this is true:
-            //---Grid (baseGrid)
-            //----Border which PlaceUIElement puts around it
-            //-----ComboBox
-            Border border = (sender as ComboBox).Parent as Border;
-
-            //minus one to get rid of the header row in the count
-            int row = (int)border.GetValue(Grid.RowProperty) - 1;
-
-            ItemSource[row].CompoundId = (sender as ComboBox).SelectedIndex;
         }
 
         private void CollapsedView()
@@ -909,8 +863,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             ChemicalStreamData d = new ChemicalStreamData();
             d.Label = this.TableName;
             d.Quantity = "?";
-            d.UnitId = 0;
-            d.CompoundId = 25;
+            d.SelectedUnitId = 0;
+            d.SelectedCompoundId = 25;
             d.Temperature = 'T' + this.TableName;
             d.PropertyChanged += new PropertyChangedEventHandler(DataUpdated);
             return d;
@@ -925,8 +879,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             ChemicalStreamData d = new ChemicalStreamData();
             d.Label = this.getNextAvailableRowName();
             d.Quantity = "?";
-            d.UnitId = 0;
-            d.CompoundId = -1;
+            d.SelectedUnitId = 0;
+            d.SelectedCompoundId = -1;
             d.TempUnits = -1;
             d.Temperature = "";
             d.PropertyChanged += new PropertyChangedEventHandler(DataUpdated);

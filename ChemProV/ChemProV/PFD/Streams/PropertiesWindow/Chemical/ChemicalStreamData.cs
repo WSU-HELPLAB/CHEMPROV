@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Xml.Serialization;
 using System.Xml;
 using System.Xml.Linq;
+using System.Collections.ObjectModel;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
@@ -24,13 +25,33 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
     {
         private string label = "";
         private string quantity = "?";
-        private int units = 0;
-        private int compound = 24;
+        private int selectedUnit = 0;
+        private int selectedCompound = 24;
         private string temperature = "?";
         private int tempUnits = 0;
         private string feedback = "";
         private string toolTipMessage = "";
+        private ObservableCollection<ChemicalUnits> units;
+        private ObservableCollection<ChemicalCompounds> compounds;
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        public ChemicalStreamData()
+        {
+            units = new ObservableCollection<ChemicalUnits>();
+            foreach (ChemicalUnits unit in Enum.GetValues(typeof(ChemicalUnits)))
+            {
+                units.Add(unit);
+            }
+
+            compounds = new ObservableCollection<ChemicalCompounds>();
+            foreach (ChemicalCompounds compound in Enum.GetValues(typeof(ChemicalCompounds)))
+            {
+                compounds.Add(compound);
+            }
+
+            SelectedCompoundId = -1;
+            SelectedUnitId = -1;
+        }
 
         public string Label
         {
@@ -58,53 +79,71 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        public ChemicalUnits Unit
+        public ChemicalUnits SelectedUnit
         {
             get
             {
-                return (ChemicalUnits)UnitId;
+                return (ChemicalUnits)SelectedUnitId;
             }
             set
             {
-                UnitId = (int)value;
+                SelectedUnitId = (int)value;
+                CheckIfEnabled("SelectedUnit");
             }
         }
 
-        public int UnitId
+        public ObservableCollection<ChemicalUnits> Units
         {
             get
             {
                 return units;
             }
-            set
-            {
-                units = value;
-                CheckIfEnabled("Units");
-            }
         }
 
-        public ChemicalCompounds Compound
+        public int SelectedUnitId
         {
             get
             {
-                return (ChemicalCompounds)CompoundId;
+                return selectedUnit;
             }
             set
             {
-                CompoundId = (int)value;
+                selectedUnit = value;
+                CheckIfEnabled("UnitId");
             }
         }
 
-        public int CompoundId
+        public ObservableCollection<ChemicalCompounds> Compounds
         {
             get
             {
-                return compound;
+                return compounds;
+            }
+        }
+
+        public ChemicalCompounds SelectedCompound
+        {
+            get
+            {
+                return (ChemicalCompounds)SelectedCompoundId;
             }
             set
             {
-                compound = value;
-                CheckIfEnabled("Compound");
+                SelectedCompoundId = (int)value;
+                CheckIfEnabled("SelectedCompound");
+            }
+        }
+
+        public int SelectedCompoundId
+        {
+            get
+            {
+                return selectedCompound;
+            }
+            set
+            {
+                selectedCompound = value;
+                CheckIfEnabled("CompoundId");
             }
         }
 
@@ -162,7 +201,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
         private void CheckIfEnabled(string propertyName = "")
         {
-            if (CompoundId != 24)
+            if (SelectedCompoundId != 24)
             {
                 Enabled = true;
                 PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
@@ -228,11 +267,11 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             writer.WriteEndElement();
 
             writer.WriteStartElement("UnitId");
-            writer.WriteString(UnitId.ToString());
+            writer.WriteString(SelectedUnitId.ToString());
             writer.WriteEndElement();
 
             writer.WriteStartElement("CompoundId");
-            writer.WriteString(CompoundId.ToString());
+            writer.WriteString(SelectedCompoundId.ToString());
             writer.WriteEndElement();
 
             writer.WriteStartElement("Temperature");
@@ -253,9 +292,9 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         }
 
         /// <summary>
-        /// Creates a new StickyNote based on the supplied XML element
+        /// Creates a new ChemicalStreamData based on the supplied XML element
         /// </summary>
-        /// <param name="xmlNote">The xml for a StickyNote</param>
+        /// <param name="xmlNote">The xml for a ChemicalStreamData</param>
         /// <returns></returns>
         public static ChemicalStreamData FromXml(XElement xmlNote)
         {

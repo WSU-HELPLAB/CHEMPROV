@@ -45,7 +45,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         {
             if (table.ItemSource[row].Enabled)
             {
-                int unitIndex = table.ItemSource[row].UnitId;
+                int unitIndex = table.ItemSource[row].SelectedUnitId;
                 if (row == 0)
                 {
                     //the first row does not have % so the index is off by one so must account for this
@@ -103,7 +103,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         {
             if (table.ItemSource[row].Enabled)
             {
-                return new CompoundFormatter().ConvertFromIntToString(table.ItemSource[row].CompoundId);
+                return new CompoundFormatter().ConvertFromIntToString(table.ItemSource[row].SelectedCompoundId);
             }
             else
             {
