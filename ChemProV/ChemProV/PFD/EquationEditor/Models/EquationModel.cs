@@ -26,7 +26,9 @@ namespace ChemProV.PFD.EquationEditor.Models
         #endregion
 
         #region private members
-        private static int _id = 0;
+        private static int _staticId = 0;
+
+        private int _id;
         private EquationScope _scope = new EquationScope();
         private EquationType _type = new EquationType();
         private string _equation = "";
@@ -36,7 +38,22 @@ namespace ChemProV.PFD.EquationEditor.Models
         #endregion
 
         #region properties
-        public int Id { get; private set; }
+        public int Id 
+        {
+            get
+            {
+                return _id;
+            }
+            set
+            {
+                _id = value;
+                if (_id > _staticId)
+                {
+                    _staticId = _id + 1;
+                }
+                OnPropertyChanged("Id");
+            }
+        }
 
         public string Annotation
         {
@@ -152,8 +169,8 @@ namespace ChemProV.PFD.EquationEditor.Models
         #region public methods
         public EquationModel()
         {
-            _id++;
-            Id = _id;
+            _staticId++;
+            Id = _staticId;
             RelatedElements = new List<IPfdElement>();
         }
 
@@ -170,6 +187,8 @@ namespace ChemProV.PFD.EquationEditor.Models
 
         public void WriteXml(System.Xml.XmlWriter writer)
         {
+            writer.WriteAttributeString("Id", Id.ToString());
+
             writer.WriteStartElement("Scope");
             writer.WriteAttributeString("Name", Scope.Name);
             writer.WriteAttributeString("ClassificationId", Scope.ClassificationId.ToString());
@@ -194,6 +213,12 @@ namespace ChemProV.PFD.EquationEditor.Models
             EquationModel model = new EquationModel();
 
             //easy stuff first
+            int id = 0;
+            Int32.TryParse(xmlModel.Attribute("Id").Value, out id);
+            if (id != 0)
+            {
+                model.Id = id;
+            }
             model.Equation = xmlModel.Element("Equation").Value;
             model.Annotation = xmlModel.Element("Annotation").Value;
 
