@@ -25,7 +25,7 @@ namespace ChemProV.UnitTests.PFD
             Assert.AreEqual(window.TableName, "M1");
 
             //switch to moles, make sure that things got changed over
-            window.ItemSource[0].Unit = ChemicalUnits.Moles - 1;
+            window.ItemSource[0].SelectedUnit = ChemicalUnits.Moles - 1;
             Assert.AreEqual(window.TableName, "N1");
         }
     }

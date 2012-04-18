@@ -92,7 +92,7 @@ namespace ChemProV.UnitTests.Grammars
             stream1Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m11",
-                                                CompoundId = 1
+                                                SelectedCompoundId = 1
                                             }
                                         );
 
@@ -108,14 +108,14 @@ namespace ChemProV.UnitTests.Grammars
             stream2Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m21",
-                                                CompoundId = 0,
+                                                SelectedCompoundId = 0,
                                                 Quantity = "33"
                                             }
                                         );
             stream2Window.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m22",
-                                                CompoundId = 2,
+                                                SelectedCompoundId = 2,
                                                 Quantity = "67"
                                             }
                                         );
@@ -133,19 +133,19 @@ namespace ChemProV.UnitTests.Grammars
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m31",
-                                                CompoundId = 0
+                                                SelectedCompoundId = 0
                                             }
                                         );
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m32",
-                                                CompoundId = 1
+                                                SelectedCompoundId = 1
                                             }
                                         );
             outgoingWindow.ItemSource.Add(new ChemicalStreamData()
                                             {
                                                 Label = "m33",
-                                                CompoundId = 2
+                                                SelectedCompoundId = 2
                                             }
                                         );
 

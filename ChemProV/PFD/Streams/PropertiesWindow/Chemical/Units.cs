@@ -8,12 +8,14 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
+    [TypeConverter(typeof(ChemicalUnitsFormatter))]
     public enum ChemicalUnits
     {
-        Percent = 1,
+        Percent = 0,
         Grams,
         GramsPerSecond,
         Kilogram,
@@ -22,8 +24,56 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         MolesPerSecond
     }
 
+    /// <summary>
+    /// Used to automatically format ChemicalUnits into "pretty" strings 
+    /// </summary>
+    public class ChemicalUnitsFormatter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return sourceType.Equals(typeof(ChemicalUnits));
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            return destinationType.Equals(typeof(string));
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType.Equals(typeof(string)) == false)
+            {
+                throw new ArgumentException("Can only convert to string.", "destinationType");
+            }
+            if (value.GetType().Equals(typeof(ChemicalUnits)) == false)
+            {
+                throw new ArgumentException("Can only convert from ChemicalUnits.", "value");
+            }
+            string name = "";
+            try
+            {
+                ChemicalUnits unit = (ChemicalUnits)value;
+                name = unit.ToPrettyString();
+            }
+            catch(Exception ex)
+            {
+                name = value.ToString();
+            }
+            return name;
+        }
+    }
+
+    /// <summary>
+    /// Adds a "ToPrettyString" to all ChemicalUnits enumeration variables
+    /// </summary>
     public static class ChemicalUnitsExtensions
     {
+
         /// <summary>
         /// </summary>
         /// <param name="item"></param>

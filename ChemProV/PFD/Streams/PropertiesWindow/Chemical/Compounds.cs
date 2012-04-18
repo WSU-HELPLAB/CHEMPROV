@@ -9,12 +9,14 @@ using System.Linq;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.ComponentModel;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
+    [TypeConverter(typeof(ChemicalCompoundsFormatter))]
     public enum ChemicalCompounds : byte
     { 
-        AceticAcid = 1,
+        AceticAcid = 0,
         Ammonia,
         Benzene,
         CarbonDioxide,
@@ -38,6 +40,50 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         SulfuricAcid,
         Toluene,
         Water
+    }
+
+    /// <summary>
+    /// Used to automatically format ChemicalCompounds into "pretty" strings 
+    /// </summary>
+    public class ChemicalCompoundsFormatter : TypeConverter
+    {
+        public override bool CanConvertFrom(ITypeDescriptorContext context, Type sourceType)
+        {
+            return sourceType.Equals(typeof(ChemicalUnits));
+        }
+
+        public override bool CanConvertTo(ITypeDescriptorContext context, Type destinationType)
+        {
+            return destinationType.Equals(typeof(string));
+        }
+
+        public override object ConvertFrom(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value)
+        {
+            return base.ConvertFrom(context, culture, value);
+        }
+
+        public override object ConvertTo(ITypeDescriptorContext context, System.Globalization.CultureInfo culture, object value, Type destinationType)
+        {
+            if (destinationType.Equals(typeof(string)) == false)
+            {
+                throw new ArgumentException("Can only convert to string.", "destinationType");
+            }
+            if (value.GetType().Equals(typeof(ChemicalCompounds)) == false)
+            {
+                throw new ArgumentException("Can only convert from ChemicalCompounds.", "value");
+            }
+            string name = "";
+            try
+            {
+                ChemicalCompounds unit = (ChemicalCompounds)value;
+                name = unit.ToPrettyString();
+            }
+            catch (Exception ex)
+            {
+                name = value.ToString();
+            }
+            return name;
+        }
     }
 
     public static class ChemicalCompoundsExtensions
