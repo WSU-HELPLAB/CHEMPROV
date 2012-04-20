@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -241,6 +241,39 @@ namespace ChemProV.PFD.Streams
                 //{
                 //}
             }
+        }
+
+        /// <summary>
+        /// E.O.
+        /// Returns a boolean value indicating whether or not the stream should be available 
+        /// with the specified difficulty setting.
+        /// </summary>
+        /// <returns>True if available with the difficulty setting, false otherwise.</returns>
+        public abstract bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty);
+
+        /// <summary>
+        /// E.O.
+        /// Every stream has a source and destination process unit. This method determines whether or 
+        /// not the specified unit is a valid source. This may depend on multiple things, such 
+        /// as the type of the stream and whether or not the process unit can accept more outgoing 
+        /// streams.
+        /// </summary>
+        /// <returns>True if the unit is a valid source, false otherwise.</returns>
+        public abstract bool IsValidSource(IProcessUnit unit);
+
+        /// <summary>
+        /// E.O.
+        /// Every stream has a source and destination process unit. This method determines whether or 
+        /// not the specified unit is a valid destination. This may depend on multiple things, such 
+        /// as the type of the stream and whether or not the process unit can accept more incoming 
+        /// streams.
+        /// </summary>
+        /// <returns>True if the unit is a valid destination, false otherwise.</returns>
+        public abstract bool IsValidDestination(IProcessUnit unit);
+
+        public abstract string Title
+        {
+            get;
         }
 
         #endregion IStream Members
@@ -794,5 +827,20 @@ namespace ChemProV.PFD.Streams
                 table.RemoveFeedback();
             }
         }
+
+        /// <summary>
+        /// E.O.
+        /// This abstract method is to ensure that everything that inherits from this class is 
+        /// capable of creating a new instance of its own type on the drawing canvas and 
+        /// providing an appropriate undo for this action.
+        /// </summary>
+        /// <param name="canvas">Canvas to create the new stream on</param>
+        /// <param name="optionalSource">This parameter is optional, meaning that it could be null. 
+        /// If non-null, this should be the source for the new stream that is created.</param>
+        /// <param name="optionalDestination">This parameter is optional, meaning that it could be null. 
+        /// If non-null, this should be the destination for the new stream that is created.</param>
+        /// <returns>A collection of undo items that will undo the creation action</returns>
+        //public abstract UndoRedoCollection CreateNewOnCanvas(UI.DrawingCanvas.DrawingCanvas canvas,
+        //    IProcessUnit optionalSource, IProcessUnit optionalDestination);
     }
 }
