@@ -7,6 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
@@ -19,7 +20,18 @@ namespace ChemProV.PFD.ProcessUnits
         private string processUnitLabel = "foo";
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
 
-        public LabeledProcessUnit() : base()
+        /// <summary>
+        /// Default constructor - used only for design view
+        /// Keep the protection on this private!
+        /// </summary>
+        private LabeledProcessUnit()
+            : base("/UI/Icons/pu_generic.png")
+        {
+
+        }
+        
+        public LabeledProcessUnit(string iconSource)
+            : base(iconSource)
         {
             InitializeComponent();
             this.DataContext = this;
@@ -27,6 +39,12 @@ namespace ChemProV.PFD.ProcessUnits
             ProcessUnitNameBox.MouseLeftButtonDown += new MouseButtonEventHandler(ProcessUnitNameBox_MouseLeftButtonDown);
             ProcessUnitNameBox.LostFocus += new RoutedEventHandler(ProcessUnitNameBox_LostFocus);
             ProcessUnitNameBox.KeyDown += new KeyEventHandler(ProcessUnitNameBox_KeyDown);
+
+            // E.O.
+            // Create the icon image
+            BitmapImage bmp = new BitmapImage();
+            bmp.UriSource = new Uri(iconSource, UriKind.Relative);
+            ProcessUnitImage.SetValue(Image.SourceProperty, bmp);
         }
 
         /// <summary>
@@ -87,17 +105,13 @@ namespace ChemProV.PFD.ProcessUnits
         #region GenericProcessUnitOverrides
 
         /// <summary>
-        /// Gets/Sets the icon dependency property
+        /// Gets the icon dependency property
         /// </summary>
         public override Image Icon
         {
             get
             {
                 return ProcessUnitImage;
-            }
-            set
-            {
-                ProcessUnitImage.Source = value.Source;
             }
         }
 

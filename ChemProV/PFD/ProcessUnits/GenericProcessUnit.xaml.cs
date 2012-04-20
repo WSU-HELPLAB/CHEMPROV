@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -15,6 +15,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Xml;
 
 using ChemProV.PFD.Streams;
@@ -41,29 +42,24 @@ namespace ChemProV.PFD.ProcessUnits
         #region Instance Variables
 
         /// <summary>
-        /// A short description of the process unit.  Not more than a few words in length.
-        /// </summary>
-        private string description;
-
-        /// <summary>
         /// Total number of incoming streams allowed.  A value of zero is taken to mean unlimited.
         /// </summary>
-        private int maxIncomingStreams;
+        private int maxIncomingStreams = 1;
 
         /// <summary>
         /// Total number of outgoing streams allowed.  A value of zero is taken to mean unlimited.
         /// </summary>
-        private int maxOutgoingStreams;
+        private int maxOutgoingStreams = 1;
 
         /// <summary>
         /// Total number of incoming streams allowed.  A value of zero is taken to mean unlimited.
         /// </summary>
-        private int maxIncomingHeatStreams;
+        private int maxIncomingHeatStreams = 1;
 
         /// <summary>
         /// Total number of outgoing streams allowed.  A value of zero is taken to mean unlimited.
         /// </summary>
-        private int maxOutgoingHeatStreams;
+        private int maxOutgoingHeatStreams = 1;
 
         /// <summary>
         /// Collection of incoming streams
@@ -79,6 +75,12 @@ namespace ChemProV.PFD.ProcessUnits
         /// Private instance var used to keep track of whether or not we've been selected
         /// </summary>
         private bool isSelected = false;
+
+        /// <summary>
+        /// E.O.
+        /// Specifies the source for the icon for this process unit
+        /// </summary>
+        private string m_iconSource;
 
         private Brush SelectedBorderBrush = new SolidColorBrush(Colors.Yellow);
         private Brush GreenBorderBrush = new SolidColorBrush(Colors.Green);
@@ -101,6 +103,12 @@ namespace ChemProV.PFD.ProcessUnits
         /// Default constructor
         /// </summary>
         public GenericProcessUnit()
+            : this("/UI/Icons/pu_generic.png")
+        {
+
+        }
+
+        public GenericProcessUnit(string iconSource)
         {
             InitializeComponent();
 
@@ -110,6 +118,14 @@ namespace ChemProV.PFD.ProcessUnits
 
             processUnitIdCounter++;
             Id = "GPU_" + processUnitIdCounter;
+
+            // E.O.
+            // Store the source
+            m_iconSource = iconSource;
+            // Create the icon image
+            BitmapImage bmp = new BitmapImage();
+            bmp.UriSource = new Uri(m_iconSource, UriKind.Relative);
+            ProcessUnitImage.SetValue(Image.SourceProperty, bmp);
         }
 
         #region IProcessUnit Members
@@ -120,20 +136,23 @@ namespace ChemProV.PFD.ProcessUnits
             {
                 return new Point((double)this.GetValue(Canvas.LeftProperty) + this.ActualWidth / 2, (double)this.GetValue(Canvas.TopProperty) + this.ActualHeight / 2);
             }
+
+            // E.O.
+            set
+            {
+                this.SetValue(Canvas.LeftProperty, value.X - this.ActualWidth / 2.0);
+                this.SetValue(Canvas.TopProperty, value.Y - this.ActualHeight / 2.0);
+            }
         }
 
         /// <summary>
-        /// Gets/Sets the icon dependency property
+        /// Gets the icon dependency property
         /// </summary>
         public virtual Image Icon
         {
             get
             {
                 return ProcessUnitImage;
-            }
-            set
-            {
-                ProcessUnitImage.Source = value.Source;
             }
         }
 
@@ -149,6 +168,14 @@ namespace ChemProV.PFD.ProcessUnits
             set
             {
                 ProcessUnitBorder = value;
+            }
+        }
+
+        public string IconSource
+        {
+            get
+            {
+                return m_iconSource;
             }
         }
 
@@ -179,6 +206,59 @@ namespace ChemProV.PFD.ProcessUnits
         }
 
         /// <summary>
+        /// E.O.
+        /// Returns a boolean value indicating whether or not the processing unit should be available 
+        /// with the specified difficulty setting.
+        /// TODO: Make this method abstract. It's already implemented in each inherting class at the 
+        /// time of this writing, except for LabeledProcessUnit and TemporaryProcessUnit.
+        /// A lot would have to change to make this class abstract so this is a low priority 
+        /// item at the moment.
+        /// </summary>
+        public virtual bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
+        {
+            // E.O.
+            // Comparing string descriptions to determine unit type...
+            // I hate to do things this way, but it'll at least be an improvement over what 
+            // existed before. Eventually there should be refactoring that makes a central 
+            // location for the logic of what's available under what difficulty level. There 
+            // are a variety of ways to do this, but this enough of a step in that direction 
+            // for now.
+
+            // Everything is available under the highest difficulty
+            if (OptionDifficultySetting.MaterialAndEnergyBalance == difficulty)
+            {
+                return true;
+            }
+
+            // Under "medium" difficulty, the following are not available:
+            //  - Heat exchanger with utility
+            //  - Heat exchanger without utility
+            if (OptionDifficultySetting.MaterialBalanceWithReactors == difficulty)
+            {
+                if (Description.Equals(ProcessUnitDescriptions.HeatExchanger) ||
+                    Description.Equals(ProcessUnitDescriptions.HeatExchangerNoUtility))
+                {
+                    return false;
+                }
+                return true;
+            }
+
+            // Coming here implies that the difficulty is the simplest. Under this difficulty, 
+            // the following are not available:
+            //  - Heat exchanger with utility
+            //  - Heat exchanger without utility
+            //  - Reactor
+            if (Description.Equals(ProcessUnitDescriptions.HeatExchanger) ||
+                Description.Equals(ProcessUnitDescriptions.HeatExchangerNoUtility) ||
+                Description.Equals(ProcessUnitDescriptions.Reactor))
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
         /// Shorthand for getting the IProcessUnit's integer component of its id
         /// </summary>
         public int ProcessUnitId
@@ -193,16 +273,15 @@ namespace ChemProV.PFD.ProcessUnits
 
         /// <summary>
         /// A short description of the process unit.  Not more than a few words in length.
+        /// E.O.
+        /// This class should eventually be abstract and so should this property. But that's 
+        /// pretty low priority at this point.
         /// </summary>
-        public string Description
+        public virtual string Description
         {
             get
             {
-                return description;
-            }
-            set
-            {
-                description = value;
+                return "Generic Process Unit";
             }
         }
 
@@ -210,63 +289,47 @@ namespace ChemProV.PFD.ProcessUnits
         /// Total number of incoming streams allowed.
         /// A value of -1 means unlimited.
         /// </summary>
-        public int MaxIncomingStreams
+        public virtual int MaxIncomingStreams
         {
             get
             {
                 return maxIncomingStreams;
-            }
-            set
-            {
-                maxIncomingStreams = value;
-            }
+            }            
         }
 
         /// <summary>
         /// Total number of outgoing streams allowed.
         /// A value of -1 means unlimited.
         /// </summary>
-        public int MaxOutgoingStreams
+        public virtual int MaxOutgoingStreams
         {
             get
             {
                 return maxOutgoingStreams;
             }
-            set
-            {
-                maxOutgoingStreams = value;
-            }
         }
 
         /// <summary>
-        /// Total number of incoming streams allowed.
+        /// Total number of incoming heat streams allowed.
         /// A value of -1 means unlimited.
         /// </summary>
-        public int MaxIncomingHeatStreams
+        public virtual int MaxIncomingHeatStreams
         {
             get
             {
                 return maxIncomingHeatStreams;
             }
-            set
-            {
-                maxIncomingHeatStreams = value;
-            }
         }
 
         /// <summary>
-        /// Total number of outgoing streams allowed.
+        /// Total number of outgoing heat streams allowed.
         /// A value of -1 means unlimited.
         /// </summary>
-        public int MaxOutgoingHeatStreams
+        public virtual int MaxOutgoingHeatStreams
         {
             get
             {
                 return maxOutgoingHeatStreams;
-            }
-            set
-            {
-                maxOutgoingHeatStreams = value;
             }
         }
 
