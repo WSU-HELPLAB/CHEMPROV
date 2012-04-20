@@ -1,0 +1,55 @@
+﻿<UserControl x:Class="ChemProV.UI.ControlPalette"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="320" d:DesignWidth="160" Loaded="UserControl_Loaded">
+
+    <StackPanel x:Name="LayoutRoot" Background="White">
+
+        <!-- Start of button to activate select mode for the mouse -->
+        <Border CornerRadius="3" BorderThickness="2" Background="Yellow" BorderBrush="Gray"
+            Margin="2,2,2,2" Padding="2,2,2,2" MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown" 
+            Name="SelectButton">
+            <StackPanel Orientation="Horizontal">
+                <Image Source="/UI/Icons/palette_select.png"></Image>
+                <TextBlock VerticalAlignment="Center" Margin="6,0,0,0">Select</TextBlock>
+            </StackPanel>
+        </Border>
+        <!-- End of select mode button -->
+
+        <Border CornerRadius="3" BorderThickness="1" Background="White" BorderBrush="Gray"
+            Margin="2,2,2,2" Padding="2,2,2,2" Name="StickyNoteButton"
+            MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown">
+
+            <StackPanel Orientation="Horizontal" Width="Auto">
+                <Image Source="/UI/Icons/palette_stickyNote.png"></Image>
+                <TextBlock VerticalAlignment="Center" Margin="6,0,0,0">Sticky Note</TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- Spacer before process units -->
+        <Border BorderThickness="2" Height="2" BorderBrush="Gray" Margin="4,4,4,4"></Border>
+
+        <!-- This panel will have buttons for available process units -->
+        <!-- It will be populated and adjusted based on difficulty at runtime -->
+        <StackPanel Name="ProcessUnitsPanel">
+            <TextBlock Name="ReplaceMeWithProcessUnits" TextWrapping="Wrap">
+                Auto-populates at runtime:
+                Process Units
+            </TextBlock>
+        </StackPanel>
+
+        <!-- Spacer before process streams -->
+        <Border BorderThickness="2" Height="2" BorderBrush="Gray" Margin="4,4,4,4"></Border>
+
+        <!-- This panel will have buttons for available streams -->
+        <!-- It will be populated and adjusted based on difficulty at runtime -->
+        <StackPanel Name="StreamsPanel">
+            <TextBlock Name="ReplaceMeWithStreams" TextWrapping="Wrap">Auto-populates at runtime:
+            Streams</TextBlock>
+        </StackPanel>
+
+    </StackPanel>
+</UserControl>

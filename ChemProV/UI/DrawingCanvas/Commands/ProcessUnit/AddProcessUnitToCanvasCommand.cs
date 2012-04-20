@@ -120,6 +120,12 @@ namespace ChemProV.UI.DrawingCanvas.Commands.ProcessUnit
 
             //add the PU to the drawing drawing_canvas
             canvas.Children.Add(puAsUiElement);
+
+            // E.O.
+            // Create an undo action that will remove it
+            ((DrawingCanvas)canvas).AddUndo(new PFD.UndoRedoCollection(
+                new PFD.Undos.RemoveFromCanvas(puAsUiElement, canvas as DrawingCanvas)));
+
             return true;
         }
     }

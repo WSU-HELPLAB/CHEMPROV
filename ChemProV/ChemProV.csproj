@@ -108,10 +108,11 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Toolkit\Nov09\Bin\System.Windows.Controls.Data.DataForm.Toolkit.dll</HintPath>
     </Reference>
     <Reference Include="System.Windows.Controls.Data.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Controls.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="System.Windows.Controls.Toolkit, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35" />
-    <Reference Include="System.Windows.Controls.Toolkit.Internals, Version=4.0.5.0, Culture=neutral, PublicKeyToken=2c5c654d367bf4a7" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit.Internals, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Data, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Windows.Interactivity, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
@@ -127,6 +128,7 @@
     <Compile Include="ChemProVHolder.xaml.cs">
       <DependentUpon>ChemProVHolder.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\App.cs" />
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
@@ -178,11 +180,16 @@
     <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
       <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PFD\ProcessUnits\HeatExchanger.cs" />
+    <Compile Include="PFD\ProcessUnits\HeatExchangerNoUtility.cs" />
     <Compile Include="PFD\ProcessUnits\IProcessUnit.cs" />
     <Compile Include="PFD\ProcessUnits\LabeledProcessUnit.xaml.cs">
       <DependentUpon>LabeledProcessUnit.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PFD\ProcessUnits\Mixer.cs" />
     <Compile Include="PFD\ProcessUnits\ProcessUnitDescriptions.cs" />
+    <Compile Include="PFD\ProcessUnits\Reactor.cs" />
+    <Compile Include="PFD\ProcessUnits\Separator.cs" />
     <Compile Include="PFD\ProcessUnits\TemporaryProcessUnit.cs" />
     <Compile Include="PFD\StickyNote\StickyNote.xaml.cs">
       <DependentUpon>StickyNote.xaml</DependentUpon>
@@ -227,6 +234,11 @@
     <Compile Include="PFD\Streams\StreamEnd.cs" />
     <Compile Include="PFD\Streams\StreamFactory.cs" />
     <Compile Include="PFD\Streams\StreamSourceIcon.cs" />
+    <Compile Include="PFD\Undos\AddToCanvas.cs" />
+    <Compile Include="PFD\Undos\RemoveFromCanvas.cs" />
+    <Compile Include="PFD\Undos\ResizeUserControl.cs" />
+    <Compile Include="PFD\Undos\RestorePosition.cs" />
+    <Compile Include="PFD\Undos\UndoDefs.cs" />
     <Compile Include="RequestOpenFileArgs.cs" />
     <Compile Include="UI\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
@@ -238,6 +250,9 @@
     </Compile>
     <Compile Include="UI\CompoundTableData.cs" />
     <Compile Include="UI\ConstantsTableData.cs" />
+    <Compile Include="UI\ControlPalette.xaml.cs">
+      <DependentUpon>ControlPalette.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\DrawingCanvas\Commands\RightClickMenu\AddContextMenuToCanvasCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\DeleteIPfdElementCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\AddProcessUnitToCanvasCommand.cs" />
@@ -269,6 +284,7 @@
     <Compile Include="UI\DrawingCanvas\States\MenuState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
     <Compile Include="UI\DrawingCanvas\States\NullState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\PlacingNewObject.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingState.cs" />
     <Compile Include="UI\DrawingCanvas\States\ResizeingState.cs" />
     <Compile Include="UI\DrawingCanvas\States\SelectedState.cs" />
@@ -404,6 +420,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\CompoundTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ControlPalette.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -587,6 +607,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

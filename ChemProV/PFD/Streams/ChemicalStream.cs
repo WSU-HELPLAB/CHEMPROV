@@ -21,6 +21,39 @@ namespace ChemProV.PFD.Streams
         {
         }
 
+        public override bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
+        {
+            // Chemical streams are available with all difficulties
+            return true;
+        }
+
+        public override bool IsValidSource(ProcessUnits.IProcessUnit unit)
+        {
+            // E.O.
+            // Chemical streams can accept any type of process unit as a source, provided 
+            // that the unit is accepting outgoing streams.
+            // TODO: Double check this with the chemistry guys
+            return unit.IsAcceptingOutgoingStreams(this);
+        }
+
+        public override bool IsValidDestination(ProcessUnits.IProcessUnit unit)
+        {
+            // E.O.
+            // As far as I can tell, the chemical streams can accept any type of process 
+            // unit as a destination. So the only required check is that the unit is 
+            // accepting incoming streams.
+            // TODO: Double check this with the chemistry guys
+            return unit.IsAcceptingIncomingStreams(this);
+        }
+
+        public override string Title
+        {
+            get
+            {
+                return "Chemical Stream";
+            }
+        }
+
         public override void UpdateStreamLocation()
         {
             base.UpdateStreamLocation();

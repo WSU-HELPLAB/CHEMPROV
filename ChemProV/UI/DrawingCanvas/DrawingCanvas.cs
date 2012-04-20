@@ -316,6 +316,53 @@ namespace ChemProV.UI.DrawingCanvas
         public LinkedList<SavedStateObject> redoStack = new LinkedList<SavedStateObject>();
 
         /// <summary>
+        /// E.O.
+        /// This is the undo stack. When the "Undo()" function is called, the top collection will be 
+        /// popped of this stack and executed. The return value from the execution function will be 
+        /// pushed onto the redo stack.
+        /// </summary>
+        private Stack<UndoRedoCollection> m_undos = new Stack<UndoRedoCollection>();
+
+        /// <summary>
+        /// E.O.
+        /// This is the redo stack. When the "Redo()" function is called, the top collection will be 
+        /// popped of this stack and executed. The return value from the execution function will be 
+        /// pushed onto the undo stack.
+        /// </summary>
+        private Stack<UndoRedoCollection> m_redos = new Stack<UndoRedoCollection>();
+
+        /// <summary>
+        /// E.O.
+        /// Adds an undo action to the undo stack. You'll notice there is no AddRedo function. This is 
+        /// intentional because upon execution of an undo (via a call to "Undo()") the redo action is 
+        /// automatically created and pushed onto the redo stack.
+        /// </summary>
+        /// <param name="collection">Collection of undo actions to push.</param>
+        /// <returns>True if the collection was successfully added to the stack, false otherwise.</returns>
+        public bool AddUndo(UndoRedoCollection collection)
+        {
+            // E.O.
+            m_undos.Push(collection);
+
+            // Adding a new undo clears the redo stack
+            m_redos.Clear();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the number of undos currently on the undo stack
+        /// </summary>
+        public int UndoCount
+        {
+            get
+            {
+                return m_undos.Count;
+            }
+        }
+
+
+        /// <summary>
         ///
         /// </summary>
         /// <param name="command"></param>
@@ -329,6 +376,66 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 undoStack.RemoveLast();
             }
+
+            //// E.O.
+            //// BUG: This code path is never called. Need to discuss whether or not we should even have an 
+            ////      undo for sticky note resizing (which I think is the only thing that can be resized)
+            //if (CanvasCommands.Resize == command)
+            //{
+            //    AddUndo(new UndoRedoCollection("Undo resizing element",
+            //        new PFD.Undos.ResizeUserControl(selectedObject as UserControl)));
+            //    return;
+            //}
+
+            //// E.O.
+            //string unitName;
+            //if (selectedObject is IStream)
+            //{
+            //    unitName = "stream";
+            //}
+            //else if (selectedObject is IProcessUnit)
+            //{
+            //    unitName = "process unit";
+            //}
+            //else
+            //{
+            //    unitName = "sticky note";
+            //}
+            //switch (command)
+            //{
+            //    case CanvasCommands.MoveHead:
+            //    case CanvasCommands.MoveTail:
+            //        // Add an undo to restore position
+            //        AddUndo(new UndoRedoCollection("Undo moving " + unitName,
+            //            new PFD.Undos.RestorePosition((UserControl)selectedObject)));
+            //        break;
+
+            //    case CanvasCommands.AddToCanvas:
+            //        // Add an undo to remove the item
+            //        if (selectedObject is AbstractStream)
+            //        {
+            //            // Streams are a special case because they have multiple UI elements
+            //            AbstractStream stream = selectedObject as AbstractStream;
+            //            AddUndo(new UndoRedoCollection("Undo addition of stream",
+            //                new PFD.Undos.RemoveFromCanvas((UIElement)selectedObject, this),
+            //                new PFD.Undos.RemoveFromCanvas((UIElement)stream.Source, this),
+            //                new PFD.Undos.RemoveFromCanvas((UIElement)stream.Destination, this),
+            //                new PFD.Undos.RemoveFromCanvas(stream.Table as UIElement, this)));
+            //        }
+            //        else
+            //        {
+            //            AddUndo(new UndoRedoCollection("Undo addition of " + unitName,
+            //                new PFD.Undos.RemoveFromCanvas((UIElement)selectedObject, this)));
+            //        }
+            //        break;
+
+            //    case CanvasCommands.RemoveFromCanvas:
+            //        // Add an undo to add the item back
+            //        AddUndo(new UndoRedoCollection("Undo deletion of " + unitName,
+            //            new PFD.Undos.AddToCanvas((UIElement)selectedObject, this)));
+            //        break;
+            //}
+
             if (selectedObject is IStream)
             {
                 undoStack.AddFirst(new StreamUndo(command, selectedObject as IStream, canvas, (selectedObject as IStream).Source as IProcessUnit, (selectedObject as IStream).Destination as IProcessUnit, lastLocation));
@@ -360,12 +467,34 @@ namespace ChemProV.UI.DrawingCanvas
         {
             //redo doesn't use the parameters
             (menuState as MenuState).Redo(this, new EventArgs());
+
+            //// E.O.
+            //if (m_redos.Count > 0)
+            //{
+            //    // Logic:
+            //    // 1. Pop redo collection on top of stack
+            //    // 2. Execute it
+            //    // 3. Take its return value and push it onto the undo stack
+            //    // (done in 1 line below)
+            //    m_undos.Push(m_redos.Pop().Execute(new UndoRedoExecutionParameters()));
+            //}
         }
 
         public void Undo()
         {
             //undo doesn't use the parameters
             (menuState as MenuState).Undo(this, new EventArgs());
+
+            //// E.O.
+            //if (m_undos.Count > 0)
+            //{
+            //    // Logic:
+            //    // 1. Pop undo collection on top of stack
+            //    // 2. Execute it
+            //    // 3. Take its return value and push it onto the redo stack
+            //    // (done in 1 line below)
+            //    m_redos.Push(m_undos.Pop().Execute(new UndoRedoExecutionParameters()));
+            //}
         }
 
         #endregion Undo/Redo
@@ -424,6 +553,35 @@ namespace ChemProV.UI.DrawingCanvas
         public void placedNewTool()
         {
             this.ToolPlaced(this, new EventArgs());
+        }
+
+        /// <summary>
+        /// E.O.
+        /// I'm a little surprised this functionality doesn't already exist in the Silverlight 
+        /// Canvas control, but whatever.
+        /// This method gets the first child control that contains the specified point. If no 
+        /// children contain the point then null is returned.
+        /// </summary>
+        /// <param name="location">Location, relative to this canvas</param>
+        /// <returns>First child containing the point, or null if there are no such children</returns>
+        public UIElement GetChildAt(Point location)
+        {
+            foreach (UIElement uie in Children)
+            {
+                double w = (double)uie.GetValue(Canvas.ActualWidthProperty);
+                double h = (double)uie.GetValue(Canvas.ActualHeightProperty);
+                double x = (double)uie.GetValue(Canvas.LeftProperty);
+                double y = (double)uie.GetValue(Canvas.TopProperty);
+
+                if (location.X >= x && location.X < x + w &&
+                    location.Y >= y && location.Y < y + h)
+                {
+                    return uie;
+                }
+            }
+
+            // Coming here means we didn't find anything
+            return null;
         }
 
         #region DrawingCanvasMouseEvents
@@ -593,67 +751,96 @@ namespace ChemProV.UI.DrawingCanvas
 
         public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)
         {
-            //first we pull all the IPfdElement from the drawing canvas then we check to see if we can do the conversion
-            //if not throw an exception if we can then we need to check to see if we need to change our IPropertiesWindow
-            //and if we do then change them
+            // E.O.
+            // I've commented out what was here previously and placed it below my new implementation. The first two 
+            // checks seemed straightforward enough, but the last check that is checking to see if the old and new 
+            // values are the same and are both MaterialAndEnergyBalance is just confusing. I'd be surprised if it's 
+            // not a logic bug (that I'm fixing by adding my changes) but just in case there's something I missed, I'm 
+            // leaving it around.
 
-            List<IPfdElement> pfdElements = this.ChildIPfdElements;
-
-            if (newValue < currentDifficultySetting && newValue == OptionDifficultySetting.MaterialBalanceWithReactors)
+            // Go through all the child elements looking for streams and process units. Upon finding either, ask it 
+            // if it's available at the difficulty level that we want to switch to and if it's not, throw an exception.
+            foreach (UIElement uie in Children)
             {
-                //this means we could have heat streams or heat exchanges that we need to check for
-                foreach (IPfdElement element in pfdElements)
+                if (uie is IStream)
                 {
-                    if (element is HeatStream)
+                    if (!(uie as IStream).IsAvailableWithDifficulty(newValue))
                     {
-                        throw new Exception("Heat streams where detected but this file says it is supposed to be only MaterialBalanceWithReactors");
+                        // This exception is caught at a higher level and an appropriate error message is shown
+                        throw new Exception();
                     }
-                    else if (element is IProcessUnit)
+                }
+                else if (uie is IProcessUnit)
+                {
+                    if (!(uie as IProcessUnit).IsAvailableWithDifficulty(newValue))
                     {
-                        if ((element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchanger ||
-                            (element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchangerNoUtility)
-                        {
-                            throw new Exception("Advanced process units where detected but this file says it is supposed to be only MaterialBalanceWithReactors");
-                        }
+                        // This exception is caught at a higher level and an appropriate error message is shown
+                        throw new Exception();
                     }
                 }
             }
 
-            else if (newValue < currentDifficultySetting && newValue == OptionDifficultySetting.MaterialBalance)
-            {
-                //this means we could have heat streams, reactors, or heat exchanges that we need to check for
-                foreach (IPfdElement element in pfdElements)
-                {
-                    if (element is HeatStream)
-                    {
-                        throw new Exception("Heat streams where detected but this file says it is supposed to be only MaterialBalance");
-                    }
-                    else if (element is IProcessUnit)
-                    {
-                        if ((element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchanger ||
-                            (element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchangerNoUtility ||
-                            (element as IProcessUnit).Description == ProcessUnitDescriptions.Reactor)
-                        {
-                            throw new Exception("Advanced process units where detected but this file says it is supposed to be only MaterialBalance");
-                        }
-                    }
-                }
-            }
+            ////first we pull all the IPfdElement from the drawing canvas then we check to see if we can do the conversion
+            ////if not throw an exception if we can then we need to check to see if we need to change our IPropertiesWindow
+            ////and if we do then change them
 
-            if (newValue == OptionDifficultySetting.MaterialAndEnergyBalance || oldValue == OptionDifficultySetting.MaterialAndEnergyBalance)
-            {
-                //got to add or remove temp from the tables it will figured out what one to do based on the newValue
-                for (int i = 0; i < pfdElements.Count; i++)
-                {
-                    IPfdElement element = pfdElements[i];
-                    if (element is IPropertiesWindow)
-                    {
-                        CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, element, this).Execute();
-                        element = PropertiesWindowFactory.TableFromTable((element as IPropertiesWindow), newValue, isReadOnly);
-                        CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, element, this).Execute();
-                    }
-                }
-            }
+            //List<IPfdElement> pfdElements = this.ChildIPfdElements;
+
+            //if (newValue < currentDifficultySetting && newValue == OptionDifficultySetting.MaterialBalanceWithReactors)
+            //{
+            //    //this means we could have heat streams or heat exchanges that we need to check for
+            //    foreach (IPfdElement element in pfdElements)
+            //    {
+            //        if (element is HeatStream)
+            //        {
+            //            throw new Exception("Heat streams where detected but this file says it is supposed to be only MaterialBalanceWithReactors");
+            //        }
+            //        else if (element is IProcessUnit)
+            //        {
+            //            if ((element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchanger ||
+            //                (element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchangerNoUtility)
+            //            {
+            //                throw new Exception("Advanced process units where detected but this file says it is supposed to be only MaterialBalanceWithReactors");
+            //            }
+            //        }
+            //    }
+            //}
+
+            //else if (newValue < currentDifficultySetting && newValue == OptionDifficultySetting.MaterialBalance)
+            //{
+            //    //this means we could have heat streams, reactors, or heat exchanges that we need to check for
+            //    foreach (IPfdElement element in pfdElements)
+            //    {
+            //        if (element is HeatStream)
+            //        {
+            //            throw new Exception("Heat streams where detected but this file says it is supposed to be only MaterialBalance");
+            //        }
+            //        else if (element is IProcessUnit)
+            //        {
+            //            if ((element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchanger ||
+            //                (element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchangerNoUtility ||
+            //                (element as IProcessUnit).Description == ProcessUnitDescriptions.Reactor)
+            //            {
+            //                throw new Exception("Advanced process units where detected but this file says it is supposed to be only MaterialBalance");
+            //            }
+            //        }
+            //    }
+            //}
+
+            //if (newValue == OptionDifficultySetting.MaterialAndEnergyBalance || oldValue == OptionDifficultySetting.MaterialAndEnergyBalance)
+            //{
+            //    //got to add or remove temp from the tables it will figured out what one to do based on the newValue
+            //    for (int i = 0; i < pfdElements.Count; i++)
+            //    {
+            //        IPfdElement element = pfdElements[i];
+            //        if (element is IPropertiesWindow)
+            //        {
+            //            CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, element, this).Execute();
+            //            element = PropertiesWindowFactory.TableFromTable((element as IPropertiesWindow), newValue, isReadOnly);
+            //            CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, element, this).Execute();
+            //        }
+            //    }
+            //}
         }
 
         /// <summary>
