@@ -1,0 +1,27 @@
+<!--
+Copyright 2010, 2011 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+-->
+<UserControl
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+    xmlns:local="clr-namespace:ChemProV.UI" x:Class="ChemProV.UI.ProcessUnitPalette" 
+    Width="Auto" Height="Auto">
+	<StackPanel x:Name="LayoutRoot" Orientation="Vertical">
+		<local:GenericPaletteItem x:Name="DefaultSelection" IconSource="/UI/Icons/palette_select.png" Description="Select" Selected="True" />
+        <local:GenericPaletteItem x:Name="StickyNote" IconSource="/UI/Icons/palette_stickyNote.png" Description="Sticky Note" Selected="False" />
+		<Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
+		<local:ProcessUnitPaletteItem ProcessUnit="Mixer" />
+		<local:ProcessUnitPaletteItem ProcessUnit="Separator" />
+        <local:ProcessUnitPaletteItem ProcessUnit="Reactor" />
+        <local:ProcessUnitPaletteItem ProcessUnit="HeatExchanger" />
+		<local:ProcessUnitPaletteItem ProcessUnit="HeatExchangerNoUtility" />
+        <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
+		<local:StreamPaletteItem Stream="Chemical" Description="Chemical Stream" />
+        <local:StreamPaletteItem Stream="Heat" Description="Heat Stream" />
+	</StackPanel>
+</UserControl>
