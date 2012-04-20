@@ -39,8 +39,16 @@ namespace ChemProV.PFD.ProcessUnits
         Image Icon
         {
             get;
-            set;
         }
+
+        /// <summary>
+        /// E.O.
+        /// Returns a boolean value indicating whether or not this processing unit should be available 
+        /// with the specified difficulty setting.
+        /// </summary>
+        /// <param name="difficulty"></param>
+        /// <returns>True if available with the difficulty setting, false otherwise.</returns>
+        bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty);
 
         /// <summary>
         /// A short description of the process unit.  Not more than a few words in length.
@@ -48,52 +56,50 @@ namespace ChemProV.PFD.ProcessUnits
         String Description
         {
             get;
-            set;
         }
 
         /// <summary>
-        /// Total number of incoming streams allowed.  A value of zero is taken to mean unlimited.
-        /// A value of -1 indicates no incoming streams.
+        /// Total number of incoming streams allowed.
+        /// A value of -1 means unlimited.
         /// </summary>
         int MaxIncomingStreams
         {
             get;
-            set;
         }
 
         /// <summary>
-        /// Total number of outgoing streams allowed.  A value of zero is taken to mean unlimited.
-        /// A value of -1 indicates no outgoing streams.
+        /// Total number of outgoing streams allowed.
+        /// A value of -1 means unlimited.
         /// </summary>
         int MaxOutgoingStreams
         {
             get;
-            set;
         }
 
         /// <summary>
-        /// Total number of incoming streams allowed.  A value of zero is taken to mean unlimited.
-        /// A value of -1 indicates no incoming streams.
+        /// Total number of incoming heat streams allowed.
+        /// A value of -1 means unlimited.
         /// </summary>
         int MaxIncomingHeatStreams
         {
             get;
-            set;
         }
 
         /// <summary>
-        /// Total number of outgoing streams allowed.  A value of zero is taken to mean unlimited.
-        /// A value of -1 indicates no outgoing streams.
+        /// Total number of outgoing heat streams allowed.
+        /// A value of -1 means unlimited.
         /// </summary>
         int MaxOutgoingHeatStreams
         {
             get;
-            set;
         }
 
         Point MidPoint
         {
             get;
+
+            // E.O.
+            set;
         }
 
         /// <summary>

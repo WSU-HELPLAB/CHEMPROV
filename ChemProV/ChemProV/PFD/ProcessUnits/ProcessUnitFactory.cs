@@ -37,7 +37,7 @@ namespace ChemProV.PFD.ProcessUnits
     /// Concrete implementation of the IProcessUnitFactory interface
     /// </summary>
     public class ProcessUnitFactory
-    {
+    {   
         /// <summary>
         /// Turns a string pointing to an image into an Image object
         /// </summary>
@@ -105,6 +105,29 @@ namespace ChemProV.PFD.ProcessUnits
         /// <returns></returns>
         public static ProcessUnitType GetProcessUnitType(IProcessUnit unit)
         {
+            if (unit is HeatExchanger)
+            {
+                return ProcessUnitType.HeatExchanger;
+            }
+            else if (unit is HeatExchangerNoUtility)
+            {
+                return ProcessUnitType.HeatExchangerNoUtility;
+            }
+            else if (unit is Mixer)
+            {
+                return ProcessUnitType.Mixer;
+            }
+            else if (unit is Reactor)
+            {
+                return ProcessUnitType.Reactor;
+            }
+            else if (unit is Separator)
+            {
+                return ProcessUnitType.Separator;
+            }
+
+            // Stuff below should be removed once stuff above gets completed
+            
             if (unit.Description.CompareTo(ProcessUnitDescriptions.Blank) == 0)
             {
                 return ProcessUnitType.Blank;
@@ -205,106 +228,58 @@ namespace ChemProV.PFD.ProcessUnits
             switch (unitType)
             {
                 case ProcessUnitType.Blank:
-                    pu = new TemporaryProcessUnit();
-                    pu.MaxIncomingStreams = 1;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 1;
-                    pu.MaxOutgoingHeatStreams = 1;
-                    pu.Description = ProcessUnitDescriptions.Blank;
+                    pu = new TemporaryProcessUnit("/UI/Icons/pu_generic.png", 1, 1, 1, 1,
+                        ProcessUnitDescriptions.Blank);
                     break;
 
                 case ProcessUnitType.Generic:
-                    pu = new GenericProcessUnit();
-                    pu.MaxIncomingStreams = 1;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 1;
-                    pu.MaxOutgoingHeatStreams = 1;
-                    pu.Description = ProcessUnitDescriptions.Generic;
+                    pu = new GenericProcessUnit(IconFromUnitType(unitType));
                     break;
 
                 case ProcessUnitType.HeatExchanger:
-                    pu = new LabeledProcessUnit();
+                    pu = new HeatExchanger();
                     (pu as LabeledProcessUnit).ProcessUnitLabel = "Exc" + pu.ProcessUnitId;
-                    pu.MaxIncomingStreams = 1;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 1;
-                    pu.MaxOutgoingHeatStreams = 0;
-                    pu.Description = ProcessUnitDescriptions.HeatExchanger;
                     break;
 
                 case ProcessUnitType.HeatExchangerNoUtility:
-                    pu = new LabeledProcessUnit();
+                    pu = new HeatExchangerNoUtility();
                     (pu as LabeledProcessUnit).ProcessUnitLabel = "Exc" + pu.ProcessUnitId;
-                    pu.MaxIncomingStreams = 2;
-                    pu.MaxOutgoingStreams = 2;
-                    pu.MaxIncomingHeatStreams = 0;
-                    pu.MaxOutgoingHeatStreams = 0;
-                    pu.Description = ProcessUnitDescriptions.HeatExchangerNoUtility;
                     break;
 
                 case ProcessUnitType.Mixer:
-                    pu = new LabeledProcessUnit();
+                    pu = new Mixer();
                     (pu as LabeledProcessUnit).ProcessUnitLabel = "Mix" + pu.ProcessUnitId;
-                    pu.MaxIncomingStreams = -1;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 0;
-                    pu.MaxOutgoingHeatStreams = 0;
-                    pu.Description = ProcessUnitDescriptions.Mixer;
                     break;
 
                 case ProcessUnitType.Reactor:
-                    pu = new LabeledProcessUnit();
+                    pu = new Reactor();
                     (pu as LabeledProcessUnit).ProcessUnitLabel = "Rct" + pu.ProcessUnitId;
-                    pu.MaxIncomingStreams = -1;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 1;
-                    pu.MaxOutgoingHeatStreams = 0;
-                    pu.Description = ProcessUnitDescriptions.Reactor;
                     break;
 
                 case ProcessUnitType.Separator:
-                    pu = new LabeledProcessUnit();
+                    pu = new Separator();
                     (pu as LabeledProcessUnit).ProcessUnitLabel = "Sep" + pu.ProcessUnitId;
-                    pu.MaxIncomingStreams = 1;
-                    pu.MaxOutgoingStreams = -1;
-                    pu.MaxIncomingHeatStreams = 0;
-                    pu.MaxOutgoingHeatStreams = 0;
-                    pu.Description = ProcessUnitDescriptions.Separator;
                     break;
 
                 case ProcessUnitType.Sink:
-                    pu = new TemporaryProcessUnit();
-                    pu.MaxIncomingStreams = 1;
-                    pu.MaxOutgoingStreams = 0;
-                    pu.MaxIncomingHeatStreams = 1;
-                    pu.MaxOutgoingHeatStreams = 0;
-                    pu.Description = ProcessUnitDescriptions.Sink;
+                    pu = new TemporaryProcessUnit("/UI/Icons/pu_sink.png", 1, 0, 1, 0,
+                        ProcessUnitDescriptions.Sink);
                     ((GenericProcessUnit)pu).Height = 20;
                     ((GenericProcessUnit)pu).Width = 20;
                     break;
 
                 case ProcessUnitType.Source:
-                    pu = new TemporaryProcessUnit();
-                    pu.MaxIncomingStreams = 0;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 0;
-                    pu.MaxOutgoingHeatStreams = 1;
-                    pu.Description = ProcessUnitDescriptions.Source;
+                    pu = new TemporaryProcessUnit("/UI/Icons/pu_source.png", 0, 1, 0, 1,
+                        ProcessUnitDescriptions.Source);
                     ((GenericProcessUnit)pu).Height = 20;
                     ((GenericProcessUnit)pu).Width = 20;
                     break;
 
                 default:
-                    pu = new GenericProcessUnit();
-                    pu.MaxIncomingStreams = 1;
-                    pu.MaxOutgoingStreams = 1;
-                    pu.MaxIncomingHeatStreams = 1;
-                    pu.MaxOutgoingHeatStreams = 1;
-                    pu.Description = ProcessUnitDescriptions.Generic;
+                    pu = new GenericProcessUnit(IconFromUnitType(unitType));
                     break;
             }
 
-            pu.Icon = ImageFromString(IconFromUnitType(unitType));
             return pu;
         }
 
