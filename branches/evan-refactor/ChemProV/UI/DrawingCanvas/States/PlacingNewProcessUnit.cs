@@ -44,7 +44,11 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // Add it to the canvas but don't show it until we get our first mouse-move event
             canvas.AddNewChild(m_pu);
+            m_pu.SetBorderColor(ProcessUnitBorderColor.NoBorder);
             m_pu.Visibility = Visibility.Collapsed;
+
+            // Deselect
+            canvas.SelectedElement = null;
         }
         
         #region IState Members
@@ -97,6 +101,9 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo process unit creation",
                     new PFD.Undos.RemoveFromCanvas(m_pu, m_canvas)));
+
+                // Select the process unit we just placed on the canvas
+                m_canvas.SelectedElement = m_pu;
 
                 // Set the process unit reference to null (see StateEnding function)
                 m_pu = null;

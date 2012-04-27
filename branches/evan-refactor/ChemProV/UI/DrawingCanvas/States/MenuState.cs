@@ -39,7 +39,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // Undo menu item
             MenuItem menuItem = new MenuItem();
-            menuItem.Header = "Undo";
+            menuItem.Header = c.UndoTitle;
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
@@ -48,7 +48,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // Redo menu item
             menuItem = new MenuItem();
-            menuItem.Header = "Redo";
+            menuItem.Header = c.RedoTitle;
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {

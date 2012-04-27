@@ -252,6 +252,7 @@
     <Compile Include="PFD\Undos\RemoveFromCanvas.cs" />
     <Compile Include="PFD\Undos\ResizeControl.cs" />
     <Compile Include="PFD\Undos\RestoreLocation.cs" />
+    <Compile Include="PFD\Undos\SetProcessUnitLabel.cs" />
     <Compile Include="PFD\Undos\SetStreamDestination.cs" />
     <Compile Include="PFD\Undos\SetStreamSource.cs" />
     <Compile Include="PFD\Undos\UndoDefs.cs" />
@@ -269,10 +270,7 @@
     <Compile Include="UI\ControlPalette.xaml.cs">
       <DependentUpon>ControlPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommandEventArgs.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\NullCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\ICommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\ResizeStickNoteCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\AddPropertiesTableToCanvasCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\RemovePropertiesTableFromCanvas.cs" />
     <Compile Include="UI\DrawingCanvas\PfdUpdatedEventArgs.cs" />
@@ -618,6 +616,7 @@
     <Folder Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\" />
     <Folder Include="UI\DrawingCanvas\Commands\ProcessUnit\" />
     <Folder Include="UI\DrawingCanvas\Commands\RightClickMenu\" />
+    <Folder Include="UI\DrawingCanvas\Commands\StickyNoteCommand\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
