@@ -9,12 +9,15 @@
     <Border x:Name="ProcessUnitBorder"
                 BorderThickness="2"
                 Width="45" Height="45"
-                BorderBrush="Transparent">
+                BorderBrush="Transparent"
+                Background="White">
         <Grid>
             <Image x:Name="ProcessUnitImage"
-               Source="/UI/Icons/pu_generic.png"
+               Source="/UI/Icons/pu_reactor.png"
                Stretch="None"
                />
+            <Image Source="/UI/Icons/comment_16x16.png" HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Width="16" Height="16" Visibility="Collapsed" Name="CommentIcon"/>
             <Rectangle Fill="White" Opacity="0.6" IsHitTestVisible="False" Height="14" Width="39" VerticalAlignment="Bottom" HorizontalAlignment="Center" />
             <TextBlock 
                 x:Name="ProcessUnitNameText" 

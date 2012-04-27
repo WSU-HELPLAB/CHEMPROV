@@ -14,6 +14,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 
+using ChemProV.UI.DrawingCanvas;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams.PropertiesWindow;
 
@@ -23,23 +24,41 @@ namespace ChemProV.PFD.Streams
     {
         #region instance vars
 
-        private IProcessUnit source;
-        private IProcessUnit destination;
-        private IPropertiesWindow table;
+        private IProcessUnit m_source;
+        private IProcessUnit m_destination;
+        protected IPropertiesWindow m_table;
         private StreamDestinationIcon streamDestination;
-        private StreamSourceIcon streamSource;
-        public Rectangle HitArea;
         public event EventHandler LocationChanged = delegate { };
-        public event EventHandler SelectionChanged = delegate { };
+        public event EventHandler SelectionChanged = null;
         public event MouseButtonEventHandler Arrow_MouseButtonLeftDown = delegate { };
         public event MouseButtonEventHandler Tail_MouseButtonLeftDown = delegate { };
-        public bool isSelected = false;
+        public bool m_isSelected = false;
+
+        /// <summary>
+        /// E.O.
+        /// This is the draggable stream destination icon that the user can drag and drop over a 
+        /// process unit to make a connection (if allowed).
+        /// </summary>
+        private DraggableStreamEndpoint m_dstDragIcon = null;
+
+        /// <summary>
+        /// E.O.
+        /// This is the draggable stream source icon that the user can drag and drop over a 
+        /// process unit to make a connection (if allowed).
+        /// </summary>
+        private DraggableStreamEndpoint m_srcDragIcon = null;
+
+        /// <summary>
+        /// The stream keeps a reference to its parent drawing canvas. Note that this will be 
+        /// null if you use the default constructor.
+        /// </summary>
+        protected DrawingCanvas m_canvas = null;
 
         /// <summary>
         /// Keeps track of the process unit's unique ID number.  Needed when parsing
         /// to/from XML for saving and loading
         /// </summary>
-        private static int streamIdCounter = 0;
+        private static int s_streamIdCounter = 0;
         private string streamId;
 
         #endregion instance vars
@@ -73,15 +92,29 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        public StreamSourceIcon StreamSource
+        public MathCore.Vector StreamVector
         {
             get
             {
-                return streamSource;
-            }
-            set
-            {
-                streamSource = value;
+                MathCore.Vector srcPos;
+                if (null == m_source)
+                {
+                    srcPos = new MathCore.Vector(m_srcDragIcon.Location);
+                }
+                else
+                {
+                    srcPos = new MathCore.Vector(m_source.Location);
+                }
+                MathCore.Vector dstPos;
+                if (null == m_destination)
+                {
+                    dstPos = new MathCore.Vector(m_dstDragIcon.Location);
+                }
+                else
+                {
+                    dstPos = new MathCore.Vector(m_destination.Location);
+                }
+                return dstPos - srcPos;
             }
         }
 
@@ -92,23 +125,59 @@ namespace ChemProV.PFD.Streams
         {
             get
             {
-                return source;
+                return m_source;
             }
             set
             {
+                IProcessUnit old = m_source;
+                
                 //remove the event listener from the old source
-                if (source != null)
+                if (m_source != null)
                 {
-                    source.LocationChanged -= new EventHandler(AttachedLocationChanged);
+                    m_source.LocationChanged -= new EventHandler(AttachedLocationChanged);
                 }
 
                 //set new source, attach new listener
-                source = value;
-                if (source != null)
+                m_source = value;
+                if (m_source != null)
                 {
-                    source.LocationChanged += new EventHandler(AttachedLocationChanged);
+                    // Update the source connection draggable icon. It will be positioned in 
+                    // UpdateStreamLocation
+                    m_srcDragIcon.SetType(DraggableStreamEndpoint.EndpointType.StreamSourceConnected);
+                    
+                    m_source.LocationChanged += new EventHandler(AttachedLocationChanged);
                     UpdateStreamLocation();
                 }
+                else
+                {
+                    if (null != old)
+                    {
+                        m_srcDragIcon.SetType(DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected);
+
+                        UpdateStreamLocation();
+                    }
+
+                    // Note that the "else" case here is that it was already null, in which case 
+                    // we shouldn't need to change anything
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the draggable control that is on the canvas in order to allow the user to 
+        /// connect the source of the stream to a process unit. If this stream has a null 
+        /// source, then this object will just be an icon that can be dragged around and 
+        /// dropped on a process unit to make a connection (if allowed). Otherwise (non-null 
+        /// source process unit) this icon will be draggable such that the current connection 
+        /// to the source process unit connection can be broken and the icon can be dropped on 
+        /// another process unit to make a new connection or drop in blank space and leave the 
+        /// connection severed.
+        /// </summary>
+        public DraggableStreamEndpoint SourceDragIcon
+        {
+            get
+            {
+                return m_srcDragIcon;
             }
         }
 
@@ -119,23 +188,46 @@ namespace ChemProV.PFD.Streams
         {
             get
             {
-                return destination;
+                return m_destination;
             }
             set
             {
-                //remove the event listener from the old dest
-                if (destination != null)
+                IProcessUnit old = m_destination;
+                
+                // Remove the event listener from the old destination
+                if (m_destination != null)
                 {
-                    destination.LocationChanged -= new EventHandler(AttachedLocationChanged);
+                    m_destination.LocationChanged -= new EventHandler(AttachedLocationChanged);
                 }
 
-                //add new dest, attach listener
-                destination = value;
-                if (destination != null)
+                // Add the new destination and attach listener
+                m_destination = value;
+                if (m_destination != null)
                 {
-                    destination.LocationChanged += new EventHandler(AttachedLocationChanged);
+                    m_dstDragIcon.SetType(DraggableStreamEndpoint.EndpointType.StreamDestinationConnected);
+                    
+                    m_destination.LocationChanged += new EventHandler(AttachedLocationChanged);
                     UpdateStreamLocation();
                 }
+                else
+                {
+                    if (null != old)
+                    {
+                        m_dstDragIcon.SetType(DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected);
+                        UpdateStreamLocation();
+                    }
+
+                    // Note that the "else" case here is that it was already null, in which case 
+                    // we shouldn't need to change anything
+                }
+            }
+        }
+
+        public DraggableStreamEndpoint DestinationDragIcon
+        {
+            get
+            {
+                return m_dstDragIcon;
             }
         }
 
@@ -143,42 +235,20 @@ namespace ChemProV.PFD.Streams
         {
             get
             {
-                return table;
+                return m_table;
             }
             set
             {
-                if (table != null)
+                if (m_table != null)
                 {
-                    table.LocationChanged -= new EventHandler(AttachedLocationChanged);
+                    m_table.LocationChanged -= new EventHandler(AttachedLocationChanged);
                 }
 
-                table = value;
-                if (table != null)
+                m_table = value;
+                if (m_table != null)
                 {
-                    table.LocationChanged += new EventHandler(AttachedLocationChanged);
+                    m_table.LocationChanged += new EventHandler(AttachedLocationChanged);
                 }
-            }
-        }
-
-        private bool sourceRectangleVisbility;
-
-        public bool SourceRectangleVisbility
-        {
-            get
-            {
-                return sourceRectangleVisbility;
-            }
-            set
-            {
-                if (value == true)
-                {
-                    this.rectangle.Visibility = Visibility.Visible;
-                }
-                else
-                {
-                    this.rectangle.Visibility = Visibility.Collapsed;
-                }
-                sourceRectangleVisbility = value;
             }
         }
 
@@ -205,51 +275,84 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// Gets or sets the selection flag for the stream
+        /// Gets the point on the border of the destination process unit where the stream line 
+        /// connects to. This is only relevant if the stream has a non-null destination process 
+        /// unit. If the destination is null then the point (0,0) is returned.
         /// </summary>
-        public Boolean Selected
+        public Point DestinationConnectionPoint
         {
             get
             {
-                return isSelected;
-            }
-            set
-            {
-                bool oldValue = isSelected;
-                isSelected = value;
-
-                if (isSelected)
+                if (null == m_destination)
                 {
-                    this.Stem.Stroke = new SolidColorBrush(Colors.Yellow);
-                    SelectionChanged(this, new EventArgs());
+                    return new Point(0.0, 0.0);
+                }
+
+                GenericProcessUnit dstUnit = m_destination as GenericProcessUnit;
+
+                // Get the center point for the source (which could be a process unit if 
+                // we're connected to one or a drag-handle if we're not)
+                MathCore.Vector srcCenter;
+                if (null == m_source)
+                {
+                    srcCenter = new MathCore.Vector(m_srcDragIcon.Location);
                 }
                 else
                 {
-                    if (this is ChemicalStream)
-                    {
-                        this.Stem.Stroke = new SolidColorBrush(Colors.Black);
-                    }
-                    else if (this is HeatStream)
-                    {
-                        this.Stem.Stroke = new SolidColorBrush(Colors.Red);
-                    }
+                    GenericProcessUnit srcUnit = m_source as GenericProcessUnit;
+                    srcCenter = new MathCore.Vector(
+                        (double)srcUnit.GetValue(Canvas.LeftProperty),
+                        (double)srcUnit.GetValue(Canvas.TopProperty));
                 }
 
-                //if the selection value has changed, then we need to fire the
-                //appropriate event.
-                //if (value != oldValue)
-                //{
-                //}
+                // Make a rectangle for the destination process unit
+                MathCore.Rectangle rDest = MathCore.Rectangle.CreateFromCanvasRect(
+                    new Point((double)dstUnit.GetValue(Canvas.LeftProperty),
+                        (double)dstUnit.GetValue(Canvas.TopProperty)),
+                    dstUnit.Width, dstUnit.Height);
+
+                // Build the line segment between the two process units
+                MathCore.LineSegment ls = new MathCore.LineSegment(
+                    srcCenter, new MathCore.Vector(m_destination.Location));
+
+                MathCore.Vector[] pts = rDest.GetIntersections(ls);
+                if (0 == pts.Length)
+                {
+                    return m_destination.Location;
+                }
+
+                return pts[0].ToPoint();
             }
         }
 
         /// <summary>
-        /// E.O.
-        /// Returns a boolean value indicating whether or not the stream should be available 
-        /// with the specified difficulty setting.
+        /// Gets or sets the selection flag for the stream
         /// </summary>
-        /// <returns>True if available with the difficulty setting, false otherwise.</returns>
-        public abstract bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty);
+        public bool Selected
+        {
+            get
+            {
+                return m_isSelected;
+            }
+            set
+            {
+                if (m_isSelected.Equals(value))
+                {
+                    // No change -> nothing to do
+                    return;
+                }
+
+                m_isSelected = value;
+
+                // Set the stem color based on selection state
+                this.Stem.Stroke = new SolidColorBrush(m_isSelected ? Colors.Yellow : Colors.Black);
+
+                if (null != SelectionChanged)
+                {
+                    SelectionChanged(this, new EventArgs());
+                }
+            }
+        }
 
         /// <summary>
         /// E.O.
@@ -270,11 +373,6 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         /// <returns>True if the unit is a valid destination, false otherwise.</returns>
         public abstract bool IsValidDestination(IProcessUnit unit);
-
-        public abstract string Title
-        {
-            get;
-        }
 
         #endregion IStream Members
 
@@ -320,149 +418,188 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         public virtual void UpdateStreamLocation()
         {
-            //   Brush black = new SolidColorBrush(Colors.Black);
-            RotateTransform rt = new RotateTransform();
-            Point temp = new Point();
+            ////   Brush black = new SolidColorBrush(Colors.Black);
+            //RotateTransform rt = new RotateTransform();
+            //Point temp = new Point();
 
-            //   ((AbstractStream)stream).HitArea.Fill = black;
-            //recast source and dest as UIElement.  *REALLY* should make this a
-            //stronger relationship
-            UIElement source = (UIElement)Source;
-            UIElement destination = (UIElement)Destination;
+            ////   ((AbstractStream)stream).HitArea.Fill = black;
+            ////recast source and dest as UIElement.  *REALLY* should make this a
+            ////stronger relationship
+            //UIElement source = (UIElement)Source;
+            //UIElement destination = (UIElement)Destination;
 
-            if (source != null && destination != null)
+            //if (source != null && destination != null)
+            //{
+            //    /////////////////////////////////////////////////////////////////////////////////
+            //    ///////build our reference line, relative to the center of our Source unit///////
+
+            //    Line referenceLine = new Line();
+            //    referenceLine.X1 = Convert.ToInt32(source.GetValue(Canvas.LeftProperty)) + (Convert.ToInt32(source.GetValue(Control.WidthProperty)) / 2);
+            //    referenceLine.X2 = referenceLine.X1;
+            //    referenceLine.Y1 = Convert.ToInt32(source.GetValue(Canvas.TopProperty)) + (Convert.ToInt32(source.GetValue(Control.HeightProperty)) / 2);
+            //    referenceLine.Y2 = referenceLine.Y1 - (Convert.ToInt32(source.GetValue(Control.HeightProperty)));
+
+            //    //stretch out the stream's stem from the beginning to the end point
+            //    Stem.X1 = referenceLine.X1;
+            //    Stem.Y1 = referenceLine.Y1;
+            //    /////////////////////////////////////////////////////////////////////////////////
+
+            //    /////////////////////////////////////////////////////////////////////////////////
+            //    ////////////Find and set destination point//////////////////////////////////////
+
+            //    if (destinationArrorVisbility == true)
+            //    {
+            //        temp = toEdgeOfObject((UserControl)source, (UserControl)destination, Arrow.Height / 2);
+            //    }
+            //    else
+            //    {
+            //        temp = toEdgeOfObject((UserControl)source, (UserControl)destination, 0);
+            //    }
+            //    Stem.X2 = temp.X;
+            //    Stem.Y2 = temp.Y;
+            //    Stem.SetValue(Canvas.ZIndexProperty, -1);
+            //    //s  element.SetValue(Canvas.ZIndexProperty, -1);
+            //    //Stem.X2 = (double)destination.GetValue(Canvas.LeftProperty);
+            //    //Stem.Y2 = (double)destination.GetValue(Canvas.TopProperty);
+            //    /////////////////////////////////////////////////////////////////////////////////
+
+            //    /////////////////////////////////////////////////////////////////////////////////
+            //    ////////place the arrow at the end of the stem///////////////////////////
+
+            //    Arrow.SetValue(Canvas.LeftProperty, Stem.X2 - (Arrow.Width / 2));
+            //    Arrow.SetValue(Canvas.TopProperty, Stem.Y2 - (Arrow.Height / 2));
+
+            //    //build the hypotenuse, used to compute the angle of rotation
+            //    Line hypotenuse = new Line();
+            //    hypotenuse.X1 = referenceLine.X2;
+            //    hypotenuse.X2 = Stem.X2;
+            //    hypotenuse.Y1 = referenceLine.Y2;
+            //    hypotenuse.Y2 = Stem.Y2;
+
+            //    //compute the angle of rotation
+            //    ArrowRotateTransform.Angle = RadiansToDegrees(ComputeAngleRadians(referenceLine, Stem, hypotenuse));
+            //    /////////////////////////////////////////////////////////////////////////////////
+
+            //    /////////////////////////////////////////////////////////////////////////////////
+            //    ////////place the HitArea Box///////////////////////////////////////////////////
+
+            //    //-90 because math was made for arrow pointing up but the box horizontal "pointing" to the right so -90 to make them the same
+            //    rt.Angle = RadiansToDegrees(ComputeAngleRadians(referenceLine, Stem, hypotenuse)) - 90;
+
+            //    //set the location of hte HitArea box -10 on Y value so box is centered
+            //    HitArea.SetValue(Canvas.LeftProperty, referenceLine.X1 + (double)LayoutRoot.GetValue(Canvas.LeftProperty));
+            //    HitArea.SetValue(Canvas.TopProperty, referenceLine.Y1 + (double)LayoutRoot.GetValue(Canvas.TopProperty) - 10);
+
+            //    //Calulate distance for length
+            //    HitArea.Width = Pyth(referenceLine.X1, Stem.X2, referenceLine.Y1, Stem.Y2);
+
+            //    //20 is height of the box
+            //    HitArea.Height = 20;
+
+            //    //CenterY = 10 so that it rotates in the middle of the box and not at an edge
+            //    rt.CenterY = 10;
+
+            //    //apply tranformation
+            //    HitArea.RenderTransform = rt;
+            //    /////////////////////////////////////////////////////////////////////////////////
+
+            //    /////////////////////////////////////////////////////////////////////////////////
+            //    //Find and draw the line from the middle of the line to its table////////////////
+
+            //    if (table != null)
+            //    {
+            //        TableLine.X1 = (Stem.X2 - Stem.X1) / 2;
+            //        TableLine.Y1 = (Stem.Y2 - Stem.Y1) / 2;
+            //        if (TableLine.X1 >= 0 && TableLine.Y1 >= 0)
+            //        {
+            //            TableLine.X1 = Math.Abs(TableLine.X1);
+            //            TableLine.Y1 = Math.Abs(TableLine.Y1);
+            //            TableLine.X1 = Stem.X1 + TableLine.X1;
+            //            TableLine.Y1 = Stem.Y1 + TableLine.Y1;
+            //        }
+            //        else if (TableLine.X1 >= 0 && TableLine.Y1 < 0)
+            //        {
+            //            TableLine.X1 = Math.Abs(TableLine.X1);
+            //            TableLine.Y1 = Math.Abs(TableLine.Y1);
+            //            TableLine.X1 = Stem.X1 + TableLine.X1;
+            //            TableLine.Y1 = Stem.Y1 - TableLine.Y1;
+            //        }
+            //        else if (TableLine.X1 < 0 && TableLine.Y1 >= 0)
+            //        {
+            //            TableLine.X1 = Math.Abs(TableLine.X1);
+            //            TableLine.Y1 = Math.Abs(TableLine.Y1);
+            //            TableLine.X1 = Stem.X1 - TableLine.X1;
+            //            TableLine.Y1 = Stem.Y1 + TableLine.Y1;
+            //        }
+            //        else if (TableLine.X1 < 0 && TableLine.Y1 < 0)
+            //        {
+            //            TableLine.X1 = Math.Abs(TableLine.X1);
+            //            TableLine.Y1 = Math.Abs(TableLine.Y1);
+            //            TableLine.X1 = Stem.X1 - TableLine.X1;
+            //            TableLine.Y1 = Stem.Y1 - TableLine.Y1;
+            //        }
+
+            //        TableLine.X2 = (double)((UIElement)table).GetValue(Canvas.LeftProperty) + ((UserControl)table).ActualWidth / 2;
+            //        TableLine.Y2 = (double)((UIElement)table).GetValue(Canvas.TopProperty) + ((UserControl)table).ActualHeight / 2;
+            //    }
+            //    /////////////////////////////////////////////////////////////////////////////////
+
+            //    /////////////////////////////////////////////////////////////////////////////////
+            //    ///////////////////////////Set Location of rectangle////////////////////////////////
+            //    if (sourceRectangleVisbility == true)
+            //    {
+            //        temp = toEdgeOfObject((UserControl)destination, (UserControl)source, rectangle.Width / 2);
+            //    }
+            //    else
+            //    {
+            //        temp = toEdgeOfObject((UserControl)destination, (UserControl)source, 0);
+            //    }
+            //    rectangle.SetValue(Canvas.LeftProperty, temp.X - rectangle.Width / 2);
+            //    rectangle.SetValue(Canvas.TopProperty, temp.Y - rectangle.Height / 2);
+            //    /////////////////////////////////////////////////////////////////////////////////
+
+                
+            //}
+
+            // E.O.
+            // Start by positioning the stem line that connects source and destination
+            Point a, b;
+            if (null == m_source)
             {
-                /////////////////////////////////////////////////////////////////////////////////
-                ///////build our reference line, relative to the center of our Source unit///////
-
-                Line referenceLine = new Line();
-                referenceLine.X1 = Convert.ToInt32(source.GetValue(Canvas.LeftProperty)) + (Convert.ToInt32(source.GetValue(Control.WidthProperty)) / 2);
-                referenceLine.X2 = referenceLine.X1;
-                referenceLine.Y1 = Convert.ToInt32(source.GetValue(Canvas.TopProperty)) + (Convert.ToInt32(source.GetValue(Control.HeightProperty)) / 2);
-                referenceLine.Y2 = referenceLine.Y1 - (Convert.ToInt32(source.GetValue(Control.HeightProperty)));
-
-                //stretch out the stream's stem from the beginning to the end point
-                Stem.X1 = referenceLine.X1;
-                Stem.Y1 = referenceLine.Y1;
-                /////////////////////////////////////////////////////////////////////////////////
-
-                /////////////////////////////////////////////////////////////////////////////////
-                ////////////Find and set destination point//////////////////////////////////////
-
-                if (destinationArrorVisbility == true)
-                {
-                    temp = toEdgeOfObject((UserControl)source, (UserControl)destination, Arrow.Height / 2);
-                }
-                else
-                {
-                    temp = toEdgeOfObject((UserControl)source, (UserControl)destination, 0);
-                }
-                Stem.X2 = temp.X;
-                Stem.Y2 = temp.Y;
-                Stem.SetValue(Canvas.ZIndexProperty, -1);
-                //s  element.SetValue(Canvas.ZIndexProperty, -1);
-                //Stem.X2 = (double)destination.GetValue(Canvas.LeftProperty);
-                //Stem.Y2 = (double)destination.GetValue(Canvas.TopProperty);
-                /////////////////////////////////////////////////////////////////////////////////
-
-                /////////////////////////////////////////////////////////////////////////////////
-                ////////place the arrow at the end of the stem///////////////////////////
-
-                Arrow.SetValue(Canvas.LeftProperty, Stem.X2 - (Arrow.Width / 2));
-                Arrow.SetValue(Canvas.TopProperty, Stem.Y2 - (Arrow.Height / 2));
-
-                //build the hypotenuse, used to compute the angle of rotation
-                Line hypotenuse = new Line();
-                hypotenuse.X1 = referenceLine.X2;
-                hypotenuse.X2 = Stem.X2;
-                hypotenuse.Y1 = referenceLine.Y2;
-                hypotenuse.Y2 = Stem.Y2;
-
-                //compute the angle of rotation
-                ArrowRotateTransform.Angle = RadiansToDegrees(ComputeAngleRadians(referenceLine, Stem, hypotenuse));
-                /////////////////////////////////////////////////////////////////////////////////
-
-                /////////////////////////////////////////////////////////////////////////////////
-                ////////place the HitArea Box///////////////////////////////////////////////////
-
-                //-90 because math was made for arrow pointing up but the box horizontal "pointing" to the right so -90 to make them the same
-                rt.Angle = RadiansToDegrees(ComputeAngleRadians(referenceLine, Stem, hypotenuse)) - 90;
-
-                //set the location of hte HitArea box -10 on Y value so box is centered
-                HitArea.SetValue(Canvas.LeftProperty, referenceLine.X1 + (double)LayoutRoot.GetValue(Canvas.LeftProperty));
-                HitArea.SetValue(Canvas.TopProperty, referenceLine.Y1 + (double)LayoutRoot.GetValue(Canvas.TopProperty) - 10);
-
-                //Calulate distance for length
-                HitArea.Width = Pyth(referenceLine.X1, Stem.X2, referenceLine.Y1, Stem.Y2);
-
-                //20 is height of the box
-                HitArea.Height = 20;
-
-                //CenterY = 10 so that it rotates in the middle of the box and not at an edge
-                rt.CenterY = 10;
-
-                //apply tranformation
-                HitArea.RenderTransform = rt;
-                /////////////////////////////////////////////////////////////////////////////////
-
-                /////////////////////////////////////////////////////////////////////////////////
-                //Find and draw the line from the middle of the line to its table////////////////
-
-                if (table != null)
-                {
-                    TableLine.X1 = (Stem.X2 - Stem.X1) / 2;
-                    TableLine.Y1 = (Stem.Y2 - Stem.Y1) / 2;
-                    if (TableLine.X1 >= 0 && TableLine.Y1 >= 0)
-                    {
-                        TableLine.X1 = Math.Abs(TableLine.X1);
-                        TableLine.Y1 = Math.Abs(TableLine.Y1);
-                        TableLine.X1 = Stem.X1 + TableLine.X1;
-                        TableLine.Y1 = Stem.Y1 + TableLine.Y1;
-                    }
-                    else if (TableLine.X1 >= 0 && TableLine.Y1 < 0)
-                    {
-                        TableLine.X1 = Math.Abs(TableLine.X1);
-                        TableLine.Y1 = Math.Abs(TableLine.Y1);
-                        TableLine.X1 = Stem.X1 + TableLine.X1;
-                        TableLine.Y1 = Stem.Y1 - TableLine.Y1;
-                    }
-                    else if (TableLine.X1 < 0 && TableLine.Y1 >= 0)
-                    {
-                        TableLine.X1 = Math.Abs(TableLine.X1);
-                        TableLine.Y1 = Math.Abs(TableLine.Y1);
-                        TableLine.X1 = Stem.X1 - TableLine.X1;
-                        TableLine.Y1 = Stem.Y1 + TableLine.Y1;
-                    }
-                    else if (TableLine.X1 < 0 && TableLine.Y1 < 0)
-                    {
-                        TableLine.X1 = Math.Abs(TableLine.X1);
-                        TableLine.Y1 = Math.Abs(TableLine.Y1);
-                        TableLine.X1 = Stem.X1 - TableLine.X1;
-                        TableLine.Y1 = Stem.Y1 - TableLine.Y1;
-                    }
-
-                    TableLine.X2 = (double)((UIElement)table).GetValue(Canvas.LeftProperty) + ((UserControl)table).ActualWidth / 2;
-                    TableLine.Y2 = (double)((UIElement)table).GetValue(Canvas.TopProperty) + ((UserControl)table).ActualHeight / 2;
-                }
-                /////////////////////////////////////////////////////////////////////////////////
-
-                /////////////////////////////////////////////////////////////////////////////////
-                ///////////////////////////Set Location of rectangle////////////////////////////////
-                if (sourceRectangleVisbility == true)
-                {
-                    temp = toEdgeOfObject((UserControl)destination, (UserControl)source, rectangle.Width / 2);
-                }
-                else
-                {
-                    temp = toEdgeOfObject((UserControl)destination, (UserControl)source, 0);
-                }
-                rectangle.SetValue(Canvas.LeftProperty, temp.X - rectangle.Width / 2);
-                rectangle.SetValue(Canvas.TopProperty, temp.Y - rectangle.Height / 2);
-                /////////////////////////////////////////////////////////////////////////////////
-
-                //Let any interested parties know that we've updated our location
-                LocationChanged(this, new EventArgs());
+                a = m_srcDragIcon.Location;
             }
+            else
+            {
+                a = m_source.Location;
+            }
+            if (null == m_destination)
+            {
+                b = m_dstDragIcon.Location;
+            }
+            else
+            {
+                b = m_destination.Location;
+            }
+            Stem.X1 = a.X;
+            Stem.Y1 = a.Y;
+            Stem.X2 = b.X;
+            Stem.Y2 = b.Y;
+
+            // If we are connected to a source, then we need to position the draggable icon
+            if (null != m_source)
+            {
+                MathCore.Vector pos = MathCore.Vector.Normalize(StreamVector) * 30.0;
+                m_srcDragIcon.Location = ((new MathCore.Vector(m_source.Location)) + pos).ToPoint();
+            }
+            // Similar thing with destination
+            if (null != m_destination)
+            {
+                MathCore.Vector pos = MathCore.Vector.Normalize(StreamVector) * -30.0;
+                m_dstDragIcon.Location = ((new MathCore.Vector(m_destination.Location)) + pos).ToPoint();
+            }
+
+            // Let any interested parties know that we've updated our location
+            LocationChanged(this, new EventArgs());
         }
 
         /// <summary>
@@ -532,39 +669,100 @@ namespace ChemProV.PFD.Streams
             return c;
         }
 
-        public AbstractStream()
+        /// <summary>
+        /// Private constructor. This is used only to get designed view to work. It MUST NOT BE 
+        /// MADE PUBLIC. For correct initialization the stream needs a DrawingCanvas reference.
+        /// </summary>
+        private AbstractStream()
+            : this(null, new Point())
         {
-            Brush transperent = new SolidColorBrush(Colors.Transparent);
-            InitializeComponent();
-            HitArea = new Rectangle();
-            HitArea.MouseLeftButtonDown += new MouseButtonEventHandler(HitArea_MouseLeftButtonDown);
-            HitArea.StrokeThickness = 2;
-            HitArea.Stroke = transperent;
-            HitArea.Fill = transperent;
 
-            streamSource = new StreamSourceIcon(this, rectangle);
-
-            streamDestination = new StreamDestinationIcon(this, Arrow);
-
-            SelectionChanged += new EventHandler(AbstractStream_SelectionChanged);
-            Arrow.MouseLeftButtonDown += new MouseButtonEventHandler(ArrowMouseLeftButtonDown);
-            rectangle.MouseLeftButtonDown += new MouseButtonEventHandler(CircleMouseLeftButtonDown);
-
-            //set the stream's id number
-            streamIdCounter++;
-            Id = "S_" + streamIdCounter;
         }
 
         /// <summary>
-        /// Called whenever the Stream's selection status has changed.
+        /// Make all classes that inherit from AbstractStream call this base constructor. In your inherting 
+        /// class you should still have a default constructor that will be used to create a "factory instance" 
+        /// that can give information about the type of stream (methods like IsAvailableWithDifficulty). So 
+        /// you should have a constructor with no paramaters and a constructor with a single DrawingCanvas 
+        /// paramater and they should both call this as the base constructor (use a null reference and point 
+        /// (0,0) for parameters in the case of the default constructor).
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void AbstractStream_SelectionChanged(object sender, EventArgs e)
+        public AbstractStream(DrawingCanvas canvas, Point locationOnCanvas)
         {
-            //if selectd, draw hit box
-            //if not selected, make hit box invisible
+            m_canvas = canvas;
+            
+            Brush transperent = new SolidColorBrush(Colors.Transparent);
+            InitializeComponent();
+
+            streamDestination = new StreamDestinationIcon(this, Arrow);
+
+            Arrow.MouseLeftButtonDown += new MouseButtonEventHandler(ArrowMouseLeftButtonDown);
+
+            //set the stream's id number
+            s_streamIdCounter++;
+            Id = "S_" + s_streamIdCounter;
+
+            if (null != canvas)
+            {
+                // E.O.
+                // Create the draggable source and destination icons
+                m_srcDragIcon = new DraggableStreamEndpoint(
+                    DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected, this,
+                    canvas);
+                m_dstDragIcon = new DraggableStreamEndpoint(
+                    DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected, this,
+                    canvas);
+
+                // Make sure the stem line has a low z-index
+                Stem.SetValue(Canvas.ZIndexProperty, -1);
+
+                // Set their sizes
+                m_srcDragIcon.Width = m_srcDragIcon.Height = 40.0;
+                m_dstDragIcon.Width = m_dstDragIcon.Height = 40.0;
+
+                // Add them to the drawing canvas
+                canvas.AddNewChild(m_srcDragIcon);
+                canvas.AddNewChild(m_dstDragIcon);
+                //LayoutRoot.Children.Add(m_srcDragIcon);
+                //LayoutRoot.Children.Add(m_dstDragIcon);
+
+                // Set positions
+                m_srcDragIcon.Location = locationOnCanvas;
+                m_dstDragIcon.Location = new Point(locationOnCanvas.X + 20.0, locationOnCanvas.Y);
+
+                // Show them by default
+                m_srcDragIcon.Visibility = System.Windows.Visibility.Visible;
+                m_dstDragIcon.Visibility = System.Windows.Visibility.Visible;
+
+                UpdateStreamLocation();
+
+                // Create the table (abstract method so inheriting class will do it)
+                CreatePropertiesTable();
+
+                // Add it to the canvas and set it up
+                m_canvas.AddNewChild(m_table as UIElement);
+
+                UserControl puAsUiElement = m_table as UserControl;
+
+                //width and height needed to calculate position, for some reaons it did not like puAsUiElemnt.Width had to
+                //go with ActualWidth and ActualHeight but everything else had to b e Width and Height.
+                double width = puAsUiElement.ActualWidth;
+                double height = puAsUiElement.ActualHeight;
+
+                //This sets the tables index to the greatest so it will be above everything
+                puAsUiElement.SetValue(System.Windows.Controls.Canvas.ZIndexProperty, 3);
+
+                m_table.TableDataChanged -= new TableDataEventHandler((canvas as DrawingCanvas).TableDataChanged);
+                m_table.TableDataChanged += new TableDataEventHandler((canvas as DrawingCanvas).TableDataChanged);
+
+                m_table.TableDataChanging += new EventHandler((canvas as DrawingCanvas).TableDataChanging);
+
+                puAsUiElement.MouseLeftButtonDown += new MouseButtonEventHandler((canvas as DrawingCanvas).MouseLeftButtonDownHandler);
+                puAsUiElement.MouseLeftButtonUp += new MouseButtonEventHandler((canvas as DrawingCanvas).MouseLeftButtonUpHandler);
+            }
         }
+
+        protected abstract void CreatePropertiesTable();
 
         /// <summary>
         /// Fired whenever the user clicks on the Stream's "Hit Area"
@@ -806,41 +1004,26 @@ namespace ChemProV.PFD.Streams
 
         public void HighlightFeedback(bool highlight)
         {
-            if (table != null)
+            if (m_table != null)
             {
-                table.HighlightFeedback(highlight);
+                m_table.HighlightFeedback(highlight);
             }
         }
 
         public void SetFeedback(string feedbackMessage, int errorNumber)
         {
-            if (table != null)
+            if (m_table != null)
             {
-                table.SetFeedback(feedbackMessage, errorNumber);
+                m_table.SetFeedback(feedbackMessage, errorNumber);
             }
         }
 
         public void RemoveFeedback()
         {
-            if (table != null)
+            if (m_table != null)
             {
-                table.RemoveFeedback();
+                m_table.RemoveFeedback();
             }
         }
-
-        /// <summary>
-        /// E.O.
-        /// This abstract method is to ensure that everything that inherits from this class is 
-        /// capable of creating a new instance of its own type on the drawing canvas and 
-        /// providing an appropriate undo for this action.
-        /// </summary>
-        /// <param name="canvas">Canvas to create the new stream on</param>
-        /// <param name="optionalSource">This parameter is optional, meaning that it could be null. 
-        /// If non-null, this should be the source for the new stream that is created.</param>
-        /// <param name="optionalDestination">This parameter is optional, meaning that it could be null. 
-        /// If non-null, this should be the destination for the new stream that is created.</param>
-        /// <returns>A collection of undo items that will undo the creation action</returns>
-        //public abstract UndoRedoCollection CreateNewOnCanvas(UI.DrawingCanvas.DrawingCanvas canvas,
-        //    IProcessUnit optionalSource, IProcessUnit optionalDestination);
     }
 }

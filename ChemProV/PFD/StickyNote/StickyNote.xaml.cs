@@ -16,6 +16,7 @@ using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using ChemProV.UI.DrawingCanvas;
 
 namespace ChemProV.PFD.StickyNote
 {
@@ -28,30 +29,33 @@ namespace ChemProV.PFD.StickyNote
         Yellow
     }
 
-    public partial class StickyNote : UserControl, IPfdElement, IXmlSerializable
+    public partial class StickyNote : UserControl, IPfdElement, IXmlSerializable, Core.ICanvasElement
     {
-        public event EventHandler Resizing = delegate { };
+        //public event EventHandler Resizing = delegate { };
+        
+        [Obsolete("Sticky note handles all it's own closing details and other objects shouldn't capture the event")]
         public event MouseButtonEventHandler Closing = delegate { };
 
+        private DrawingCanvas m_canvas = null;
+        
         private StickyNoteColors color;
 
         static int i = -1;
 
-        public StickyNote(bool isReadOnly)
+        /// <summary>
+        /// Default constructor that exists only to make design view work. Must stay private.
+        /// </summary>
+        private StickyNote()
+            : this(null)
+        {
+        }
+        
+        public StickyNote(DrawingCanvas canvas)
         {
             InitializeComponent();
-            Note.IsReadOnly = isReadOnly;
-            LocalInit();
-        }
+            m_canvas = canvas;
 
-        public StickyNote()
-        {
-            InitializeComponent();
-            LocalInit();
-        }
-
-        private void LocalInit()
-        {
+            // Set the next color in the cycle
             i++;
             switch (i)
             {
@@ -129,8 +133,13 @@ namespace ChemProV.PFD.StickyNote
 
         private void Bottem_Left_Corner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Resizing(this, EventArgs.Empty);
             e.Handled = true;
+
+            // Set the canvas state so that we'll enter resizing mode
+            m_canvas.CurrentState = new UI.DrawingCanvas.States.ResizingStickyNote(
+                m_canvas, this);
+            // Kick it off by sending the mouse-down event
+            m_canvas.CurrentState.MouseLeftButtonDown(sender, e);
         }
 
         private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -172,8 +181,11 @@ namespace ChemProV.PFD.StickyNote
 
         private void X_Label_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            Closing(this, e);
+            // Make sure we mark this mouse event as handled
             e.Handled = true;
+            
+            // Use static logic to delete this note and create an undo for us
+            Core.DrawingCanvasCommands.DeleteElement(m_canvas, this);
         }
 
         public static StickyNoteColors StickyNoteColorsFromString(string colorString)
@@ -247,6 +259,14 @@ namespace ChemProV.PFD.StickyNote
             this.color = color;
         }
 
+        public StickyNoteColors ColorScheme
+        {
+            get
+            {
+                return this.color;
+            }
+        }
+
         #region IXmlSerializable Members
 
         public System.Xml.Schema.XmlSchema GetSchema()
@@ -310,5 +330,35 @@ namespace ChemProV.PFD.StickyNote
         }
 
         #endregion IXmlSerializable Members
+
+        #region ICanvasElement Members
+
+        /// <summary>
+        /// Gets or sets the location of the sticky note on the canvas. The location for sticky 
+        /// notes is in the center of the note horizontally, but 10 pixels down from the top 
+        /// edge vertically.
+        /// </summary>
+        public Point Location
+        {
+            get
+            {
+                return new Point(
+                    (double)GetValue(Canvas.LeftProperty) + Width / 2.0,
+                    (double)GetValue(Canvas.TopProperty) + 10.0);
+            }
+            set
+            {
+                if (Location.Equals(value))
+                {
+                    // No change, so nothing to do
+                    return;
+                }
+
+                SetValue(Canvas.LeftProperty, value.X - Width / 2.0);
+                SetValue(Canvas.TopProperty, value.Y - 10.0);
+            }
+        }
+
+        #endregion
     }
 }

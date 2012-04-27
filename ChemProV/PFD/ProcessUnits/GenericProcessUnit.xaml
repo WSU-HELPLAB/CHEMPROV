@@ -9,7 +9,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 <UserControl x:Class="ChemProV.PFD.ProcessUnits.GenericProcessUnit"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    Width="43" Height="43" IsTabStop="True">
+    Width="43" Height="43" IsTabStop="True" Background="White">
     <Border>
         <Border Name="ProcessUnitBorder"
                 BorderThickness="2"

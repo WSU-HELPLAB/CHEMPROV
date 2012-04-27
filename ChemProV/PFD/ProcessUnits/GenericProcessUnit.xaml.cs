@@ -34,8 +34,12 @@ namespace ChemProV.PFD.ProcessUnits
     /// <summary>
     /// A simple implementation of the IProcessUnit interface.  This class should work
     /// for any process unit that doesn't require any special functionality.
+    /// E.O.
+    /// The direction I'm trying to go in with my refactoring is to eventually make this an 
+    /// abstract base class. Before my refactoring, generic process units were used as 
+    /// draggable stream endpoint icons, but I'm working on logic to eliminate that.
     /// </summary>
-    public partial class GenericProcessUnit : UserControl, IProcessUnit
+    public partial class GenericProcessUnit : UserControl, IProcessUnit, Core.ICanvasElement
     {
         public event EventHandler StreamsChanged = delegate { };
 
@@ -81,6 +85,12 @@ namespace ChemProV.PFD.ProcessUnits
         /// Specifies the source for the icon for this process unit
         /// </summary>
         private string m_iconSource;
+
+        /// <summary>
+        /// E.O.
+        /// Specifies the color for the subgroup. White is default.
+        /// </summary>
+        protected Color m_subgroup = Colors.White;
 
         private Brush SelectedBorderBrush = new SolidColorBrush(Colors.Yellow);
         private Brush GreenBorderBrush = new SolidColorBrush(Colors.Green);
@@ -140,8 +150,8 @@ namespace ChemProV.PFD.ProcessUnits
             // E.O.
             set
             {
-                this.SetValue(Canvas.LeftProperty, value.X - this.ActualWidth / 2.0);
-                this.SetValue(Canvas.TopProperty, value.Y - this.ActualHeight / 2.0);
+                this.SetValue(Canvas.LeftProperty, value.X - this.Width / 2.0);
+                this.SetValue(Canvas.TopProperty, value.Y - this.Height / 2.0);
             }
         }
 
@@ -541,6 +551,24 @@ namespace ChemProV.PFD.ProcessUnits
             return;
         }
 
+        /// <summary>
+        /// Gets or sets the subgroup color
+        /// </summary>
+        public virtual Color Subgroup
+        {
+            get
+            {
+                return m_subgroup;    
+            }
+            set
+            {
+                m_subgroup = value;
+
+                // We need to update the control's background color
+                this.Background = new SolidColorBrush(m_subgroup);
+            }
+        }
+
         #endregion IProcessUnit Members
 
         #region IXmlSerializable Members
@@ -575,6 +603,12 @@ namespace ChemProV.PFD.ProcessUnits
             writer.WriteElementString("X", GetValue(Canvas.LeftProperty).ToString());
             writer.WriteElementString("Y", GetValue(Canvas.TopProperty).ToString());
             writer.WriteEndElement();
+
+            // E.O.
+            // Write subgroup information, which right now is just an RGBA color
+            writer.WriteStartElement("Subgroup");
+            writer.WriteAttributeString("Color", Subgroup.ToString());
+            writer.WriteEndElement();
         }
 
         #endregion IXmlSerializable Members
@@ -596,8 +630,48 @@ namespace ChemProV.PFD.ProcessUnits
                            };
             puElement.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
             puElement.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
+
+            // E.O.
+            XElement subgroupEl = xpu.Element("Subgroup");
+            if (null != subgroupEl)
+            {
+                XAttribute sgAttr = subgroupEl.Attribute("Color");
+                if (null != sgAttr)
+                {
+                    Color clr;
+                    if (!Core.App.TryParseColor(sgAttr.Value, out clr))
+                    {
+                        clr = Colors.White;
+                    }
+                    this.Subgroup = clr;
+                }
+            }
+
             return targetUnit;
         }
+
+        #region ICanvasElement Members
+
+        public virtual Point Location
+        {
+            get
+            {
+                return MidPoint;
+            }
+            set
+            {
+                if (!MidPoint.Equals(value))
+                {
+                    MidPoint = value;
+                    if (null != LocationChanged)
+                    {
+                        LocationChanged(this, new EventArgs());
+                    }
+                }
+            }
+        }
+
+        #endregion
 
         #region non-inherited properties
 
@@ -617,21 +691,7 @@ namespace ChemProV.PFD.ProcessUnits
             }
         }
 
-        /// <summary>
-        /// Uber-hack used to track changes in the process unit's position.
-        /// Should not be called directly.  Instead, use Canvas.LeftProperty.
-        /// </summary>
-        public Double TopProperty
-        {
-            get
-            {
-                return Convert.ToDouble(GetValue(Canvas.TopProperty));
-            }
-            set
-            {
-                LocationChanged(this, new EventArgs());
-            }
-        }
+        
 
         #endregion non-inherited properties
     }

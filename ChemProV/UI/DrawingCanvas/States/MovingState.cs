@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -7,355 +7,152 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
+using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.UI.DrawingCanvas.Commands;
-using ChemProV.UI.DrawingCanvas.Commands.DrawingCanvasCommands;
+using ChemProV.PFD;
+using ChemProV.Core;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
+    /// <summary>
+    /// This is the state for the drawing canvas when we are moving an object. This is NOT used to create 
+    /// new objects, only move existing ones.
+    /// </summary>
     public class MovingState : IState
     {
-        private DrawingCanvas canvas;
-        private bool validMove = true;
-        public Point previousLocation = new Point();
+        private DrawingCanvas m_canvas;
 
-        public MovingState(DrawingCanvas c)
+        private bool m_mouseDown = false;
+
+        private MathCore.Vector m_mouseDownPt = new MathCore.Vector();
+
+        private MathCore.Vector m_originalLocation;
+
+        private GenericProcessUnit m_puThatGotBorderChange = null;
+        
+        /// <summary>
+        /// Private constructor. Use the static "Create" method to create an instance of a moving state. There 
+        /// are only certain types of items that we can move so we use the static constructor for error 
+        /// checking.
+        /// </summary>
+        /// <param name="c"></param>
+        private MovingState(DrawingCanvas c)
         {
-            canvas = c;
+            m_canvas = c;
+        }
+
+        public static MovingState Create(DrawingCanvas canvas)
+        {
+            // It's implied that the element we want to move is the selected item on the canvas
+            object elementToMove = canvas.SelectedElement;
+            
+            if (null == elementToMove || !(elementToMove is ICanvasElement))
+            {
+                // We can only move canvas elements
+                return null;
+            }
+
+            MovingState ms = new MovingState(canvas);
+            ICanvasElement ce = elementToMove as ICanvasElement;
+            ms.m_originalLocation = new MathCore.Vector(ce.Location);
+            return ms;
         }
 
         #region IState Members
 
-        public void MouseLeave(object sender, MouseEventArgs e)
-        {
-            /*    commandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, drawing_canvas.SelectedElement, drawing_canvas, e.GetPosition(drawing_canvas)).Execute();
-                drawing_canvas.SelectedPaletteItem = drawing_canvas.SelectedElement;
-                drawing_canvas.CurrentState = drawing_canvas.PlacingState;*/
-        }
-
-        /// <summary>
-        /// Moving the mouse and in movingstate so we are moving the selectedElement.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void MouseMove(object sender, MouseEventArgs e)
         {
-            if ((canvas as DrawingCanvas).SelectedElement is StreamSourceIcon)
+            if (!m_mouseDown)
             {
-                validMove = CommandFactory.CreateCommand(CanvasCommands.MoveTail, ((canvas as DrawingCanvas).SelectedElement as StreamSourceIcon).Stream, canvas, e.GetPosition(canvas), previousLocation).Execute();
+                return;
             }
-            else if ((canvas as DrawingCanvas).SelectedElement is StreamDestinationIcon)
+            
+            // We can't do anything if the canvas is read-only
+            if (m_canvas.IsReadOnly)
             {
-                validMove = CommandFactory.CreateCommand(CanvasCommands.MoveHead, ((canvas as DrawingCanvas).SelectedElement as StreamDestinationIcon).Stream, canvas, e.GetPosition(canvas), previousLocation).Execute();
+                return;
             }
-            else
+            
+            Point pt = e.GetPosition(m_canvas);
+
+            MathCore.Vector diff = (new MathCore.Vector(pt)) - m_mouseDownPt;
+            pt = (m_originalLocation + diff).ToPoint();
+
+            // If we changed a border color, change it back and null the reference
+            if (null != m_puThatGotBorderChange)
             {
-                validMove = CommandFactory.CreateCommand(CanvasCommands.MoveHead, canvas.SelectedElement, canvas, e.GetPosition(canvas), previousLocation).Execute();
+                m_puThatGotBorderChange.SetBorderColor(ProcessUnitBorderColor.Selected);
+                m_puThatGotBorderChange = null;
             }
-            previousLocation = e.GetPosition(canvas);
+
+            // Various objects have slightly different moving rules so we need to check the type
+            if (m_canvas.SelectedElement is PFD.ProcessUnits.GenericProcessUnit)
+            {
+                // First off, move the process unit
+                (m_canvas.SelectedElement as GenericProcessUnit).Location = pt;
+                
+                // See if we're dragging it over anything else
+                object hoveringOver = m_canvas.GetChildAt(pt, m_canvas.SelectedElement);
+
+                // See if it's a stream connection endpoint
+                DraggableStreamEndpoint dse = hoveringOver as DraggableStreamEndpoint;
+                if (null != dse)
+                {
+                    m_puThatGotBorderChange = m_canvas.SelectedElement as GenericProcessUnit;
+                    // Set the process unit's border color
+                    m_puThatGotBorderChange.SetBorderColor(dse.CanConnectTo(m_puThatGotBorderChange) ?
+                        ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
+                }
+            }
+            else if (m_canvas.SelectedElement is Core.ICanvasElement)
+            {
+                // Other items just get their locations set
+                (m_canvas.SelectedElement as Core.ICanvasElement).Location = pt;
+            }
+
+            // NOTE: Stream-oriented moving stuff is handled elsewhere. See the DraggableStreamEndpoint class
         }
 
-        private bool AttachStream(TemporaryProcessUnit tpu, Point Location)
-        {
-            bool deletedSomething = false;
-
-            //call stateChanger to take care of everything, it is undo and is not recursion
-            ChangeStateCommand changeState = ChangeStateCommand.GetInstance() as ChangeStateCommand;
-            changeState.Undo = true;
-            changeState.Drawing_Canvas = canvas;
-
-            if (canvas.IsReadOnly)
-            {
-                //since we are in readOnly mode the user cannot attach a process unit to a stream by dragging the process unit onto
-                //its soruce or destiation so automatically undo the action
-                changeState.Execute();
-                return deletedSomething;
-            }
-
-            if (tpu.IncomingStreams.Count != 0)
-            {
-                if ((canvas.SelectedElement as IProcessUnit).IsAcceptingIncomingStreams(tpu.IncomingStreams[0]))
-                {
-                    //make sure it is not an outgoing stream
-                    foreach (IStream stream in (canvas.SelectedElement as IProcessUnit).OutgoingStreams)
-                    {
-                        if (tpu.IncomingStreams[0] == stream)
-                        {
-                            changeState.Execute();
-                            return deletedSomething;
-                        }
-                    }
-                    CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, tpu.IncomingStreams[0].Destination, canvas, Location).Execute();
-                    //we removed an element so decrement i by one.
-                    deletedSomething = true;
-                    (tpu.IncomingStreams[0] as AbstractStream).DestinationArrorVisbility = true;
-                    (canvas.SelectedElement as IProcessUnit).AttachIncomingStream(tpu.IncomingStreams[0]);
-                    tpu.IncomingStreams[0].Destination = canvas.SelectedElement as IProcessUnit;
-                }
-                else
-                {
-                    changeState.Execute();
-                }
-            }
-            else
-            {
-                if ((canvas.SelectedElement as IProcessUnit).IsAcceptingOutgoingStreams(tpu.OutgoingStreams[0]))
-                {
-                    //make sure it is not an incoming stream
-                    foreach (IStream stream in (canvas.SelectedElement as IProcessUnit).IncomingStreams)
-                    {
-                        if (tpu.OutgoingStreams[0] == stream)
-                        {
-                            changeState.Execute();
-                            return deletedSomething;
-                        }
-                    }
-                    CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, tpu.OutgoingStreams[0].Source, canvas, Location).Execute();
-                    //we removed an element so decrement i by one.
-                    deletedSomething = true;
-                    (tpu.OutgoingStreams[0] as AbstractStream).SourceRectangleVisbility = true;
-                    (canvas.SelectedElement as IProcessUnit).AttachOutgoingStream(tpu.OutgoingStreams[0]);
-                    tpu.OutgoingStreams[0].Source = canvas.SelectedElement as IProcessUnit;
-                }
-                else
-                {
-                    changeState.Execute();
-                }
-            }
-            return deletedSomething;
-        }
-
-        /// <summary>
-        /// We have stopped our dragging need to check if it was a valid move.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
-            previousLocation = new Point(-2, -2);
-
-            //this determines if the process unit was placed ontop of a temporaryProcessUnit and if so it deals with it
-            if (canvas.SelectedElement is IProcessUnit)
+            if (!m_mouseDown)
             {
-                UserControl processUnitAsUserControl = canvas.SelectedElement as UserControl;
-                int i = 0;
-                for (i = 0; i < canvas.Children.Count; i++)
-                {
-                    UIElement ui = canvas.Children[i];
-                    if (ui is IProcessUnit && ui != canvas.SelectedElement)
-                    {
-                        UserControl tpu = (ui as UserControl);
-                        Point tpuTopLeftPoint = new Point((double)ui.GetValue(Canvas.LeftProperty), (double)ui.GetValue(Canvas.TopProperty));
-                        Point tpuBottemRightPoint = new Point(tpuTopLeftPoint.X + tpu.Width, tpuTopLeftPoint.Y + tpu.Height);
-                        Point processUnitTopLeft = new Point((double)processUnitAsUserControl.GetValue(Canvas.LeftProperty), (double)processUnitAsUserControl.GetValue(Canvas.TopProperty));
-                        Point ProcessUnitBottemRight = new Point(processUnitTopLeft.X + processUnitAsUserControl.Width, processUnitTopLeft.Y + processUnitAsUserControl.Height);
+                // If we didn't capture a mouse down first then we don't do the mouse-up
+                return;
+            }
+            
+            // Mouse button is no longer down
+            m_mouseDown = false;
 
-                        //Checks the top left conner of the tpu to see if it is in the PU
-                        if (processUnitTopLeft.X < tpuTopLeftPoint.X && ProcessUnitBottemRight.X > tpuTopLeftPoint.X && processUnitTopLeft.Y < tpuTopLeftPoint.Y && ProcessUnitBottemRight.Y > tpuTopLeftPoint.Y)
-                        {
-                            if (tpu is TemporaryProcessUnit)
-                            {
-                                //attach stream
-                                if (AttachStream(tpu as TemporaryProcessUnit, tpuTopLeftPoint))
-                                {
-                                    //AttachStream returns true if it deleted something if it did then we need to decrement i else i will miss an element
-                                    i--;
-                                }
-                            }
-                            else
-                            {
-                                ChangeStateCommand changeState = ChangeStateCommand.GetInstance() as ChangeStateCommand;
-                                changeState.Undo = true;
-                                changeState.Drawing_Canvas = canvas;
-                                changeState.Execute();
-                            }
-                        }
-                        //Checks the top right conner of the tpu to see if it is in the PU
-                        else if (ProcessUnitBottemRight.X > tpuTopLeftPoint.X && processUnitTopLeft.X < tpuBottemRightPoint.X && processUnitTopLeft.Y < tpuTopLeftPoint.Y && ProcessUnitBottemRight.Y > tpuTopLeftPoint.Y)
-                        {
-                            if (tpu is TemporaryProcessUnit)
-                            {
-                                if (canvas.IsReadOnly)
-                                {
-                                    ChangeStateCommand changeState = ChangeStateCommand.GetInstance() as ChangeStateCommand;
-                                    changeState.Undo = true;
-                                    changeState.Drawing_Canvas = canvas;
-                                    changeState.Execute();
-                                }
-                                else
-                                {
-                                    //attach stream
-                                    if (AttachStream(tpu as TemporaryProcessUnit, tpuTopLeftPoint))
-                                    {
-                                        //AttachStream returns true if it deleted something if it did then we need to decrement i else i will miss an element
-                                        i--;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                ChangeStateCommand changeState = ChangeStateCommand.GetInstance() as ChangeStateCommand;
-                                changeState.Undo = true;
-                                changeState.Drawing_Canvas = canvas;
-                                changeState.Execute();
-                            }
-                        }
-                        //Checks the bottem right conner of the tpu to see if it is in the PU
-                        else if (processUnitTopLeft.X < tpuBottemRightPoint.X && ProcessUnitBottemRight.X > tpuBottemRightPoint.X && processUnitTopLeft.Y < tpuBottemRightPoint.Y && ProcessUnitBottemRight.Y > tpuBottemRightPoint.Y)
-                        {
-                            if (tpu is TemporaryProcessUnit)
-                            {
-                                //attach stream
-                                if (AttachStream(tpu as TemporaryProcessUnit, tpuTopLeftPoint))
-                                {
-                                    //AttachStream returns true if it deleted something if it did then we need to decrement i else i will miss an element
-                                    i--;
-                                }
-                            }
-                            else
-                            {
-                                ChangeStateCommand changeState = ChangeStateCommand.GetInstance() as ChangeStateCommand;
-                                changeState.Undo = true;
-                                changeState.Drawing_Canvas = canvas;
-                                changeState.Execute();
-                            }
-                        }
-                        //Checks the top right conner of the tpu to see if it is in the PU
-                        else if (ProcessUnitBottemRight.X > tpuTopLeftPoint.X && processUnitTopLeft.X < tpuTopLeftPoint.X && processUnitTopLeft.Y < tpuBottemRightPoint.Y && ProcessUnitBottemRight.Y > tpuBottemRightPoint.Y)
-                        {
-                            if (tpu is TemporaryProcessUnit)
-                            {
-                                //attach stream
-                                if (AttachStream(tpu as TemporaryProcessUnit, tpuTopLeftPoint))
-                                {
-                                    //AttachStream returns true if it deleted something if it did then we need to decrement i else i will miss an element
-                                    i--;
-                                }
-                            }
-                            else
-                            {
-                                ChangeStateCommand changeState = ChangeStateCommand.GetInstance() as ChangeStateCommand;
-                                changeState.Undo = true;
-                                changeState.Drawing_Canvas = canvas;
-                                changeState.Execute();
-                            }
-                        }
-                    }
-                }
+            Point location = e.GetPosition(m_canvas);
+            if (m_canvas.SelectedElement is IProcessUnit)
+            {
+                DropProcessUnit(m_canvas.SelectedElement as IProcessUnit, location);
+            }
+            // Note that stream endpoint stuff is handled in a different state object
+            else if (m_canvas.SelectedElement is ICanvasElement)
+            {
+                // All we have to do here is create an undo and then fall through to 
+                // below and go back to the null state
+                m_canvas.AddUndo(new UndoRedoCollection("Undo move",
+                    new PFD.Undos.RestoreLocation((ICanvasElement)m_canvas.SelectedElement, 
+                        m_originalLocation.ToPoint())));
             }
 
-            if (validMove == false)
-            {
-                if (canvas.SelectedElement is StreamDestinationIcon)
-                {
-                    if ((canvas as DrawingCanvas).HoveringOver is IProcessUnit)
-                    {
-                        ((canvas as DrawingCanvas).HoveringOver as GenericProcessUnit).SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                    }
-                    CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, (canvas.SelectedElement as StreamDestinationIcon).Stream, canvas, new Point()).Execute();
+            // Letting up the left mouse button signifies the end of the moving state. Therefore 
+            // we want to set the drawing canvas state to null
+            m_canvas.CurrentState = null;
+        }
 
-                    //This must either be a new stream command or a move command.
-                    StreamUndo streamUndo = canvas.undoStack.First.Value as StreamUndo;
-                    canvas.undoStack.RemoveFirst();
-                    if (streamUndo.CommandIssed == CanvasCommands.MoveHead)
-                    {
-                        canvas.saveState(CanvasCommands.RemoveFromCanvas, (canvas.SelectedElement as StreamDestinationIcon).Stream, canvas, streamUndo.Location);
-                    }
-                    else
-                    {
-                        //do nothing we removed the add command so now it is like this never happend.
-                    }
-                }
-                else if (canvas.SelectedElement is StreamSourceIcon)
-                {
-                    if ((canvas as DrawingCanvas).HoveringOver is IProcessUnit)
-                    {
-                        ((canvas as DrawingCanvas).HoveringOver as GenericProcessUnit).SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                    }
-                    CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, (canvas.SelectedElement as StreamSourceIcon).Stream, canvas, new Point()).Execute();
-
-                    //This must either be a new stream command or a move command.
-                    StreamUndo streamUndo = canvas.undoStack.First.Value as StreamUndo;
-                    canvas.undoStack.RemoveFirst();
-
-                    if (streamUndo.CommandIssed == CanvasCommands.MoveTail)
-                    {
-                        canvas.saveState(CanvasCommands.RemoveFromCanvas, (canvas.SelectedElement as StreamSourceIcon).Stream, canvas, streamUndo.Location);
-                    }
-                    else
-                    {
-                        //do nothing we removed the add command so now it is like this never happend.
-                    }
-                }
-                else
-                {
-                    if ((canvas as DrawingCanvas).HoveringOver is IProcessUnit)
-                    {
-                        ((canvas as DrawingCanvas).HoveringOver as GenericProcessUnit).SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                    }
-                    CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, canvas.SelectedElement, canvas, new Point()).Execute();
-                }
-                validMove = true;
-                canvas.SelectedElement = null;
-                canvas.CurrentState = canvas.NullState;
-            }
-            else
-            {
-                if (canvas.SelectedElement is StreamDestinationIcon)
-                {
-                    IStream stream = (canvas.SelectedElement as StreamDestinationIcon).Stream;
-                    if (stream.Source == stream.Destination)
-                    {
-                        //source and dest are the same which is not allowed do not exit moving state
-                        return;
-                    }
-                    if ((canvas as DrawingCanvas).HoveringOver is IProcessUnit)
-                    {
-                        ((canvas as DrawingCanvas).HoveringOver as GenericProcessUnit).SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                    }
-                }
-                else if (canvas.SelectedElement is StreamSourceIcon)
-                {
-                    IStream stream = (canvas.SelectedElement as StreamSourceIcon).Stream;
-                    if (stream.Source == stream.Destination)
-                    {
-                        //source and dest are the same which is not allowed do not exit moving state
-                        return;
-                    }
-                    if ((canvas as DrawingCanvas).HoveringOver is IProcessUnit)
-                    {
-                        ((canvas as DrawingCanvas).HoveringOver as GenericProcessUnit).SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                    }
-                }
-                else if (canvas.SelectedElement is IProcessUnit)
-                {
-                    if (ProcessUnitFactory.GetProcessUnitType((canvas.SelectedElement as IProcessUnit)) == ProcessUnitType.HeatExchanger)
-                    {
-                        if ((canvas.SelectedElement as IProcessUnit).IncomingStreams.Count == 0)
-                        {
-                            HeatStream hs = new HeatStream();
-                            hs.Destination = canvas.SelectedElement as IProcessUnit;
-                            (canvas.SelectedElement as IProcessUnit).AttachIncomingStream(hs);
-                            CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, hs, canvas, previousLocation).Execute();
-                            canvas.SelectedElement = new StreamSourceIcon(hs, hs.rectangle);
-
-                            //Remove the event listener from the arrow so it is not dettachable
-                            hs.Arrow_MouseButtonLeftDown -= new MouseButtonEventHandler((canvas as DrawingCanvas).HeadMouseLeftButtonDownHandler);
-
-                            canvas.UpdateCanvasSize();
-                            //need to stay in moving state so return so we dont go to selectedState
-                            return;
-                        }
-                    }
-                }
-                //we have finished a move need to update the saved state for the move with new location
-                canvas.CurrentState = canvas.SelectedState;
-                canvas.UpdateCanvasSize();
-            }
+        public void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            m_mouseDown = true;
+            m_mouseDownPt = new MathCore.Vector(e.GetPosition(m_canvas));
         }
 
         #region Unused Mouse Events
@@ -364,15 +161,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         {
         }
 
-        public void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-        }
-
-        public void MouseRightButtonDown(object sender, MouseButtonEventArgs e)
-        {
-        }
-
-        public void MouseRightButtonUp(object sender, MouseButtonEventArgs e)
+        public void MouseLeave(object sender, MouseEventArgs e)
         {
         }
 
@@ -380,13 +169,80 @@ namespace ChemProV.UI.DrawingCanvas.States
         {
         }
 
-        #endregion Unused Mouse Events
+        public void StateEnding()
+        {
+        }
 
-        #endregion IState Members
+        #endregion Unused Mouse Events
 
         public void LostMouseCapture(object sender, MouseEventArgs e)
         {
             MouseLeftButtonUp(sender, e as MouseButtonEventArgs);
+        }
+
+        #endregion IState Members
+
+        private void DropProcessUnit(IProcessUnit pu, Point location)
+        {
+            // We want to see if the process unit is being dragged and dropped onto a stream 
+            // source or destination
+
+            // Get the element (besides the one being dragged) that's at the mouse location
+            object dropTarget = m_canvas.GetChildAt(location, m_canvas.SelectedElement);
+
+            // If there is no child at that point or there is a child but it's not a stream endpoint 
+            // then this ends up just being a move of the process unit
+            if (null == dropTarget || !(dropTarget is DraggableStreamEndpoint))
+            {
+                // Add an undo that will move the process unit back to where it was
+                m_canvas.AddUndo(new UndoRedoCollection("Undo moving process unit",
+                    new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
+
+                // The control is already in the right position from the mouse-move event, so we're done
+                return;
+            }
+
+            // Coming here means that we've dropped the process unit on a stream endpoint. We need to
+            // check if this is a valid move or not and handle it appropriately.
+            DraggableStreamEndpoint streamEndpoint = dropTarget as DraggableStreamEndpoint;
+            if (streamEndpoint.CanConnectTo(pu))
+            {
+                switch (streamEndpoint.Type)
+                {
+                    case DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected:
+                        m_canvas.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
+                            new PFD.Undos.DetachIncomingStream(pu, streamEndpoint.ParentStream),
+                            new PFD.Undos.SetStreamDestination(streamEndpoint.ParentStream, null),
+                            new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
+                        pu.AttachIncomingStream(streamEndpoint.ParentStream);
+                        streamEndpoint.ParentStream.Destination = pu;
+                        break;
+
+                    case DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected:
+                        m_canvas.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
+                            new PFD.Undos.DetachOutgoingStream(pu, streamEndpoint.ParentStream),
+                            new PFD.Undos.SetStreamSource(streamEndpoint.ParentStream, null),
+                            new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
+                        pu.AttachOutgoingStream(streamEndpoint.ParentStream);
+                        streamEndpoint.ParentStream.Source = pu;
+                        break;
+
+                    default:
+                        // Um....
+                        break;
+                }
+            }
+            else // Not a valid move
+            {
+                // In this case we simply snap it back to where it was when the move started. 
+                // Ideally we should have some sort of animation that makes it slide back to its original 
+                // location, but that can come much later if we want it.
+                pu.Location = m_originalLocation.ToPoint();
+                
+                // Note that in either case we've essentially canceled the action and no net-change has 
+                // been made. Thus we don't need to create an undo.
+                return;
+            }
         }
     }
 }

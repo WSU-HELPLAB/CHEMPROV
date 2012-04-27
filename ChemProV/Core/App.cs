@@ -18,6 +18,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using System.Windows.Media.Imaging;
 
 namespace ChemProV.Core
 {
@@ -27,6 +28,21 @@ namespace ChemProV.Core
     public static class App
     {
         private static ChemProV.UI.WorkSpace s_workspace = null;
+
+        public static Image CreateImageFromSource(string source)
+        {
+            if (!source.StartsWith("/UI"))
+            {
+                source = "/UI/Icons/" + source;
+            }
+            
+            Image img = new Image();
+            BitmapImage bmp = new BitmapImage();
+            bmp.UriSource = new Uri(source, UriKind.Relative);
+            img.SetValue(Image.SourceProperty, bmp);
+
+            return img;
+        }
 
         public static OptionDifficultySetting DifficultySetting
         {
@@ -47,6 +63,30 @@ namespace ChemProV.Core
         public static void MessageBox(string message)
         {
             System.Windows.MessageBox.Show(message);
+        }
+
+        /// <summary>
+        /// Attempts to parse a string of the form "#AARRGGBB" and build a color 
+        /// value from it. On failure, the color is set to white and false is 
+        /// returned.
+        /// </summary>
+        public static bool TryParseColor(string argb, out Color color)
+        {
+            // We're expecting strings of this form for the color:
+            //  #AARRGGBB
+            
+            if (!argb.StartsWith("#") || 9 != argb.Length)
+            {
+                color = Colors.White;
+                return false;
+            }
+
+            byte a = Convert.ToByte(argb.Substring(1, 2), 16);
+            byte r = Convert.ToByte(argb.Substring(3, 2), 16);
+            byte g = Convert.ToByte(argb.Substring(5, 2), 16);
+            byte b = Convert.ToByte(argb.Substring(7, 2), 16);
+            color = Color.FromArgb(a, r, g, b);
+            return true;
         }
 
         public static ChemProV.UI.WorkSpace Workspace

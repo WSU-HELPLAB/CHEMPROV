@@ -14,6 +14,7 @@ using System.Windows.Controls;
 using System.Xml.Serialization;
 using ChemProV.PFD.Streams;
 using System.Xml.Linq;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.ProcessUnits
 {
@@ -21,7 +22,7 @@ namespace ChemProV.PFD.ProcessUnits
     /// Interface that must be implemented by any process unit.  This outlines all of the basic
     /// functionality encapsulated by any process unit.
     /// </summary>
-    public interface IProcessUnit : IPfdElement, IXmlSerializable
+    public interface IProcessUnit : IPfdElement, IXmlSerializable, ICanvasElement
     {
         event EventHandler StreamsChanged;
 
@@ -160,5 +161,18 @@ namespace ChemProV.PFD.ProcessUnits
         /// <param name="xpu"></param>
         /// <returns></returns>
         IProcessUnit FromXml(XElement xpu, IProcessUnit targetUnit);
+
+        /// <summary>
+        /// E.O.
+        /// Not sure if defining this as a color is the best thing to do, but that's 
+        /// essentially all it will be in the interface is a color. All colors should 
+        /// be fully opaque (alpha=255). The color white RGBA(255, 255, 255, 255) will 
+        /// be default.
+        /// </summary>
+        System.Windows.Media.Color Subgroup
+        {
+            get;
+            set;
+        }
     }
 }

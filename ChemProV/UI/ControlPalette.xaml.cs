@@ -21,6 +21,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Reflection;
 using ChemProV.PFD.ProcessUnits;
+using ChemProV.PFD.Streams;
 
 namespace ChemProV.UI
 {
@@ -72,8 +73,47 @@ namespace ChemProV.UI
             return btn;
         }
 
+        /// <summary>
+        /// Highlights the select button (and unhighlights all others) without setting any canvas states. 
+        /// The SwitchToSelect method will set the drawing canvas's current state to null but this method 
+        /// will not.
+        /// </summary>
+        public void HighlightSelect()
+        {
+            DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
+            SolidColorBrush fill = new SolidColorBrush(Colors.White);
+
+            // Start by setting the background on all "buttons" to white. Reminder: we're 
+            // using Border objects for our buttons.
+            SelectButton.Background = StickyNoteButton.Background = fill;
+            SelectButton.BorderThickness = StickyNoteButton.BorderThickness = new Thickness(1.0);
+            foreach (UIElement ui in ProcessUnitsPanel.Children)
+            {
+                Border btn = ui as Border;
+                if (null != ui)
+                {
+                    btn.Background = fill;
+                    btn.BorderThickness = new Thickness(1.0);
+                }
+            }
+            foreach (UIElement ui in StreamsPanel.Children)
+            {
+                Border btn = ui as Border;
+                if (null != ui)
+                {
+                    btn.Background = fill;
+                    btn.BorderThickness = new Thickness(1.0);
+                }
+            }
+
+            // Now set the background on the one that was clicked to indicate that it's active
+            SelectButton.Background = new SolidColorBrush(Colors.Yellow);
+            SelectButton.BorderThickness = new Thickness(2.0);
+        }
+
         private void PaletteButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
             SolidColorBrush fill = new SolidColorBrush(Colors.White);
 
             // Start by setting the background on all "buttons" to white. Reminder: we're 
@@ -109,16 +149,40 @@ namespace ChemProV.UI
             // mode. Similar thing with sticky notes. The select button is a special case wherein we want 
             // to cancel/finish and current state for the canvas and switch over to a null state.
 
+            // First, set the canvas's selected element to null
+            Core.App.Workspace.DrawingCanvas.SelectedElement = null;
+
             // Start with the select button
             if (object.ReferenceEquals(sender, SelectButton))
             {
-                Core.App.Workspace.DrawingCanvas.CurrentState = Core.App.Workspace.DrawingCanvas.NullState;
+                Core.App.Workspace.DrawingCanvas.CurrentState = null;
+                return;
+            }
+            else if (object.ReferenceEquals(sender, StickyNoteButton))
+            {
+                // We have a custom state for placing sticky notes
+                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingStickyNote(
+                    canvas, this);
                 return;
             }
 
-            // Set the canvas state to setting a new object
-            Core.App.Workspace.DrawingCanvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewObject(
-                this, Core.App.Workspace.DrawingCanvas, ((Border)sender).Tag);
+            // Get the type of object we are about to create
+            Type newObjType = ((Border)sender).Tag as Type;
+
+            // If it's a process unit, assign the state to create it
+            if (newObjType.IsSubclassOf(typeof(GenericProcessUnit)))
+            {
+                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewProcessUnit(
+                    this, canvas, newObjType);
+            }
+            else
+            {
+                // Set the canvas state to setting a new object of the appropriate type
+                // This state handles the placing of streams
+                // TODO: Rename appropriately since it only handles streams
+                Core.App.Workspace.DrawingCanvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
+                    this, Core.App.Workspace.DrawingCanvas, newObjType);
+            }
         }
 
         /// <summary>
@@ -158,14 +222,38 @@ namespace ChemProV.UI
                 }
                 else if (t.IsSubclassOf(typeof(PFD.Streams.AbstractStream)))
                 {
-                    // We've found a potential stream, but we need to make sure that 
-                    // it can be created under the specified difficulty setting. Create 
-                    // a dummy object to find out.
-                    PFD.Streams.IStream stream = (PFD.Streams.IStream)Activator.CreateInstance(t);
-                    if (stream.IsAvailableWithDifficulty(setting))
+                    // We've found a potential stream, but we need to make sure that it can be created under the 
+                    // specified difficulty setting. The stream must have a static method for this and we'll use 
+                    // reflection to find it.
+                    MethodInfo mi = t.GetMethod("IsAvailableWithDifficulty",
+                        new Type[]{typeof(OptionDifficultySetting)});
+
+                    // Tell the developer that they need to add this in
+                    if (null == mi)
                     {
-                        StreamsPanel.Children.Add(CreateButton((stream is PFD.Streams.HeatStream) ?
-                            "/UI/Icons/pu_heat_stream.png" : "/UI/Icons/pu_stream.png", stream.Title, t));
+                        throw new Exception("Note to developer: You have a class named " + t.Name +
+                            " that inherits from AbstractStream but does not have the required static method " +
+                            "\"IsAvailableWithDifficulty(OptionDifficultySetting)\". Please implement this " +
+                            "method so that the control palette knows how to deal with the stream type.");
+                    }
+
+                    // There also needs to be a static string property for the title
+                    PropertyInfo pi = t.GetProperty("Title", typeof(string));
+                    if (null == pi)
+                    {
+                        throw new Exception("Note to developer: You have a class named " + t.Name +
+                            " that inherits from AbstractStream but does not have the required static property " +
+                            "\"string Title { get; }\". Please implement this property so that the control " + 
+                            "palette knows how to label the stream creation option.");
+                    }
+
+                    // Execute it
+                    bool available = (bool)mi.Invoke(null, new object[] { setting });
+                    if (available)
+                    {
+                        StreamsPanel.Children.Add(CreateButton(t.Equals(typeof(PFD.Streams.HeatStream)) ?
+                            "/UI/Icons/pu_heat_stream.png" : "/UI/Icons/pu_stream.png",
+                            pi.GetGetMethod().Invoke(null, null) as string, t));
                     }
                 }
             }

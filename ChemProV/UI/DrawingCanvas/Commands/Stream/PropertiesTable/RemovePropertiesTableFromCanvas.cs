@@ -20,7 +20,6 @@ namespace ChemProV.UI.DrawingCanvas.Commands.Stream.PropertiesWindow
         /// Private reference to our drawing_canvas.  Needed to add the new object to the drawing space
         /// </summary>
         private Panel canvas;
-        private CommandFactory commandFactory = new CommandFactory();
 
         public Panel Canvas
         {
