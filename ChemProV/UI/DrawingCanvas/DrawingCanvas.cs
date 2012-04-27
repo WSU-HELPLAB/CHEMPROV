@@ -228,6 +228,18 @@ namespace ChemProV.UI.DrawingCanvas
             }
         }
 
+        public string UndoTitle
+        {
+            get
+            {
+                if (0 == m_undos.Count)
+                {
+                    return "Undo";
+                }
+                return m_undos.Peek().Title;
+            }
+        }
+
         /// <summary>
         /// E.O.
         /// Gets the number of redos currently on the redo stack.
@@ -237,6 +249,18 @@ namespace ChemProV.UI.DrawingCanvas
             get
             {
                 return m_redos.Count;
+            }
+        }
+
+        public string RedoTitle
+        {
+            get
+            {
+                if (0 == m_redos.Count)
+                {
+                    return "Redo";
+                }
+                return m_redos.Peek().Title;
             }
         }
 

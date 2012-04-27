@@ -26,6 +26,8 @@ namespace ChemProV.PFD.ProcessUnits
         /// </summary>
         private List<Core.Comment> m_comments = new List<Core.Comment>();
 
+        private string m_labelOnEditStart = null;
+
         /// <summary>
         /// Default constructor - used only for design view
         /// Keep the protection on this private!
@@ -79,8 +81,8 @@ namespace ChemProV.PFD.ProcessUnits
             }
             set
             {
-                //don't allow empty names
-                if (value.Length > 0)
+                // Don't allow null or empty names
+                if (!string.IsNullOrEmpty(value))
                 {
                     processUnitLabel = value;
                     PropertyChanged(this, new PropertyChangedEventArgs("ProcessUnitLabel"));
@@ -108,6 +110,25 @@ namespace ChemProV.PFD.ProcessUnits
         {
             ProcessUnitNameText.Visibility = System.Windows.Visibility.Visible;
             ProcessUnitNameBox.Visibility = System.Windows.Visibility.Collapsed;
+
+            // Here's where we finalize the name change, so we need an undo if the name changed
+            if (!ProcessUnitLabel.Equals(m_labelOnEditStart))
+            {
+                if (null == m_labelOnEditStart)
+                {
+                    Core.App.Log(Core.App.LogItemType.Error,
+                        "Labeled process unit tried to create undo but had a null string for its original label");
+                }
+                else
+                {
+                    string undoText = "Undo renaming process unit from " + m_labelOnEditStart +
+                        " to " + ProcessUnitLabel;
+                    Core.App.Workspace.DrawingCanvasReference.AddUndo(
+                        new UndoRedoCollection(undoText,
+                        new Undos.SetProcessUnitLabel(this, m_labelOnEditStart)));
+                }
+            }
+            
         }
 
         void ProcessUnitNameBox_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -121,6 +142,9 @@ namespace ChemProV.PFD.ProcessUnits
             ProcessUnitNameBox.Visibility = System.Windows.Visibility.Visible;
             ProcessUnitNameBox.Focus();
             e.Handled = true;
+
+            // This is where we begin the name edit, so we need to store the current name
+            m_labelOnEditStart = ProcessUnitLabel;
         }
 
         #region GenericProcessUnitOverrides

@@ -9,6 +9,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 // Original file author: Evan Olds
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -27,6 +28,8 @@ namespace ChemProV.Core
     /// </summary>
     public static class App
     {
+        private static List<LogItem> s_log = new List<LogItem>();
+        
         private static ChemProV.UI.WorkSpace s_workspace = null;
 
         public static Image CreateImageFromSource(string source)
@@ -58,6 +61,15 @@ namespace ChemProV.Core
         public static void Init(ChemProV.UI.WorkSpace workspace)
         {
             s_workspace = workspace;
+        }
+
+        /// <summary>
+        /// Writes a message to the application's log. Currently this is just an in-memory log 
+        /// used mainly for debugging, but it might be altered to write to a file in the future.
+        /// </summary>
+        public static void Log(LogItemType type, string message)
+        {
+            s_log.Add(new LogItem(type, message));
         }
 
         public static void MessageBox(string message)
@@ -94,6 +106,42 @@ namespace ChemProV.Core
             get
             {
                 return s_workspace;
+            }
+        }
+
+        public enum LogItemType
+        {
+            Info,
+            Warning,
+            Error
+        }
+
+        private class LogItem
+        {
+            private LogItemType m_type;
+
+            private string m_message;
+
+            public LogItem(LogItemType type, string message)
+            {
+                m_type = type;
+                m_message = message;
+            }
+
+            public string Message
+            {
+                get
+                {
+                    return m_message;
+                }
+            }
+
+            public LogItemType Type
+            {
+                get
+                {
+                    return m_type;
+                }
             }
         }
     }
