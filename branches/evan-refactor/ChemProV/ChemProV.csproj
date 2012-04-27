@@ -129,6 +129,9 @@
       <DependentUpon>ChemProVHolder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\App.cs" />
+    <Compile Include="Core\DrawingCanvasCommands.cs" />
+    <Compile Include="Core\CommentDefs.cs" />
+    <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
@@ -137,6 +140,9 @@
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
+    <Compile Include="MathCore\LineSegment.cs" />
+    <Compile Include="MathCore\Rectangle.cs" />
+    <Compile Include="MathCore\Vector.cs" />
     <Compile Include="PFD\EquationEditor\EquationControl.xaml.cs">
       <DependentUpon>EquationControl.xaml</DependentUpon>
     </Compile>
@@ -198,6 +204,9 @@
       <DependentUpon>AbstractStream.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\Streams\ChemicalStream.cs" />
+    <Compile Include="PFD\Streams\DraggableStreamEndpoint.xaml.cs">
+      <DependentUpon>DraggableStreamEndpoint.xaml</DependentUpon>
+    </Compile>
     <Compile Include="PFD\Streams\HeatStream.cs" />
     <Compile Include="PFD\Streams\IStream.cs" />
     <Compile Include="PFD\ProcessUnits\ProcessUnitFactory.cs" />
@@ -233,11 +242,18 @@
     <Compile Include="PFD\Streams\StreamDestinationIcon.cs" />
     <Compile Include="PFD\Streams\StreamEnd.cs" />
     <Compile Include="PFD\Streams\StreamFactory.cs" />
-    <Compile Include="PFD\Streams\StreamSourceIcon.cs" />
     <Compile Include="PFD\Undos\AddToCanvas.cs" />
+    <Compile Include="PFD\Undos\AttachOutgoingStream.cs" />
+    <Compile Include="PFD\Undos\DetachOutgoingStream.cs" />
+    <Compile Include="PFD\Undos\RestoreStickyNoteColor.cs" />
+    <Compile Include="PFD\Undos\SetProcessSubgroup.cs" />
+    <Compile Include="PFD\Undos\DetachIncomingStream.cs" />
+    <Compile Include="PFD\Undos\AttachIncomingStream.cs" />
     <Compile Include="PFD\Undos\RemoveFromCanvas.cs" />
-    <Compile Include="PFD\Undos\ResizeUserControl.cs" />
-    <Compile Include="PFD\Undos\RestorePosition.cs" />
+    <Compile Include="PFD\Undos\ResizeControl.cs" />
+    <Compile Include="PFD\Undos\RestoreLocation.cs" />
+    <Compile Include="PFD\Undos\SetStreamDestination.cs" />
+    <Compile Include="PFD\Undos\SetStreamSource.cs" />
     <Compile Include="PFD\Undos\UndoDefs.cs" />
     <Compile Include="RequestOpenFileArgs.cs" />
     <Compile Include="UI\AboutWindow.xaml.cs">
@@ -253,43 +269,21 @@
     <Compile Include="UI\ControlPalette.xaml.cs">
       <DependentUpon>ControlPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\DrawingCanvas\Commands\RightClickMenu\AddContextMenuToCanvasCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\DeleteIPfdElementCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\AddProcessUnitToCanvasCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\CommandFactory.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommandEventArgs.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\MoveProcessUnitCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\NullCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\ProcessUnit\RemoveProcessUnitFromCanvasCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\ICommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\RightClickMenu\RemoveContextMenuFromCanvas.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\AddStickyNoteToCanvasCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\ChangeColorCommandcs.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\MoveStickyNoteCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\RemoveStickyNoteFromCanvasCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\StickyNoteCommand\ResizeStickNoteCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\AddStreamToCanvasCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\DeleteStreamFromCanvas.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\MoveStreamHeadCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\MoveStreamTailCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\AddPropertiesTableToCanvasCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\MovePropertiesTableCommand.cs" />
     <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\RemovePropertiesTableFromCanvas.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\ChangeStateCommand.cs" />
     <Compile Include="UI\DrawingCanvas\PfdUpdatedEventArgs.cs" />
-    <Compile Include="UI\DrawingCanvas\ProcessUnitUndo.cs" />
-    <Compile Include="UI\DrawingCanvas\SavedStateObject.cs" />
     <Compile Include="UI\DrawingCanvas\DrawingCanvas.cs" />
     <Compile Include="UI\DrawingCanvas\States\IState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MenuState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\NullState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\PlacingNewObject.cs" />
-    <Compile Include="UI\DrawingCanvas\States\PlacingState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\ResizeingState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\SelectedState.cs" />
-    <Compile Include="UI\DrawingCanvas\StickyNoteUndo.cs" />
-    <Compile Include="UI\DrawingCanvas\StreamUndo.cs" />
+    <Compile Include="UI\DrawingCanvas\States\PlacingNewStream.cs" />
+    <Compile Include="UI\DrawingCanvas\States\PlacingNewProcessUnit.cs" />
+    <Compile Include="UI\DrawingCanvas\States\PlacingStickyNote.cs" />
+    <Compile Include="UI\DrawingCanvas\States\ResizingStickyNote.cs" />
     <Compile Include="UI\OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
@@ -407,6 +401,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="PFD\Streams\DraggableStreamEndpoint.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -501,6 +499,12 @@
     <Content Include="Libraries\Silverlight.Controls.dll" />
     <Content Include="Libraries\Silverlight.Controls.pdb" />
     <Content Include="Libraries\System.Windows.Interactivity.dll" />
+    <Content Include="UI\Icons\check_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\comment_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UI\Icons\logo128.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -561,6 +565,9 @@
     <Content Include="UI\Icons\pu_stream.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="UI\Icons\StreamSourceConnection.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UI\Icons\toolbar_about.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
@@ -607,7 +614,11 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\" />
+    <Folder Include="UI\DrawingCanvas\Commands\ProcessUnit\" />
+    <Folder Include="UI\DrawingCanvas\Commands\RightClickMenu\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

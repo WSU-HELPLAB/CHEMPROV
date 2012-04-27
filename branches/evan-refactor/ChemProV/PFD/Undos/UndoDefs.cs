@@ -43,7 +43,20 @@ namespace ChemProV.PFD
     /// </summary>
     public class UndoRedoExecutionParameters
     {
+        private UI.DrawingCanvas.DrawingCanvas m_canvas;
 
+        public UndoRedoExecutionParameters(UI.DrawingCanvas.DrawingCanvas canvas)
+        {
+            m_canvas = canvas;
+        }
+
+        public UI.DrawingCanvas.DrawingCanvas DrawingCanvas
+        {
+            get
+            {
+                return m_canvas;
+            }
+        }
     }
 
     /// <summary>
@@ -58,6 +71,17 @@ namespace ChemProV.PFD
     /// </summary>
     public class UndoRedoCollection
     {
+        // Things NOT to add to this class:
+        // Do NOT add the ability to add new items to the collection after it has been 
+        // instantiated. If there's a scenario where to want to build up a list of 
+        // IUndoRedoAction objects and you don't want to do it in a single statement, 
+        // then use a list of some sort (System.Collections.Generic.List for example) 
+        // to add all your actions and then create the undo/redo collection by using 
+        // the .ToArray() method on that list.
+        // This keeps the collection immutable which has greater potential to reduce 
+        // coding errors.
+        
+        
         private List<IUndoRedoAction> m_items = new List<IUndoRedoAction>();
 
         /// <summary>
@@ -69,15 +93,6 @@ namespace ChemProV.PFD
         /// description will be stored in this title.
         /// </summary>
         private string m_title = "Undo";
-
-        /// <summary>
-        /// Constructs an UndoRedoCollection that consists of a single IUndoRedoAction item. 
-        /// The default title of "Undo" will be used.
-        /// </summary>
-        public UndoRedoCollection(IUndoRedoAction singleAction)
-        {
-            m_items.Add(singleAction);
-        }
 
         /// <summary>
         /// Constructs an UndoRedoCollection that consists one or more IUndoRedoAction items 

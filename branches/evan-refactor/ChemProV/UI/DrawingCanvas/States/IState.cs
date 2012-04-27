@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -12,7 +12,7 @@ using System.Windows.Input;
 namespace ChemProV.UI.DrawingCanvas.States
 {
     /// <summary>
-    /// This is the base class that all states inherite from.
+    /// This is the base class that all states inherit from.
     /// </summary>
     public interface IState
     {
@@ -26,12 +26,19 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         void MouseLeftButtonUp(object sender, MouseButtonEventArgs e);
 
-        void MouseRightButtonDown(object sender, MouseButtonEventArgs e);
-
-        void MouseRightButtonUp(object sender, MouseButtonEventArgs e);
-
         void MouseWheel(object sender, MouseEventArgs e);
 
         void LostMouseCapture(object sender, MouseEventArgs e);
+
+        /// <summary>
+        /// This is invoked by the drawing canvas when this state is currently active but 
+        /// is about to be deactivated for another state to come in (or perhaps no state). 
+        /// This can be used for things like hiding a popup menu that was added to the 
+        /// canvas.
+        /// While states generally have permission to set a new drawing canvas state from 
+        /// their mouse processing functions, the must not set the CurrentState property of 
+        /// the drawing canvas from this function.
+        /// </summary>
+        void StateEnding();
     }
 }
