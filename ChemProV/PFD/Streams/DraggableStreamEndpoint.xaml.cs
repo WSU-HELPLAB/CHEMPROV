@@ -242,9 +242,9 @@ namespace ChemProV.PFD.Streams
             set
             {
                 // IMPORTANT
-                // Never try to create undos in here. The location can be changed by a variety of 
-                // code paths for a variety of different reasons. Thus, undo actions to restore 
-                // location (if needed) are created at a higher level and not within this setter.
+                // Never try to create undos in here. The location property can be changed by a variety of 
+                // code paths for a variety of different reasons. Thus, undo actions to restore location 
+                // (if needed) are created at a higher level and not within this setter.
                 
                 Point current = new Point(
                     (double)GetValue(Canvas.LeftProperty) + this.Width / 2.0,
@@ -315,7 +315,7 @@ namespace ChemProV.PFD.Streams
                 m_connectedToOnMouseDown.DettachIncomingStream(m_owner);
 
                 // Set the destination to null on the stream. Note that this will invoke our type change event
-                m_owner.Source = null;
+                m_owner.Destination = null;
             }
             
             // First position this control on the drawing canvas
@@ -336,45 +336,20 @@ namespace ChemProV.PFD.Streams
             // Now we need to ask the question of: if we were to drop the endpoint here, could we make 
             // a valid connection? We need to answer this question and give some sort of signal to 
             // the user to let them know if they can connect this way or not.
-            if (EndpointType.StreamSourceNotConnected == m_type)
-            {
-                // If this is a source endpoint, then this implies that hooking up to a process unit 
-                // would require that process unit to be accepting outgoing streams.
-                
-                // We are about to change the border color for this process unit
+            
+            // We are about to change the border color for this process unit
                 m_weChangedThisUnitsBorder = (GenericProcessUnit)pu;
 
-                // Set a border color based on whether or not the action is doable
-                m_weChangedThisUnitsBorder.SetBorderColor(pu.IsAcceptingOutgoingStreams(m_owner) ? 
-                    ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
-            }
-            else if (EndpointType.StreamDestinationNotConnected == m_type)
-            {
-                // If this is a destination endpoint, then this implies that hooking up to a process 
-                // unit would require that process unit to be accepting incoming streams.
-
-                // We are about to change the border color for this process unit
-                m_weChangedThisUnitsBorder = (GenericProcessUnit)pu;
-
-                // Set a border color based on whether or not the action is doable
-                m_weChangedThisUnitsBorder.SetBorderColor(pu.IsAcceptingIncomingStreams(m_owner) ?
-                    ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
-            }
-            else
-            {
-                // At this time those are the only two possibilities, so we'll never hit this code 
-                // block, but to provide some resilience against breaking changes, we'll throw 
-                // and exception if we get here.
-                throw new InvalidOperationException(
-                    "Stream endpoint was expected to be either a source or destination but was neither");
-            }
+            // Set a border color based on whether or not the action is doable
+            m_weChangedThisUnitsBorder.SetBorderColor(CanConnectTo(pu) ? 
+                ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
 
             m_owner.UpdateStreamLocation();
         }
 
         public new void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            m_locationOnLMBDown = e.GetPosition(m_canvas);
+            m_locationOnLMBDown = this.Location;
             m_isMouseDown = true;
             e.Handled = true;
 
@@ -448,11 +423,22 @@ namespace ChemProV.PFD.Streams
                     return;
                 }
 
-                m_canvas.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
-                    new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
-                    new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown)));
+                if (m_type == EndpointType.StreamDestinationNotConnected)
+                {
+                    m_canvas.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
+                        new Undos.RestoreLocation(this, this.Location),
+                        new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
+                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown)));
+                }
+                else
+                {
+                    m_canvas.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
+                        new Undos.RestoreLocation(this, this.Location),
+                        new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
+                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown)));
+                }
 
-                m_canvas.CurrentState = null;
+                Core.App.ControlPalette.SwitchToSelect();
                 return;
             }
 
@@ -479,7 +465,7 @@ namespace ChemProV.PFD.Streams
                     if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
                     {
                         // No change was made
-                        m_canvas.CurrentState = null;
+                        Core.App.ControlPalette.SwitchToSelect();
                         return;
                     }
 
@@ -497,9 +483,9 @@ namespace ChemProV.PFD.Streams
                     // 3. Move the draggable icon back to it was when the drag first started
                     m_canvas.AddUndo(new UndoRedoCollection(
                         "Undo linking stream source to process unit",
+                        new Undos.RestoreLocation(this, m_locationOnLMBDown),
                         new Undos.DetachOutgoingStream(pu, m_owner),
-                        new Undos.SetStreamSource(m_owner, null),
-                        new Undos.RestoreLocation(this, m_locationOnLMBDown)));
+                        new Undos.SetStreamSource(m_owner, null)));
                 }
 
                 // Now do the actual attaching
@@ -526,8 +512,8 @@ namespace ChemProV.PFD.Streams
                     // we're about to attach to and then reattah to the old one.
                     if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
                     {
-                        // No change was made
-                        m_canvas.CurrentState = null;
+                        // No change was made - switch back to the selecting state
+                        Core.App.ControlPalette.SwitchToSelect();
                         return;
                     }
 
@@ -545,9 +531,9 @@ namespace ChemProV.PFD.Streams
                     // 3. Move the draggable icon back to it was when the drag first started
                     m_canvas.AddUndo(new UndoRedoCollection(
                         "Undo linking stream source to process unit",
+                        new Undos.RestoreLocation(this, m_locationOnLMBDown),
                         new Undos.DetachIncomingStream(pu, m_owner),
-                        new Undos.SetStreamDestination(m_owner, null),
-                        new Undos.RestoreLocation(this, m_locationOnLMBDown)));
+                        new Undos.SetStreamDestination(m_owner, null)));
                 }
 
                 // Now do the actual attaching
@@ -563,8 +549,8 @@ namespace ChemProV.PFD.Streams
                     "Stream endpoint was expected to be either a source or destination but was neither");
             }
 
-            // Flip back to the default state for the drawing canvas
-            m_canvas.CurrentState = null;
+            // Flip back to the selecting state
+            Core.App.ControlPalette.SwitchToSelect();
 
             ((AbstractStream)m_owner).UpdateStreamLocation();
         }
@@ -612,15 +598,20 @@ namespace ChemProV.PFD.Streams
                 if (EndpointType.StreamSourceNotConnected == m_type)
                 {
                     unit.AttachOutgoingStream(m_owner);
+                    m_owner.Source = m_connectedToOnMouseDown;
                 }
                 else
                 {
                     unit.AttachIncomingStream(m_owner);
+                    m_owner.Destination = m_connectedToOnMouseDown;
                 }
             }
+
+            // Update the stream's visual stuff
+            m_owner.UpdateStreamLocation();
             
-            // Flip back to the default state for the drawing canvas
-            m_canvas.CurrentState = null;
+            // Flip back to the default state
+            Core.App.ControlPalette.SwitchToSelect();
         }
     }
 }

@@ -246,8 +246,8 @@ namespace ChemProV.UI.DrawingCanvas.States
                     // Thus we end without a destination attachment
                     EndWithoutDestConnection(true);
 
-                    // Go back to the default state for the canvas
-                    m_canvas.CurrentState = null;
+                    // Go back to the selecting state
+                    m_palette.SwitchToSelect();
                     return;
                 }
                 else
@@ -255,6 +255,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                     // There's a process unit that we can connect to
                     undos.Add(new DetachIncomingStream(gpu, m_newStream));
                     gpu.AttachIncomingStream(m_newStream);
+                    m_newStream.Destination = gpu;
                 }
             }
 
@@ -271,8 +272,8 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             m_newStream.UpdateStreamLocation();
 
-            // Go back to the default state for the canvas
-            m_canvas.CurrentState = null;
+            // Go back to the selecting state
+            m_palette.SwitchToSelect();
             return;
         }
 

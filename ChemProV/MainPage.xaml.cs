@@ -185,6 +185,10 @@ namespace ChemProV
             {
                 OpenFile(fileInfo);
             }
+
+            // E.O.
+            // Intialize the static App class
+            Core.App.Init(WorkSpace, PrimaryPalette);
         }
 
         private void OpenFile(FileInfo file)
