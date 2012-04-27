@@ -27,30 +27,24 @@ namespace ChemProV.UI
 {
     public partial class ControlPalette : UserControl
     {
+        private int m_buttonsPerRow = 3;
+        
         public ControlPalette()
         {
             InitializeComponent();
         }
 
-        private Border CreateButton(string imageSource, string text, Type tag)
+        private Border CreateButton(string imageSource, string toolTip, Type tag)
         {
             // Create the icon for the button
             Image image = new Image();
             Uri uri = new Uri(imageSource, UriKind.Relative);
             ImageSource img = new System.Windows.Media.Imaging.BitmapImage(uri);
             image.SetValue(Image.SourceProperty, img);
+            image.Stretch = Stretch.None;
 
-            // Create the text block for the button's text
-            TextBlock tb = new TextBlock();
-            tb.Text = text;
-            tb.Margin = new Thickness(6.0, 0.0, 0.0, 0.0);
-            tb.VerticalAlignment = System.Windows.VerticalAlignment.Center;
-
-            // Create the stack panel to hold content within the button
-            StackPanel sp = new StackPanel();
-            sp.Orientation = Orientation.Horizontal;
-            sp.Children.Add(image);
-            sp.Children.Add(tb);
+            // Give the image a tool tip
+            ToolTipService.SetToolTip(image, toolTip);
 
             // Create the "button". We're using Border objects as buttons because they have 
             // all the desired functionality and are easier to adjust in terms of visual styles
@@ -60,8 +54,7 @@ namespace ChemProV.UI
             btn.Background = new SolidColorBrush(Colors.White);
             btn.BorderBrush = new SolidColorBrush(Colors.Gray);
             btn.Padding = new Thickness(2.0);
-            //btn.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Stretch;
-            btn.Child = sp;
+            btn.Child = image;
             btn.Margin = new Thickness(2.0);
 
             // Give it a tag to represent the type it creates
@@ -73,6 +66,22 @@ namespace ChemProV.UI
             return btn;
         }
 
+        private void HighlightButton(Border button)
+        {
+            SolidColorBrush fill = new SolidColorBrush(Colors.White);
+
+            // Start by setting the background on all "buttons" to white. Reminder: we're 
+            // using Border objects for our buttons.
+            SelectButton.Background = StickyNoteButton.Background = fill;
+            SelectButton.BorderThickness = StickyNoteButton.BorderThickness = new Thickness(1.0);
+            SetBorderButtonsStyle(ProcessUnitsPanel, fill, 1.0, true);
+            SetBorderButtonsStyle(StreamsPanel, fill, 1.0, true);
+
+            // Now set the background on the one that was specified
+            button.Background = new SolidColorBrush(Colors.Yellow);
+            button.BorderThickness = new Thickness(2.0);
+        }
+
         /// <summary>
         /// Highlights the select button (and unhighlights all others) without setting any canvas states. 
         /// The SwitchToSelect method will set the drawing canvas's current state to null but this method 
@@ -80,68 +89,12 @@ namespace ChemProV.UI
         /// </summary>
         public void HighlightSelect()
         {
-            DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
-            SolidColorBrush fill = new SolidColorBrush(Colors.White);
-
-            // Start by setting the background on all "buttons" to white. Reminder: we're 
-            // using Border objects for our buttons.
-            SelectButton.Background = StickyNoteButton.Background = fill;
-            SelectButton.BorderThickness = StickyNoteButton.BorderThickness = new Thickness(1.0);
-            foreach (UIElement ui in ProcessUnitsPanel.Children)
-            {
-                Border btn = ui as Border;
-                if (null != ui)
-                {
-                    btn.Background = fill;
-                    btn.BorderThickness = new Thickness(1.0);
-                }
-            }
-            foreach (UIElement ui in StreamsPanel.Children)
-            {
-                Border btn = ui as Border;
-                if (null != ui)
-                {
-                    btn.Background = fill;
-                    btn.BorderThickness = new Thickness(1.0);
-                }
-            }
-
-            // Now set the background on the one that was clicked to indicate that it's active
-            SelectButton.Background = new SolidColorBrush(Colors.Yellow);
-            SelectButton.BorderThickness = new Thickness(2.0);
+            HighlightButton(SelectButton);
         }
 
         private void PaletteButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
-            SolidColorBrush fill = new SolidColorBrush(Colors.White);
-
-            // Start by setting the background on all "buttons" to white. Reminder: we're 
-            // using Border objects for our buttons.
-            SelectButton.Background = StickyNoteButton.Background = fill;
-            SelectButton.BorderThickness = StickyNoteButton.BorderThickness = new Thickness(1.0);
-            foreach (UIElement ui in ProcessUnitsPanel.Children)
-            {
-                Border btn = ui as Border;
-                if (null != ui)
-                {
-                    btn.Background = fill;
-                    btn.BorderThickness = new Thickness(1.0);
-                }
-            }
-            foreach (UIElement ui in StreamsPanel.Children)
-            {
-                Border btn = ui as Border;
-                if (null != ui)
-                {
-                    btn.Background = fill;
-                    btn.BorderThickness = new Thickness(1.0);
-                }
-            }
-
-            // Now set the background on the one that was clicked to indicate that it's active
-            ((Border)sender).Background = new SolidColorBrush(Colors.Yellow);
-            ((Border)sender).BorderThickness = new Thickness(2.0);
 
             // Now we want to set the canvas state appropriately. If we've clicked a button for a process 
             // unit, then we want to make sure that the canvas is in process-unit-placing mode. If we've 
@@ -152,6 +105,10 @@ namespace ChemProV.UI
             // First, set the canvas's selected element to null
             Core.App.Workspace.DrawingCanvas.SelectedElement = null;
 
+            // Highlight the button that was clicked
+            HighlightButton(sender as Border);
+
+            // Now we need to see what button was clicked
             // Start with the select button
             if (object.ReferenceEquals(sender, SelectButton))
             {
@@ -179,7 +136,6 @@ namespace ChemProV.UI
             {
                 // Set the canvas state to setting a new object of the appropriate type
                 // This state handles the placing of streams
-                // TODO: Rename appropriately since it only handles streams
                 Core.App.Workspace.DrawingCanvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
                     this, Core.App.Workspace.DrawingCanvas, newObjType);
             }
@@ -195,6 +151,14 @@ namespace ChemProV.UI
             ProcessUnitsPanel.Children.Clear();
             StreamsPanel.Children.Clear();
 
+            // We will create potentially multiple stack panels for rows of buttons
+            StackPanel spPUs = null;
+            StackPanel spStreams = null;
+
+            // Keep track of how many buttons we create
+            int puBtns = 0;
+            int streamBtnCount = 0;
+
             // Use reflection to find appropriate process units and streams for the palette
             Assembly a = Assembly.GetExecutingAssembly();
             foreach (Type t in a.GetTypes())
@@ -205,7 +169,7 @@ namespace ChemProV.UI
                     continue;
                 }
 
-                // We only are interested in types that inherit from GenericProcessUnit and 
+                // We only are interested in types that inherit from LabeledProcessUnit and 
                 // AbstractStream
                 if (t.IsSubclassOf(typeof(PFD.ProcessUnits.LabeledProcessUnit)) &&
                     typeof(PFD.ProcessUnits.LabeledProcessUnit) != t)
@@ -216,8 +180,23 @@ namespace ChemProV.UI
                         Activator.CreateInstance(t);
                     if (unit.IsAvailableWithDifficulty(setting))
                     {
-                        ProcessUnitsPanel.Children.Add(CreateButton(unit.IconSource,
-                            unit.Description, t));
+                        if (0 == (puBtns % m_buttonsPerRow))
+                        {
+                            // Create a new row
+                            spPUs = new StackPanel();
+                            spPUs.Orientation = Orientation.Horizontal;
+
+                            // Add the first button to it
+                            spPUs.Children.Add(CreateButton(unit.IconSource, unit.Description, t));
+
+                            ProcessUnitsPanel.Children.Add(spPUs);
+                        }
+                        else
+                        {
+                            spPUs.Children.Add(CreateButton(unit.IconSource, unit.Description, t));
+                        }
+
+                        puBtns++;
                     }
                 }
                 else if (t.IsSubclassOf(typeof(PFD.Streams.AbstractStream)))
@@ -246,15 +225,43 @@ namespace ChemProV.UI
                             "\"string Title { get; }\". Please implement this property so that the control " + 
                             "palette knows how to label the stream creation option.");
                     }
+                    string streamTitle = pi.GetGetMethod().Invoke(null, null) as string;
 
                     // Execute it
                     bool available = (bool)mi.Invoke(null, new object[] { setting });
                     if (available)
                     {
-                        StreamsPanel.Children.Add(CreateButton(t.Equals(typeof(PFD.Streams.HeatStream)) ?
-                            "/UI/Icons/pu_heat_stream.png" : "/UI/Icons/pu_stream.png",
-                            pi.GetGetMethod().Invoke(null, null) as string, t));
+                        if (0 == (streamBtnCount % m_buttonsPerRow))
+                        {
+                            // Create a new row
+                            spStreams = new StackPanel();
+                            spStreams.Orientation = Orientation.Horizontal;
+
+                            // Add the row into the control
+                            StreamsPanel.Children.Add(spStreams);
+                        }
+
+                        spStreams.Children.Add(CreateButton(t.Equals(typeof(PFD.Streams.HeatStream)) ?
+                            "/UI/Icons/pu_heat_stream.png" : "/UI/Icons/pu_stream.png", streamTitle, t));
+
+                        streamBtnCount++;
                     }
+                }
+            }
+        }
+
+        private void SetBorderButtonsStyle(StackPanel parent, Brush fill, double borderThickness, bool recurse)
+        {
+            foreach (UIElement uie in parent.Children)
+            {
+                if (uie is Border)
+                {
+                    (uie as Border).Background = fill;
+                    (uie as Border).BorderThickness = new Thickness(borderThickness);
+                }
+                else if (uie is StackPanel && recurse)
+                {
+                    SetBorderButtonsStyle(uie as StackPanel, fill, borderThickness, recurse);
                 }
             }
         }

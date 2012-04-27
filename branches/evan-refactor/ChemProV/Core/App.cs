@@ -29,8 +29,18 @@ namespace ChemProV.Core
     public static class App
     {
         private static List<LogItem> s_log = new List<LogItem>();
+
+        private static ChemProV.UI.ControlPalette s_palette = null;
         
         private static ChemProV.UI.WorkSpace s_workspace = null;
+
+        public static ChemProV.UI.ControlPalette ControlPalette
+        {
+            get
+            {
+                return s_palette;
+            }
+        }
 
         public static Image CreateImageFromSource(string source)
         {
@@ -58,9 +68,10 @@ namespace ChemProV.Core
         /// <summary>
         /// This must be called upon application initialization
         /// </summary>
-        public static void Init(ChemProV.UI.WorkSpace workspace)
+        public static void Init(ChemProV.UI.WorkSpace workspace, ChemProV.UI.ControlPalette palette)
         {
             s_workspace = workspace;
+            s_palette = palette;
         }
 
         /// <summary>

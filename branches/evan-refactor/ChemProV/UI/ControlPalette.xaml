@@ -8,26 +8,29 @@
 
     <StackPanel x:Name="LayoutRoot" Background="White">
 
-        <!-- Start of button to activate select mode for the mouse -->
-        <Border CornerRadius="3" BorderThickness="2" Background="Yellow" BorderBrush="Gray"
-            Margin="2,2,2,2" Padding="2,2,2,2" MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown" 
-            Name="SelectButton">
-            <StackPanel Orientation="Horizontal">
-                <Image Source="/UI/Icons/palette_select.png"></Image>
-                <TextBlock VerticalAlignment="Center" Margin="6,0,0,0">Select</TextBlock>
-            </StackPanel>
-        </Border>
-        <!-- End of select mode button -->
-
-        <Border CornerRadius="3" BorderThickness="1" Background="White" BorderBrush="Gray"
+        <!-- The select and sticky note buttons are in the same horizontal stack panel at the top of this control -->
+        <StackPanel Orientation="Horizontal">
+            <!-- Start of button to activate select mode for the mouse -->
+            <Border CornerRadius="3" BorderThickness="2" Background="Yellow" BorderBrush="Gray"
+                Margin="2,2,2,2" Padding="2,2,2,2" MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown" 
+                Name="SelectButton">
+                <Image Source="/UI/Icons/palette_select.png" Stretch="None">
+                    <ToolTipService.ToolTip>Select</ToolTipService.ToolTip>
+                </Image>
+            </Border>
+            <!-- End of select mode button -->
+            
+            <!-- Start of sticky note button  -->
+            <Border CornerRadius="3" BorderThickness="1" Background="White" BorderBrush="Gray"
             Margin="2,2,2,2" Padding="2,2,2,2" Name="StickyNoteButton"
             MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown">
-
-            <StackPanel Orientation="Horizontal" Width="Auto">
-                <Image Source="/UI/Icons/palette_stickyNote.png"></Image>
-                <TextBlock VerticalAlignment="Center" Margin="6,0,0,0">Sticky Note</TextBlock>
-            </StackPanel>
-        </Border>
+                <Image Source="/UI/Icons/palette_stickyNote.png" Stretch="None">
+                    <ToolTipService.ToolTip>Create a sticky note</ToolTipService.ToolTip>
+                </Image>
+            </Border>
+            <!-- End of sticky note button -->
+        </StackPanel>
+        <!-- End of panel that contains select and sticky note buttons -->
 
         <!-- Spacer before process units -->
         <Border BorderThickness="2" Height="2" BorderBrush="Gray" Margin="4,4,4,4"></Border>

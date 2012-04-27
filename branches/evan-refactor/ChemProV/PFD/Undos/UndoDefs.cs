@@ -128,6 +128,8 @@ namespace ChemProV.PFD
         /// this action. In other words, if this is an undo action, then it returns the 
         /// collection for the redo. If it is a redo action then it will return a collection 
         /// that undoes the redo.
+        /// Undos are executed from the beginning of the collection in the same order as they 
+        /// were in within the array that was passed to the constructor.
         /// </summary>
         public UndoRedoCollection Execute(UndoRedoExecutionParameters parameters)
         {
