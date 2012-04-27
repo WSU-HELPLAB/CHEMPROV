@@ -23,23 +23,30 @@ namespace ChemProV.PFD.Undos
     /// E.O.
     /// This class represents an undo action that will resize a UserControl.
     /// </summary>
-    public class ResizeUserControl : IUndoRedoAction
+    public class ResizeControl : IUndoRedoAction
     {
-        private UserControl m_control;
+        private Control m_control;
 
         private Size m_size;
 
-        public ResizeUserControl(UserControl control)
+        public ResizeControl(Control control)
         {
             // Store a reference to the element and copy its size value
             m_control = control;
             m_size = new Size(control.Width, control.Height);
         }
 
+        public ResizeControl(Control control, Size sizeToRestore)
+        {
+            // Store a reference to the element and copy the size value
+            m_control = control;
+            m_size = sizeToRestore;
+        }
+
         public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
         {
             // Create the opposite action first
-            IUndoRedoAction opposite = new ResizeUserControl(m_control);
+            IUndoRedoAction opposite = new ResizeControl(m_control);
 
             // Set the new size
             m_control.Width = m_size.Width;

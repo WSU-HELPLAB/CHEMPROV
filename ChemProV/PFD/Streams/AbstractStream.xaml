@@ -11,12 +11,16 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:StreamsNS="clr-namespace:ChemProV.PFD.Streams"
     mc:Ignorable="d"
 	Width="30"
 	Height="15"
     IsTabStop="True"
     >
     <Canvas x:Name="LayoutRoot">
+        <!-- This control is not much more than a few connecting lines in terms of what's actually in the 
+        control. The control's logic, however, creates several more components at runtime and adds them 
+        to the DrawingCanvas that it exists upon. -->
         <Polygon
 			Stroke="Black"
 			Fill="Black"
@@ -29,7 +33,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <RotateTransform x:Name="ArrowRotateTransform" Angle="0" CenterX="15.0" CenterY="7.5" />
             </Polygon.RenderTransform>
         </Polygon>
-        <Rectangle Width="10" Height="10" StrokeThickness="3" Stroke="Black" Fill="Black" x:Name="rectangle"/>
         <Line X1="15" X2="15" Y1="15" Y2="50" Stroke="Black"  Fill="Black" x:Name="Stem" Canvas.ZIndex="-2" />
         <Line X1="15" X2="15" Y1="15" Y2="50" Stroke="White" x:Name="TableLine"  />
     </Canvas>

@@ -19,6 +19,14 @@ namespace ChemProV.PFD.ProcessUnits
 
         }
 
+        public override string DefaultLabelPrefix
+        {
+            get
+            {
+                return "Sep";
+            }
+        }
+
         /// <summary>
         /// Gets the title that will appear in the control palette
         /// </summary>

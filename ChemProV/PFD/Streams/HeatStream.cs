@@ -7,24 +7,51 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
+using System.Windows;
 using System.Windows.Media;
+using ChemProV.UI.DrawingCanvas;
 
 namespace ChemProV.PFD.Streams
 {
     public class HeatStream : AbstractStream
     {
         public HeatStream()
-            : base()
+            : this(null, new Point())
+        {
+        }
+
+        public HeatStream(DrawingCanvas canvas, Point locationOnCanvas)
+            : base(canvas, locationOnCanvas)
         {
             SolidColorBrush red = new SolidColorBrush(Colors.Red);
             this.Stem.Stroke = red;
             this.Stem.Fill = red;
             this.Arrow.Fill = red;
-            this.rectangle.Fill = red;
-            this.rectangle.Stroke = red;
+
+            this.SelectionChanged += new System.EventHandler(HeatStream_SelectionChanged);
         }
 
-        public override bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
+        protected override void CreatePropertiesTable()
+        {
+            m_table = PropertiesWindow.PropertiesWindowFactory.TableFromStreamType(
+                StreamType.Heat, m_canvas.CurrentDifficultySetting, false);
+        }
+
+        void HeatStream_SelectionChanged(object sender, System.EventArgs e)
+        {
+            // Yellow for selected, red for not selected
+            this.Stem.Stroke = new SolidColorBrush(m_isSelected ? Colors.Yellow : Colors.Red);
+        }
+
+        /// <summary>
+        /// Every stream MUST have this static method. I wish I could enforce it at compile-time 
+        /// but the only way to do that would be to make it an abstract function in the base 
+        /// class, in which case it would be a member function and not a static function. It 
+        /// needs to be static so it can be queried without creating an instance.
+        /// A runtime error will occur if this method is not present in any class that inherits 
+        /// from AbstractStream. This logic exists in the control palette code.
+        /// </summary>
+        public static bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
         {
             // Heat streams are only available with MaterialAndEnergyBalance
             return (OptionDifficultySetting.MaterialAndEnergyBalance == difficulty);
@@ -49,7 +76,11 @@ namespace ChemProV.PFD.Streams
                 unit.IsAcceptingIncomingStreams(this));
         }
 
-        public override string Title
+        /// <summary>
+        /// Every stream MUST have this static method or an exception will be thrown upon 
+        /// initialization at runtime.
+        /// </summary>
+        public static string Title
         {
             get
             {

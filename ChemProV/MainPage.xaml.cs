@@ -122,20 +122,8 @@ namespace ChemProV
                 return false;
             }
 
-            if (processUnitPalette != null)
-            {
-                this.LeftHandToolBar_StackPanel.Children.Remove(processUnitPalette);
-                processUnitPalette.SelectionChanged -= new EventHandler(PuPalette_PaletteSelectionChanged);
-            }
-
-            processUnitPalette = ProcessUnitPaletteFactory.GetProcessUnitPalette(value);
-
-            processUnitPalette.SetValue(DockPanel.DockProperty, Dock.Left);
-            processUnitPalette.Background = new SolidColorBrush(Colors.White);
-            processUnitPalette.Margin = new Thickness(5);
-            processUnitPalette.Height = 192;
-            processUnitPalette.SelectionChanged += new EventHandler(PuPalette_PaletteSelectionChanged);
-            LeftHandToolBar_StackPanel.Children.Insert(0, processUnitPalette);
+            // Tell the control palette that the difficulty changed
+            PrimaryPalette.RefreshPalette(value);
 
             return true;
         }
@@ -353,38 +341,6 @@ namespace ChemProV
         private void ToolPlaced(object sender, EventArgs e)
         {
             processUnitPalette.ResetSelection();
-        }
-
-        /// <summary>
-        /// called whenever the user changes his selection in the process unit palette
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PuPalette_PaletteSelectionChanged(object sender, EventArgs e)
-        {
-            //update the change in the drawing drawing_canvas
-            object tool = ((ProcessUnitPalette)sender).SelectedItem.Data;
-
-            //because the selected tool is passed by reference, we need to create
-            //a local copy for placement on the drawing drawing_canvas
-            if (tool is IProcessUnit)
-            {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = ProcessUnitFactory.ProcessUnitFromProcessUnit(tool as IProcessUnit);
-            }
-            else if (tool is IStream)
-            {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = StreamFactory.StreamFromStreamObject(tool as IStream);
-            }
-            else if (((ProcessUnitPalette)sender).SelectedItem.Description == "Sticky Note")
-            {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = new StickyNote();
-            }
-            //if we get to the ELSE, we must not care whether or not we're playing with a
-            //someone else's reference
-            else
-            {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = null;
-            }
         }
 
         private void SaveChemProVFile(Stream stream)

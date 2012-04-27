@@ -58,7 +58,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
         <!-- Left-Hand toolbar -->
         <StackPanel x:Name="LeftHandToolBar_StackPanel">
-            <!--this is where the ProcessPalette will go-->
+            <ChemProV_UI:ControlPalette Name="PrimaryPalette"></ChemProV_UI:ControlPalette>
             <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
             <ScrollViewer VerticalScrollBarVisibility="Auto" x:Name="CompoundTableScrollViewer" BorderBrush="Transparent">
                 <ChemProV_UI:CompoundTable x:Name="CompoundTable"/>

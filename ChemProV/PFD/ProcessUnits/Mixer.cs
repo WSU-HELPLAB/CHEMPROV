@@ -28,6 +28,14 @@ namespace ChemProV.PFD.ProcessUnits
             : base("/UI/Icons/pu_mixer.png")
         {        }
 
+        public override string DefaultLabelPrefix
+        {
+            get
+            {
+                return "Mix";
+            }
+        }
+
         /// <summary>
         /// A short description of the process unit.  Not more than a few words in length.
         /// </summary>

@@ -26,7 +26,17 @@ namespace ChemProV.PFD.ProcessUnits
     {
         public Reactor()
             : base("/UI/Icons/pu_reactor.png")
-        { }
+        {
+            ProcessUnitLabel = "Rct" + ProcessUnitId;
+        }
+
+        public override string DefaultLabelPrefix
+        {
+            get
+            {
+                return "Rct";
+            }
+        }
 
         public override string Description
         {
