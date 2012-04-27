@@ -54,29 +54,12 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// this holds the stream and the rectangle for the rectangle at the beginning of the stream
-        /// </summary>
-        StreamSourceIcon StreamSource
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Can be called to manually update the stream's location
         /// </summary>
         void UpdateStreamLocation();
 
         event MouseButtonEventHandler Arrow_MouseButtonLeftDown;
         event MouseButtonEventHandler Tail_MouseButtonLeftDown;
-
-        /// <summary>
-        /// E.O.
-        /// Returns a boolean value indicating whether or not this stream should be available 
-        /// with the specified difficulty setting.
-        /// </summary>
-        /// <returns>True if available with the difficulty setting, false otherwise.</returns>
-        bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty);
 
         /// <summary>
         /// E.O.
@@ -97,14 +80,5 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         /// <returns>True if the unit is a valid destination, false otherwise.</returns>
         bool IsValidDestination(IProcessUnit unit);
-
-        /// <summary>
-        /// E.O.
-        /// The name for the stream that will appear in the user interface
-        /// </summary>
-        string Title
-        {
-            get;
-        }
     }
 }

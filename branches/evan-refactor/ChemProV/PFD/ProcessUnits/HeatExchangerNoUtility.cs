@@ -34,6 +34,14 @@ namespace ChemProV.PFD.ProcessUnits
             return (OptionDifficultySetting.MaterialAndEnergyBalance == difficulty);
         }
 
+        public override string DefaultLabelPrefix
+        {
+            get
+            {
+                return "Exc";
+            }
+        }
+
         public override string Description
         {
             get

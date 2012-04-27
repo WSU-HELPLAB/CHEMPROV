@@ -82,6 +82,9 @@ namespace ChemProV.UI
 
             GridSplitter.MouseMove += new MouseEventHandler(GridSplitter_MouseMove);
             SizeChanged += new SizeChangedEventHandler(WorkSpace_SizeChanged);
+
+            // E.O.
+            Core.App.Init(this);
         }
 
         #endregion Constructor

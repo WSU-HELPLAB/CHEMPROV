@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -40,115 +40,50 @@ namespace ChemProV.UI.DrawingCanvas
         public event PfdUpdatedEventHandler PfdUpdated = delegate { };
         public event EventHandler PfdChanging = delegate { };
 
+        /// <summary>
+        /// This is a debugging-oriented state tracker. When the CurrentState property is set to 
+        /// some value, we check to see if our current state is non-null. If it is non-null then 
+        /// the contract is that we let that state know that it's ending and we're going to a new 
+        /// one. We do this by calling the stat's StateEnding() function. Before we call we set 
+        /// this to true and after the call returns we set it back to false.
+        /// This allows us to ensure that the StateEnding() function doesn't try to set 
+        /// CurrentState again. States are not allowed to set the drawing canvas's state from 
+        /// their StateEnding() functions.
+        /// In theory this could be enforced using reflection and eliminate the need for this 
+        /// variable, but that's something that I'll look into later.
+        /// </summary>
+        private bool m_endingAState = false;
+
         #region States
-
-        /// <summary>
-        /// If it is in resizingState then we are resizing an object
-        /// </summary>
-        private IState resizingState;
-
-        public IState ResizingState
-        {
-            get { return resizingState; }
-            set { resizingState = value; }
-        }
-
-        /// <summary>
-        /// If it is in MenuState then the right click menu must be open
-        /// </summary>
-        private IState menuState;
-
-        public IState MenuState
-        {
-            get { return menuState; }
-            set { menuState = value; }
-        }
-
-        /// <summary>
-        /// Moving state is when we are moving a pre-existing item.
-        /// </summary>
-        private IState movingState;
-
-        public IState MovingState
-        {
-            get { return movingState; }
-            set { movingState = value; }
-        }
-
-        /// <summary>
-        /// This is our default state nothing is happening
-        /// </summary>
-        private IState nullState;
-
-        public IState NullState
-        {
-            get { return nullState; }
-            set { nullState = value; }
-        }
-
-        /// <summary>
-        /// This state is the only state that gets set outside of drawingCanvas when the user selects a new item
-        /// from the palette on the left the palette throws an interrupt and places drawing drawing_canvas in this state
-        /// </summary>
-        private IState placingState;
-
-        public IState PlacingState
-        {
-            get { return placingState; }
-            set { placingState = value; }
-        }
-
-        private IState selectedState;
-
-        /// <summary>
-        /// This occurs when we have an item selected and we are not doing anything else at the moment.
-        /// MenuState and MovingState both have priority over selectedState.
-        /// </summary>
-        public IState SelectedState
-        {
-            get { return selectedState; }
-            set { selectedState = value; }
-        }
 
         /// <summary>
         /// This is a variable that saves the current state.
         /// </summary>
-        private IState currentState;
+        private IState currentState = null;
 
         public IState CurrentState
         {
             get { return currentState; }
             set
             {
-                /*
-                * we want to clear the redo stack just in case so long as we aren't just going menu state or selecting an object.
-                * we also need to tell delete to clear the redoStack because it doesn't happen when we transition to menu but we want it to happen
-                * if they delete something.
-                */
-                if (!(value == menuState || value == nullState || value == selectedState))
+                // Start with a check to see if we're currently ending a state
+                if (m_endingAState)
                 {
-                    redoStack.Clear();
+                    throw new InvalidOperationException(
+                        "Objects that implement IState are NOT permitted to set the " +
+                        "DrawingCanvas.CurrentState property when in their StateEnding() method.");
                 }
-                //Ok so going to movingState need to save state before we go there, unless we just came from PlacingState cause we are placing an object no need to save.
-                if (value == movingState && currentState != PlacingState)
+                
+                // The contract for items that implement IState is that when we're switching from 
+                // them to something else, we let them know that their state is ending
+                if (null != currentState &&
+                    !object.ReferenceEquals(value, currentState))
                 {
-                    if (selectedElement is StreamSourceIcon)
-                    {
-                        saveState(CanvasCommands.MoveTail, (selectedElement as StreamEnd).Stream, this, new Point((double)((((selectedElement as StreamEnd).Stream).Source as UIElement).GetValue(Canvas.LeftProperty)), (double)((((selectedElement as StreamEnd).Stream).Source as UIElement).GetValue(Canvas.TopProperty))));
-                    }
-                    else if (selectedElement is StreamDestinationIcon)
-                    {
-                        saveState(CanvasCommands.MoveHead, (selectedElement as StreamEnd).Stream, this, new Point((double)((((selectedElement as StreamEnd).Stream).Destination as UIElement).GetValue(Canvas.LeftProperty)), (double)((((selectedElement as StreamEnd).Stream).Destination as UIElement).GetValue(Canvas.TopProperty))));
-                    }
-                    else if (selectedElement is IProcessUnit)
-                    {
-                        saveState(CanvasCommands.MoveHead, selectedElement, this, (selectedElement as IProcessUnit).MidPoint);
-                    }
-                    else if (selectedElement is StickyNote)
-                    {
-                        saveState(CanvasCommands.MoveHead, selectedElement, this, new Point((double)(selectedElement as UIElement).GetValue(Canvas.LeftProperty), (double)(selectedElement as UIElement).GetValue(Canvas.TopProperty)));
-                    }
+                    m_endingAState = true;
+                    currentState.StateEnding();
+                    m_endingAState = false;
                 }
+
                 currentState = value;
             }
         }
@@ -178,25 +113,6 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 DifficultySettingChanged(currentDifficultySetting, value);
                 currentDifficultySetting = value;
-            }
-        }
-
-        /// <summary>
-        /// Used to keep a reference to NewContextMenu so it can removed easily
-        /// </summary>
-        private ContextMenu newContextMenu;
-
-        public ContextMenu NewContextMenu
-        {
-            get { return newContextMenu; }
-            set
-            {
-                if (newContextMenu != null)
-                {
-                    //this is so we cannot have multiple right click menus open.
-                    this.Children.Remove(newContextMenu);
-                }
-                newContextMenu = value;
             }
         }
 
@@ -246,48 +162,6 @@ namespace ChemProV.UI.DrawingCanvas
             }
         }
 
-        /// <summary>
-        /// This stores if the mouse is currently over a IProcessUnit.
-        /// </summary>
-        private IPfdElement hoveringOver;
-
-        public IPfdElement HoveringOver
-        {
-            get { return hoveringOver; }
-            set { hoveringOver = value; }
-        }
-
-        private StickyNote hoveringOverStickyNote;
-
-        public StickyNote HoveringOverStickyNote
-        {
-            get { return hoveringOverStickyNote; }
-            set { hoveringOverStickyNote = value; }
-        }
-
-        /// <summary>
-        /// This stores the element that is currently selected in the drawing drawing_canvas
-        /// </summary>
-        private IPfdElement selectedPaletteItem;
-
-        public IPfdElement SelectedPaletteItem
-        {
-            get
-            {
-                return selectedPaletteItem;
-            }
-            set
-            {
-                //This is how we get to placingState notice it doesn't matter what we were doing if it is changed
-                //we go to placingState, error prone?
-                selectedPaletteItem = value;
-                if (value != null)
-                {
-                    currentState = placingState;
-                }
-            }
-        }
-
         public List<IPfdElement> ChildIPfdElements
         {
             get
@@ -302,20 +176,6 @@ namespace ChemProV.UI.DrawingCanvas
         #region Undo/Redo
 
         /// <summary>
-        /// NOTE: the "state" referred to here is not referring to the DrawingCanvas States but closely related.
-        /// The undoStack and redoStack.  These save states of the drawing drawing_canvas.  State change happens when something is delete, moved or added.
-        /// The undoStack saves previous states right before the transition to a new state.
-        /// The RedoStack is added to when an undo is called and it saves the current state before the undo reverts it back.
-        /// So the current state is never saved on any stack until it is about to change.
-        /// The UndoStack saves any previous states.
-        /// And the RedoStack saves any states that happened but were "lost" when the user called undo.
-        /// NOTE: Treat like a stack only reason it isn't is if it gets bigger than 25 elements we remove the last one.
-        /// </summary>
-        public LinkedList<SavedStateObject> undoStack = new LinkedList<SavedStateObject>();
-
-        public LinkedList<SavedStateObject> redoStack = new LinkedList<SavedStateObject>();
-
-        /// <summary>
         /// E.O.
         /// This is the undo stack. When the "Undo()" function is called, the top collection will be 
         /// popped of this stack and executed. The return value from the execution function will be 
@@ -328,6 +188,10 @@ namespace ChemProV.UI.DrawingCanvas
         /// This is the redo stack. When the "Redo()" function is called, the top collection will be 
         /// popped of this stack and executed. The return value from the execution function will be 
         /// pushed onto the undo stack.
+        /// NEVER add anything to this stack or m_undos. Use the AddUndo function. The undo system 
+        /// is intentially designed so that redos are created automatically in the Undo() function. 
+        /// The Undo() function should be the ONLY place where you see m_redos.Push and the Redo() 
+        /// function is the ONLY place where you should see m_redos.Pop();
         /// </summary>
         private Stack<UndoRedoCollection> m_redos = new Stack<UndoRedoCollection>();
 
@@ -336,6 +200,8 @@ namespace ChemProV.UI.DrawingCanvas
         /// Adds an undo action to the undo stack. You'll notice there is no AddRedo function. This is 
         /// intentional because upon execution of an undo (via a call to "Undo()") the redo action is 
         /// automatically created and pushed onto the redo stack.
+        /// 
+        /// Will remove exception throw when I get the new undo system in place
         /// </summary>
         /// <param name="collection">Collection of undo actions to push.</param>
         /// <returns>True if the collection was successfully added to the stack, false otherwise.</returns>
@@ -351,7 +217,8 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// Gets the number of undos currently on the undo stack
+        /// E.O.
+        /// Gets the number of undos currently on the undo stack.
         /// </summary>
         public int UndoCount
         {
@@ -361,140 +228,50 @@ namespace ChemProV.UI.DrawingCanvas
             }
         }
 
-
         /// <summary>
-        ///
+        /// E.O.
+        /// Gets the number of redos currently on the redo stack.
         /// </summary>
-        /// <param name="command"></param>
-        /// <param name="selectedObject"></param>
-        /// <param name="canvas"></param>
-        /// <param name="lastLocation">This must be the TopLeft of the element if applicable</param>
-        public void saveState(CanvasCommands command, IPfdElement selectedObject, Canvas canvas, Point lastLocation)
+        public int RedoCount
         {
-            //25 is arbitrary we felt that this was a big enough size for the undoStack
-            if (undoStack.Count > 25)
+            get
             {
-                undoStack.RemoveLast();
-            }
-
-            //// E.O.
-            //// BUG: This code path is never called. Need to discuss whether or not we should even have an 
-            ////      undo for sticky note resizing (which I think is the only thing that can be resized)
-            //if (CanvasCommands.Resize == command)
-            //{
-            //    AddUndo(new UndoRedoCollection("Undo resizing element",
-            //        new PFD.Undos.ResizeUserControl(selectedObject as UserControl)));
-            //    return;
-            //}
-
-            //// E.O.
-            //string unitName;
-            //if (selectedObject is IStream)
-            //{
-            //    unitName = "stream";
-            //}
-            //else if (selectedObject is IProcessUnit)
-            //{
-            //    unitName = "process unit";
-            //}
-            //else
-            //{
-            //    unitName = "sticky note";
-            //}
-            //switch (command)
-            //{
-            //    case CanvasCommands.MoveHead:
-            //    case CanvasCommands.MoveTail:
-            //        // Add an undo to restore position
-            //        AddUndo(new UndoRedoCollection("Undo moving " + unitName,
-            //            new PFD.Undos.RestorePosition((UserControl)selectedObject)));
-            //        break;
-
-            //    case CanvasCommands.AddToCanvas:
-            //        // Add an undo to remove the item
-            //        if (selectedObject is AbstractStream)
-            //        {
-            //            // Streams are a special case because they have multiple UI elements
-            //            AbstractStream stream = selectedObject as AbstractStream;
-            //            AddUndo(new UndoRedoCollection("Undo addition of stream",
-            //                new PFD.Undos.RemoveFromCanvas((UIElement)selectedObject, this),
-            //                new PFD.Undos.RemoveFromCanvas((UIElement)stream.Source, this),
-            //                new PFD.Undos.RemoveFromCanvas((UIElement)stream.Destination, this),
-            //                new PFD.Undos.RemoveFromCanvas(stream.Table as UIElement, this)));
-            //        }
-            //        else
-            //        {
-            //            AddUndo(new UndoRedoCollection("Undo addition of " + unitName,
-            //                new PFD.Undos.RemoveFromCanvas((UIElement)selectedObject, this)));
-            //        }
-            //        break;
-
-            //    case CanvasCommands.RemoveFromCanvas:
-            //        // Add an undo to add the item back
-            //        AddUndo(new UndoRedoCollection("Undo deletion of " + unitName,
-            //            new PFD.Undos.AddToCanvas((UIElement)selectedObject, this)));
-            //        break;
-            //}
-
-            if (selectedObject is IStream)
-            {
-                undoStack.AddFirst(new StreamUndo(command, selectedObject as IStream, canvas, (selectedObject as IStream).Source as IProcessUnit, (selectedObject as IStream).Destination as IProcessUnit, lastLocation));
-            }
-            else if (selectedObject is IProcessUnit)
-            {
-                //commented out cause it don't work
-                //convert lastLocation to middle because that is what moving expects
-                UserControl ui = selectedObject as UserControl;
-
-                //  lastLocation.X = lastLocation.X + ui.Width / 2;
-                //  lastLocation.Y = lastLocation.Y + ui.Height / 2;
-
-                undoStack.AddFirst(new ProcessUnitUndo(command, selectedObject as IProcessUnit, canvas, lastLocation));
-            }
-            else if (selectedObject is StickyNote)
-            {
-                //convert lastLocation to middle because that is what moving expects
-                UserControl ui = selectedObject as UserControl;
-
-                //  lastLocation.X = lastLocation.X + ui.Width / 2;
-                //  lastLocation.Y = lastLocation.Y + ui.Height / 2;
-
-                undoStack.AddFirst(new StickyNoteUndo(command, selectedObject as StickyNote, canvas, lastLocation));
+                return m_redos.Count;
             }
         }
 
         public void Redo()
         {
-            //redo doesn't use the parameters
-            (menuState as MenuState).Redo(this, new EventArgs());
+            // Set the state to null just in case (risky?)
+            CurrentState = null;
 
-            //// E.O.
-            //if (m_redos.Count > 0)
-            //{
-            //    // Logic:
-            //    // 1. Pop redo collection on top of stack
-            //    // 2. Execute it
-            //    // 3. Take its return value and push it onto the undo stack
-            //    // (done in 1 line below)
-            //    m_undos.Push(m_redos.Pop().Execute(new UndoRedoExecutionParameters()));
-            //}
+            // E.O.
+            if (m_redos.Count > 0)
+            {
+                // Logic:
+                // 1. Pop redo collection on top of stack
+                // 2. Execute it
+                // 3. Take its return value and push it onto the undo stack
+                // (done in 1 line below)
+                m_undos.Push(m_redos.Pop().Execute(new UndoRedoExecutionParameters(this)));
+            }
         }
 
         public void Undo()
         {
-            //undo doesn't use the parameters
-            (menuState as MenuState).Undo(this, new EventArgs());
+            // First we flip back to the null state
+            CurrentState = null;
 
-            //// E.O.
-            //if (m_undos.Count > 0)
-            //{
-            //    // Logic:
-            //    // 1. Pop undo collection on top of stack
-            //    // 2. Execute it
-            //    // 3. Take its return value and push it onto the redo stack
-            //    // (done in 1 line below)
-            //    m_redos.Push(m_undos.Pop().Execute(new UndoRedoExecutionParameters()));
-            //}
+            // Then we execute the undo (if there is one)
+            if (m_undos.Count > 0)
+            {
+                // Logic:
+                // 1. Pop undo collection on top of stack
+                // 2. Execute it
+                // 3. Take its return value and push it onto the redo stack
+                // (done in 1 line below)
+                m_redos.Push(m_undos.Pop().Execute(new UndoRedoExecutionParameters(this)));
+            }
         }
 
         #endregion Undo/Redo
@@ -511,18 +288,7 @@ namespace ChemProV.UI.DrawingCanvas
         public DrawingCanvas()
             : base()
         {
-            //initialize our states
-            menuState = new MenuState(this);
-            movingState = new MovingState(this);
-            nullState = new NullState(this);
-            placingState = new PlacingState(this);
-            selectedState = new SelectedState(this);
-            resizingState = new ResizeingState(this);
-
-            //set default state
-            currentState = nullState;
-
-            //set event listeners
+            // Set event listeners
             MouseEnter += new MouseEventHandler(MouseEnterHandler);
             MouseLeave += new MouseEventHandler(MouseLeaveHandler);
             MouseMove += new MouseEventHandler(MouseMoveHandler);
@@ -563,11 +329,21 @@ namespace ChemProV.UI.DrawingCanvas
         /// children contain the point then null is returned.
         /// </summary>
         /// <param name="location">Location, relative to this canvas</param>
+        /// <param name="excludeMe">Object reference to ignore. Note that if the ONLY child at the 
+        /// location is equal to this then null will be returned. This is useful for scenarios where 
+        /// you might be dragging one object on top of the other. In this case obviously the child 
+        /// you're your dragging is going to be at the location you specify, but you want to ignore 
+        /// that child and look for anything else it might be getting dragged onto.</param>
         /// <returns>First child containing the point, or null if there are no such children</returns>
-        public UIElement GetChildAt(Point location)
+        public UIElement GetChildAt(Point location, object excludeMe)
         {
             foreach (UIElement uie in Children)
             {
+                if (object.ReferenceEquals(excludeMe, uie))
+                {
+                    continue;
+                }
+                
                 double w = (double)uie.GetValue(Canvas.ActualWidthProperty);
                 double h = (double)uie.GetValue(Canvas.ActualHeightProperty);
                 double x = (double)uie.GetValue(Canvas.LeftProperty);
@@ -594,33 +370,80 @@ namespace ChemProV.UI.DrawingCanvas
         /// <param name="e"></param>
         public void MouseRightButtonUpHandler(object sender, MouseButtonEventArgs e)
         {
-            currentState.MouseRightButtonUp(sender, e);
             hasFocus = true;
             e.Handled = true;
         }
 
         public void MouseRightButtonDownHandler(object sender, MouseButtonEventArgs e)
         {
-            currentState.MouseRightButtonDown(sender, e);
             hasFocus = true;
-            if (!isReadOnly)
-            {
-                e.Handled = true;
-            }
+            e.Handled = true;
+
+            // Go ahead and select the item under the mouse
+            SelectedElement = GetChildAt(e.GetPosition(this), null) as IPfdElement;
+
+            // A right mouse button down implies that we need to flip to the menu state
+            CurrentState = new UI.DrawingCanvas.States.MenuState(this, e.GetPosition(this));
         }
 
         public void MouseLeftButtonUpHandler(object sender, MouseButtonEventArgs e)
         {
-            currentState.MouseLeftButtonUp(sender, e);
+            if (null != currentState)
+            {
+                currentState.MouseLeftButtonUp(sender, e);
+            }
             hasFocus = true;
             e.Handled = true;
         }
 
         public void MouseLeftButtonDownHandler(object sender, MouseButtonEventArgs e)
         {
-            currentState.MouseLeftButtonDown(sender, e);
-            hasFocus = true;
             e.Handled = true;
+            hasFocus = true;
+
+            // This canvas gets mouse events after any child element within it will 
+            // get the events. We stop the event from going to higher parents of this 
+            // canvas by setting Handled equal to true.
+
+            // If the current state is non-null then send the mouse event to it
+            if (null != currentState)
+            {
+                currentState.MouseLeftButtonDown(sender, e);
+                return;
+            }
+
+            // If our current state is null, then we want to create an appropriate one.
+            // But first we need to check to see if we've selected an element
+            object childAtPos = GetChildAt(e.GetPosition(this), null);
+            SelectedElement = childAtPos as IPfdElement;
+
+            // If there is nothing where the mouse pointer is, then we leave the state 
+            // null and return.
+            if (null == childAtPos)
+            {
+                return;
+            }
+
+            // Otherwise we check to see if the selected element has its own mouse 
+            // processing logic
+            IState selectedObjState = childAtPos as IState;
+            if (null != selectedObjState)
+            {
+                // Set the state
+                currentState = selectedObjState;
+            }
+            else
+            {
+                // If the selected element does not have its own mouse processing logic then 
+                // we create a MovingState object, which will drag around the selected element.
+                currentState = MovingState.Create(this);
+            }
+
+            // Finish up by sending this mouse event to the current state
+            if (null != currentState)
+            {
+                currentState.MouseLeftButtonDown(sender, e);
+            }
         }
 
         public void MouseWheelHandler(object sender, MouseWheelEventArgs e)
@@ -629,17 +452,26 @@ namespace ChemProV.UI.DrawingCanvas
 
         public void MouseMoveHandler(object sender, MouseEventArgs e)
         {
-            currentState.MouseMove(sender, e);
+            if (null != currentState)
+            {
+                currentState.MouseMove(sender, e);
+            }
         }
 
         public void MouseLeaveHandler(object sender, MouseEventArgs e)
         {
-            currentState.MouseLeave(sender, e);
+            if (null != currentState)
+            {
+                currentState.MouseLeave(sender, e);
+            }
         }
 
         public void MouseEnterHandler(object sender, MouseEventArgs e)
         {
-            currentState.MouseEnter(sender, e);
+            if (null != currentState)
+            {
+                currentState.MouseEnter(sender, e);
+            }
         }
 
         #endregion DrawingCanvasMouseEvents
@@ -660,66 +492,17 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// This is called when we leave an ProcessUnit so we need to the boarder to transparent just in case it got
-        /// changed to red or green.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void IProcessUnit_MouseLeave(object sender, MouseEventArgs e)
-        {
-            //make sure it is not the selectedElement as we don't want to unselect an item just because we moved off it
-            if (!sender.Equals(selectedElement))
-            {
-                (sender as GenericProcessUnit).SetBorderColor(ProcessUnitBorderColor.NoBorder);
-            }
-            hoveringOver = null;
-        }
-
-        /// <summary>
         /// This is called when we move the mouse on top off a ProcessUnit in which case it sets hoveringOver to be itself.
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
         public void IProcessUnit_MouseEnter(object sender, MouseEventArgs e)
         {
-            hoveringOver = sender as IProcessUnit;
         }
 
         public void ProcessUnitStreamsChanged(object sender, EventArgs e)
         {
             PFDModified();
-        }
-
-        /// <summary>
-        /// This is called whenever a temporary process unit is clicked on.  Checks to see if it is a source
-        /// or destination by checking if it has incoming or outgoing streams then call currentState.MouseLeftButtonDown
-        /// on the class either streamDest or Stream Source this is need because it holds the stream and which end
-        /// we need to move
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void TempProcessUnitMouseLeftButtonDownHandler(object sender, MouseButtonEventArgs e)
-        {
-            if ((sender as IProcessUnit).IncomingStreams.Count > 0)
-            {
-                currentState.MouseLeftButtonDown((((sender as IProcessUnit).IncomingStreams[0] as IStream).StreamDestination), e);
-            }
-            if ((sender as IProcessUnit).OutgoingStreams.Count > 0)
-            {
-                currentState.MouseLeftButtonDown((((sender as IProcessUnit).OutgoingStreams[0] as IStream).StreamSource), e);
-            }
-
-            e.Handled = true;
-        }
-
-        /// <summary>
-        /// This is fired when the arrow is clicked on and it mimics what happens when u click on the sink
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void TailMouseLeftButtonDownHandler(object sender, MouseButtonEventArgs e)
-        {
-            currentState.MouseLeftButtonDown((sender as IStream).StreamSource, e);
         }
 
         /// <summary>
@@ -764,7 +547,9 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 if (uie is IStream)
                 {
-                    if (!(uie as IStream).IsAvailableWithDifficulty(newValue))
+                    System.Reflection.MethodInfo mi = uie.GetType().GetMethod("IsAvailableWithDifficulty");
+                    bool available = (bool)mi.Invoke(null, new object[] { newValue });
+                    if (!available)
                     {
                         // This exception is caught at a higher level and an appropriate error message is shown
                         throw new Exception();
@@ -893,27 +678,17 @@ namespace ChemProV.UI.DrawingCanvas
         /// <param name="e"></param>
         public void GotKeyDown(object sender, KeyEventArgs e)
         {
-            if (e.Key == Key.Delete && currentState == selectedState)
+            if (e.Key == Key.Delete && null != selectedElement)
             {
-                if (selectedElement is ChemicalStreamPropertiesWindow)
-                {
-                    // (selectedElement as ChemicalStreamPropertiesWindow).PropertiesWindow_KeyDown(sender, e);
-                }
-                else
-                {
-                    //these arguments are not used so it doesn't care what they are
-                    (menuState as MenuState).Delete(sender, e);
-                }
+                Core.DrawingCanvasCommands.DeleteSelectedElement(this);
             }
             else if (e.Key == Key.Z && (Keyboard.Modifiers == ModifierKeys.Control))
             {
-                //these arguments are not used so it doesn't care what they are
-                (menuState as MenuState).Undo(this, EventArgs.Empty);
+                Undo();
             }
             else if (e.Key == Key.Y && (Keyboard.Modifiers == ModifierKeys.Control))
             {
-                //these arguments are not used so it doesn't care what they are
-                (menuState as MenuState).Redo(this, EventArgs.Empty);
+                Redo();
             }
         }
 
@@ -945,16 +720,13 @@ namespace ChemProV.UI.DrawingCanvas
         /// <param name="doc"></param>
         public void LoadXmlElements(XElement doc)
         {
-            //Process units first
+            // Process units first
             XElement processUnits = doc.Descendants("ProcessUnits").ElementAt(0);
             foreach (XElement unit in processUnits.Elements())
             {
-                //create the process unit
+                // Create the process unit and add it to the canvas
                 IProcessUnit pu = ProcessUnitFactory.ProcessUnitFromXml(unit);
-
-                //create & execute the command to place the process unit onto the drawing_canvas
-                Commands.ICommand cmd = CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, pu, this, new Point(-1.0, -1.0));
-                cmd.Execute();
+                AddNewChild((UIElement)pu);
             }
 
             //then streams
@@ -1013,9 +785,13 @@ namespace ChemProV.UI.DrawingCanvas
                 pTable.ParentStream = parent.ElementAt(0);
                 parent.ElementAt(0).Table = pTable;
 
-                //add the stream, and therefore the table to the drawing_canvas
-                Commands.ICommand cmd = CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, parent.ElementAt(0), this, new Point(-1.0, -1.0));
-                cmd.Execute();
+                // E.O.
+                // Add the stream, and therefore the table to the drawing_canvas
+                AddNewChild((UIElement)parent.ElementAt(0));
+                // Below was what was here originally. I'm still unsure about some of the stream-related 
+                // initialization stuff
+                //Commands.ICommand cmd = CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, parent.ElementAt(0), this, new Point(-1.0, -1.0));
+                //cmd.Execute();
 
                 //tell the stream to redraw in order to fix any graphical glitches
                 parent.ElementAt(0).UpdateStreamLocation();
@@ -1026,10 +802,7 @@ namespace ChemProV.UI.DrawingCanvas
             foreach (XElement note in stickyNoteList.Elements())
             {
                 StickyNote sn = StickyNote.FromXml(note);
-
-                //create & execute the command to place the process unit onto the drawing_canvas
-                Commands.ICommand cmd = CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, sn, this, new Point(-1.0, -1.0));
-                cmd.Execute();
+                AddNewChild(sn);
             }
 
             //kind of a hack, but the rule checker fails during object creation for obvious reasons.
@@ -1218,7 +991,10 @@ namespace ChemProV.UI.DrawingCanvas
             this.Cursor = Cursors.SizeNWSE;
             selectedElement = sender as IPfdElement;
             (sender as StickyNote).CaptureMouse();
-            currentState = resizingState;
+            
+            //currentState = resizingState;
+            // TODO
+            throw new InvalidOperationException("This code needs to be fixed or removed");
         }
 
         /// <summary>
@@ -1242,31 +1018,32 @@ namespace ChemProV.UI.DrawingCanvas
             currentState.MouseLeftButtonDown(parent, e);
         }
 
-        public void StickyNote_Closing(object sender, MouseButtonEventArgs e)
-        {
-            FrameworkElement parent = sender as FrameworkElement;
+        #endregion StickyNotes
 
-            while (!(parent is IPfdElement))
+        /// <summary>
+        /// I'm creating this method even though children can currently be added via 
+        /// Children.Add by any piece of code outside this class. It would be nice 
+        /// if we had everything add through this method. Then, if we wanted to do 
+        /// some sort of validation in the future we could do it here. Until then, 
+        /// it's functionally equivalent to Children.Add
+        /// </summary>
+        /// <returns>True if the child element was added to the collection of children, 
+        /// false otherwise.</returns>
+        public bool AddNewChild(UIElement childElement)
+        {
+            Children.Add(childElement);
+            return true;
+        }
+
+        public bool RemoveChild(UIElement childElement)
+        {
+            if (!Children.Contains(childElement))
             {
-                parent = parent.Parent as FrameworkElement;
+                return false;
             }
 
-            selectedElement = parent as IPfdElement;
-
-            //call the Delete in menu state so it can remove the stickyNote
-            (menuState as MenuState).Delete(selectedElement, EventArgs.Empty);
+            Children.Remove(childElement);
+            return true;
         }
-
-        public void newStickyNote_MouseEnter(object sender, MouseEventArgs e)
-        {
-            HoveringOverStickyNote = sender as StickyNote;
-        }
-
-        public void newStickyNote_MouseLeave(object sender, MouseEventArgs e)
-        {
-            HoveringOverStickyNote = null;
-        }
-
-        #endregion StickyNotes
     }
 }
