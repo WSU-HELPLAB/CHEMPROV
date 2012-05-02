@@ -245,6 +245,8 @@
     <Compile Include="PFD\Undos\AddToCanvas.cs" />
     <Compile Include="PFD\Undos\AttachOutgoingStream.cs" />
     <Compile Include="PFD\Undos\DetachOutgoingStream.cs" />
+    <Compile Include="PFD\Undos\InsertComment.cs" />
+    <Compile Include="PFD\Undos\RemoveComment.cs" />
     <Compile Include="PFD\Undos\RestoreStickyNoteColor.cs" />
     <Compile Include="PFD\Undos\SetProcessSubgroup.cs" />
     <Compile Include="PFD\Undos\DetachIncomingStream.cs" />
@@ -270,9 +272,6 @@
     <Compile Include="UI\ControlPalette.xaml.cs">
       <DependentUpon>ControlPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\DrawingCanvas\Commands\ICommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\AddPropertiesTableToCanvasCommand.cs" />
-    <Compile Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\RemovePropertiesTableFromCanvas.cs" />
     <Compile Include="UI\DrawingCanvas\PfdUpdatedEventArgs.cs" />
     <Compile Include="UI\DrawingCanvas\DrawingCanvas.cs" />
     <Compile Include="UI\DrawingCanvas\States\IState.cs" />
@@ -285,20 +284,7 @@
     <Compile Include="UI\OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\PalletItems\GenericPaletteItem.xaml.cs">
-      <DependentUpon>GenericPaletteItem.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\PalletItems\IPaletteItem.cs" />
-    <Compile Include="UI\PalletItems\ProcessUnitPaletteFactory.cs" />
-    <Compile Include="UI\PalletItems\ProcessUnitPaletteItem.cs" />
-    <Compile Include="UI\PalletItems\ProcessUnitPaletteMaterialAndEnergyBalance.cs" />
-    <Compile Include="UI\PalletItems\ProcessUnitPalette.xaml.cs">
-      <DependentUpon>ProcessUnitPalette.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="UI\PalletItems\ProcessUnitPaletteMaterialBalances.cs" />
-    <Compile Include="UI\PalletItems\ProcessUnitPaletteMaterialBalancesWithReactors.cs" />
-    <Compile Include="UI\PalletItems\StreamPaletteItem.cs" />
     <Compile Include="UI\UserDefinedVariableWindow\UserDefinedVariableWindow.xaml.cs">
       <DependentUpon>UserDefinedVariableWindow.xaml</DependentUpon>
     </Compile>
@@ -426,18 +412,6 @@
     <Page Include="UI\OptionWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\PalletItems\GenericPaletteItem.xaml">
-      <Generator>MSBuild:MarkupCompilePass1</Generator>
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="UI\PalletItems\ProcessUnitPalette.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:MarkupCompilePass1</Generator>
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\UserDefinedVariableWindow\UserDefinedVariableWindow.xaml">
       <SubType>Designer</SubType>
@@ -617,6 +591,8 @@
     <Folder Include="UI\DrawingCanvas\Commands\ProcessUnit\" />
     <Folder Include="UI\DrawingCanvas\Commands\RightClickMenu\" />
     <Folder Include="UI\DrawingCanvas\Commands\StickyNoteCommand\" />
+    <Folder Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\" />
+    <Folder Include="UI\PalletItems\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

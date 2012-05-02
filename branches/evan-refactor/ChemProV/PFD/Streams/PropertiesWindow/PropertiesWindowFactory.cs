@@ -74,37 +74,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
             }
         }
 
-        public static IPropertiesWindow TableFromTable(IPropertiesWindow orginalTable, OptionDifficultySetting difficultySetting, bool isReadOnly)
-        {
-            using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
-            {
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream("Temp.xml", FileMode.Create, isf))
-                {
-                    XmlWriterSettings settings = new XmlWriterSettings();
-                    settings.Indent = true;
-                    settings.IndentChars = "   ";
-                    XmlWriter writer = XmlWriter.Create(isfs, settings);
-                    //writer.WriteStartElement("ChemicalStreamPropertiesWindow");
-                    (new XmlSerializer(typeof(ChemicalStreamPropertiesWindow))).Serialize(writer, orginalTable);
-                    //writer.WriteEndElement();
-                    writer.Flush();
-                }
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream("Temp.xml", FileMode.Open, isf))
-                {
-                    using (StreamReader sr = new StreamReader(isfs))
-                    {
-                        XDocument xdoc = XDocument.Load(sr);
-                        IPropertiesWindow window = TableFromXml(xdoc.Element("ChemicalStreamPropertiesWindow"), difficultySetting, isReadOnly);
-
-                        //this is questionable if this should be here, but since we copied the table we let the parent stream know that he has a new table to point at
-                        orginalTable.ParentStream.Table = window;
-                        window.ParentStream = orginalTable.ParentStream;
-                        return window;
-                    }
-                }
-            }
-        }
-
         public static IPropertiesWindow TableFromXml(XElement tableXml, OptionDifficultySetting difficultySetting, bool isReadOnly)
         {
             //The root node name should be the name of the object to create

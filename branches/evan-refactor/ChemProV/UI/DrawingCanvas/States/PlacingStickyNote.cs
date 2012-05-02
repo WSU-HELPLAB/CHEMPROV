@@ -58,6 +58,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Create the sticky note and add it
             m_note = new StickyNote(canvas);
             m_canvas.AddNewChild(m_note);
+            m_note.Width = m_note.Height = 100.0;
         }
         
         public void MouseEnter(object sender, MouseEventArgs e)

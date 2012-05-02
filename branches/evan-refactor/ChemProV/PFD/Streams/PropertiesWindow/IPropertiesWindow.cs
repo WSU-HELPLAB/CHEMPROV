@@ -14,7 +14,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
 {
     public delegate void TableDataEventHandler(object sender, TableDataChangedEventArgs e);
 
-    public interface IPropertiesWindow : IPfdElement, IXmlSerializable, IComparable
+    public interface IPropertiesWindow : IPfdElement, IXmlSerializable, IComparable, Core.ICanvasElement
     {
         /// <summary>
         /// This occurs when a change has been commited and the data changed as a result

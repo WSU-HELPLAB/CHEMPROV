@@ -55,13 +55,7 @@ namespace ChemProV.Core
             if (element is PFD.StickyNote.StickyNote)
             {
                 // Case 1: deleting a sticky note
-
-                // Create an undo that adds it back to the canvas
-                canvas.AddUndo(new PFD.UndoRedoCollection("Undo deletion of sticky note",
-                    new PFD.Undos.AddToCanvas(element, canvas)));
-
-                // Remove it from the canvas
-                canvas.Children.Remove(element);
+                (element as PFD.StickyNote.StickyNote).DeleteWithUndo(canvas);
             }
             else if (element is AbstractStream)
             {

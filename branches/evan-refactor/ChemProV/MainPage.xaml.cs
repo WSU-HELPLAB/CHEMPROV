@@ -28,7 +28,6 @@ using ChemProV.PFD.StickyNote;
 using ChemProV.PFD.Streams;
 using ChemProV.UI;
 using ChemProV.UI.DrawingCanvas;
-using ChemProV.UI.PalletItems;
 using ChemProV.UI.UserDefinedVariableWindow;
 using ChemProV.Validation.Feedback;
 using ImageTools;
@@ -70,7 +69,6 @@ namespace ChemProV
         /// Use the public version of this unless you want to change it without having everyone know
         /// </summary>
         private OptionDifficultySetting currentDifficultySetting;
-        private ProcessUnitPalette processUnitPalette = null;
         private DispatcherTimer saveTimer = new DispatcherTimer();
 
         /// <summary>
@@ -162,7 +160,6 @@ namespace ChemProV
             }
 
             //listen for selection changes in our children
-            WorkSpace.ToolPlaced += new EventHandler(ToolPlaced);
             WorkSpace.CompoundsUpdated += new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked += new EventHandler(WorkSpace_ValidationChecked);
             userDefinedVariableWindow.UserDefinedVariablesUpdated += new EventHandler(userDefinedVariableWindow_UserDefinedVariablesUpdated);
@@ -333,18 +330,6 @@ namespace ChemProV
         private void CompoundTable_ConstantClicked(object sender, EventArgs e)
         {
             WorkSpace.EquationEditor.InsertConstant((sender as Button).Content as string);
-        }
-
-        /// <summary>
-        /// Called whenever the drawing_canvas places a new tool.  We use it here to coordinate with
-        /// the process unit palette control.  Basically, whenenver the drawing drawing_canvas places
-        /// a tool, we reset the tool palette back to the default selection.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToolPlaced(object sender, EventArgs e)
-        {
-            processUnitPalette.ResetSelection();
         }
 
         private void SaveChemProVFile(Stream stream)
@@ -573,8 +558,7 @@ namespace ChemProV
             //before creating a new file, check to see if our drawing drawing_canvas is not
             //empty.  If so, ask the user if they'd like to save the current file
             //before erasing everything.
-            if (WorkSpace.DrawingCanvas.Children
-                .Count > 0)
+            if (WorkSpace.DrawingCanvas.Children.Count > 0)
             {
                 MessageBoxResult result = MessageBox.Show("Creating a new file will erase the current process flow diagram.  Click OK to continue or CANCEL to go back and save.  This action will not be undo-able", "New File Confirmation", MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.OK)
@@ -676,7 +660,6 @@ namespace ChemProV
             }
 
             //unlisten for selection changes in our children
-            WorkSpace.ToolPlaced -= new EventHandler(ToolPlaced);
             WorkSpace.CompoundsUpdated -= new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked -= new EventHandler(WorkSpace_ValidationChecked);
             userDefinedVariableWindow.UserDefinedVariablesUpdated -= new EventHandler(userDefinedVariableWindow_UserDefinedVariablesUpdated);

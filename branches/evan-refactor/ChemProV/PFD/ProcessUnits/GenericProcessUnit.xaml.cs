@@ -144,7 +144,16 @@ namespace ChemProV.PFD.ProcessUnits
         {
             get
             {
-                return new Point((double)this.GetValue(Canvas.LeftProperty) + this.ActualWidth / 2, (double)this.GetValue(Canvas.TopProperty) + this.ActualHeight / 2);
+                if (double.IsNaN(Width) || double.IsNaN(Height))
+                {
+                    return new Point(
+                        (double)this.GetValue(Canvas.LeftProperty) + this.ActualWidth / 2,
+                        (double)this.GetValue(Canvas.TopProperty) + this.ActualHeight / 2);
+                }
+
+                return new Point(
+                    (double)this.GetValue(Canvas.LeftProperty) + this.Width / 2,
+                    (double)this.GetValue(Canvas.TopProperty) + this.Height / 2);
             }
 
             // E.O.
@@ -593,10 +602,8 @@ namespace ChemProV.PFD.ProcessUnits
             writer.WriteAttributeString("Id", Id);
 
             //the type of process unit
-            writer.WriteAttributeString(
-                                        "ProcessUnitType",
-                                        ProcessUnitFactory.GetProcessUnitType(this).ToString()
-                                        );
+            writer.WriteAttributeString("ProcessUnitType",
+                ProcessUnitFactory.GetProcessUnitType(this).ToString());
 
             //the process units location
             writer.WriteStartElement("Location");

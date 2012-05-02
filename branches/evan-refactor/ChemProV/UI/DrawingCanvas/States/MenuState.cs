@@ -13,9 +13,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.PFD.StickyNote;
-using ChemProV.UI.DrawingCanvas.Commands;
 using System.Windows.Media;
 using ChemProV.PFD.Streams;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
@@ -79,7 +79,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                     // Change visibility if it's a sticky note
                     if (uie is StickyNote)
                     {
-                        (uie as StickyNote).Visibility = Visibility.Visible;
+                        (uie as StickyNote).Show();
                     }
                 }
 
@@ -117,20 +117,11 @@ namespace ChemProV.UI.DrawingCanvas.States
                 menuItem.Click += new RoutedEventHandler(ChangeStickyNoteColor);
             }
 
-            //if (m_canvas.SelectedElement is StreamSourceIcon)
-            //{
-            //    m_canvas.SelectedElement = (m_canvas.SelectedElement as StreamSourceIcon).Stream;
-            //}
-            //else if (m_canvas.SelectedElement is StreamDestinationIcon)
-            //{
-            //    m_canvas.SelectedElement = (m_canvas.SelectedElement as StreamDestinationIcon).Stream;
-            //}
-
             // E.O.
-            // If the user has right-clicked on a process unit then we want to add subgroup options
+            // If the user has right-clicked on a process unit then we want to add subprocess options
             if (m_canvas.SelectedElement is PFD.ProcessUnits.IProcessUnit)
             {
-                AddSubgroupMenuOptions(m_contextMenu,
+                AddSubprocessMenuOptions(m_contextMenu,
                     m_canvas.SelectedElement as PFD.ProcessUnits.IProcessUnit);
             }
 
@@ -138,39 +129,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Show comment options if the item implements ICommentCollection
             if (m_canvas.SelectedElement is Core.ICommentCollection)
             {
-                // Make the header in the menu for the comment-specific options
-                menuItem = new MenuItem();
-                menuItem.Header = "Comment Options";
-                m_contextMenu.Items.Add(menuItem);
-                // We're using this item as a label, so don't let the user click it
-                menuItem.IsHitTestVisible = false;
-                // Change the colors to signal to the user that it's a label
-                menuItem.Background = new SolidColorBrush(Colors.LightGray);
-                menuItem.Foreground = new SolidColorBrush(Color.FromArgb(255, 100, 100, 100));
-                menuItem.FontWeight = FontWeights.Bold;
-
-                menuItem = new MenuItem();
-                menuItem.Header = "Add new comment...";
-                menuItem.Tag = m_canvas.SelectedElement;
-                m_contextMenu.Items.Add(menuItem);
-
-                // Use an anonymous delegate to handle the click event
-                menuItem.Click += delegate(object sender, RoutedEventArgs e)
-                {
-                    MenuItem tempMI = sender as MenuItem;
-                    Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
-
-                    // This is kind of hacky, but we add a comment with null properties to
-                    // get the interface to pop up so that the user can enter a new comment
-                    cc.AddComment(new Core.Comment(null, null));
-
-                    // Make sure to remove the popup menu from the canvas
-                    m_canvas.Children.Remove(m_contextMenu);
-                    m_contextMenu = null;
-
-                    // Flip back to the default state for the canvas (null)
-                    m_canvas.CurrentState = null;
-                };
+                AddCommentCollectionMenuOptions(m_contextMenu);
             }
             m_contextMenu.SetValue(Canvas.LeftProperty, location.X);
             m_contextMenu.SetValue(Canvas.TopProperty, location.Y);
@@ -246,7 +205,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 if (uie is StickyNote)
                 {
-                    (uie as StickyNote).Visibility = Visibility.Collapsed;
+                    (uie as StickyNote).Hide();
                 }
             }
 
@@ -292,13 +251,116 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         #endregion IState Members
 
+        private void AddCommentCollectionMenuOptions(ContextMenu newContextMenu)
+        {
+            // Make the header in the menu for the comment-specific options
+            MenuItem menuItem = new MenuItem();
+            menuItem.Header = "Comment Options";
+            newContextMenu.Items.Add(menuItem);
+            // We're using this item as a label, so don't let the user click it
+            menuItem.IsHitTestVisible = false;
+            // Change the colors to signal to the user that it's a label
+            menuItem.Background = new SolidColorBrush(Colors.LightGray);
+            menuItem.Foreground = new SolidColorBrush(Color.FromArgb(255, 100, 100, 100));
+            menuItem.FontWeight = FontWeights.Bold;
+
+            menuItem = new MenuItem();
+            menuItem.Header = "Add new comment...";
+            menuItem.Tag = m_canvas.SelectedElement;
+            newContextMenu.Items.Add(menuItem);
+
+            // Use an anonymous delegate to handle the click event
+            menuItem.Click += delegate(object sender, RoutedEventArgs e)
+            {
+                MenuItem tempMI = sender as MenuItem;
+                Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
+
+                // Build the new comment sticky note on the canvas
+                StickyNote sn = StickyNote.CreateCommentNote(m_canvas, cc, null);
+
+                // Create an undo to remove both
+                m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo creation of comment",
+                    new RemoveFromCanvas(sn, m_canvas),
+                    new RemoveFromCanvas(sn.LineToParent, m_canvas),
+                    new RemoveComment(cc, cc.CommentCount)));
+
+                // Add it to the collection
+                cc.AddComment(sn);
+
+                // Make sure to remove the popup menu from the canvas
+                m_canvas.Children.Remove(m_contextMenu);
+                m_contextMenu = null;
+
+                // Flip back to the default state for the canvas (null)
+                m_canvas.CurrentState = null;
+            };
+
+            string objName = "selected object";
+            if (m_canvas.SelectedElement is PFD.ProcessUnits.LabeledProcessUnit)
+            {
+                objName = (m_canvas.SelectedElement as PFD.ProcessUnits.LabeledProcessUnit).ProcessUnitLabel;
+            }
+            else if (m_canvas.SelectedElement is AbstractStream)
+            {
+                objName = "selected stream";
+            }
+
+            // Add a new menu item to hide all comments
+            menuItem = new MenuItem();
+            menuItem.Header = "Hide all comments for " + objName;
+            menuItem.Tag = m_canvas.SelectedElement;
+            newContextMenu.Items.Add(menuItem);
+            menuItem.Click += delegate(object sender, RoutedEventArgs e)
+            {
+                MenuItem tempMI = sender as MenuItem;
+                Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
+
+                for (int i = 0; i < cc.CommentCount; i++)
+                {
+                    StickyNote sn = cc.GetCommentAt(i) as StickyNote;
+                    sn.Hide();
+                }
+
+                // Make sure to remove the popup menu from the canvas
+                m_canvas.Children.Remove(m_contextMenu);
+                m_contextMenu = null;
+
+                // Flip back to the default state for the canvas (null)
+                m_canvas.CurrentState = null;
+            };
+
+            // Add one to show all comments too
+            menuItem = new MenuItem();
+            menuItem.Header = "Show all comments for " + objName;
+            menuItem.Tag = m_canvas.SelectedElement;
+            newContextMenu.Items.Add(menuItem);
+            menuItem.Click += delegate(object sender, RoutedEventArgs e)
+            {
+                MenuItem tempMI = sender as MenuItem;
+                Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
+
+                for (int i = 0; i < cc.CommentCount; i++)
+                {
+                    StickyNote sn = cc.GetCommentAt(i) as StickyNote;
+                    sn.Show();
+                }
+
+                // Make sure to remove the popup menu from the canvas
+                m_canvas.Children.Remove(m_contextMenu);
+                m_contextMenu = null;
+
+                // Flip back to the default state for the canvas (null)
+                m_canvas.CurrentState = null;
+            };
+        }
+
         /// <summary>
         /// E.O.
         /// </summary>
-        private void AddSubgroupMenuOptions(ContextMenu newContextMenu, PFD.ProcessUnits.IProcessUnit pu)
+        private void AddSubprocessMenuOptions(ContextMenu newContextMenu, PFD.ProcessUnits.IProcessUnit pu)
         {
             MenuItem parentMenuItem = new MenuItem();
-            parentMenuItem.Header = "Process Unit Subgroup";
+            parentMenuItem.Header = "Subprocess";
             newContextMenu.Items.Add(parentMenuItem);
             // We're using this item as a label, so don't let the user click it
             parentMenuItem.IsHitTestVisible = false;
@@ -335,11 +397,13 @@ namespace ChemProV.UI.DrawingCanvas.States
                         System.Tuple<PFD.ProcessUnits.IProcessUnit, Color>;
                     
                     // Create undo item before setting the new subgroup
-                    m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo process unit subgroup change",
+                    m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo subprocess change",
                         new PFD.Undos.SetProcessSubgroup(t.Item1)));
 
                     // Set the subgroup
                     t.Item1.Subgroup = t.Item2;
+
+                    m_canvas.PFDModified();
 
                     // Make sure to remove the popup menu from the canvas
                     m_canvas.Children.Remove(m_contextMenu);
@@ -358,7 +422,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// right-clicks on a process unit.
         /// </summary>
         private static readonly NamedColor[] s_subgroupColors = new NamedColor[]{
-            new NamedColor("White", Colors.White), // White is the default
+            new NamedColor("None (white)", Colors.White), // White is the default
             new NamedColor("Red", Colors.Red), new NamedColor("Green", Colors.Green),
             new NamedColor("Blue", Colors.Blue), new NamedColor("Cyan", Colors.Cyan),
             new NamedColor("Magenta", Colors.Magenta), new NamedColor("Yellow", Colors.Yellow)};

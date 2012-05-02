@@ -35,7 +35,7 @@ namespace ChemProV.Core
         /// is read-only or some other error occurs, then false is returned. Otherwise the comment 
         /// is added as the last item in the collection and true is returned.
         /// </summary>
-        bool AddComment(Comment comment);
+        bool AddComment(IComment comment);
         
         int CommentCount
         {
@@ -45,7 +45,15 @@ namespace ChemProV.Core
         /// <summary>
         /// Gets the comment at the specified index. If the index is invalid, then null is returned.
         /// </summary>
-        Comment GetCommentAt(int index);
+        IComment GetCommentAt(int index);
+
+        /// <summary>
+        /// Inserts a comment into the collection
+        /// </summary>
+        /// <param name="comment">Comment to insert</param>
+        /// <param name="insertionIndex">Insertion index. This must be in the range [0, CommentCount].</param>
+        /// <returns>True on success, false on failure.</returns>
+        bool InsertCommentAt(IComment comment, int insertionIndex);
 
         /// <summary>
         /// Removes the comment at the specified index from the collection. If the collection is 
@@ -60,43 +68,19 @@ namespace ChemProV.Core
         /// invalid, or the current user does not have sufficient permissions then false is returned. 
         /// Otherwise, the comment at the specified index is replaced and true is returned.
         /// </summary>
-        bool ReplaceCommentAt(int index, Comment newComment);
+        bool ReplaceCommentAt(int index, IComment newComment);
     }
 
-    /// <summary>
-    /// Represents an immutable comment. At the time of this writing, we don't really have a strong idea 
-    /// of how the comment system should be designed for ChemProV. Thus, it is expected that this class 
-    /// may be extended in the future, but it MUST REMAIN IMMUTABLE. This is part of an effort to create 
-    /// more solid code in ChemProV. Immutable comments will require the invokation of the ReplaceCommentAt 
-    /// function in the comment collection to alter a comment. The implementation of that function can 
-    /// include relevant permissions checks and whatnot.
-    /// </summary>
-    public class Comment
+    public interface IComment
     {
-        protected string m_text;
-        
-        protected string m_userName;
-
-        public Comment(string userName, string text)
+        string CommentText
         {
-            m_userName = userName;
-            m_text = text;
+            get;
         }
 
-        public string Text
+        string CommentUserName
         {
-            get
-            {
-                return m_text;
-            }
-        }
-
-        public string UserName
-        {
-            get
-            {
-                return m_userName;
-            }
+            get;
         }
     }
 }

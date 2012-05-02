@@ -7,14 +7,6 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
-// E.O.
-// Why this file exists: the undo system in ChemProV is terribly convoluted at this point in 
-// time (April 2012). This file contains declarations for an undo system that aims to provide 
-// a much cleaner undo system.
-// On top of this undo system there will be compatibilty for the old undo system so that it 
-// doesn't have to be completely rewritten. Eventually however, the old one should be phased 
-// out entirely. Every single undo/redo action should use objects declared in this class.
-
 using System;
 using System.Collections.Generic;
 

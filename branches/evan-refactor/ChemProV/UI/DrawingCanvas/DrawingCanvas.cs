@@ -24,7 +24,6 @@ using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
-using ChemProV.UI.DrawingCanvas.Commands;
 using ChemProV.UI.DrawingCanvas.States;
 
 namespace ChemProV.UI.DrawingCanvas
@@ -404,7 +403,12 @@ namespace ChemProV.UI.DrawingCanvas
             e.Handled = true;
 
             // Go ahead and select the item under the mouse
-            SelectedElement = GetChildAt(e.GetPosition(this), null) as IPfdElement;
+            object child = GetChildAt(e.GetPosition(this), null);
+            SelectedElement = child as IPfdElement;
+            if (child is DraggableStreamEndpoint)
+            {
+                SelectedElement = (child as DraggableStreamEndpoint).ParentStream;
+            }
 
             // A right mouse button down implies that we need to flip to the menu state
             CurrentState = new UI.DrawingCanvas.States.MenuState(this, e.GetPosition(this));
@@ -527,16 +531,6 @@ namespace ChemProV.UI.DrawingCanvas
         public void ProcessUnitStreamsChanged(object sender, EventArgs e)
         {
             PFDModified();
-        }
-
-        /// <summary>
-        /// This is fired when the rectangle at the start of the stream is clicked on and it mimics what happens when u click on the source
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void HeadMouseLeftButtonDownHandler(object sender, MouseButtonEventArgs e)
-        {
-            currentState.MouseLeftButtonDown((sender as IStream).StreamDestination, e);
         }
 
         /// <summary>
@@ -705,14 +699,17 @@ namespace ChemProV.UI.DrawingCanvas
             if (e.Key == Key.Delete && null != selectedElement)
             {
                 Core.DrawingCanvasCommands.DeleteSelectedElement(this);
+                e.Handled = true;
             }
             else if (e.Key == Key.Z && (Keyboard.Modifiers == ModifierKeys.Control))
             {
                 Undo();
+                e.Handled = true;
             }
             else if (e.Key == Key.Y && (Keyboard.Modifiers == ModifierKeys.Control))
             {
                 Redo();
+                e.Handled = true;
             }
         }
 
@@ -751,6 +748,20 @@ namespace ChemProV.UI.DrawingCanvas
                 // Create the process unit and add it to the canvas
                 IProcessUnit pu = ProcessUnitFactory.ProcessUnitFromXml(unit);
                 AddNewChild((UIElement)pu);
+
+                // E.O.
+                // Load any comments that are present
+                XElement cmtElement = unit.Element("Comments");
+                if (null != cmtElement)
+                {
+                    foreach (XElement child in cmtElement.Elements())
+                    {                        
+                        StickyNote sn = StickyNote.CreateCommentNote(
+                            this, pu as Core.ICommentCollection, child);
+
+                        (pu as LabeledProcessUnit).AddComment(sn);
+                    }
+                }
             }
 
             //then streams
@@ -758,34 +769,14 @@ namespace ChemProV.UI.DrawingCanvas
             XElement streamList = doc.Descendants("Streams").ElementAt(0);
             foreach (XElement stream in streamList.Elements())
             {
-                //create the stream
-                IStream s = StreamFactory.StreamFromXml(stream);
+                // Create the stream. The factory will connect it to the process units and create 
+                // sticky notes for comments if present
+                IStream s = StreamFactory.StreamFromXml(stream, this, true);
 
-                //set the source and destination
-                var targetNames = from c in stream.DescendantsAndSelf()
-                                  select new
-                                  {
-                                      Source = (string)c.Element("Source"),
-                                      Destination = (string)c.Element("Destination")
-                                  };
+                // The stream control itself is really just lines and these lines need a low Z-index
+                (s as AbstractStream).SetValue(Canvas.ZIndexProperty, -3);
 
-                //find the source in the current list of children
-                var source = from c in Children
-                             where c is IProcessUnit
-                             &&
-                             ((c as IPfdElement).Id.CompareTo(targetNames.ElementAt(0).Source) == 0)
-                             select c;
-
-                //and the destination
-                var dest = from c in Children
-                           where c is IProcessUnit
-                           &&
-                           ((c as IPfdElement).Id.CompareTo(targetNames.ElementAt(0).Destination) == 0)
-                           select c;
-
-                //set the source and destination of the stream
-                s.Source = source.ElementAt(0) as IProcessUnit;
-                s.Destination = dest.ElementAt(0) as IProcessUnit;
+                s.UpdateStreamLocation();
 
                 //we can't add the streams until we have also built the properties table
                 //so just add to local list variable
@@ -825,19 +816,20 @@ namespace ChemProV.UI.DrawingCanvas
             XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
             foreach (XElement note in stickyNoteList.Elements())
             {
-                StickyNote sn = StickyNote.FromXml(note);
+                StickyNote sn = StickyNote.FromXml(note, this);
                 AddNewChild(sn);
             }
 
-            //kind of a hack, but the rule checker fails during object creation for obvious reasons.
-            //In order to get around this, we're delaying the attaching of streams to process units,
-            //which essentially prevents the error checker from working.  We do this at the end after
-            //everything has been created an added to the drawing_canvas
-            foreach (IStream s in streamObjects)
+            // Tell all stream endpoints to update their locations
+            foreach (UIElement uie in Children)
             {
-                s.Source.AttachOutgoingStream(s);
-                s.Destination.AttachIncomingStream(s);
-                s.UpdateStreamLocation();
+                if (!(uie is DraggableStreamEndpoint))
+                {
+                    continue;
+                }
+
+                DraggableStreamEndpoint dse = uie as DraggableStreamEndpoint;
+                dse.EndpointConnectionChanged(dse.Type, null, null);
             }
         }
 
@@ -925,10 +917,15 @@ namespace ChemProV.UI.DrawingCanvas
             }
             writer.WriteEndElement();
 
+            // Write "free-floating" sticky notes. These are ones that have don't have a 
+            // comment collection parent
             writer.WriteStartElement("StickyNotes");
             foreach (IPfdElement element in stickyNotes)
             {
-                objectFromIPfdElement(element).Serialize(writer, element);
+                if (!((StickyNote)element).HasCommentCollectionParent)
+                {
+                    objectFromIPfdElement(element).Serialize(writer, element);
+                }
             }
             writer.WriteEndElement();
 
@@ -1006,6 +1003,10 @@ namespace ChemProV.UI.DrawingCanvas
             this.Children.Clear();
             ChemicalStreamPropertiesWindow.ResetTableCounter();
             HeatStreamPropertiesWindow.ResetTableCounter();
+
+            // Clear undos/redos
+            m_undos.Clear();
+            m_redos.Clear();
         }
 
         #region StickyNotes
@@ -1056,6 +1057,7 @@ namespace ChemProV.UI.DrawingCanvas
         public bool AddNewChild(UIElement childElement)
         {
             Children.Add(childElement);
+            PFDModified();
             return true;
         }
 
