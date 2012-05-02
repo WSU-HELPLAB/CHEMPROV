@@ -13,7 +13,6 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
-using ChemProV.UI.DrawingCanvas.Commands;
 using ChemProV.PFD;
 using ChemProV.Core;
 

@@ -8,5 +8,6 @@
     
     <Grid x:Name="LayoutRoot" Background="Transparent">
         <Image Name="IconImage" Source="/UI/Icons/pu_source.png" Stretch="None" />
+        <Polygon Points="20,0,20,20,0,20" Fill="Black" Name="ArrowIcon" Visibility="Collapsed"></Polygon>
     </Grid>
 </UserControl>

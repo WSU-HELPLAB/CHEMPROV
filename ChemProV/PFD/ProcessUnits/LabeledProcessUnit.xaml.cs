@@ -12,6 +12,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using System.Windows.Data;
+using System.Xml.Linq;
 
 namespace ChemProV.PFD.ProcessUnits
 {
@@ -24,7 +25,7 @@ namespace ChemProV.PFD.ProcessUnits
         /// E.O.
         /// List of comments used for the implementation of Core.ICommentCollection
         /// </summary>
-        private List<Core.Comment> m_comments = new List<Core.Comment>();
+        private List<Core.IComment> m_comments = new List<Core.IComment>();
 
         private string m_labelOnEditStart = null;
 
@@ -177,7 +178,23 @@ namespace ChemProV.PFD.ProcessUnits
 
         public override void WriteXml(System.Xml.XmlWriter writer)
         {
+            // Start with attributes: Id, type, and name/label
+            writer.WriteAttributeString("Id", Id);
+            writer.WriteAttributeString("ProcessUnitType",
+                ProcessUnitFactory.GetProcessUnitType(this).ToString());
             writer.WriteAttributeString("Name", ProcessUnitLabel);
+
+            //the process units location
+            writer.WriteStartElement("Location");
+            writer.WriteElementString("X", GetValue(Canvas.LeftProperty).ToString());
+            writer.WriteElementString("Y", GetValue(Canvas.TopProperty).ToString());
+            writer.WriteEndElement();
+
+            // E.O.
+            // Write subgroup information, which right now is just an RGBA color
+            writer.WriteStartElement("Subgroup");
+            writer.WriteAttributeString("Color", Subgroup.ToString());
+            writer.WriteEndElement();            
 
             // E.O.
             // Write any and all comments
@@ -186,19 +203,18 @@ namespace ChemProV.PFD.ProcessUnits
                 writer.WriteStartElement("Comments");
                 for (int i = 0; i < m_comments.Count; i++)
                 {
+                    StickyNote.StickyNote sn = m_comments[i] as StickyNote.StickyNote;
+                    
                     writer.WriteStartElement("Comment");
-                    writer.WriteAttributeString("UserName", m_comments[i].UserName);
-                    writer.WriteString(m_comments[i].Text);
+                    writer.WriteAttributeString("UserName", m_comments[i].CommentUserName);
+                    sn.WriteXml(writer);
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
             }
-
-            // Have the parent class write the rest
-            base.WriteXml(writer);
         }
 
-        public override IProcessUnit FromXml(System.Xml.Linq.XElement xpu, IProcessUnit targetUnit)
+        public override IProcessUnit FromXml(XElement xpu, IProcessUnit targetUnit)
         {
             (targetUnit as LabeledProcessUnit).ProcessUnitLabel = xpu.Attribute("Name").Value;
             targetUnit = base.FromXml(xpu, targetUnit);
@@ -222,7 +238,7 @@ namespace ChemProV.PFD.ProcessUnits
 
         #region ICommentCollection Members
         
-        public bool AddComment(Core.Comment comment)
+        public bool AddComment(Core.IComment comment)
         {
             // Future versions might have some sort of permissions check here, but for 
             // now we just add it
@@ -237,13 +253,6 @@ namespace ChemProV.PFD.ProcessUnits
             {
                 CommentIcon.Visibility = System.Windows.Visibility.Collapsed;
             }
-
-            // We also have to take care of the visual aspect of the comment. This means we need a 
-            // new comment sticky note on the canvas.
-            // TODO: Fix
-            throw new NotImplementedException();
-
-            // TODO: CREATE UNDO ACTION!
             
             return true;
         }
@@ -253,7 +262,7 @@ namespace ChemProV.PFD.ProcessUnits
             get { return m_comments.Count; }
         }
 
-        public Core.Comment GetCommentAt(int index)
+        public Core.IComment GetCommentAt(int index)
         {
             if (index < 0 || index >= m_comments.Count)
             {
@@ -261,6 +270,23 @@ namespace ChemProV.PFD.ProcessUnits
             }
 
             return m_comments[index];
+        }
+
+        public bool InsertCommentAt(Core.IComment comment, int insertionIndex)
+        {
+            if (insertionIndex < 0 || insertionIndex > m_comments.Count)
+            {
+                return false;
+            }
+
+            // If index == count then we add
+            if (insertionIndex == m_comments.Count)
+            {
+                return AddComment(comment);
+            }
+
+            m_comments.Insert(insertionIndex, comment);
+            return true;
         }
 
         public bool RemoveCommentAt(int index)
@@ -274,10 +300,21 @@ namespace ChemProV.PFD.ProcessUnits
             // Future versions might have some sort of permissions check here, but for 
             // now we just remove it
             m_comments.RemoveAt(index);
+
+            // If we have comments then we need to show the comment icon, otherwise we hide it
+            if (m_comments.Count > 0)
+            {
+                CommentIcon.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                CommentIcon.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
             return true;
         }
 
-        public bool ReplaceCommentAt(int index, Core.Comment newComment)
+        public bool ReplaceCommentAt(int index, Core.IComment newComment)
         {
             if (index < 0 || index >= m_comments.Count)
             {

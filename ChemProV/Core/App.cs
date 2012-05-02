@@ -112,6 +112,38 @@ namespace ChemProV.Core
             return true;
         }
 
+        /// <summary>
+        /// Attempts to parse a string of the form "X,Y" and build a point 
+        /// value from it. On failure, the point is set to 0,0 and false 
+        /// is returned.
+        /// </summary>
+        public static bool TryParsePoint(string pointString, out Point point)
+        {
+            // The expected format of the string is "X,Y"
+            if (null == pointString || !pointString.Contains(","))
+            {
+                point = new Point(0.0, 0.0);
+                return false;
+            }
+
+            string[] components = pointString.Split(',');
+            if (null == components || components.Length < 2)
+            {
+                point = new Point(0.0, 0.0);
+                return false;
+            }
+
+            double x, y;
+            if (double.TryParse(components[0], out x) && double.TryParse(components[1], out y))
+            {
+                point = new Point(x, y);
+                return true;
+            }
+
+            point = new Point(0.0, 0.0);
+            return false;
+        }
+
         public static ChemProV.UI.WorkSpace Workspace
         {
             get

@@ -86,7 +86,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             m_newObjType = objectType;
 
             // Create the stream, put it on the canvas, and hide it
-            m_newStream = (AbstractStream)Activator.CreateInstance(objectType, m_canvas, new Point());
+            m_newStream = (AbstractStream)Activator.CreateInstance(objectType, m_canvas);
             m_canvas.AddNewChild(m_newStream);
             m_newStream.SetValue(Canvas.ZIndexProperty, -1);
             // The stream has 4 components that we have to deal with
@@ -150,6 +150,14 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 // Move the destination icon around
                 m_newStream.DestinationDragIcon.Location = mousePt;
+
+                if (null != m_puWithAlteredBorderColor)
+                {
+                    m_puWithAlteredBorderColor.SetBorderColor(
+                        m_puWithAlteredBorderColor.IsAcceptingIncomingStreams(m_newStream) ?
+                        ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
+                }
+
                 m_newStream.UpdateStreamLocation();
             }
         }
@@ -178,6 +186,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 if (null == gpu)
                 {
                     m_newStream.SourceDragIcon.Location = location;
+                    m_newStream.DestinationDragIcon.Location = location;
                 }
                 else if (gpu.IsAcceptingOutgoingStreams(m_newStream))
                 {
@@ -200,6 +209,9 @@ namespace ChemProV.UI.DrawingCanvas.States
                     m_palette.SwitchToSelect();
                     return;
                 }
+
+                // Position the table
+                m_newStream.Table.Location = m_newStream.CalculateTablePositon(location, location);
 
                 // Now is where we finally show the stream
                 m_newStream.Visibility = Visibility.Visible;

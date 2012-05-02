@@ -185,10 +185,11 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     </UserControl.Resources>
     <Border>
         <Grid x:Name="LayoutRoot" Background="White">
-            <StackPanel Orientation="Vertical" Background="#FFFFFCA3" x:Name="vertialStackPanel" Loaded="vertialStackPanel_Loaded">
+            <StackPanel Orientation="Vertical" Background="#FFFFFCA3" x:Name="vertialStackPanel">
                 <StackPanel Orientation="Horizontal" Background="#FFCEC351" Height="23" x:Name="Header_StackPanel">
-                    <Rectangle Height="Auto" x:Name="Header" Width="78" Fill="#FFD4CC75" />
-                    <sdk:Label Height="Auto" x:Name="X_Label" Width="22" Content="X" HorizontalAlignment="Center" MouseLeftButtonDown="X_Label_MouseLeftButtonDown" Background="#FFD4CC75" />
+                    <Rectangle Height="Auto" x:Name="Header" Width="56" Fill="#FFD4CC75" />
+                    <sdk:Label Height="Auto" x:Name="CollapseLabel" Width="18" Content="_" HorizontalAlignment="Center" Background="Transparent" MouseLeftButtonDown="CollapseLabel_MouseLeftButtonDown" />
+                    <sdk:Label Height="Auto" x:Name="X_Label" Width="18" Content="X" HorizontalAlignment="Center" MouseLeftButtonDown="X_Label_MouseLeftButtonDown" Background="#FFD4CC75" />
                 </StackPanel>
                 <TextBox
             Height="3"

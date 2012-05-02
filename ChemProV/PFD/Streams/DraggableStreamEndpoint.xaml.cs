@@ -10,6 +10,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 // Original file author: Evan Olds
 
 using System;
+using System.Xml;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -42,18 +43,8 @@ namespace ChemProV.PFD.Streams
             StreamSourceConnected,
             StreamDestinationConnected
         }
-        
-        public delegate void LocationDelegate(DraggableStreamEndpoint sender, 
-            Point oldLocation, Point newLocation);
-
-        public event LocationDelegate LocationChanged = null;
 
         #region Private member variables
-
-        /// <summary>
-        /// Arrow polygon that's only shown when we have type: StreamDestinationConnected
-        /// </summary>
-        private Polygon m_arrow = null;
         
         private DrawingCanvas m_canvas;
 
@@ -71,6 +62,8 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         private GenericProcessUnit m_connectedToOnMouseDown = null;
 
+        private int m_id;
+
         /// <summary>
         /// Tracks whether the left mouse button is pressed down. This is set to true in LMB down 
         /// event and false in LMB up event.
@@ -85,6 +78,8 @@ namespace ChemProV.PFD.Streams
         private Point m_locationOnLMBDown;
         
         private AbstractStream m_owner;
+
+        private bool m_settingLocation = false;
         
         private EndpointType m_type;
 
@@ -96,6 +91,8 @@ namespace ChemProV.PFD.Streams
         private GenericProcessUnit m_weChangedThisUnitsBorder = null;
         
         #endregion
+
+        private static int s_idCounter = 1;
 
         /// <summary>
         /// Private constructor with no parameters. This is used ONLY to get the designer to work since 
@@ -109,6 +106,9 @@ namespace ChemProV.PFD.Streams
         public DraggableStreamEndpoint(EndpointType endpointType, AbstractStream owner, DrawingCanvas canvas)
         {
             InitializeComponent();
+
+            m_id = s_idCounter;
+            s_idCounter++;
 
             m_canvas = canvas;
             m_owner = owner;
@@ -127,16 +127,42 @@ namespace ChemProV.PFD.Streams
             // have to identify whether we're incoming or outgoing.
             if (EndpointType.StreamDestinationNotConnected == m_type)
             {
-                return processUnit.IsAcceptingIncomingStreams(m_owner);
+                return processUnit.IsAcceptingIncomingStreams(m_owner) &&
+                    !object.ReferenceEquals(processUnit, m_owner.Source);
             }
             else if (EndpointType.StreamSourceNotConnected == m_type)
             {
-                return processUnit.IsAcceptingOutgoingStreams(m_owner);
+                return processUnit.IsAcceptingOutgoingStreams(m_owner) &&
+                    !object.ReferenceEquals(processUnit, m_owner.Destination);
             }
 
             // If we're already connected then we cannot connect to anything else. Endpoints attach 
             // to only one item.
             return false;
+        }
+
+        public string Id
+        {
+            get
+            {
+                return "EGPU_" + m_id.ToString();
+            }
+        }
+
+        public bool IsSource
+        {
+            get
+            {
+                switch (m_type)
+                {
+                    case EndpointType.StreamSourceConnected:
+                    case EndpointType.StreamSourceNotConnected:
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
         }
 
         public IStream ParentStream
@@ -154,27 +180,44 @@ namespace ChemProV.PFD.Streams
             if (EndpointType.StreamDestinationConnected == m_type)
             {
                 AbstractStream a = m_owner as AbstractStream;
-                
-                // Start by getting the normalized connection line vector
-                Vector v = Vector.Normalize(a.StreamVector);
 
-                // Also get the connection point
-                Vector tip = new Vector(a.DestinationConnectionPoint);
+                // Get the points array for the arrow's vertices
+                Point[] pts = a.GetArrowVertices();
 
-                // Build perpendicular vectors
-                Vector perp1 = Vector.GetPerpendicular1(v) * 10.0;
-                Vector perp2 = Vector.GetPerpendicular1(v) * 10.0;
+                double minX, minY, maxX, maxY;
+                minX = minY = double.MaxValue;
+                maxX = maxY = double.MinValue;
+                foreach (Point pt in pts)
+                {
+                    minX = Math.Min(minX, pt.X);
+                    minY = Math.Min(minY, pt.Y);
+                    maxX = Math.Max(maxX, pt.X);
+                    maxY = Math.Max(maxY, pt.Y);
+                }
 
-                // Build the arrow
-                m_arrow = new Polygon();
-                PointCollection pc = new PointCollection();
-                pc.Add(tip.ToPoint());
-                pc.Add(((tip - (v * 10.0)) + perp1).ToPoint());
-                pc.Add(((tip - (v * 10.0)) + perp2).ToPoint());
-                m_arrow.Points = pc;
+                // Set the width and height
+                Width = maxX - minX;
+                Height = maxY - minY;
+
+                // Adjust points to make them relative to this control's coordinate system
+                for (int i = 0; i < 3; i++)
+                {
+                    ArrowIcon.Points[i] = new Point(pts[i].X - minX, pts[i].Y - minY);
+                }
+
+                // Want position such that: 
+                //   Left.X + (pts[0].X - minX) = pts[0].X
+                //   Left.X = minX
+                // Similar thing for Y
+
+                SetValue(Canvas.LeftProperty, minX);
+                SetValue(Canvas.TopProperty, minY);
+
+                // Use the same fill as the stem
+                ArrowIcon.Fill = m_owner.Stem.Fill;
 
                 // Make sure it's visible and the icon is hidden
-                m_arrow.Visibility = System.Windows.Visibility.Visible;
+                ArrowIcon.Visibility = System.Windows.Visibility.Visible;
                 IconImage.Visibility = System.Windows.Visibility.Collapsed;
             }
             else
@@ -186,14 +229,17 @@ namespace ChemProV.PFD.Streams
                 {
                     case EndpointType.StreamDestinationNotConnected:
                         bmp.UriSource = new Uri("/UI/Icons/pu_sink.png", UriKind.Relative);
+                        Width = Height = 20;
                         break;
 
                     case EndpointType.StreamSourceConnected:
                         bmp.UriSource = new Uri("/UI/Icons/StreamSourceConnection.png", UriKind.Relative);
+                        Width = Height = 12;
                         break;
 
                     case EndpointType.StreamSourceNotConnected:
                         bmp.UriSource = new Uri("/UI/Icons/pu_source.png", UriKind.Relative);
+                        Width = Height = 20;
                         break;
 
                     default:
@@ -205,11 +251,8 @@ namespace ChemProV.PFD.Streams
                 IconImage.SetValue(Image.SourceProperty, bmp);
                 IconImage.Visibility = System.Windows.Visibility.Visible;
                 
-                // Make sure the arrow (if non-null) is hidden
-                if (null != m_arrow)
-                {
-                    m_arrow.Visibility = System.Windows.Visibility.Collapsed;
-                }
+                // Make sure the arrow is hidden
+                ArrowIcon.Visibility = System.Windows.Visibility.Collapsed;
             }            
             
         }
@@ -245,6 +288,13 @@ namespace ChemProV.PFD.Streams
                 // Never try to create undos in here. The location property can be changed by a variety of 
                 // code paths for a variety of different reasons. Thus, undo actions to restore location 
                 // (if needed) are created at a higher level and not within this setter.
+
+                // Avoid recursive calls
+                if (m_settingLocation)
+                {
+                    return;
+                }
+                m_settingLocation = true;
                 
                 Point current = new Point(
                     (double)GetValue(Canvas.LeftProperty) + this.Width / 2.0,
@@ -253,6 +303,7 @@ namespace ChemProV.PFD.Streams
                 // See if this is actually a change
                 if (current.Equals(value))
                 {
+                    m_settingLocation = false;
                     return;
                 }
                 
@@ -260,11 +311,17 @@ namespace ChemProV.PFD.Streams
                 SetValue(Canvas.LeftProperty, value.X - this.Width / 2.0);
                 SetValue(Canvas.TopProperty, value.Y - this.Height / 2.0);
 
-                // Fire the LocationChanged event if it's not null
-                if (null != LocationChanged)
+                // Enpoints for a stream let each other when their locations change
+                OtherEndpoint.PU_LocationChanged(null, null);
+
+                // Update the parent stream's location, provided we are not connected
+                if (EndpointType.StreamDestinationNotConnected == m_type ||
+                    EndpointType.StreamSourceNotConnected == m_type)
                 {
-                    LocationChanged(this, current, value);
+                    m_owner.UpdateStreamLocation();
                 }
+
+                m_settingLocation = false;
             }
         }
 
@@ -318,7 +375,7 @@ namespace ChemProV.PFD.Streams
                 m_owner.Destination = null;
             }
             
-            // First position this control on the drawing canvas
+            // First position this control on the drawing canvas. This will update the stream's location
             this.Location = pt;
 
             // If we are hovering over an element then we want to see if it's a process unit. We 
@@ -329,7 +386,6 @@ namespace ChemProV.PFD.Streams
             // If it's not a process unit then we can return
             if (null == pu)
             {
-                m_owner.UpdateStreamLocation();
                 return;
             }
 
@@ -338,13 +394,11 @@ namespace ChemProV.PFD.Streams
             // the user to let them know if they can connect this way or not.
             
             // We are about to change the border color for this process unit
-                m_weChangedThisUnitsBorder = (GenericProcessUnit)pu;
+            m_weChangedThisUnitsBorder = (GenericProcessUnit)pu;
 
             // Set a border color based on whether or not the action is doable
             m_weChangedThisUnitsBorder.SetBorderColor(CanConnectTo(pu) ? 
                 ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
-
-            m_owner.UpdateStreamLocation();
         }
 
         public new void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -443,20 +497,17 @@ namespace ChemProV.PFD.Streams
             }
 
             // Now we know we're dropping on a process unit and we need to see if it's a valid connection 
-            // or not. We need to handle the different endpoint types separately.
+            // or not.
+            if (!CanConnectTo(pu))
+            {
+                // This implies that it is an invalid drag-drop
+                FinishBadDrag(pu as GenericProcessUnit);
+                return;
+            }
+
+            // For connecting, we need to handle the different endpoint types separately.
             if (EndpointType.StreamSourceNotConnected == m_type)
             {
-                // If this is a source endpoint, then this implies that hooking up to a process unit 
-                // would require that process unit to be accepting outgoing streams.
-
-                if (!pu.IsAcceptingOutgoingStreams(m_owner))
-                {
-                    // This implies that it is an invalid drag-drop
-                    FinishBadDrag(pu as GenericProcessUnit);
-                    return;
-                }
-
-                // Otherwise it's valid and we need to link things up
                 if (null != m_connectedToOnMouseDown)
                 {
                     // We were connected to something and broke that connection. Unless it's the exact 
@@ -464,7 +515,17 @@ namespace ChemProV.PFD.Streams
                     // we're about to attach to and then reattah to the old one.
                     if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
                     {
-                        // No change was made
+                        // No net-change was made. Reattach and return
+                        if (IsSource)
+                        {
+                            m_connectedToOnMouseDown.AttachOutgoingStream(m_owner);
+                            m_owner.Source = m_connectedToOnMouseDown;
+                        }
+                        else
+                        {
+                            m_connectedToOnMouseDown.AttachIncomingStream(m_owner);
+                            m_owner.Destination = m_connectedToOnMouseDown;
+                        }
                         Core.App.ControlPalette.SwitchToSelect();
                         return;
                     }
@@ -494,17 +555,6 @@ namespace ChemProV.PFD.Streams
             }
             else if (EndpointType.StreamDestinationNotConnected == m_type)
             {
-                // If this is a destination endpoint, then this implies that hooking up to a process 
-                // unit would require that process unit to be accepting incoming streams.
-
-                if (!pu.IsAcceptingIncomingStreams(m_owner))
-                {
-                    // This implies that it is an invalid drag-drop
-                    FinishBadDrag(pu as GenericProcessUnit);
-                    return;
-                }
-
-                // Otherwise it's valid and we need to link things up
                 if (null != m_connectedToOnMouseDown)
                 {
                     // We were connected to something and broke that connection. Unless it's the exact 
@@ -544,7 +594,7 @@ namespace ChemProV.PFD.Streams
             {
                 // At this time those are the only two possibilities, so we'll never hit this code 
                 // block, but to provide some resilience against breaking changes, we'll throw 
-                // and exception if we get here.
+                // an exception if we get here.
                 throw new InvalidOperationException(
                     "Stream endpoint was expected to be either a source or destination but was neither");
             }
@@ -569,12 +619,54 @@ namespace ChemProV.PFD.Streams
 
         #endregion
 
-        public void SetType(EndpointType newType)
+        public void EndpointConnectionChanged(EndpointType newType, GenericProcessUnit oldPU,
+            GenericProcessUnit newPU)
         {
-            if (!m_type.Equals(newType))
+            // Whenever the source or destination process units change, BOTH stream endpoints need to 
+            // attach location change listeners
+            
+            if (null != oldPU)
             {
-                m_type = newType;
+                // Detach listeners
+                oldPU.LocationChanged -= PU_LocationChanged;
+                oldPU.LocationChanged -= OtherEndpoint.PU_LocationChanged;
+            }
+
+            if (null != newPU)
+            {
+                // Attach new listeners
+                newPU.LocationChanged += PU_LocationChanged;
+                newPU.LocationChanged += OtherEndpoint.PU_LocationChanged;
+            }
+            
+            // Store the new type
+            m_type = newType;
+
+            RebuildIcon();
+
+            // Invoke the location change event to update positions (if needed)
+            PU_LocationChanged(null, null);
+        }
+
+        private void PU_LocationChanged(object sender, EventArgs e)
+        {
+            if (EndpointType.StreamDestinationConnected == m_type)
+            {
                 RebuildIcon();
+            }
+            else if (EndpointType.StreamSourceConnected == m_type)
+            {
+                MathCore.Vector pos = MathCore.Vector.Normalize(m_owner.StreamVector) * 30.0;
+                this.Location = ((new MathCore.Vector(m_owner.Source.Location)) + pos).ToPoint();
+            }
+        }
+
+        private DraggableStreamEndpoint OtherEndpoint
+        {
+            get
+            {
+                return object.ReferenceEquals(this, m_owner.SourceDragIcon) ?
+                    m_owner.DestinationDragIcon : m_owner.SourceDragIcon;
             }
         }
 

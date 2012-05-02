@@ -20,12 +20,12 @@ namespace ChemProV.PFD.Streams
     public class ChemicalStream : AbstractStream
     {
         public ChemicalStream()
-            : this(null, new Point())
+            : this(null)
         {
         }
 
-        public ChemicalStream(DrawingCanvas canvas, Point locationOnCanvas)
-            : base(canvas, locationOnCanvas)
+        public ChemicalStream(DrawingCanvas canvas)
+            : base(canvas)
         {
         }
 
@@ -34,6 +34,8 @@ namespace ChemProV.PFD.Streams
             // Use the factory to create it
             m_table = ChemicalStreamPropertiesTableFactory.GetChemicalStreamPropertiesTable(
                 m_canvas.CurrentDifficultySetting, false, this);
+
+            m_table.ParentStream = this;
         }
 
         /// <summary>

@@ -16,17 +16,16 @@ namespace ChemProV.PFD.Streams
     public class HeatStream : AbstractStream
     {
         public HeatStream()
-            : this(null, new Point())
+            : this(null)
         {
         }
 
-        public HeatStream(DrawingCanvas canvas, Point locationOnCanvas)
-            : base(canvas, locationOnCanvas)
+        public HeatStream(DrawingCanvas canvas)
+            : base(canvas)
         {
             SolidColorBrush red = new SolidColorBrush(Colors.Red);
             this.Stem.Stroke = red;
             this.Stem.Fill = red;
-            this.Arrow.Fill = red;
 
             this.SelectionChanged += new System.EventHandler(HeatStream_SelectionChanged);
         }
@@ -35,6 +34,8 @@ namespace ChemProV.PFD.Streams
         {
             m_table = PropertiesWindow.PropertiesWindowFactory.TableFromStreamType(
                 StreamType.Heat, m_canvas.CurrentDifficultySetting, false);
+
+            m_table.ParentStream = this;
         }
 
         void HeatStream_SelectionChanged(object sender, System.EventArgs e)

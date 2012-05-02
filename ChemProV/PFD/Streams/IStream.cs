@@ -45,21 +45,9 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// this holds the stream and the polygon for the arrow.
-        /// </summary>
-        StreamDestinationIcon StreamDestination
-        {
-            get;
-            set;
-        }
-
-        /// <summary>
         /// Can be called to manually update the stream's location
         /// </summary>
         void UpdateStreamLocation();
-
-        event MouseButtonEventHandler Arrow_MouseButtonLeftDown;
-        event MouseButtonEventHandler Tail_MouseButtonLeftDown;
 
         /// <summary>
         /// E.O.

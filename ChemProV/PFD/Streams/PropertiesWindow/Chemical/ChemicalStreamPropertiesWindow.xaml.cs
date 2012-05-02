@@ -1201,5 +1201,27 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
             TableDataChanging(sender, args);
         }
+
+        #region ICanvasElement Members
+
+        /// <summary>
+        /// TODO: Changes for collapsed mode?
+        /// </summary>
+        public Point Location
+        {
+            get
+            {
+                return new Point(
+                    (double)GetValue(Canvas.LeftProperty) + ActualWidth / 2.0,
+                    (double)GetValue(Canvas.TopProperty) + 5.0);
+            }
+            set
+            {
+                SetValue(Canvas.LeftProperty, value.X - ActualWidth / 2.0);
+                SetValue(Canvas.TopProperty, value.Y - 5.0);
+            }
+        }
+
+        #endregion
     }
 }

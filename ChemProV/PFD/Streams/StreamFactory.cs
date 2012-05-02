@@ -8,7 +8,11 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
+using System.Windows;
 using System.Xml.Linq;
+using ChemProV.UI.DrawingCanvas;
+using ChemProV.PFD.ProcessUnits;
+using ChemProV.PFD.StickyNote;
 
 namespace ChemProV.PFD.Streams
 {
@@ -113,31 +117,116 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// Creates a new stream based on the supplied stream type
-        /// </summary>
-        /// <param name="unitType"></param>
-        /// <returns></returns>
-        public static IStream StreamFromStreamType(string unitType)
-        {
-            //turn the string into an enum and return the stream
-            StreamType type = (StreamType)Enum.Parse(typeof(StreamType), unitType, true);
-            return StreamFromStreamType(type);
-        }
-
-        /// <summary>
         ///
         /// </summary>
         /// <returns></returns>
-        public static IStream StreamFromXml(XElement element)
+        public static IStream StreamFromXml(XElement element, DrawingCanvas owner, bool attachProcessUnits)
         {
-            //pull the attribute
+            // Get the ID attribute
             string id = (string)element.Attribute("Id");
 
-            //pull the process unit type
+            // Get the process unit type
             string unitType = (string)element.Attribute("StreamType");
 
-            //call the factory to create a new object for us
-            IStream stream = StreamFromStreamType(unitType);
+            IStream stream = null;
+            if ("Chemical" == unitType)
+            {
+                stream = new ChemicalStream(owner);
+            }
+            else
+            {
+                // Right now ChemProV only has chemical and heat streams
+                stream = new HeatStream(owner);
+            }
+
+            // E.O.
+            // Check for unconnected endpoints
+            XElement usEl = element.Element("UnattachedSource");
+            if (null != usEl)
+            {
+                XAttribute locAttr = usEl.Attribute("Location");
+                if (null != locAttr)
+                {
+                    Point loc;
+                    if (Core.App.TryParsePoint(locAttr.Value, out loc))
+                    {
+                        (stream as AbstractStream).SourceDragIcon.Location = loc;
+                    }
+                }
+            }
+            XElement udEl = element.Element("UnattachedDestination");
+            if (null != udEl)
+            {
+                XAttribute locAttr = udEl.Attribute("Location");
+                if (null != locAttr)
+                {
+                    Point loc;
+                    if (Core.App.TryParsePoint(locAttr.Value, out loc))
+                    {
+                        (stream as AbstractStream).DestinationDragIcon.Location = loc;
+                    }
+                }
+            }
+
+            // Read source and destination process unit IDs (if present)
+            string srcID = null, dstID = null;
+            XElement srcEl = element.Element("Source");
+            if (null != srcEl)
+            {
+                srcID = srcEl.Value;
+            }
+            XElement dstEl = element.Element("Destination");
+            if (null != dstEl)
+            {
+                dstID = dstEl.Value;
+            }
+
+            // If attachProcessUnits is true then it's assumed that the drawing canvas has all process 
+            // units already added to it, so we can make connections
+            if (attachProcessUnits)
+            {
+                foreach (UIElement uie in owner.Children)
+                {
+                    if (!(uie is GenericProcessUnit))
+                    {
+                        continue;
+                    }
+
+                    GenericProcessUnit gpu = uie as GenericProcessUnit;
+
+                    // See if this process unit is either the source or destination for the stream
+                    if (null != srcID && gpu.Id.Equals(srcID))
+                    {
+                        // Connect as source
+                        stream.Source = gpu;
+                        gpu.AttachOutgoingStream(stream);
+                    }
+                    if (null != dstID && gpu.Id.Equals(dstID))
+                    {
+                        // Connect as destination
+                        stream.Destination = gpu;
+                        gpu.AttachIncomingStream(stream);
+                    }
+                }
+            }
+
+            // Show the drag icons
+            (stream as AbstractStream).SourceDragIcon.Visibility = Visibility.Visible;
+            (stream as AbstractStream).DestinationDragIcon.Visibility = Visibility.Visible;
+
+            // Load any comments that are present
+            XElement cmtElement = element.Element("Comments");
+            if (null != cmtElement)
+            {
+                foreach (XElement child in cmtElement.Elements())
+                {
+                    PFD.StickyNote.StickyNote sn = PFD.StickyNote.StickyNote.CreateCommentNote(
+                        owner, (stream as Core.ICommentCollection), child);
+
+                    (stream as AbstractStream).AddComment(sn);
+                }
+            }
+
             stream.Id = id;
             return stream;
         }
