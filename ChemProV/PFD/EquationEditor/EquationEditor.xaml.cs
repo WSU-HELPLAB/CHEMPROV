@@ -264,6 +264,28 @@ namespace ChemProV.PFD.EquationEditor
                 if (unit != null)
                 {
                     EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = unit.ProcessUnitLabel));
+
+                    // E.O.
+                    // I think this is where this goes, I'm still getting familiar with all the equation-oriented stuff
+                    // If there's a scope for this process unit, then add it
+                    if (!unit.Subprocess.Equals(System.Windows.Media.Colors.White))
+                    {
+                        // Find the name of this color
+                        string name = null;
+                        foreach (Core.NamedColor nc in Core.NamedColors.All)
+                        {
+                            if (nc.Color.Equals(unit.Subprocess))
+                            {
+                                name = nc.Name + " subprocess";
+                                break;
+                            }
+                        }
+
+                        if (!string.IsNullOrEmpty(name))
+                        {
+                            EquationScopes.Add(new EquationScope(EquationScopeClassification.SubProcess, name));
+                        }
+                    }
                 }
             }
 

@@ -369,10 +369,10 @@ namespace ChemProV.UI.DrawingCanvas.States
             parentMenuItem.Foreground = new SolidColorBrush(Color.FromArgb(255, 100, 100, 100));
             parentMenuItem.FontWeight = FontWeights.Bold;
 
-            // Create a submenu for colors. See the declaration of the s_subgroupColors array for 
+            // Create a submenu for colors. See the declaration of the Core.NamedColors.All array for 
             // the list of colors that are being used. Make changes in that array (not in this code) 
             // to change the list of available colors.
-            foreach (NamedColor nc in s_subgroupColors)
+            foreach (Core.NamedColor nc in Core.NamedColors.All)
             {
                 MenuItem menuItem = new MenuItem();
                 menuItem.Header = nc.Name;
@@ -380,7 +380,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                     pu, nc.Color);
 
                 // Show the menu item with a check next to it if it's the current color
-                if (nc.Color.Equals(pu.Subgroup))
+                if (nc.Color.Equals(pu.Subprocess))
                 {
                     menuItem.Icon = Core.App.CreateImageFromSource("check_16x16.png");
                 }
@@ -398,10 +398,10 @@ namespace ChemProV.UI.DrawingCanvas.States
                     
                     // Create undo item before setting the new subgroup
                     m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo subprocess change",
-                        new PFD.Undos.SetProcessSubgroup(t.Item1)));
+                        new PFD.Undos.SetSubprocess(t.Item1)));
 
                     // Set the subgroup
-                    t.Item1.Subgroup = t.Item2;
+                    t.Item1.Subprocess = t.Item2;
 
                     m_canvas.PFDModified();
 
@@ -412,50 +412,6 @@ namespace ChemProV.UI.DrawingCanvas.States
                     // Flip back to the default state for the canvas (null)
                     m_canvas.CurrentState = null;
                 };
-            }
-        }
-
-        /// <summary>
-        /// E.O.
-        /// Array of all possible subgroup colors. You can add or remove colors as you like 
-        /// and they will appear in the "Process Unit Subgroup" popup menu when the user 
-        /// right-clicks on a process unit.
-        /// </summary>
-        private static readonly NamedColor[] s_subgroupColors = new NamedColor[]{
-            new NamedColor("None (white)", Colors.White), // White is the default
-            new NamedColor("Red", Colors.Red), new NamedColor("Green", Colors.Green),
-            new NamedColor("Blue", Colors.Blue), new NamedColor("Cyan", Colors.Cyan),
-            new NamedColor("Magenta", Colors.Magenta), new NamedColor("Yellow", Colors.Yellow)};
-
-        /// <summary>
-        /// E.O.
-        /// Immutable structure for a color with a name.
-        /// </summary>
-        private struct NamedColor
-        {
-            private Color m_clr;
-            private string m_name;
-
-            public NamedColor(string name, Color color)
-            {
-                m_clr = color;
-                m_name = name;
-            }
-
-            public Color Color
-            {
-                get
-                {
-                    return m_clr;
-                }
-            }
-
-            public string Name
-            {
-                get
-                {
-                    return m_name;
-                }
             }
         }
     }

@@ -193,7 +193,7 @@ namespace ChemProV.PFD.ProcessUnits
             // E.O.
             // Write subgroup information, which right now is just an RGBA color
             writer.WriteStartElement("Subgroup");
-            writer.WriteAttributeString("Color", Subgroup.ToString());
+            writer.WriteAttributeString("Color", Subprocess.ToString());
             writer.WriteEndElement();            
 
             // E.O.
@@ -221,16 +221,26 @@ namespace ChemProV.PFD.ProcessUnits
             return targetUnit;
         }
 
-        public override Color Subgroup
+        public override Color Subprocess
         {
             get
             {
-                return m_subgroup;
+                return m_subprocess;
             }
             set
             {
-                m_subgroup = value;
-                ProcessUnitBorder.Background = new SolidColorBrush(value);
+                if (value.Equals(m_subprocess))
+                {
+                    // No change
+                    return;
+                }
+
+                m_subprocess = value;
+
+                // We need to update the control's background color
+                ProcessUnitBorder.Background = new SolidColorBrush(m_subprocess);
+
+                PropertyChanged(this, new PropertyChangedEventArgs("Subprocess"));
             }
         }
 

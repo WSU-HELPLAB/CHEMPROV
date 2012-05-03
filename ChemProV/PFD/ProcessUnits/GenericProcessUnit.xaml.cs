@@ -88,9 +88,9 @@ namespace ChemProV.PFD.ProcessUnits
 
         /// <summary>
         /// E.O.
-        /// Specifies the color for the subgroup. White is default.
+        /// Specifies the color for the subprocess. White is default.
         /// </summary>
-        protected Color m_subgroup = Colors.White;
+        protected Color m_subprocess = Colors.White;
 
         private Brush SelectedBorderBrush = new SolidColorBrush(Colors.Yellow);
         private Brush GreenBorderBrush = new SolidColorBrush(Colors.Green);
@@ -561,20 +561,26 @@ namespace ChemProV.PFD.ProcessUnits
         }
 
         /// <summary>
-        /// Gets or sets the subgroup color
+        /// Gets or sets the subprocess color
         /// </summary>
-        public virtual Color Subgroup
+        public virtual Color Subprocess
         {
             get
             {
-                return m_subgroup;    
+                return m_subprocess;    
             }
             set
             {
-                m_subgroup = value;
+                if (value.Equals(m_subprocess))
+                {
+                    // No change
+                    return;
+                }
+                
+                m_subprocess = value;
 
                 // We need to update the control's background color
-                this.Background = new SolidColorBrush(m_subgroup);
+                this.Background = new SolidColorBrush(m_subprocess);
             }
         }
 
@@ -612,9 +618,9 @@ namespace ChemProV.PFD.ProcessUnits
             writer.WriteEndElement();
 
             // E.O.
-            // Write subgroup information, which right now is just an RGBA color
+            // Write subprocess information, which right now is just an RGBA color
             writer.WriteStartElement("Subgroup");
-            writer.WriteAttributeString("Color", Subgroup.ToString());
+            writer.WriteAttributeString("Color", Subprocess.ToString());
             writer.WriteEndElement();
         }
 
@@ -650,7 +656,7 @@ namespace ChemProV.PFD.ProcessUnits
                     {
                         clr = Colors.White;
                     }
-                    this.Subgroup = clr;
+                    this.Subprocess = clr;
                 }
             }
 

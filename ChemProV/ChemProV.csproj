@@ -132,6 +132,7 @@
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\CommentDefs.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
+    <Compile Include="Core\NamedColors.cs" />
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
@@ -587,11 +588,6 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="UI\DrawingCanvas\Commands\DrawingCanvasCommands\" />
-    <Folder Include="UI\DrawingCanvas\Commands\ProcessUnit\" />
-    <Folder Include="UI\DrawingCanvas\Commands\RightClickMenu\" />
-    <Folder Include="UI\DrawingCanvas\Commands\StickyNoteCommand\" />
-    <Folder Include="UI\DrawingCanvas\Commands\Stream\PropertiesTable\" />
     <Folder Include="UI\PalletItems\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />

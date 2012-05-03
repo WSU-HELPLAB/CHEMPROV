@@ -169,7 +169,7 @@ namespace ChemProV.PFD.ProcessUnits
         /// be fully opaque (alpha=255). The color white RGBA(255, 255, 255, 255) will 
         /// be default.
         /// </summary>
-        System.Windows.Media.Color Subgroup
+        System.Windows.Media.Color Subprocess
         {
             get;
             set;

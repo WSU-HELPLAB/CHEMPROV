@@ -23,25 +23,25 @@ using ChemProV.PFD.ProcessUnits;
 
 namespace ChemProV.PFD.Undos
 {
-    public class SetProcessSubgroup : IUndoRedoAction
+    public class SetSubprocess : IUndoRedoAction
     {
         private Color m_color;
 
         private IProcessUnit m_pu;
 
-        public SetProcessSubgroup(IProcessUnit processUnit)
+        public SetSubprocess(IProcessUnit processUnit)
         {
-            m_color = processUnit.Subgroup;
+            m_color = processUnit.Subprocess;
             m_pu = processUnit;
         }
 
         public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
         {
             // Use the current color for the opposite action
-            IUndoRedoAction opposite = new SetProcessSubgroup(m_pu);
+            IUndoRedoAction opposite = new SetSubprocess(m_pu);
 
             // Restore the color
-            m_pu.Subgroup = m_color;
+            m_pu.Subprocess = m_color;
 
             return opposite;
         }
