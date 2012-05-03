@@ -149,6 +149,22 @@ namespace ChemProV.PFD.Streams
             }
         }
 
+        public bool IsConnected
+        {
+            get
+            {
+                switch (m_type)
+                {
+                    case EndpointType.StreamSourceConnected:
+                    case EndpointType.StreamDestinationConnected:
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+        }
+
         public bool IsSource
         {
             get
@@ -403,6 +419,15 @@ namespace ChemProV.PFD.Streams
 
         public new void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            // There's a special case scenario if we're the destination and connected to 
+            // a heat exchanger with utility. These cannot be detached.
+            if (EndpointType.StreamDestinationConnected == m_type &&
+                m_owner.Destination is HeatExchanger)
+            {
+                m_canvas.CurrentState = null;
+                return;
+            }
+            
             m_locationOnLMBDown = this.Location;
             m_isMouseDown = true;
             e.Handled = true;
@@ -644,8 +669,15 @@ namespace ChemProV.PFD.Streams
 
             RebuildIcon();
 
-            // Invoke the location change event to update positions (if needed)
-            PU_LocationChanged(null, null);
+            if (IsConnected)
+            {
+                // Invoke the location change event to update positions (if needed)
+                PU_LocationChanged(null, null);
+            }
+            else
+            {
+                m_owner.UpdateStreamLocation();
+            }
         }
 
         private void PU_LocationChanged(object sender, EventArgs e)

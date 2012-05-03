@@ -39,7 +39,7 @@ namespace ChemProV.UI
 
         private bool isLoadingFile = false;
 
-        private bool isReadOnly = false;
+        private bool m_isReadOnly = false;
 
         private List<Tuple<string, EquationControl>> userDefinedVaraibles = new List<Tuple<string, EquationControl>>();
 
@@ -58,22 +58,18 @@ namespace ChemProV.UI
         #region Constructor
 
         public WorkSpace()
+            : this(false)
+        {
+        }
+
+        public WorkSpace(bool isReadOnly)
         {
             InitializeComponent();
 
             //this will make the workspace and everything in it read-only
             //IsReadOnly = true;
             EquationEditor.IsReadOnly = isReadOnly;
-            localInitializer(isReadOnly);
-        }
 
-        public WorkSpace(bool isReadOnly)
-        {
-            localInitializer(isReadOnly);
-        }
-
-        public void localInitializer(bool isReadOnly)
-        {
             IsReadOnly = isReadOnly;
             DrawingCanvas.PfdChanging += new EventHandler(DrawingCanvas_PfdChanging);
             DrawingCanvas.ToolPlaced += new EventHandler(DrawingCanvas_ToolPlaced);
@@ -115,10 +111,10 @@ namespace ChemProV.UI
 
         public bool IsReadOnly
         {
-            get { return isReadOnly; }
+            get { return m_isReadOnly; }
             set
             {
-                isReadOnly = value;
+                m_isReadOnly = value;
                 DrawingCanvas.IsReadOnly = value;
             }
         }

@@ -43,7 +43,7 @@ namespace ChemProV.UI.DrawingCanvas
         /// This is a debugging-oriented state tracker. When the CurrentState property is set to 
         /// some value, we check to see if our current state is non-null. If it is non-null then 
         /// the contract is that we let that state know that it's ending and we're going to a new 
-        /// one. We do this by calling the stat's StateEnding() function. Before we call we set 
+        /// one. We do this by calling the state's StateEnding() function. Before we call we set 
         /// this to true and after the call returns we set it back to false.
         /// This allows us to ensure that the StateEnding() function doesn't try to set 
         /// CurrentState again. States are not allowed to set the drawing canvas's state from 
@@ -81,6 +81,8 @@ namespace ChemProV.UI.DrawingCanvas
                     m_endingAState = true;
                     currentState.StateEnding();
                     m_endingAState = false;
+
+                    Core.App.Workspace.EquationEditorReference.PfdElements = ChildIPfdElements;
                 }
 
                 currentState = value;
@@ -800,13 +802,12 @@ namespace ChemProV.UI.DrawingCanvas
                 pTable.ParentStream = parent.ElementAt(0);
                 parent.ElementAt(0).Table = pTable;
 
-                // E.O.
-                // Add the stream, and therefore the table to the drawing_canvas
+                // Add the stream. Streams take care of adding/removing their tables to/from
+                // the drawing canvas
                 AddNewChild((UIElement)parent.ElementAt(0));
-                // Below was what was here originally. I'm still unsure about some of the stream-related 
-                // initialization stuff
-                //Commands.ICommand cmd = CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, parent.ElementAt(0), this, new Point(-1.0, -1.0));
-                //cmd.Execute();
+
+                pTable.TableDataChanged += new TableDataEventHandler(TableDataChanged);
+                pTable.TableDataChanging += new EventHandler(TableDataChanging);
 
                 //tell the stream to redraw in order to fix any graphical glitches
                 parent.ElementAt(0).UpdateStreamLocation();
@@ -1010,17 +1011,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         #region StickyNotes
-
-        public void newNote_Resizing(object sender, EventArgs e)
-        {
-            this.Cursor = Cursors.SizeNWSE;
-            selectedElement = sender as IPfdElement;
-            (sender as StickyNote).CaptureMouse();
-            
-            //currentState = resizingState;
-            // TODO
-            throw new InvalidOperationException("This code needs to be fixed or removed");
-        }
 
         /// <summary>
         /// This is called by the rectangle in the header of a StickyNote so we need to get a pointer to the StickyNote itself.
