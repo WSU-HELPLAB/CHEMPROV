@@ -16,7 +16,7 @@ namespace ChemProV.PFD.Streams
     public class HeatStream : AbstractStream
     {
         public HeatStream()
-            : this(null)
+            : this(Core.App.Workspace.DrawingCanvas)
         {
         }
 

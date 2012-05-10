@@ -93,8 +93,7 @@ namespace ChemProV.Core
             else
             {
                 // Generic case - just remove whatever's selected with an undo to re-add it
-                canvas.AddUndo(new PFD.UndoRedoCollection("Undo",
-                    new PFD.Undos.AddToCanvas(element, canvas)));
+                canvas.AddUndo(new UndoRedoCollection("Undo", new AddToCanvas(element, canvas)));
                 canvas.Children.Remove(element);
             }
 
@@ -108,26 +107,38 @@ namespace ChemProV.Core
 
         private static void DeleteHEWU(HeatExchanger he, DrawingCanvas canvas)
         {
+            int i;
+            
             // Heat exchangers with utilities must also delete the heat stream that's incoming
-            HeatStream stream = he.IncomingStreams[0] as HeatStream;
+            // Normally the heat stream is at index 0 among the incoming streams, but it seems like 
+            // this does not always hold true when loading from files so it's just safer to search 
+            // for it
+            HeatStream heatStream = null;
+            foreach (IStream incomingStream in he.IncomingStreams)
+            {
+                if (incomingStream is HeatStream)
+                {
+                    heatStream = incomingStream as HeatStream;
+                    break;
+                }
+            }
 
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
             undos.Add(new AddToCanvas(he, canvas));
-            undos.Add(new AddToCanvas(stream, canvas));
-            undos.Add(new AddToCanvas(stream.SourceDragIcon, canvas));
-            undos.Add(new AddToCanvas(stream.DestinationDragIcon, canvas));
-            undos.Add(new AddToCanvas(stream.Table as UIElement, canvas));
+            undos.Add(new AddToCanvas(heatStream, canvas));
+            undos.Add(new AddToCanvas(heatStream.SourceDragIcon, canvas));
+            undos.Add(new AddToCanvas(heatStream.DestinationDragIcon, canvas));
+            undos.Add(new AddToCanvas(heatStream.Table as UIElement, canvas));
 
             // We need to check if the attached stream has a source
-            if (null != stream.Source)
+            if (null != heatStream.Source)
             {
                 // Detach with undo
-                undos.Add(new AttachOutgoingStream(stream.Source, stream));
-                stream.Source.DettachOutgoingStream(stream);
+                undos.Add(new AttachOutgoingStream(heatStream.Source, heatStream));
+                heatStream.Source.DettachOutgoingStream(heatStream);
             }
 
             // Delete all comment sticky notes for the process unit
-            int i;
             for (i = 0; i < he.CommentCount; i++)
             {
                 PFD.StickyNote.StickyNote sn = he.GetCommentAt(i) as PFD.StickyNote.StickyNote;
@@ -143,7 +154,7 @@ namespace ChemProV.Core
             }
 
             // Delete all comment sticky notes for the stream
-            ICommentCollection cc = stream as ICommentCollection;
+            ICommentCollection cc = heatStream as ICommentCollection;
             if (null != cc)
             {
                 for (i = 0; i < cc.CommentCount; i++)
@@ -161,15 +172,31 @@ namespace ChemProV.Core
                 }
             }
 
+            // Detach all outgoing streams and make undos
+            for (i = 0; i < he.OutgoingStreams.Count; i++)
+            {
+                IStream s = he.OutgoingStreams[i];
+                undos.Add(new SetStreamSource(s, he, null, (s as AbstractStream).SourceDragIcon.Location));
+                s.Source = null;
+            }
+
+            // Detach all incoming streams and make undos
+            for (i = 0; i < he.IncomingStreams.Count; i++)
+            {
+                IStream s = he.IncomingStreams[i];
+                undos.Add(new SetStreamDestination(s, he, null));
+                s.Destination = null;
+            }
+
             canvas.AddUndo(new UndoRedoCollection(
                 "Undo deletion of heat exchanger with utility", undos.ToArray()));
 
             // Remove the pieces from the canvas
             canvas.RemoveChild(he);
-            canvas.RemoveChild(stream);
-            canvas.RemoveChild(stream.SourceDragIcon);
-            canvas.RemoveChild(stream.DestinationDragIcon);
-            canvas.RemoveChild(stream.Table as UIElement);
+            canvas.RemoveChild(heatStream);
+            canvas.RemoveChild(heatStream.SourceDragIcon);
+            canvas.RemoveChild(heatStream.DestinationDragIcon);
+            canvas.RemoveChild(heatStream.Table as UIElement);
         }
 
         private static void DeleteProcessUnitWithUndo(GenericProcessUnit pu, DrawingCanvas canvas)
@@ -182,7 +209,7 @@ namespace ChemProV.Core
             for (i = 0; i < pu.IncomingStreams.Count; i++)
             {
                 IStream s = pu.IncomingStreams[i];
-                undos.Add(new SetStreamDestination(s, pu));
+                undos.Add(new SetStreamDestination(s, pu, null));
                 s.Destination = null;
             }
 
@@ -190,7 +217,7 @@ namespace ChemProV.Core
             for (i = 0; i < pu.OutgoingStreams.Count; i++)
             {
                 IStream s = pu.OutgoingStreams[i];
-                undos.Add(new SetStreamSource(s, pu));
+                undos.Add(new SetStreamSource(s, pu, null, (s as AbstractStream).SourceDragIcon.Location));
                 s.Source = null;
             }
 

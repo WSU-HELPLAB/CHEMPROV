@@ -279,7 +279,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             undos.Add(new RemoveFromCanvas(m_newStream.Table as UIElement, m_canvas));
 
             // Add the undo
-            m_canvas.AddUndo(new PFD.UndoRedoCollection(
+            m_canvas.AddUndo(new UndoRedoCollection(
                 "Undo creation of new stream", undos.ToArray()));
 
             m_newStream.UpdateStreamLocation();
@@ -296,8 +296,6 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         public void LostMouseCapture(object sender, MouseEventArgs e)
         {
-            // Not sure about this one
-            // TODO: Check on this
         }
 
         public void StateEnding()
@@ -367,7 +365,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             undos.Add(new RemoveFromCanvas(m_newStream.Table as UIElement, m_canvas));
 
             // Create an undo to delete the stream
-            m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo creation of new stream", undos.ToArray()));
+            m_canvas.AddUndo(new UndoRedoCollection("Undo creation of new stream", undos.ToArray()));
 
             // Update the stream's visual stuff
             m_newStream.UpdateStreamLocation();

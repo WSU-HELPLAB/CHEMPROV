@@ -220,10 +220,9 @@ namespace ChemProV.PFD.Streams
             {
                 foreach (XElement child in cmtElement.Elements())
                 {
-                    PFD.StickyNote.StickyNote sn = PFD.StickyNote.StickyNote.CreateCommentNote(
-                        owner, (stream as Core.ICommentCollection), child);
-
-                    (stream as AbstractStream).AddComment(sn);
+                    PFD.StickyNote.StickyNote sn = null;
+                    PFD.StickyNote.StickyNote.CreateCommentNote(
+                         owner, (stream as Core.ICommentCollection), child, out sn);
                 }
             }
 

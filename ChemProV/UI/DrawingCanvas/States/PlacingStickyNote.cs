@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.PFD.StickyNote;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
@@ -88,8 +89,8 @@ namespace ChemProV.UI.DrawingCanvas.States
             //  2. Null the note's reference (so as to avoid removing it in "StateEnding") and 
             //  3. change the state of the canvas.
 
-            m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo sticky note creation",
-                new PFD.Undos.RemoveFromCanvas(m_note, m_canvas)));
+            m_canvas.AddUndo(new UndoRedoCollection("Undo sticky note creation",
+                new RemoveFromCanvas(m_note, m_canvas)));
 
             // Select it on the canvas
             m_canvas.SelectedElement = m_note;

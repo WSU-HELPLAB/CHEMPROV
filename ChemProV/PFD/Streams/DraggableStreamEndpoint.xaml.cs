@@ -26,6 +26,7 @@ using ChemProV.UI.DrawingCanvas.States;
 using ChemProV.UI.DrawingCanvas;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.MathCore;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.PFD.Streams
 {
@@ -141,14 +142,6 @@ namespace ChemProV.PFD.Streams
             return false;
         }
 
-        public string Id
-        {
-            get
-            {
-                return "EGPU_" + m_id.ToString();
-            }
-        }
-
         public bool IsConnected
         {
             get
@@ -235,6 +228,9 @@ namespace ChemProV.PFD.Streams
                 // Make sure it's visible and the icon is hidden
                 ArrowIcon.Visibility = System.Windows.Visibility.Visible;
                 IconImage.Visibility = System.Windows.Visibility.Collapsed;
+
+                // Tell the other endpoint to update since we have potentially just repositioned this one
+                OtherEndpoint.PU_LocationChanged(null, null);
             }
             else
             {
@@ -315,13 +311,6 @@ namespace ChemProV.PFD.Streams
                 Point current = new Point(
                     (double)GetValue(Canvas.LeftProperty) + this.Width / 2.0,
                     (double)GetValue(Canvas.TopProperty) + this.Height / 2.0);
-
-                // See if this is actually a change
-                if (current.Equals(value))
-                {
-                    m_settingLocation = false;
-                    return;
-                }
                 
                 // This means the position is changing
                 SetValue(Canvas.LeftProperty, value.X - this.Width / 2.0);
@@ -491,7 +480,6 @@ namespace ChemProV.PFD.Streams
             // 2. It WAS connected originally and we have broken the connection and dropped the endpoint at 
             //    a location where there is no process unit. We need our undo to create re-attaching logic 
             //    in this case.
-            // In both cases we finish up by setting the canvas state back to null.
             if (null == uie || null == pu)
             {
                 if (null == m_connectedToOnMouseDown)
@@ -504,17 +492,16 @@ namespace ChemProV.PFD.Streams
 
                 if (m_type == EndpointType.StreamDestinationNotConnected)
                 {
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
-                        new Undos.RestoreLocation(this, this.Location),
+                    m_canvas.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
+                        //new Undos.RestoreLocation(this, m_locationOnLMBDown),
                         new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown)));
+                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, null)));
                 }
                 else
                 {
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
-                        new Undos.RestoreLocation(this, this.Location),
+                    m_canvas.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
                         new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown)));
+                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, null, this.Location)));
                 }
 
                 Core.App.ControlPalette.SwitchToSelect();
@@ -559,19 +546,18 @@ namespace ChemProV.PFD.Streams
                     m_canvas.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
                         new Undos.DetachOutgoingStream(pu, m_owner),
                         new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown)));
+                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, pu, new Point())));
                 }
                 else
                 {
                     // Create an undo that will:
                     // 1. Detach the stream from the process unit that we're about to connect it to
-                    // 2. Set the stream source back to null
-                    // 3. Move the draggable icon back to it was when the drag first started
+                    // 2. Set the stream source back to null (this sets the draggable icon back to 
+                    //    where it was when the drag first started)
                     m_canvas.AddUndo(new UndoRedoCollection(
                         "Undo linking stream source to process unit",
-                        new Undos.RestoreLocation(this, m_locationOnLMBDown),
                         new Undos.DetachOutgoingStream(pu, m_owner),
-                        new Undos.SetStreamSource(m_owner, null)));
+                        new Undos.SetStreamSource(m_owner, null, pu, m_locationOnLMBDown)));
                 }
 
                 // Now do the actual attaching
@@ -596,19 +582,23 @@ namespace ChemProV.PFD.Streams
                     m_canvas.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
                         new Undos.DetachIncomingStream(pu, m_owner),
                         new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown)));
+                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, pu)));
                 }
                 else
                 {
                     // Create an undo that will:
                     // 1. Detach the stream from the process unit that we're about to connect it to
-                    // 2. Set the stream destination back to null
-                    // 3. Move the draggable icon back to it was when the drag first started
+                    // 2. Set the stream destination back to null and move the draggable icon back to it 
+                    //    was when the drag first started
+                    //m_canvas.AddUndo(new UndoRedoCollection(
+                    //    "Undo linking stream source to process unit",
+                    //    new Undos.RestoreLocation(this, m_locationOnLMBDown),
+                    //    new Undos.DetachIncomingStream(pu, m_owner),
+                    //    new Undos.SetStreamDestination(m_owner, null)));
                     m_canvas.AddUndo(new UndoRedoCollection(
                         "Undo linking stream source to process unit",
-                        new Undos.RestoreLocation(this, m_locationOnLMBDown),
                         new Undos.DetachIncomingStream(pu, m_owner),
-                        new Undos.SetStreamDestination(m_owner, null)));
+                        new Undos.SetStreamDestination(m_owner, m_locationOnLMBDown, pu)));
                 }
 
                 // Now do the actual attaching

@@ -29,29 +29,49 @@ namespace ChemProV.PFD.Undos
     /// Represents an undo/redo action that will set the source of a stream to a process 
     /// unit. This action only affects the stream and the process unit is not modified 
     /// during execution.
+    /// Since setting stream sources potentially changes the location of the draggable stream 
+    /// endpoint, this undo takes care of positioning the endpoint as well.
     /// </summary>
     public class SetStreamSource : IUndoRedoAction
     {
+        private Point m_location;
+
+        private SetStreamSource m_opposite;
+        
         private IProcessUnit m_pu;
 
-        private IStream m_stream;
+        private AbstractStream m_stream;
 
-        public SetStreamSource(IStream stream, IProcessUnit source)
+        private SetStreamSource() { }
+
+        public SetStreamSource(IStream stream, IProcessUnit sourceForThis, IProcessUnit sourceForOpposite,
+            Point locationForDSE)
         {
-            m_stream = stream;
-            m_pu = source;
+            m_stream = stream as AbstractStream;
+            m_pu = sourceForThis;
+            m_location = locationForDSE;
+
+            // Create the opposite action
+            m_opposite = new SetStreamSource();
+            m_opposite.m_location = locationForDSE;
+            m_opposite.m_opposite = this;
+            m_opposite.m_pu = sourceForOpposite;
+            m_opposite.m_stream = m_stream;
         }
 
         public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
         {
-            // For the opposite action we have to set the source back to what it
-            // is at the current moment
-            IUndoRedoAction opposite = new SetStreamSource(m_stream, m_stream.Source);
-
             // Set the source
             m_stream.Source = m_pu;
 
-            return opposite;
+            // If we're setting the source to null then we need to restore the DSE location
+            if (null == m_pu)
+            {
+                // Set the icon location
+                m_stream.SourceDragIcon.Location = m_location;
+            }
+
+            return m_opposite;
         }
     }
 }

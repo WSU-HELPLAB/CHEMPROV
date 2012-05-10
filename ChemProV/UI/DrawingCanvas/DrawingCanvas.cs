@@ -25,6 +25,7 @@ using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 using ChemProV.UI.DrawingCanvas.States;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas
 {
@@ -160,6 +161,15 @@ namespace ChemProV.UI.DrawingCanvas
                 }
 
                 selectedElement = value;
+            }
+        }
+
+        public List<StickyNote> ChildStickyNotes
+        {
+            get
+            {
+                var snElements = from c in this.Children where c is StickyNote select c as StickyNote;
+                return new List<StickyNote>(snElements);
             }
         }
 
@@ -385,6 +395,58 @@ namespace ChemProV.UI.DrawingCanvas
             return null;
         }
 
+        public LabeledProcessUnit GetProcessUnitById(string id)
+        {
+            foreach (UIElement uie in Children)
+            {
+                if (!(uie is LabeledProcessUnit))
+                {
+                    continue;
+                }
+
+                LabeledProcessUnit pu = uie as LabeledProcessUnit;
+                if (pu.Id.Equals(id))
+                {
+                    return pu;
+                }
+            }
+
+            return null;
+        }
+
+        public AbstractStream GetStreamById(string id)
+        {
+            foreach (UIElement uie in Children)
+            {
+                if (!(uie is AbstractStream))
+                {
+                    continue;
+                }
+
+                AbstractStream stream = uie as AbstractStream;
+                if (stream.Id.Equals(id))
+                {
+                    return stream;
+                }
+            }
+
+            return null;
+        }
+
+        public int CountChildrenOfType(Type type)
+        {
+            int count = 0;
+            foreach (UIElement uie in Children)
+            {
+                if (uie.GetType().Equals(type))
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         #region DrawingCanvasMouseEvents
 
         /// <summary>
@@ -584,68 +646,6 @@ namespace ChemProV.UI.DrawingCanvas
                     }
                 }
             }
-
-            ////first we pull all the IPfdElement from the drawing canvas then we check to see if we can do the conversion
-            ////if not throw an exception if we can then we need to check to see if we need to change our IPropertiesWindow
-            ////and if we do then change them
-
-            //List<IPfdElement> pfdElements = this.ChildIPfdElements;
-
-            //if (newValue < currentDifficultySetting && newValue == OptionDifficultySetting.MaterialBalanceWithReactors)
-            //{
-            //    //this means we could have heat streams or heat exchanges that we need to check for
-            //    foreach (IPfdElement element in pfdElements)
-            //    {
-            //        if (element is HeatStream)
-            //        {
-            //            throw new Exception("Heat streams where detected but this file says it is supposed to be only MaterialBalanceWithReactors");
-            //        }
-            //        else if (element is IProcessUnit)
-            //        {
-            //            if ((element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchanger ||
-            //                (element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchangerNoUtility)
-            //            {
-            //                throw new Exception("Advanced process units where detected but this file says it is supposed to be only MaterialBalanceWithReactors");
-            //            }
-            //        }
-            //    }
-            //}
-
-            //else if (newValue < currentDifficultySetting && newValue == OptionDifficultySetting.MaterialBalance)
-            //{
-            //    //this means we could have heat streams, reactors, or heat exchanges that we need to check for
-            //    foreach (IPfdElement element in pfdElements)
-            //    {
-            //        if (element is HeatStream)
-            //        {
-            //            throw new Exception("Heat streams where detected but this file says it is supposed to be only MaterialBalance");
-            //        }
-            //        else if (element is IProcessUnit)
-            //        {
-            //            if ((element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchanger ||
-            //                (element as IProcessUnit).Description == ProcessUnitDescriptions.HeatExchangerNoUtility ||
-            //                (element as IProcessUnit).Description == ProcessUnitDescriptions.Reactor)
-            //            {
-            //                throw new Exception("Advanced process units where detected but this file says it is supposed to be only MaterialBalance");
-            //            }
-            //        }
-            //    }
-            //}
-
-            //if (newValue == OptionDifficultySetting.MaterialAndEnergyBalance || oldValue == OptionDifficultySetting.MaterialAndEnergyBalance)
-            //{
-            //    //got to add or remove temp from the tables it will figured out what one to do based on the newValue
-            //    for (int i = 0; i < pfdElements.Count; i++)
-            //    {
-            //        IPfdElement element = pfdElements[i];
-            //        if (element is IPropertiesWindow)
-            //        {
-            //            CommandFactory.CreateCommand(CanvasCommands.RemoveFromCanvas, element, this).Execute();
-            //            element = PropertiesWindowFactory.TableFromTable((element as IPropertiesWindow), newValue, isReadOnly);
-            //            CommandFactory.CreateCommand(CanvasCommands.AddToCanvas, element, this).Execute();
-            //        }
-            //    }
-            //}
         }
 
         /// <summary>
@@ -758,10 +758,9 @@ namespace ChemProV.UI.DrawingCanvas
                 {
                     foreach (XElement child in cmtElement.Elements())
                     {                        
-                        StickyNote sn = StickyNote.CreateCommentNote(
-                            this, pu as Core.ICommentCollection, child);
-
-                        (pu as LabeledProcessUnit).AddComment(sn);
+                        StickyNote sn;
+                        StickyNote.CreateCommentNote(
+                            this, pu as Core.ICommentCollection, child, out sn);
                     }
                 }
             }
@@ -831,6 +830,125 @@ namespace ChemProV.UI.DrawingCanvas
 
                 DraggableStreamEndpoint dse = uie as DraggableStreamEndpoint;
                 dse.EndpointConnectionChanged(dse.Type, null, null);
+            }
+        }
+
+        public void MergeCommentsFrom(XElement doc)
+        {
+            DrawingCanvas dc = new DrawingCanvas();
+            dc.LoadXmlElements(doc);
+
+            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
+
+            // Start with the sticky notes
+            List<StickyNote> existing = ChildStickyNotes;
+            foreach (UIElement uie in dc.Children)
+            {
+                if (!(uie is StickyNote))
+                {
+                    continue;
+                }
+
+                StickyNote sn = uie as StickyNote;
+
+                // The sticky note that we're potentially importing will either have a comment-collection 
+                // parent or be free floating
+                if (sn.HasCommentCollectionParent)
+                {
+                    // Comment sticky note
+                    // We need to make sure that the parent item exists within this document
+                    Core.ICommentCollection snParent = sn.CommentCollectionParent;
+
+                    // It will be either a process unit or a stream
+                    AbstractStream stream = snParent as AbstractStream;
+                    if (null != stream)
+                    {
+                        // Look for the stream on this drawing canvas that has the same Id
+                        AbstractStream current = GetStreamById(stream.Id);
+                        if (null == current)
+                        {
+                            continue;
+                        }
+
+                        // Make sure we don't load duplicate messages
+                        if (Core.CommentLogic.ContainsCommentWithText(current, sn.CommentText))
+                        {
+                            continue;
+                        }
+
+                        // Add this comment to the stream
+                        StickyNote snNew;
+                        undos.AddRange(StickyNote.CreateCommentNote(this, current, null, out snNew).ToArray());
+                        //snNew.Location = sn.Location;
+                        snNew.Note.Text = sn.Note.Text;
+                        snNew.Width = sn.Width;
+                        snNew.Height = sn.Height;
+                    }
+                    else
+                    {
+                        // It's a process unit that contains this comment
+                        LabeledProcessUnit lpu = GetProcessUnitById((snParent as GenericProcessUnit).Id);
+                        if (null == lpu)
+                        {
+                            continue;
+                        }
+
+                        // Make sure we don't load duplicate messages
+                        if (Core.CommentLogic.ContainsCommentWithText(lpu, sn.CommentText))
+                        {
+                            continue;
+                        }
+
+                        // Add this comment to the sticky note
+                        StickyNote snNew;
+                        undos.AddRange(StickyNote.CreateCommentNote(this, lpu, null, out snNew).ToArray());
+                        //snNew.Location = sn.Location;
+                        snNew.Note.Text = sn.Note.Text;
+                        snNew.Width = sn.Width;
+                        snNew.Height = sn.Height;
+                    }
+                }
+                else // Free-floating sticky note
+                {
+                    // First go through all sticky notes in this workspace and make sure we don't 
+                    // already have one with the same text
+                    bool addIt = true;
+                    foreach (StickyNote snThis in ChildStickyNotes)
+                    {
+                        if (snThis.HasCommentCollectionParent)
+                        {
+                            // Not free-floating ==> skip
+                            continue;
+                        }
+
+                        if (snThis.CommentText.Equals(sn.CommentText))
+                        {
+                            addIt = false;
+                            break;
+                        }
+                    }
+
+                    if (addIt)
+                    {
+                        StickyNote copy = new StickyNote(this);
+                        AddNewChild(copy);
+                        copy.Note.Text = sn.Note.Text;
+                        copy.Width = sn.Width;
+                        copy.Height = sn.Height;
+                        copy.Location = sn.Location;
+
+                        // Don't forget the undo
+                        undos.Add(new RemoveFromCanvas(copy, this));
+                    }
+                }
+            }
+
+            // TODO: Annotations
+
+            // Finish up by adding the undo
+            if (0 != undos.Count)
+            {
+                AddUndo(new UndoRedoCollection("Undo comment merge", undos.ToArray()));
             }
         }
 
@@ -1010,35 +1128,10 @@ namespace ChemProV.UI.DrawingCanvas
             m_redos.Clear();
         }
 
-        #region StickyNotes
-
-        /// <summary>
-        /// This is called by the rectangle in the header of a StickyNote so we need to get a pointer to the StickyNote itself.
-        /// We do this by calling parent until we get an IPfdElement which must be our stickyNote.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void StickyNoteMouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            FrameworkElement parent = sender as FrameworkElement;
-
-            //this tell the label to grab the mouse
-            parent.CaptureMouse();
-
-            while (!(parent is IPfdElement))
-            {
-                parent = parent.Parent as FrameworkElement;
-            }
-
-            currentState.MouseLeftButtonDown(parent, e);
-        }
-
-        #endregion StickyNotes
-
         /// <summary>
         /// I'm creating this method even though children can currently be added via 
         /// Children.Add by any piece of code outside this class. It would be nice 
-        /// if we had everything add through this method. Then, if we wanted to do 
+        /// if we had everything added through this method. Then, if we wanted to do 
         /// some sort of validation in the future we could do it here. Until then, 
         /// it's functionally equivalent to Children.Add
         /// </summary>
@@ -1059,6 +1152,7 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             Children.Remove(childElement);
+            PFDModified();
             return true;
         }
     }

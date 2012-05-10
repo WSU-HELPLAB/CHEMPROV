@@ -21,6 +21,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.UI.DrawingCanvas;
 using ChemProV.UI.DrawingCanvas.States;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
@@ -100,8 +101,8 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // Releasing the mouse button signifies completion of the resize and 
             // requires us to create an undo
-            m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo sticky note resizing",
-                new PFD.Undos.ResizeControl(m_note, m_sizeOnMouseDown)));
+            m_canvas.AddUndo(new UndoRedoCollection("Undo sticky note resizing",
+                new ResizeControl(m_note, m_sizeOnMouseDown)));
 
             m_isMouseDown = false;
 

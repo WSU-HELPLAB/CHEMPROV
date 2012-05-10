@@ -28,7 +28,6 @@ using ChemProV.PFD.StickyNote;
 using ChemProV.PFD.Streams;
 using ChemProV.UI;
 using ChemProV.UI.DrawingCanvas;
-using ChemProV.UI.UserDefinedVariableWindow;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
@@ -55,8 +54,6 @@ namespace ChemProV
         /// </summary>
         public event EventHandler RequestNewBlankMainPage = delegate { };
         public event RequestOpenFileEventHandler RequestOpenFile = delegate { };
-
-        private UserDefinedVariableWindow userDefinedVariableWindow;
 
         private string versionNumber = "";
         private const string saveFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml|Portable Network Graphics (*.png)|*.png";
@@ -126,20 +123,10 @@ namespace ChemProV
             return true;
         }
 
-        public List<Tuple<string, EquationControl>> UserDefinedVaraibles
-        {
-            get
-            {
-                return userDefinedVariableWindow.VariableDictionary;
-            }
-        }
-
         public MainPage(FileInfo fileInfo = null)
         {
             // Required to initialize variables
             InitializeComponent();
-
-            userDefinedVariableWindow = new UserDefinedVariableWindow(WorkSpace.IsReadOnly);
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
@@ -162,7 +149,6 @@ namespace ChemProV
             //listen for selection changes in our children
             WorkSpace.CompoundsUpdated += new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked += new EventHandler(WorkSpace_ValidationChecked);
-            userDefinedVariableWindow.UserDefinedVariablesUpdated += new EventHandler(userDefinedVariableWindow_UserDefinedVariablesUpdated);
 
             CompoundTable.ConstantClicked += new EventHandler(CompoundTable_ConstantClicked);
 
@@ -191,18 +177,21 @@ namespace ChemProV
         private void OpenFile(FileInfo file)
         {
             FileStream fs = file.OpenRead();
-            XDocument doc = XDocument.Load(fs);
+            LoadChemProVFile(fs);
+            fs.Dispose();
+        }
+
+        public void LoadChemProVFile(Stream stream)
+        {
+            XDocument doc = XDocument.Load(stream);
 
             string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
             CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
 
             WorkSpace.LoadXmlElements(doc);
 
-            userDefinedVariableWindow.LoadXmlElements(doc);
-
             //we dont want to load the config file so stop the event from firing
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);
-
         }
 
         /// <summary>
@@ -317,11 +306,6 @@ namespace ChemProV
             }
         }
 
-        private void userDefinedVariableWindow_UserDefinedVariablesUpdated(object sender, EventArgs e)
-        {
-            WorkSpace.UserDefinedVariablesUpdated(UserDefinedVaraibles);
-        }
-
         private void WorkSpace_UpdateCompounds(object sender, EventArgs e)
         {
             CompoundTable.UpdateCompounds(WorkSpace.Compounds);
@@ -332,12 +316,11 @@ namespace ChemProV
             WorkSpace.EquationEditor.InsertConstant((sender as Button).Content as string);
         }
 
-        private void SaveChemProVFile(Stream stream)
+        public void SaveChemProVFile(Stream stream)
         {
             XmlSerializer canvasSerializer = new XmlSerializer(typeof(DrawingCanvas));
             XmlSerializer equationSerializer = new XmlSerializer(typeof(EquationEditor));
             XmlSerializer feedbackWindowSerializer = new XmlSerializer(typeof(FeedbackWindow));
-            XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(UserDefinedVariableWindow));
             // XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(EquationEditor));
             //make sure that out XML turns out pretty
             XmlWriterSettings settings = new XmlWriterSettings();
@@ -365,9 +348,6 @@ namespace ChemProV
 
                 //write feedback
                 feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
-
-                //write userdefinedvariables
-                userDefinedVariablesSerializer.Serialize(writer, userDefinedVariableWindow);
 
                 //end root node
                 writer.WriteEndElement();
@@ -582,8 +562,6 @@ namespace ChemProV
                     }
                 }
 
-                this.userDefinedVariableWindow.Window.IsOpen = false;
-
                 //why mess around this will completely reset everything
                 RequestNewBlankMainPage(this, EventArgs.Empty);
             }
@@ -612,13 +590,6 @@ namespace ChemProV
                     MessageBox.Show("Installation Failed: is it installed already? Try refreshing this page");
                 }
             }
-        }
-
-        private void UserDefinedVariableButton_Click(object sender, RoutedEventArgs e)
-        {
-            userDefinedVariableWindow.Window.HorizontalOffset = this.ActualWidth / 2 - 50;
-            userDefinedVariableWindow.Window.VerticalOffset = this.ActualHeight / 2 - 50;
-            userDefinedVariableWindow.Window.IsOpen = true;
         }
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
@@ -662,15 +633,42 @@ namespace ChemProV
             //unlisten for selection changes in our children
             WorkSpace.CompoundsUpdated -= new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked -= new EventHandler(WorkSpace_ValidationChecked);
-            userDefinedVariableWindow.UserDefinedVariablesUpdated -= new EventHandler(userDefinedVariableWindow_UserDefinedVariablesUpdated);
-
-            userDefinedVariableWindow.Window.IsOpen = false;
 
             CompoundTable.ConstantClicked -= new EventHandler(CompoundTable_ConstantClicked);
 
             //stop timer
             saveTimer.Tick -= new EventHandler(autoSave);
             saveTimer.Stop();
+        }
+
+        private void btnLoadMergeComments_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog openDialog = new OpenFileDialog();
+            openDialog.Filter = loadFileFilter;
+            bool? openFileResult = false;
+
+            openFileResult = openDialog.ShowDialog();
+            if (!openFileResult.HasValue || !openFileResult.Value)
+            {
+                return;
+            }
+
+            FileInfo fi = openDialog.File;
+            FileStream fs = fi.OpenRead();
+            XDocument doc = XDocument.Load(fs);
+
+            WorkSpace.DrawingCanvasReference.MergeCommentsFrom(doc.Element("ProcessFlowDiagram").Element("DrawingCanvas"));
+
+            //we dont want to load the config file so stop the event from firing
+            this.Loaded -= new RoutedEventHandler(LoadConfigFile);
+        }
+
+        public WorkSpace WorkspaceReference
+        {
+            get
+            {
+                return WorkSpace;
+            }
         }
     }
 }
