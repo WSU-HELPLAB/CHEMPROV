@@ -40,6 +40,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Undo menu item
             MenuItem menuItem = new MenuItem();
             menuItem.Header = c.UndoTitle;
+            menuItem.IsEnabled = (c.UndoCount > 0);
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
@@ -49,6 +50,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Redo menu item
             menuItem = new MenuItem();
             menuItem.Header = c.RedoTitle;
+            menuItem.IsEnabled = (c.RedoCount > 0);
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
@@ -183,7 +185,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         public void ChangeStickyNoteColor(object sender, EventArgs e)
         {
             // Start by adding an undo action that will restore the color we about to change
-            m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo stick note color change",
+            m_canvas.AddUndo(new UndoRedoCollection("Undo stick note color change",
                 new PFD.Undos.RestoreStickyNoteColor(m_canvas.SelectedElement as StickyNote)));
             
             // Change the color
@@ -243,7 +245,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         {
             if (null != m_contextMenu)
             {
-                // Start by getting rid of the popup menu
+                // Get rid of the popup menu if it's still on the drawing canvas
                 m_canvas.Children.Remove(m_contextMenu);
                 m_contextMenu = null;
             }
@@ -275,17 +277,10 @@ namespace ChemProV.UI.DrawingCanvas.States
                 MenuItem tempMI = sender as MenuItem;
                 Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
 
-                // Build the new comment sticky note on the canvas
-                StickyNote sn = StickyNote.CreateCommentNote(m_canvas, cc, null);
-
-                // Create an undo to remove both
-                m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo creation of comment",
-                    new RemoveFromCanvas(sn, m_canvas),
-                    new RemoveFromCanvas(sn.LineToParent, m_canvas),
-                    new RemoveComment(cc, cc.CommentCount)));
-
-                // Add it to the collection
-                cc.AddComment(sn);
+                // Build the new comment sticky note on the canvas and add undo
+                StickyNote sn;
+                m_canvas.AddUndo(new UndoRedoCollection("Undo creation of comment",
+                    StickyNote.CreateCommentNote(m_canvas, cc, null, out sn).ToArray()));
 
                 // Make sure to remove the popup menu from the canvas
                 m_canvas.Children.Remove(m_contextMenu);
@@ -355,7 +350,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         }
 
         /// <summary>
-        /// E.O.
+        /// Adds menu options for the subprocess color changing
         /// </summary>
         private void AddSubprocessMenuOptions(ContextMenu newContextMenu, PFD.ProcessUnits.IProcessUnit pu)
         {
@@ -397,8 +392,8 @@ namespace ChemProV.UI.DrawingCanvas.States
                         System.Tuple<PFD.ProcessUnits.IProcessUnit, Color>;
                     
                     // Create undo item before setting the new subgroup
-                    m_canvas.AddUndo(new PFD.UndoRedoCollection("Undo subprocess change",
-                        new PFD.Undos.SetSubprocess(t.Item1)));
+                    m_canvas.AddUndo(new UndoRedoCollection("Undo subprocess change",
+                        new SetSubprocess(t.Item1)));
 
                     // Set the subgroup
                     t.Item1.Subprocess = t.Item2;

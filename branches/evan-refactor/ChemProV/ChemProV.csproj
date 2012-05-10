@@ -129,6 +129,7 @@
       <DependentUpon>ChemProVHolder.xaml</DependentUpon>
     </Compile>
     <Compile Include="Core\App.cs" />
+    <Compile Include="Core\CommentLogic.cs" />
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\CommentDefs.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
@@ -240,8 +241,6 @@
     <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowFactory.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\View.cs" />
-    <Compile Include="PFD\Streams\StreamDestinationIcon.cs" />
-    <Compile Include="PFD\Streams\StreamEnd.cs" />
     <Compile Include="PFD\Streams\StreamFactory.cs" />
     <Compile Include="PFD\Undos\AddToCanvas.cs" />
     <Compile Include="PFD\Undos\AttachOutgoingStream.cs" />
@@ -286,9 +285,6 @@
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\UserDefinedVariableWindow\UserDefinedVariableWindow.xaml.cs">
-      <DependentUpon>UserDefinedVariableWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="UI\WorkSpace.xaml.cs">
       <DependentUpon>WorkSpace.xaml</DependentUpon>
     </Compile>
@@ -411,10 +407,6 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\OptionWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="UI\UserDefinedVariableWindow\UserDefinedVariableWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -587,9 +579,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="UI\PalletItems\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

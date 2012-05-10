@@ -8,6 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -444,12 +445,23 @@ namespace ChemProV.PFD.StickyNote
             }
         }
 
+        public Core.ICommentCollection CommentCollectionParent
+        {
+            get
+            {
+                return m_commentParent;
+            }
+        }
+
         /// <summary>
-        /// Creates a new sticky note to be used as a comment attached to a specific PFD element and adds 
-        /// it to the specified drawing canvas. NO UNDO IS CREATED!
+        /// Creates a new sticky note to be used as a comment attached to a specific PFD element. The comment is added
+        /// to the specified comment-collection-parent and appropriate controls are added to the drawing canvas.
+        /// Undo items are created and returned in a list but are not actually added to the drawing canvas via its 
+        /// "AddUndo" method. Rather, a list is returned so that if the caller is doing multiple things at once it can 
+        /// pack more undo items into a single collection as it sees fit.
         /// </summary>
-        public static StickyNote CreateCommentNote(DrawingCanvas canvas, Core.ICommentCollection parent,
-            XElement optionalToLoadFromXML)
+        public static List<IUndoRedoAction> CreateCommentNote(DrawingCanvas canvas, Core.ICommentCollection parent,
+            XElement optionalToLoadFromXML, out StickyNote createdNote)
         {
             if (!(parent is AbstractStream) && !(parent is IProcessUnit))
             {
@@ -510,7 +522,20 @@ namespace ChemProV.PFD.StickyNote
 
             sn.UpdateLineToParent();
 
-            return sn;
+            // Set the output value
+            createdNote = sn;
+
+            // Add the comment to the collection
+            parent.AddComment(sn);
+
+            // Build and return a list of undos that will remove the elements that we added to the 
+            // drawing canvas and will remove the comment from the collection
+            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
+            undos.Add(new RemoveFromCanvas(sn, canvas));
+            undos.Add(new RemoveFromCanvas(sn.LineToParent, canvas));
+            undos.Add(new RemoveComment(parent, parent.CommentCount - 1));
+
+            return undos;
         }
 
         /// <summary>
@@ -523,8 +548,8 @@ namespace ChemProV.PFD.StickyNote
             if (null == m_commentParent)
             {
                 // The case is simple when we're not a comment
-                canvas.AddUndo(new PFD.UndoRedoCollection("Undo deletion of sticky note",
-                    new PFD.Undos.AddToCanvas(this, canvas)));
+                canvas.AddUndo(new UndoRedoCollection("Undo deletion of sticky note",
+                    new AddToCanvas(this, canvas)));
                 canvas.RemoveChild(this);
                 return;
             }
@@ -559,6 +584,10 @@ namespace ChemProV.PFD.StickyNote
         public string CommentText
         {
             get { return Note.Text; }
+            set
+            {
+                Note.Text = value;
+            }
         }
 
         /// <summary>
@@ -591,6 +620,7 @@ namespace ChemProV.PFD.StickyNote
 
         private void CollapseLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
+            e.Handled = true;
             Hide();
         }
     }

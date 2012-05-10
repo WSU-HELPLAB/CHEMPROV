@@ -20,7 +20,7 @@ namespace ChemProV.PFD.Streams
     public class ChemicalStream : AbstractStream
     {
         public ChemicalStream()
-            : this(null)
+            : this(Core.App.Workspace.DrawingCanvas)
         {
         }
 

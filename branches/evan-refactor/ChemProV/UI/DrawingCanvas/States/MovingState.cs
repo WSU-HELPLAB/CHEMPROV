@@ -15,6 +15,7 @@ using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD;
 using ChemProV.Core;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
@@ -211,17 +212,15 @@ namespace ChemProV.UI.DrawingCanvas.States
                     case DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected:
                         m_canvas.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
                             new PFD.Undos.DetachIncomingStream(pu, streamEndpoint.ParentStream),
-                            new PFD.Undos.SetStreamDestination(streamEndpoint.ParentStream, null),
-                            new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
+                            new PFD.Undos.SetStreamDestination(streamEndpoint.ParentStream, m_originalLocation.ToPoint(), pu)));
                         pu.AttachIncomingStream(streamEndpoint.ParentStream);
                         streamEndpoint.ParentStream.Destination = pu;
                         break;
 
                     case DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected:
                         m_canvas.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
-                            new PFD.Undos.DetachOutgoingStream(pu, streamEndpoint.ParentStream),
-                            new PFD.Undos.SetStreamSource(streamEndpoint.ParentStream, null),
-                            new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
+                            new DetachOutgoingStream(pu, streamEndpoint.ParentStream),
+                            new SetStreamSource(streamEndpoint.ParentStream, null, pu, streamEndpoint.Location)));
                         pu.AttachOutgoingStream(streamEndpoint.ParentStream);
                         streamEndpoint.ParentStream.Source = pu;
                         break;

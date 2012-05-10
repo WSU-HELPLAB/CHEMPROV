@@ -11,7 +11,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ctk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
 	xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
-	xmlns:ChemProV_UI_PalletItems="clr-namespace:ChemProV.UI.PalletItems"
     xmlns:ChemProV_UI="clr-namespace:ChemProV.UI"
     xmlns:ChemProV_UI_DrawingCanvas="clr-namespace:ChemProV.UI.DrawingCanvas"
     xmlns:ChemProV_EquationEditor ="clr-namespace:ChemProV.PFD.EquationEditor"
@@ -53,12 +52,19 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Click="HelpButton_Click" ToolTipService.ToolTip="About ChemProV" >
                     <Image Source="/UI/Icons/toolbar_about.png" />
                 </Button>
+                
+                <!-- Button to merge comments from another document -->
+                <Button Margin="0,0,5,0" Name="btnLoadMergeComments" Click="btnLoadMergeComments_Click">
+                    <ToolTipService.ToolTip>Merge comments from another file</ToolTipService.ToolTip>
+                    <Image Source="/UI/Icons/palette_stickyNote_16x16.png"></Image>
+                </Button>                
+                
             </StackPanel>
         </StackPanel>
 
         <!-- Left-Hand toolbar -->
         <StackPanel x:Name="LeftHandToolBar_StackPanel">
-            <ChemProV_UI:ControlPalette Name="PrimaryPalette"></ChemProV_UI:ControlPalette>
+            <ChemProV_UI:ControlPalette x:Name="PrimaryPalette"></ChemProV_UI:ControlPalette>
             <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
             <ScrollViewer VerticalScrollBarVisibility="Auto" x:Name="CompoundTableScrollViewer" BorderBrush="Transparent">
                 <ChemProV_UI:CompoundTable x:Name="CompoundTable"/>
