@@ -129,9 +129,6 @@ namespace ChemProV.UI.DrawingCanvas
             set { hasFocus = value; }
         }
 
-        //if value = moving state got to save 'previous location' which would be current location at that time.
-        //if currentState is PlacingState need to set PreviousLocation to null so index know index need to delete if index undo
-
         /// <summary>
         /// This stores the currently selected element, the one with the yellow boarder
         /// </summary>
@@ -211,14 +208,11 @@ namespace ChemProV.UI.DrawingCanvas
         /// Adds an undo action to the undo stack. You'll notice there is no AddRedo function. This is 
         /// intentional because upon execution of an undo (via a call to "Undo()") the redo action is 
         /// automatically created and pushed onto the redo stack.
-        /// 
-        /// Will remove exception throw when I get the new undo system in place
         /// </summary>
         /// <param name="collection">Collection of undo actions to push.</param>
         /// <returns>True if the collection was successfully added to the stack, false otherwise.</returns>
         public bool AddUndo(UndoRedoCollection collection)
         {
-            // E.O.
             m_undos.Push(collection);
 
             // Adding a new undo clears the redo stack
@@ -228,7 +222,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// E.O.
         /// Gets the number of undos currently on the undo stack.
         /// </summary>
         public int UndoCount
@@ -252,7 +245,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// E.O.
         /// Gets the number of redos currently on the redo stack.
         /// </summary>
         public int RedoCount
@@ -277,10 +269,9 @@ namespace ChemProV.UI.DrawingCanvas
 
         public void Redo()
         {
-            // Set the state to null just in case (risky?)
+            // Set the state to null just in case
             CurrentState = null;
 
-            // E.O.
             if (m_redos.Count > 0)
             {
                 // Logic:
@@ -357,9 +348,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// E.O.
-        /// I'm a little surprised this functionality doesn't already exist in the Silverlight 
-        /// Canvas control, but whatever.
         /// This method gets the first child control that contains the specified point. If no 
         /// children contain the point then null is returned.
         /// </summary>
@@ -616,13 +604,6 @@ namespace ChemProV.UI.DrawingCanvas
 
         public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)
         {
-            // E.O.
-            // I've commented out what was here previously and placed it below my new implementation. The first two 
-            // checks seemed straightforward enough, but the last check that is checking to see if the old and new 
-            // values are the same and are both MaterialAndEnergyBalance is just confusing. I'd be surprised if it's 
-            // not a logic bug (that I'm fixing by adding my changes) but just in case there's something I missed, I'm 
-            // leaving it around.
-
             // Go through all the child elements looking for streams and process units. Upon finding either, ask it 
             // if it's available at the difficulty level that we want to switch to and if it's not, throw an exception.
             foreach (UIElement uie in Children)
@@ -694,8 +675,6 @@ namespace ChemProV.UI.DrawingCanvas
         /// This is called from main page whenever it gets a key press and drawing drawing_canvas has focus.
         /// NOTE: HasFocus1 is what we use for focus since drawing_canvas cannot have built-in focus
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         public void GotKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete && null != selectedElement)
