@@ -229,7 +229,7 @@ namespace ChemProV
                     SaveChemProVFile(isfs);
                 }
             }
-            Saving_TextBlock.Text = "Auto Saved";
+            Saving_TextBlock.Text = "Last auto save was at " + DateTime.Now.ToString("t");
         }
 
         private void LoadConfigFile(object sender, RoutedEventArgs e)
@@ -352,6 +352,9 @@ namespace ChemProV
                 //end root node
                 writer.WriteEndElement();
             }
+
+            // Restart the auto-save timer
+            saveTimer.Start();
         }
 
         private void SaveFileButton_Click(object sender, RoutedEventArgs e)
@@ -655,9 +658,8 @@ namespace ChemProV
 
             FileInfo fi = openDialog.File;
             FileStream fs = fi.OpenRead();
-            XDocument doc = XDocument.Load(fs);
-
-            WorkSpace.DrawingCanvasReference.MergeCommentsFrom(doc.Element("ProcessFlowDiagram").Element("DrawingCanvas"));
+            WorkSpace.MergeCommentsFrom(fs);
+            fs.Dispose();
 
             //we dont want to load the config file so stop the event from firing
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);

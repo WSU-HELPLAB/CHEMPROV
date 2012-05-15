@@ -56,7 +56,7 @@ namespace ChemProV.PFD.StickyNote
         
         private StickyNoteColors color;
 
-        static int i = -1;
+        private static int i = -1;
 
         /// <summary>
         /// Default constructor that exists only to make design view work. Must stay private.
@@ -71,33 +71,8 @@ namespace ChemProV.PFD.StickyNote
             InitializeComponent();
             m_canvas = canvas;
 
-            // Set the next color in the cycle
-            i++;
-            switch (i)
-            {
-                case 0:
-                    ColorChange(StickyNoteColors.Yellow);
-                    break;
-                case 1:
-                    ColorChange(StickyNoteColors.Blue);
-                    break;
-                case 2:
-                    ColorChange(StickyNoteColors.Green);
-                    break;
-                case 3:
-                    ColorChange(StickyNoteColors.Orange);
-                    break;
-                case 4:
-                    ColorChange(StickyNoteColors.Pink);
-
-                    //reset index
-                    i = -1;
-                    break;
-
-                default:
-                    ColorChange(StickyNoteColors.Yellow);
-                    break;
-            }
+            // Ensure that we always default to yellow
+            ColorChange(StickyNoteColors.Yellow);
         }
 
         /// <summary>
@@ -265,7 +240,7 @@ namespace ChemProV.PFD.StickyNote
             Header_StackPanel.Background = headerBrush;
             X_Label.Background = headerBrush;
             CollapseLabel.Background = headerBrush;
-            Header.Fill = headerBrush;
+            //Header.Background = headerBrush;
 
             this.color = color;
         }
@@ -302,10 +277,13 @@ namespace ChemProV.PFD.StickyNote
             writer.WriteElementString("Y", GetValue(Canvas.TopProperty).ToString());
             writer.WriteEndElement();
 
-            //and the color
-            writer.WriteStartElement("Color");
-            writer.WriteString(this.color.ToString());
-            writer.WriteEndElement();
+            // The design decision on sticky note colors ended up being that they are to be 
+            // determined by the user that created them. Therefore, we don't save or load 
+            // them. Their colors will be determined when they are loaded and this depends on 
+            // whether you're just opening a file, doing a comment merge, etc.
+            //writer.WriteStartElement("Color");
+            //writer.WriteString(this.color.ToString());
+            //writer.WriteEndElement();
 
             //and the stickey note's content
             writer.WriteStartElement("Content");
@@ -315,6 +293,12 @@ namespace ChemProV.PFD.StickyNote
             // E.O.
             // Write the size as well
             writer.WriteElementString("Size", string.Format("{0},{1}", Width, Height));
+
+            // Write the user name if we have one
+            if (!string.IsNullOrEmpty(CommentUserName))
+            {
+                writer.WriteElementString("UserName", CommentUserName);
+            }
         }
 
         /// <summary>
@@ -328,7 +312,12 @@ namespace ChemProV.PFD.StickyNote
 
             //pull out content & color
             note.Note.Text = xmlNote.Element("Content").Value;
-            note.ColorChange(StickyNoteColorsFromString(xmlNote.Element("Color").Value));
+            
+            // The design decision on sticky note colors ended up being that they are to be 
+            // determined by the user that created them. Therefore, we don't save or load 
+            // them. Their colors will be determined when they are loaded and this depends on 
+            // whether you're just opening a file, doing a comment merge, etc.
+            //note.ColorChange(StickyNoteColorsFromString(xmlNote.Element("Color").Value));
 
             //use LINQ to find us the X,Y coords
             var location = from c in xmlNote.Elements("Location")
@@ -359,6 +348,13 @@ namespace ChemProV.PFD.StickyNote
                 {
                     note.Width = note.Height = 100.0;
                 }
+            }
+
+            // Look for a user name
+            XElement userEl = xmlNote.Element("UserName");
+            if (null != userEl)
+            {
+                note.CommentUserName = userEl.Value;
             }
 
             //return the processed note
@@ -591,11 +587,18 @@ namespace ChemProV.PFD.StickyNote
         }
 
         /// <summary>
-        /// (might use this in future versions)
+        /// User name for the creator of this comment
         /// </summary>
         public string CommentUserName
         {
-            get { return string.Empty; }
+            get
+            {
+                return Header.Text;
+            }
+            set
+            {
+                Header.Text = (null == value) ? string.Empty : value;
+            }
         }
 
         #endregion
@@ -622,6 +625,31 @@ namespace ChemProV.PFD.StickyNote
         {
             e.Handled = true;
             Hide();
+        }
+
+        public static StickyNoteColors GetNextUserStickyColor()
+        {
+            i++;
+            switch (i)
+            {
+                case 0:
+                    return StickyNoteColors.Blue;
+
+                case 1:
+                    return StickyNoteColors.Green;
+
+                case 2:
+                    return StickyNoteColors.Orange;
+
+                case 3:
+                    //reset index
+                    i = -1;
+
+                    return StickyNoteColors.Pink;
+
+                default:
+                    return StickyNoteColors.Yellow;
+            }
         }
     }
 }

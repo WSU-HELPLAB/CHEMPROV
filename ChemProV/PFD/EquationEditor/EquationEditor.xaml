@@ -43,22 +43,12 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
                 BorderThickness="0" BorderBrush="Transparent"
                 >
-                <Grid x:Name="EquationsGrid" 
-                      MinWidth="400" 
-                      VerticalAlignment="Top"
-                      >
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="150"  />
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
-
-                </Grid>
+                
+                <!-- Stack panel for equation controls -->
+                <StackPanel x:Name="EquationsGrid" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <!-- EquationControl objects are added at runtime -->
+                </StackPanel>
+                
             </ScrollViewer>
         </StackPanel>
     </Grid>

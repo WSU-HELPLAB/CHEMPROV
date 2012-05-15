@@ -1,5 +1,5 @@
 <!--
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -12,19 +12,25 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:tokens="clr-namespace:ChemProV.PFD.EquationEditor.Tokens"
+    xmlns:ctk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     mc:Ignorable="d"
-    d:DesignHeight="300" d:DesignWidth="400" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    d:DesignHeight="100" d:DesignWidth="635" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <Border>
         <Grid x:Name="LayoutRoot" Background="White">
-            <StackPanel x:Name="stackPanel" Orientation="Horizontal">
-                <ComboBox Height="28" x:Name="ScopeComboBox" MinWidth="100" ItemsSource="{Binding Path=foo, Mode=OneWay}"/>
-                <ComboBox Height="28" x:Name="EquationType" MinWidth="100" ItemsSource="{Binding Path=EquationTypes, Mode=OneWay}"/>
-                <TextBox Height="25" Visibility="Collapsed" FontSize="11" IsReadOnly="True" x:Name="EquationFeedback" AcceptsReturn="False" MinWidth="10" />
-                <StackPanel Orientation="Vertical" VerticalAlignment="Center">
-                    <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200" MaxWidth="270" TextWrapping="Wrap" />
-                    <tokens:TokenList x:Name="TokenListControl" Visibility="Collapsed"  MinWidth="200" />
-                </StackPanel>
-            </StackPanel>
+            <ctk:DockPanel>
+                <!-- annotation button -->
+                <Button Height="25" Name="AnnotationButton">
+                    <Image Source="/UI/Icons/palette_stickyNote_16x16_gray.png" Width="16" Height="16" />
+                </Button>
+
+                <ComboBox Height="25" x:Name="EquationType" MinWidth="150" ItemsSource="{Binding Path=TypeOptions, Mode=OneWay}"/>
+                <ComboBox Height="25" x:Name="ScopeComboBox" MinWidth="150" ItemsSource="{Binding Path=ScopeOptions, Mode=OneWay}"/>
+
+                <!-- Equation text box -->
+                <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200"  
+                    TextWrapping="Wrap" Height="25" HorizontalAlignment="Stretch" TextChanged="EquationTextBox_TextChanged" />
+            </ctk:DockPanel>
+
         </Grid>
     </Border>
 </UserControl>

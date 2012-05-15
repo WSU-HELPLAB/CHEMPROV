@@ -94,40 +94,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             };
 
             // ----- Now we start into stuff that's dependent on the selected item -----
-            
-            if (m_canvas.SelectedElement is StickyNote)
-            {
-                menuItem = new MenuItem();
-                menuItem.Header = "Blue";
-                m_contextMenu.Items.Add(menuItem);
-                menuItem.Click += new RoutedEventHandler(ChangeStickyNoteColor);
-                menuItem = new MenuItem();
-                menuItem.Header = "Pink";
-                m_contextMenu.Items.Add(menuItem);
-                menuItem.Click += new RoutedEventHandler(ChangeStickyNoteColor);
-                menuItem = new MenuItem();
-                menuItem.Header = "Green";
-                m_contextMenu.Items.Add(menuItem);
-                menuItem.Click += new RoutedEventHandler(ChangeStickyNoteColor);
-                menuItem = new MenuItem();
-                menuItem.Header = "Orange";
-                m_contextMenu.Items.Add(menuItem);
-                menuItem.Click += new RoutedEventHandler(ChangeStickyNoteColor);
-                menuItem = new MenuItem();
-                menuItem.Header = "Yellow";
-                m_contextMenu.Items.Add(menuItem);
-                menuItem.Click += new RoutedEventHandler(ChangeStickyNoteColor);
-            }
 
-            // E.O.
-            // If the user has right-clicked on a process unit then we want to add subprocess options
-            if (m_canvas.SelectedElement is PFD.ProcessUnits.IProcessUnit)
-            {
-                AddSubprocessMenuOptions(m_contextMenu,
-                    m_canvas.SelectedElement as PFD.ProcessUnits.IProcessUnit);
-            }
-
-            // E.O.
             // Show comment options if the item implements ICommentCollection
             if (m_canvas.SelectedElement is Core.ICommentCollection)
             {
@@ -135,6 +102,13 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
             m_contextMenu.SetValue(Canvas.LeftProperty, location.X);
             m_contextMenu.SetValue(Canvas.TopProperty, location.Y);
+
+            // If the user has right-clicked on a process unit then we want to add subprocess options
+            if (m_canvas.SelectedElement is PFD.ProcessUnits.IProcessUnit)
+            {
+                AddSubprocessMenuOptions(m_contextMenu,
+                    m_canvas.SelectedElement as PFD.ProcessUnits.IProcessUnit);
+            }
 
             // Set the Z-index to put the menu on top of everything else
             m_contextMenu.SetValue(Canvas.ZIndexProperty, 4);
@@ -179,6 +153,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         /// <summary>
         /// This is used to changed color of the sticky notes
+        /// TODO: Delete since it is not used anymore (keeping temporarily for reference)
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>

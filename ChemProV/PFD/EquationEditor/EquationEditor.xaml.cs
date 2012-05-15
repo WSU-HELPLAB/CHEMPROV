@@ -22,6 +22,7 @@ using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.EquationEditor.Views;
 using ChemProV.PFD.EquationEditor.Models;
 using ChemProV.PFD.ProcessUnits;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -37,12 +38,11 @@ namespace ChemProV.PFD.EquationEditor
 
         private object selectedTool;
 
-        private ObservableCollection<EquationData> equationData = new ObservableCollection<EquationData>();
         private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
         private bool isReadOnly = false;
-        private List<EquationModel> equationModels = new List<EquationModel>();
+
         private List<IPfdElement> pfdElements = new List<IPfdElement>();
 
         #endregion
@@ -88,12 +88,6 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         public ObservableCollection<EquationScope> EquationScopes { get; private set; }
-
-        public object SelectedTool
-        {
-            get { return selectedTool; }
-            set { selectedTool = value; }
-        }
 
         public OptionDifficultySetting CurrentDifficultySetting
         {
@@ -158,11 +152,7 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         public void ClearEquations()
         {
-            int rowCount = EquationsGrid.RowDefinitions.Count;
-            for (int i = 0; i < rowCount; i++)
-            {
-                RemoveEquationRow(i);
-            }
+            EquationsGrid.Children.Clear();
         }
 
         public void LoadXmlElements(XElement doc)
@@ -174,14 +164,90 @@ namespace ChemProV.PFD.EquationEditor
             XElement equations = doc.Descendants("Equations").ElementAt(0);
             foreach (XElement xmlEquation in equations.Elements())
             {
-                EquationModel modelFromXml = EquationModel.FromXml(xmlEquation);
-                EquationModel rowModel = AddNewEquationRow();
-
-                rowModel.Annotation = modelFromXml.Annotation;
-                rowModel.Equation = modelFromXml.Equation;
-                rowModel.Scope = modelFromXml.Scope;
-                rowModel.Type = modelFromXml.Type;
+                EquationModel rowModel = AddNewEquationRow(xmlEquation);
             }
+        }
+
+        public List<IUndoRedoAction> MergeAnnotationsFrom(XDocument doc, string userNameIfNotInXml)
+        {
+            // Initialize the list of undo/redo actions
+            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
+            
+            // The root should be ProcessFlowDiagram
+            XElement root = doc.Element("ProcessFlowDiagram");
+            if (null == root)
+            {
+                return undos;
+            }
+
+            // Find the <EquationEditor> child and then <Equations> within that
+            XElement ee = root.Element("EquationEditor");
+            if (null == ee) { return undos; }
+            XElement eqs = ee.Element("Equations");
+            if (null == eqs) { return undos; }
+
+            // Iterate through <EquationModel> elements
+            foreach (XElement em in eqs.Elements("EquationModel"))
+            {
+                // See if we have an annotation stored
+                XElement annotationElement = em.Element("Annotation");
+                if (null == annotationElement)
+                {
+                    continue;
+                }
+
+                // Look for a user name attribute
+                string xmlUserName = null;
+                XAttribute userAttr = annotationElement.Attribute("UserName");
+                if (null != userAttr)
+                {
+                    xmlUserName = userAttr.Value;
+                }
+
+                // We need to make sure that we match up equation models with the same equation
+                XElement emEq = em.Element("Equation");
+                if (null == emEq)
+                {
+                    throw new Exception(
+                        "Element \"EquationModel\" is missing child \"Equation\" element");
+                }
+
+                // Look through the equation models and try to find a matching equation string
+                EquationModel match = null;
+                foreach (EquationModel emThis in this.equationModels)
+                {
+                    if (emThis.Equation.Equals(emEq.Value))
+                    {
+                        match = emThis;
+                        break;
+                    }
+                }
+
+                // Go to next <EquationModel> element if we didn't find a match
+                if (null == match)
+                {
+                    continue;
+                }
+                
+                string anno = annotationElement.Value;
+                if (!string.IsNullOrEmpty(anno))
+                {
+                    // Here's where we actually do the merge
+                    undos.Add(new SetAnnotation(match, match.Annotation));
+                    
+                    // Prioritize user names from the Xml over the function's parameter
+                    if (!string.IsNullOrEmpty(xmlUserName))
+                    {
+                        match.Annotation += "\r\n\r\n--- " + xmlUserName + " ---\r\n" + anno;
+                    }
+                    else
+                    {
+                        match.Annotation += "\r\n\r\n--- " + userNameIfNotInXml + " ---\r\n" + anno;
+                    }
+                }
+            }
+
+            return undos;
         }
 
         #endregion
@@ -189,44 +255,49 @@ namespace ChemProV.PFD.EquationEditor
         #region Private methods
 
         /// <summary>
-        /// Adds a new equation row to the equations grid.
+        /// Adds a blank new equation row to the equations grid
         /// </summary>
+        /// <returns></returns>
         private EquationModel AddNewEquationRow()
         {
-            EquationModel newRowModel = new EquationModel();
-            newRowModel.TypeOptions = EquationTypes;
-            newRowModel.ScopeOptions = EquationScopes;
-            newRowModel.RelatedElements = PfdElements;
-            newRowModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
-            equationModels.Add(newRowModel);
+            return AddNewEquationRow(null);
+        }
 
-            int rowNumber = EquationsGrid.RowDefinitions.Count;
-            EquationsGrid.RowDefinitions.Add(new RowDefinition());
+        /// <summary>
+        /// Adds a new equation row to the equations list. If the optional Xml equation element is non-null 
+        /// then it will be used to fill the row's data appropriately. If it is null then the new row will 
+        /// be blank.
+        /// </summary>
+        private EquationModel AddNewEquationRow(XElement optionalXmlEquation)
+        {
+            // E.O.
+            // Create a new equation control and add it to the stack panel
+            EquationControl newRow = new EquationControl(this, optionalXmlEquation);
+            EquationsGrid.Children.Add(newRow);
+            newRow.Model.RelatedElements = PfdElements;
+            newRow.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
 
-            AnnotateControl annotateControl = new AnnotateControl();
-            annotateControl.SetValue(Grid.RowProperty, rowNumber);
-            annotateControl.SetValue(Grid.ColumnProperty, 0);
-            annotateControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(annotateControl);
+            newRow.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
 
-            TypeControl typeControl = new TypeControl();
-            typeControl.SetValue(Grid.RowProperty, rowNumber);
-            typeControl.SetValue(Grid.ColumnProperty, 1);
-            typeControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(typeControl);
+            // I think I have all of this taken care of in EquationControl.cs
+            // |
+            // |
+            // V
+            //ScopeControl scopeControl = new ScopeControl();
+            //scopeControl.SetValue(Grid.RowProperty, rowNumber);
+            //scopeControl.SetValue(Grid.ColumnProperty, 2);
+            //scopeControl.DataContext = newRowModel;
+            //try
+            //{
+            //    scopeControl.ScopeComboBox.SelectedItem = newRowModel.Scope;
+            //}
+            //catch (Exception)
+            //{
+            //    // This probably isn't a problem
+            //}
+            //EquationsGrid.Children.Add(scopeControl);
 
-            ScopeControl scopeControl = new ScopeControl();
-            scopeControl.SetValue(Grid.RowProperty, rowNumber);
-            scopeControl.SetValue(Grid.ColumnProperty, 2);
-            scopeControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(scopeControl);
-
-            Views.EquationControl equationControl = new Views.EquationControl();
-            equationControl.SetValue(Grid.RowProperty, rowNumber);
-            equationControl.SetValue(Grid.ColumnProperty, 3);
-            equationControl.DataContext = newRowModel;
-            EquationsGrid.Children.Add(equationControl);
-            return newRowModel;
+            return newRow.Model;
         }
 
         /// <summary>
@@ -234,18 +305,12 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         private void RemoveEquationRow(int rowNumber)
         {
-            UIElement[] elements = (from child in EquationsGrid.Children
-                                    where (int)child.GetValue(Grid.RowProperty) == rowNumber
-                                    select child).ToArray();
-            foreach (UIElement element in elements)
-            {
-                //element.Visibility = System.Windows.Visibility.Collapsed;
-                EquationsGrid.Children.Remove(element);
-            }
+            // Every child in the stack panel is a row
+            EquationsGrid.Children.RemoveAt(rowNumber);
         }
 
         /// <summary>
-        /// Updates the list of scoes that an equation can reference
+        /// Updates the list of scopes that an equation can reference
         /// </summary>
         private void updateScopes()
         {
@@ -265,8 +330,6 @@ namespace ChemProV.PFD.EquationEditor
                 {
                     EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = unit.ProcessUnitLabel));
 
-                    // E.O.
-                    // I think this is where this goes, I'm still getting familiar with all the equation-oriented stuff
                     // If there's a scope for this process unit, then add it
                     if (!unit.Subprocess.Equals(System.Windows.Media.Colors.White))
                     {
@@ -294,6 +357,31 @@ namespace ChemProV.PFD.EquationEditor
             {
                 vm.ScopeOptions = EquationScopes;
                 UpdateEquationModelElements(vm);
+            }
+        }
+
+        /// <summary>
+        /// E.O.
+        /// For compatibility since I significantly changed the equation control stuff
+        /// Will remove at a later date after some refactoring
+        /// </summary>
+        private List<EquationModel> equationModels
+        {
+            get
+            {
+                List<EquationModel> models = new List<EquationModel>();
+                foreach (UIElement uie in EquationsGrid.Children)
+                {
+                    EquationControl ec = uie as EquationControl;
+                    if (null == ec)
+                    {
+                        continue;
+                    }
+
+                    models.Add(ec.Model);
+                }
+
+                return models;
             }
         }
 
@@ -431,26 +519,35 @@ namespace ChemProV.PFD.EquationEditor
         private void EquationModelPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             EquationModel model = sender as EquationModel;
-            
+
             //if the scope changed, then update the property units that are visible to the particular view model
             if (e.PropertyName == "Scope")
             {
                 UpdateEquationModelElements(model);
             }
-            //is the data being modified the last row in our equations grid?  If so, 
-            //add a new one
-            int maxRowCount = EquationsGrid.RowDefinitions.Count - 1; //subtract 1 because rows start at 0
+
+            // Has data been modified in the last row?  If so, add a new one
+            int eqCount = EqRowCount;
+            if (eqCount > 0)
+            {
+                EquationControl ec = EquationsGrid.Children[eqCount - 1] as EquationControl;
+                if (null != ec)
+                {
+                    if (!string.IsNullOrEmpty(ec.EquationText))
+                    {
+                        AddNewEquationRow();
+                    }
+                }
+            }
+
+            int maxRowCount = EqRowCount - 1; //subtract 1 because rows start at 0
             UIElement element = (from child in EquationsGrid.Children
                                  where (int)child.GetValue(Grid.RowProperty) == maxRowCount
                                  select child).FirstOrDefault();
             if (element != null)
             {
                 EquationModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationModel);
-                if (elementVm.Id == model.Id && model.Equation.Length != 0)
-                {
-                    AddNewEquationRow();
-                }
-                else if (elementVm.Id != model.Id)
+                if (elementVm.Id != model.Id)
                 {
                     //if not, perhaps its empty and we need to remove the row
                     if (maxRowCount > 2 && model.Equation.Length == 0)
@@ -467,6 +564,14 @@ namespace ChemProV.PFD.EquationEditor
                         }
                     }
                 }
+            }
+        }
+
+        private int EqRowCount
+        {
+            get
+            {
+                return EquationsGrid.Children.Count;
             }
         }
 

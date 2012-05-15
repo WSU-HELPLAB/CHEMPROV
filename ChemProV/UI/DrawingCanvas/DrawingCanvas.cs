@@ -810,16 +810,20 @@ namespace ChemProV.UI.DrawingCanvas
                 DraggableStreamEndpoint dse = uie as DraggableStreamEndpoint;
                 dse.EndpointConnectionChanged(dse.Type, null, null);
             }
+
+            PFDModified();
         }
 
-        public void MergeCommentsFrom(XElement doc)
+        public List<IUndoRedoAction> MergeCommentsFrom(XElement doc, string userNameIfNotInXml)
         {
             DrawingCanvas dc = new DrawingCanvas();
             dc.LoadXmlElements(doc);
 
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
 
-            // Start with the sticky notes
+            // Determine a color
+            StickyNoteColors clr = StickyNote.GetNextUserStickyColor();
+
             List<StickyNote> existing = ChildStickyNotes;
             foreach (UIElement uie in dc.Children)
             {
@@ -858,10 +862,17 @@ namespace ChemProV.UI.DrawingCanvas
                         // Add this comment to the stream
                         StickyNote snNew;
                         undos.AddRange(StickyNote.CreateCommentNote(this, current, null, out snNew).ToArray());
-                        //snNew.Location = sn.Location;
                         snNew.Note.Text = sn.Note.Text;
                         snNew.Width = sn.Width;
                         snNew.Height = sn.Height;
+                        snNew.CommentUserName = sn.CommentUserName;
+
+                        // Resolve the user name and set the color
+                        if (string.IsNullOrEmpty(snNew.CommentUserName))
+                        {
+                            snNew.CommentUserName = userNameIfNotInXml;
+                        }
+                        snNew.ColorChange(GetStickyNoteColor(snNew));
                     }
                     else
                     {
@@ -878,13 +889,20 @@ namespace ChemProV.UI.DrawingCanvas
                             continue;
                         }
 
-                        // Add this comment to the sticky note
+                        // Add this comment to the process unit
                         StickyNote snNew;
                         undos.AddRange(StickyNote.CreateCommentNote(this, lpu, null, out snNew).ToArray());
-                        //snNew.Location = sn.Location;
                         snNew.Note.Text = sn.Note.Text;
                         snNew.Width = sn.Width;
                         snNew.Height = sn.Height;
+                        snNew.CommentUserName = sn.CommentUserName;
+                        
+                        // Resolve the user name and set the color
+                        if (string.IsNullOrEmpty(snNew.CommentUserName))
+                        {
+                            snNew.CommentUserName = userNameIfNotInXml;
+                        }
+                        snNew.ColorChange(GetStickyNoteColor(snNew));
                     }
                 }
                 else // Free-floating sticky note
@@ -915,6 +933,14 @@ namespace ChemProV.UI.DrawingCanvas
                         copy.Width = sn.Width;
                         copy.Height = sn.Height;
                         copy.Location = sn.Location;
+                        copy.CommentUserName = sn.CommentUserName;
+
+                        // Resolve the user name and set the color
+                        if (string.IsNullOrEmpty(copy.CommentUserName))
+                        {
+                            copy.CommentUserName = userNameIfNotInXml;
+                        }
+                        copy.ColorChange(GetStickyNoteColor(copy));           
 
                         // Don't forget the undo
                         undos.Add(new RemoveFromCanvas(copy, this));
@@ -922,12 +948,22 @@ namespace ChemProV.UI.DrawingCanvas
                 }
             }
 
-            // TODO: Annotations
+            return undos;
+        }
 
-            // Finish up by adding the undo
-            if (0 != undos.Count)
+        private StickyNoteColors GetStickyNoteColor(StickyNote forThis)
+        {
+            if (!Core.App.Workspace.UserStickyNoteColors.ContainsKey(forThis.CommentUserName))
             {
-                AddUndo(new UndoRedoCollection("Undo comment merge", undos.ToArray()));
+                // New user = new color. We need to get a new color and then add this user to
+                // the dictionary
+                StickyNoteColors clr = StickyNote.GetNextUserStickyColor();
+                Core.App.Workspace.UserStickyNoteColors.Add(forThis.CommentUserName, clr);
+                return clr;
+            }
+            else
+            {
+                return Core.App.Workspace.UserStickyNoteColors[forThis.CommentUserName];
             }
         }
 

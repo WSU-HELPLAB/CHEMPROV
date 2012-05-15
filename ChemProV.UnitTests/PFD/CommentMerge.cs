@@ -102,7 +102,9 @@ namespace ChemProV.UnitTests.PFD
             Assert.IsNotNull(doc, "FAIL: XDocument loaded from memory stream is null");
 
             // Have the first workspace merge in comments from the second
-            w1.DrawingCanvasReference.MergeCommentsFrom(doc.Element("ProcessFlowDiagram").Element("DrawingCanvas"));
+            string userNameIfNotInXml = "who_cares";
+            w1.DrawingCanvasReference.MergeCommentsFrom(doc.Element("ProcessFlowDiagram").Element("DrawingCanvas"),
+                userNameIfNotInXml);
 
             // Dispose stream before validation
             ms.Dispose();
