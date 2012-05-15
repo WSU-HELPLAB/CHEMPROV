@@ -42,6 +42,10 @@ namespace ChemProV.Core
             }
         }
 
+        /// <summary>
+        /// Creates an image from the specified project source
+        /// Remember that the image's "BuildAction" must be set to "Content"
+        /// </summary>
         public static Image CreateImageFromSource(string source)
         {
             if (!source.StartsWith("/UI"))

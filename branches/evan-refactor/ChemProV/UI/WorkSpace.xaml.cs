@@ -41,8 +41,6 @@ namespace ChemProV.UI
 
         private bool m_isReadOnly = false;
 
-        private List<Tuple<string, EquationControl>> userDefinedVaraibles = new List<Tuple<string, EquationControl>>();
-
         private RuleManager ruleManager = RuleManager.GetInstance();
 
         private bool checkRules = true;
@@ -52,6 +50,12 @@ namespace ChemProV.UI
         private ObservableCollection<string> compounds = new ObservableCollection<string>();
 
         private ObservableCollection<string> elements = new ObservableCollection<string>();
+
+        /// <summary>
+        /// Dictionary used to map a user name to a sticky note color
+        /// </summary>
+        private Dictionary<string, PFD.StickyNote.StickyNoteColors> m_snUserColors =
+            new Dictionary<string, PFD.StickyNote.StickyNoteColors>();
 
         #endregion Fields
 
@@ -200,12 +204,6 @@ namespace ChemProV.UI
         {
             DrawingCanvas.CurrentDifficultySetting = newValue;
             EquationEditor.CurrentDifficultySetting = newValue;
-        }
-
-        public void UserDefinedVariablesUpdated(List<Tuple<string, EquationControl>> newVariables)
-        {
-            userDefinedVaraibles = newVariables;
-            CheckRulesForPFD(null, EventArgs.Empty);
         }
 
         /// <summary>
@@ -367,5 +365,39 @@ namespace ChemProV.UI
         }
 
         #endregion Private Helper
+
+        /// <summary>
+        /// Dictionary that maps a user name string to a sticky note color
+        /// </summary>
+        public Dictionary<string, PFD.StickyNote.StickyNoteColors> UserStickyNoteColors
+        {
+            get
+            {
+                return m_snUserColors;
+            }
+        }
+
+        public void MergeCommentsFrom(System.IO.Stream stream)
+        {
+            XDocument doc = XDocument.Load(stream);
+
+            // Kind of hard to implement user-name-oriented functionality when there's really no 
+            // concept of user names in ChemProV
+            string userNameIfNotInXml = "Unknown user " + (UserStickyNoteColors.Count + 1).ToString();
+
+            // First tell the drawing canvas to do sticky note merging
+            List<PFD.Undos.IUndoRedoAction> undos = DrawingCanvas.MergeCommentsFrom(
+                doc.Element("ProcessFlowDiagram").Element("DrawingCanvas"), userNameIfNotInXml);
+
+            // We also want to bring in equation annotations
+            undos.AddRange(EquationEditor.MergeAnnotationsFrom(doc, userNameIfNotInXml).ToArray());
+
+            // Finish up by adding the undo
+            if (0 != undos.Count)
+            {
+                DrawingCanvas.AddUndo(
+                    new PFD.Undos.UndoRedoCollection("Undo comment merge", undos.ToArray()));
+            }
+        }
     }
 }
