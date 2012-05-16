@@ -169,15 +169,6 @@
     <Compile Include="PFD\EquationEditor\Views\AnnotateWindow.xaml.cs">
       <DependentUpon>AnnotateWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\EquationEditor\Views\EquationControl.xaml.cs">
-      <DependentUpon>EquationControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PFD\EquationEditor\Views\ErrorControl.xaml.cs">
-      <DependentUpon>ErrorControl.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PFD\EquationEditor\Views\ScopeControl.xaml.cs">
-      <DependentUpon>ScopeControl.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PFD\IPfdElement.cs" />
     <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
       <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
@@ -336,18 +327,6 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PFD\EquationEditor\Views\AnnotateWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PFD\EquationEditor\Views\EquationControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PFD\EquationEditor\Views\ErrorControl.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PFD\EquationEditor\Views\ScopeControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -545,6 +524,7 @@
     <Content Include="UI\Icons\toolbar_save.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="UI\Icons\toolbar_saveas.png" />
     <Content Include="UI\Icons\toolbar_save_all.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

@@ -14,7 +14,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:tokens="clr-namespace:ChemProV.PFD.EquationEditor.Tokens"
     xmlns:ctk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
     mc:Ignorable="d"
-    d:DesignHeight="100" d:DesignWidth="635" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    d:DesignHeight="50" d:DesignWidth="635" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <Border>
         <Grid x:Name="LayoutRoot" Background="White">
             <ctk:DockPanel>
@@ -23,8 +23,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <Image Source="/UI/Icons/palette_stickyNote_16x16_gray.png" Width="16" Height="16" />
                 </Button>
 
-                <ComboBox Height="25" x:Name="EquationType" MinWidth="150" ItemsSource="{Binding Path=TypeOptions, Mode=OneWay}"/>
-                <ComboBox Height="25" x:Name="ScopeComboBox" MinWidth="150" ItemsSource="{Binding Path=ScopeOptions, Mode=OneWay}"/>
+                <!-- Type and scope combo boxes -->
+                <ComboBox Height="25" x:Name="TypeComboBox" MinWidth="150" SelectionChanged="TypeComboBox_SelectionChanged" />
+                <ComboBox Height="25" x:Name="ScopeComboBox" MinWidth="150" SelectionChanged="ScopeComboBox_SelectionChanged"/>
 
                 <!-- Equation text box -->
                 <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200"  

@@ -383,6 +383,62 @@ namespace ChemProV.UI.DrawingCanvas
             return null;
         }
 
+        public UIElement GetChildAtIncludeStreams(Point location)
+        {
+            UIElement element = null;
+            
+            foreach (UIElement uie in Children)
+            {
+                double w = (double)uie.GetValue(Canvas.ActualWidthProperty);
+                double h = (double)uie.GetValue(Canvas.ActualHeightProperty);
+                double x = (double)uie.GetValue(Canvas.LeftProperty);
+                double y = (double)uie.GetValue(Canvas.TopProperty);
+
+                if (location.X >= x && location.X < x + w &&
+                    location.Y >= y && location.Y < y + h)
+                {
+                    // We found something at this location, but we need to check if we have another element 
+                    // with a higher Z-index
+                    if (null != element)
+                    {
+                        if ((int)uie.GetValue(Canvas.ZIndexProperty) >= (int)element.GetValue(Canvas.ZIndexProperty))
+                        {
+                            element = uie;
+                        }
+                    }
+                    else
+                    {
+                        element = uie;
+                    }
+                }
+            }
+
+            // Check streams if we didn't get anything above
+            if (null == element)
+            {
+                // We'll say any click within 4-pixels distance from the line is close enough
+                double dist = 4.0;
+                foreach (UIElement uie in Children)
+                {
+                    AbstractStream stream = uie as AbstractStream;
+                    if (null == stream)
+                    {
+                        continue;
+                    }
+
+                    MathCore.LineSegment ls = new MathCore.LineSegment(
+                        new Point(stream.Stem.X1, stream.Stem.Y1),
+                        new Point(stream.Stem.X2, stream.Stem.Y2));
+                    if (ls.GetDistance(location) <= dist)
+                    {
+                        return stream;
+                    }
+                }
+            }
+
+            return element;
+        }
+
         public LabeledProcessUnit GetProcessUnitById(string id)
         {
             foreach (UIElement uie in Children)
@@ -455,7 +511,7 @@ namespace ChemProV.UI.DrawingCanvas
             e.Handled = true;
 
             // Go ahead and select the item under the mouse
-            object child = GetChildAt(e.GetPosition(this), null);
+            object child = GetChildAtIncludeStreams(e.GetPosition(this));
             SelectedElement = child as IPfdElement;
             if (child is DraggableStreamEndpoint)
             {
@@ -494,7 +550,7 @@ namespace ChemProV.UI.DrawingCanvas
 
             // If our current state is null, then we want to create an appropriate one.
             // But first we need to check to see if we've selected an element
-            object childAtPos = GetChildAt(e.GetPosition(this), null);
+            object childAtPos = GetChildAtIncludeStreams(e.GetPosition(this));
             SelectedElement = childAtPos as IPfdElement;
 
             // If there is nothing where the mouse pointer is, then we leave the state 

@@ -34,30 +34,17 @@ namespace ChemProV.PFD.EquationEditor
     {
         private EquationModel m_model;
 
-        public EquationControl(EquationEditor parent, XElement optionalXmlEquation)
+        public EquationControl(EquationEditor parent)
         {
             InitializeComponent();
             
-            if (null == optionalXmlEquation)
-            {
-                m_model = new EquationModel();
-            }
-            else
-            {
-                m_model = EquationModel.FromXml(optionalXmlEquation);
-                EquationTextBox.Text = m_model.Equation;
-            }
-            m_model.ScopeOptions = parent.EquationScopes;
-            m_model.TypeOptions = parent.EquationTypes;
+            m_model = new EquationModel();
+            SetScopeOptions(parent.EquationScopes);
+            SetTypeOptions(parent.EquationTypes);
             this.DataContext = m_model;
 
             // Setup the annotation button
-            Image img = Core.App.CreateImageFromSource(
-                string.IsNullOrEmpty(m_model.Annotation) ?
-                "palette_stickyNote_16x16_gray.png" :
-                "palette_stickyNote_16x16.png");
-            img.Width = img.Height = 16;
-            AnnotationButton.Content = img;
+            RefreshAnnotationButton();
             AnnotationButton.Click += delegate(object sender, RoutedEventArgs e)
             {
                 PFD.EquationEditor.Views.AnnotateWindow window =
@@ -72,29 +59,9 @@ namespace ChemProV.PFD.EquationEditor
                 if (e.PropertyName.Equals("Annotation"))
                 {
                     // Refresh the button's icon
-                    Image img2 = Core.App.CreateImageFromSource(
-                        string.IsNullOrEmpty(m_model.Annotation) ?
-                        "palette_stickyNote_16x16_gray.png" :
-                        "palette_stickyNote_16x16.png");
-                    img2.Width = img2.Height = 16;
-                    AnnotationButton.Content = img2;
+                    RefreshAnnotationButton();
                 }
             };
-
-            // Setup the combo boxes
-            EquationType.DataContext = m_model;
-            ScopeComboBox.DataContextChanged += new DependencyPropertyChangedEventHandler(ScopeControl_DataContextChanged);
-            try
-            {
-                ScopeComboBox.SelectedItem = m_model.Scope;
-            }
-            catch (Exception)
-            {
-                // This probably isn't a problem
-            }
-
-            // Last but not least, the text box
-            EquationTextBox.DataContext = m_model;
         }
         
         /// <summary>
@@ -122,8 +89,24 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
+        /// Gets a boolean value that indicates whether or not a control within this control 
+        /// is the current focused element.
+        /// </summary>
+        public bool HasFocus
+        {
+            get
+            {
+                object focus = FocusManager.GetFocusedElement();
+                return object.ReferenceEquals(focus, AnnotationButton) ||
+                    object.ReferenceEquals(focus, TypeComboBox) ||
+                    object.ReferenceEquals(focus, ScopeComboBox) ||
+                    object.ReferenceEquals(focus, EquationTextBox);
+            }
+        }
+
+        /// <summary>
         /// Gets the equation model. This control exists to provide a user interface relevant to creating 
-        /// an equation model.
+        /// this equation model.
         /// </summary>
         public EquationModel Model
         {
@@ -142,7 +125,7 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         public EquationType SelectedItem
         {
-            get { return EquationType.SelectedItem as EquationType; }
+            get { return TypeComboBox.SelectedItem as EquationType; }
         }
 
         /// <summary>
@@ -180,45 +163,125 @@ namespace ChemProV.PFD.EquationEditor
 
         #endregion
 
-        #region Scope combo box stuff
-
-        void ScopeControl_DataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
+        public void LoadFrom(XElement equationModelElement)
         {
-            //remove listener from old model
-            if (e.OldValue is EquationModel)
-            {
-                EquationModel context = e.NewValue as EquationModel;
-                context.PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler(ScopeDataContext_PropertyChanged);
-            }
+            m_model = EquationModel.FromXml(equationModelElement);
+            EquationTextBox.Text = m_model.Equation;
+            this.DataContext = m_model;
 
-            //attach it to new model
-            if (e.NewValue is EquationModel)
+            // Setup the annotation button
+            RefreshAnnotationButton();
+            // Monitor when the annotation changes so that we can set the button's icon to a grayed-out sticky 
+            // note when the annotation is empty and a yellow sticky note when it's not
+            m_model.PropertyChanged += delegate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
             {
-                EquationModel context = e.NewValue as EquationModel;
-                context.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ScopeDataContext_PropertyChanged);
-            }
-        }
-
-        private void ScopeDataContext_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            //if the Scope changed, sync it up in our list
-            if (e.PropertyName.CompareTo("Scope") == 0)
-            {
-                EquationModel model = DataContext as EquationModel;
-                foreach (EquationScope item in ScopeComboBox.Items)
+                if (e.PropertyName.Equals("Annotation"))
                 {
-                    if (item.Equals(model.Scope))
+                    // Refresh the button's icon
+                    RefreshAnnotationButton();
+                }
+            };
+
+            // Setup the type combo box
+            foreach (object typeObj in TypeComboBox.Items)
+            {
+                if (m_model.Type.Equals(typeObj))
+                {
+                    TypeComboBox.SelectedItem = typeObj;
+                }
+            }
+            
+            // Setup the scope combo box
+            foreach (EquationScope item in ScopeComboBox.Items)
+            {
+                if (item.Equals(m_model.Scope))
+                {
+                    if (ScopeComboBox.SelectedItem != item)
                     {
-                        if (ScopeComboBox.SelectedItem != item)
-                        {
-                            ScopeComboBox.SelectedItem = item;
-                        }
+                        ScopeComboBox.SelectedItem = item;
                     }
                 }
             }
+
+            // Last but not least, the text box
+            EquationTextBox.DataContext = m_model;
         }
 
-        #endregion
+        private void RefreshAnnotationButton()
+        {
+            Image img2 = Core.App.CreateImageFromSource(
+                string.IsNullOrEmpty(m_model.Annotation) ?
+                    "palette_stickyNote_16x16_gray.png" :
+                    "palette_stickyNote_16x16.png");
+            img2.Width = img2.Height = 16;
+            AnnotationButton.Content = img2;
+        }
+
+        private void ScopeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            m_model.Scope = ScopeComboBox.SelectedItem as EquationScope;
+        }
+
+        /// <summary>
+        /// Refreshes the options in the "Scope" combo box. Preserves the selected value if possible.
+        /// </summary>
+        public void SetScopeOptions(ObservableCollection<EquationScope> options)
+        {
+            // We want to avoid firing the SelectionChanged event during this method
+            ScopeComboBox.SelectionChanged -= ScopeComboBox_SelectionChanged;
+            
+            // Before we clear, store the selected element
+            object selected = ScopeComboBox.SelectedItem;
+
+            // Clear and rebuild
+            this.ScopeComboBox.Items.Clear();
+            foreach (EquationScope es in options)
+            {
+                ScopeComboBox.Items.Add(es);
+
+                // If the item we just added is equal to the previously selected one, then select it
+                if (es.Equals(selected))
+                {
+                    ScopeComboBox.SelectedItem = es;
+                }
+            }
+
+            // Go back to watching for selection changes
+            ScopeComboBox.SelectionChanged += ScopeComboBox_SelectionChanged;
+        }
+
+        /// <summary>
+        /// Refreshes the options in the "Type" combo box. Preserves the selected value if possible.
+        /// </summary>
+        public void SetTypeOptions(ObservableCollection<EquationType> options)
+        {
+            // We want to avoid firing the SelectionChanged event during this method
+            TypeComboBox.SelectionChanged -= TypeComboBox_SelectionChanged;
+            
+            // Before we clear, store the selected element
+            object selected = TypeComboBox.SelectedItem;
+
+            // Clear and rebuild
+            this.TypeComboBox.Items.Clear();
+            foreach (EquationType et in options)
+            {
+                TypeComboBox.Items.Add(et);
+
+                // If the item we just added is equal to the previously selected one, then select it
+                if (et.Equals(selected))
+                {
+                    TypeComboBox.SelectedItem = et;
+                }
+            }
+
+            // Go back to watching for selection changes
+            TypeComboBox.SelectionChanged += TypeComboBox_SelectionChanged;
+        }
+
+        private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            m_model.Type = TypeComboBox.SelectedItem as EquationType;
+        }
 
         // ----- I'm doing an entire rewrite of this control -----
         // ----- Until finished, I'm leaving the old code commented out below
