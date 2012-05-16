@@ -96,6 +96,24 @@ namespace ChemProV.MathCore
             return Vector.Project(ptMinusA, Direction);
         }
 
+        /// <summary>
+        /// Gets the unsigned distance between the specified point and this line
+        /// </summary>
+        public double GetDistance(Point point)
+        {
+            Vector v = new Vector(point) - m_a;
+            double adj = v.ScalarProjectOnto(Direction);
+            double hyp = v.Length;
+            // opp^2 + adj^2 = hyp^2
+            // opp^2 = hyp^2 - adj^2
+            double oppSqr = hyp * hyp - adj * adj;
+            if (oppSqr <= 0.0)
+            {
+                return 0.0;
+            }
+            return Math.Sqrt(oppSqr);
+        }
+
         public Point GetPointA()
         {
             return new Point(m_a.X, m_a.Y);

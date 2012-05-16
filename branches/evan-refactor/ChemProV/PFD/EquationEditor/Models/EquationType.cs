@@ -26,7 +26,7 @@ namespace ChemProV.PFD.EquationEditor.Models
         public EquationType()
         {
             Classification = EquationTypeClassification.Total;
-            Name = "Overall";
+            Name = "Total";
         }
 
         public EquationType(EquationTypeClassification classification, string name)

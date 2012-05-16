@@ -272,7 +272,12 @@ namespace ChemProV.PFD.EquationEditor
         {
             // E.O.
             // Create a new equation control and add it to the stack panel
-            EquationControl newRow = new EquationControl(this, optionalXmlEquation);
+            EquationControl newRow = new EquationControl(this);
+            if (null != optionalXmlEquation)
+            {
+                newRow.LoadFrom(optionalXmlEquation);
+            }
+
             EquationsGrid.Children.Add(newRow);
             newRow.Model.RelatedElements = PfdElements;
             newRow.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
@@ -352,11 +357,12 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
-            //update all view models
-            foreach (EquationModel vm in equationModels)
+            // Update all of the equation controls
+            for (int i = 0; i < EqRowCount; i++)
             {
-                vm.ScopeOptions = EquationScopes;
-                UpdateEquationModelElements(vm);
+                EquationControl ec = GetRow(i);
+                ec.SetScopeOptions(EquationScopes);
+                UpdateEquationModelElements(ec.Model);
             }
         }
 
@@ -383,6 +389,47 @@ namespace ChemProV.PFD.EquationEditor
 
                 return models;
             }
+        }
+
+        /// <summary>
+        /// Gets the equation control at the specified row index.
+        /// </summary>
+        /// <param name="index">Zero-based index of the row</param>
+        /// <returns>Null if not found, reference to the appropriate EquationControl otherwise</returns>
+        private EquationControl GetRow(int index)
+        {
+            if (index < 0)
+            {
+                return null;
+            }
+
+            int rowsSeen = 0;
+
+            // Iterate through the itms in the stack panel of equation controls. At the time of this writing, 
+            // the only items in here will be EquationControl objects, so we could just do:
+            //   return EquationsGrid.Children[index] as EquationControl
+            // However, in the future I could see things such as equation feedback elements being added beneath 
+            // equation controls in this panel for usability purposes. Therefore we do an iteration through the 
+            // children, which is more robust for the future.
+            foreach (UIElement uie in EquationsGrid.Children)
+            {
+                EquationControl ec = uie as EquationControl;
+                if (null == ec)
+                {
+                    continue;
+                }
+
+                if (index == rowsSeen)
+                {
+                    return ec;
+                }
+
+                // We have passed up another row
+                rowsSeen++;
+            }
+
+            // Coming here implies that we didn't find it
+            return null;
         }
 
         /// <summary>
@@ -422,9 +469,10 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
-            foreach (EquationModel vm in equationModels)
+            // Update the type options for each row
+            for (int i = 0; i < EqRowCount; i++)
             {
-                vm.TypeOptions = EquationTypes;
+                GetRow(i).SetTypeOptions(EquationTypes);
             }
         }
 
@@ -526,43 +574,42 @@ namespace ChemProV.PFD.EquationEditor
                 UpdateEquationModelElements(model);
             }
 
-            // Has data been modified in the last row?  If so, add a new one
-            int eqCount = EqRowCount;
-            if (eqCount > 0)
+            // Find the index of the last row that has a non-empty equation in it
+            int lastNonEmpty = -1;
+            int i = EqRowCount - 1;
+            while (i >= 0)
             {
-                EquationControl ec = EquationsGrid.Children[eqCount - 1] as EquationControl;
-                if (null != ec)
+                if (!string.IsNullOrEmpty(GetRow(i).Model.Equation))
                 {
-                    if (!string.IsNullOrEmpty(ec.EquationText))
-                    {
-                        AddNewEquationRow();
-                    }
+                    lastNonEmpty = i;
+                    break;
                 }
+
+                i--;
             }
 
-            int maxRowCount = EqRowCount - 1; //subtract 1 because rows start at 0
-            UIElement element = (from child in EquationsGrid.Children
-                                 where (int)child.GetValue(Grid.RowProperty) == maxRowCount
-                                 select child).FirstOrDefault();
-            if (element != null)
+            // Do we have a non-empty equation in the last row?  If so, add a new one
+            if (EqRowCount - 1 == lastNonEmpty)
             {
-                EquationModel elementVm = (element.GetValue(Control.DataContextProperty) as EquationModel);
-                if (elementVm.Id != model.Id)
+                AddNewEquationRow();
+            }
+
+            // Do we have empty equations in rows before non-empty ones? If so, delete them
+            for (i = 0; i < lastNonEmpty; i++)
+            {
+                EquationControl ec = GetRow(i);
+
+                // If we have a focus in this row, then skip it
+                if (ec.HasFocus)
                 {
-                    //if not, perhaps its empty and we need to remove the row
-                    if (maxRowCount > 2 && model.Equation.Length == 0)
-                    {
-                        FrameworkElement[] controls = (from child in EquationsGrid.Children
-                                                       where (child as FrameworkElement).DataContext is EquationModel //make sure that the child has the correct view model (header row doesn't)
-                                                       select child as FrameworkElement).ToArray();
-                        element = (from control in controls
-                                   where (control.DataContext as EquationModel).Id == model.Id
-                                   select control).FirstOrDefault();
-                        if (element != null)
-                        {
-                            RemoveEquationRow((int)element.GetValue(Grid.RowProperty));
-                        }
-                    }
+                    continue;
+                }                
+
+                if (string.IsNullOrEmpty(ec.Model.Equation))
+                {
+                    RemoveEquationRow(i);
+                    i--;
+                    lastNonEmpty--;
                 }
             }
         }

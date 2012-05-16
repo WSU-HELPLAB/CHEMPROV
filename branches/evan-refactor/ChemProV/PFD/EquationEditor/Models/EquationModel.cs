@@ -33,8 +33,6 @@ namespace ChemProV.PFD.EquationEditor.Models
         private EquationType _type = new EquationType();
         private string _equation = "";
         private string _annotation = "";
-        private ObservableCollection<EquationScope> _scopeOptions = new ObservableCollection<EquationScope>();
-        private ObservableCollection<EquationType> _typeOptions = new ObservableCollection<EquationType>();
         #endregion
 
         #region properties
@@ -68,66 +66,6 @@ namespace ChemProV.PFD.EquationEditor.Models
             }
         }
 
-        public ObservableCollection<EquationScope> ScopeOptions
-        {
-            get
-            {
-                return _scopeOptions;
-            }
-            set
-            {
-                ObservableCollection<EquationScope> newScopes = value;
-
-                //remove any invalid scopes
-                foreach (EquationScope scope in _scopeOptions.ToArray())
-                {
-                    if (!newScopes.Contains(scope))
-                    {
-                        _scopeOptions.Remove(scope);
-                    }
-                }
-
-                //add in new scopes
-                foreach (EquationScope scope in newScopes)
-                {
-                    if (!_scopeOptions.Contains(scope))
-                    {
-                        _scopeOptions.Add(scope);
-                    }
-                }
-                OnPropertyChanged("ScopeOptions");
-            }
-        }
-        public ObservableCollection<EquationType> TypeOptions
-        {
-            get
-            {
-                return _typeOptions;
-            }
-            set
-            {
-                ObservableCollection<EquationType> newTypes = value;
-                
-                //remove any invalid types
-                foreach (EquationType type in _typeOptions.ToArray())
-                {
-                    if (!newTypes.Contains(type))
-                    {
-                        _typeOptions.Remove(type);
-                    }
-                }
-
-                //add in new types
-                foreach (EquationType type in newTypes)
-                {
-                    if (!_typeOptions.Contains(type))
-                    {
-                        _typeOptions.Add(type);
-                    }
-                }
-                OnPropertyChanged("TypeOptions");
-            }
-        }
         public EquationScope Scope
         {
             get
@@ -233,7 +171,7 @@ namespace ChemProV.PFD.EquationEditor.Models
             XElement type = xmlModel.Element("Type");
             int typeId = 0;
             string typeName = type.Attribute("Name").Value;
-            Int32.TryParse(scope.Attribute("ClassificationId").Value, out typeId);
+            Int32.TryParse(type.Attribute("ClassificationId").Value, out typeId);
             model.Type = new EquationType((EquationTypeClassification)typeId, typeName);
 
             return model;
