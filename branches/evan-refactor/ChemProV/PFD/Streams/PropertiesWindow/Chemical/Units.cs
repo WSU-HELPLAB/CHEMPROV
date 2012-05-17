@@ -15,13 +15,16 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
     [TypeConverter(typeof(ChemicalUnitsFormatter))]
     public enum ChemicalUnits
     {
-        Percent = 0,
+        MassPercent = 0,
+        MolePercent,
         Grams,
         GramsPerSecond,
         Kilogram,
         KilogramsPerSecond,
         Moles,
-        MolesPerSecond
+        MolesPerSecond,
+        MoleFraction,
+        MassFraction,
     }
 
     /// <summary>
@@ -107,9 +110,23 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                     prettyString = "mol/sec";
                     break;
 
-                case ChemicalUnits.Percent:
-                    prettyString = "%";
+                case ChemicalUnits.MassPercent:
+                    prettyString = "mass %";
                     break;
+
+                case ChemicalUnits.MolePercent:
+                    prettyString = "mol %";
+                    break;
+
+                case ChemicalUnits.MoleFraction:
+                    prettyString = "molFrac";
+                    break;
+
+                case ChemicalUnits.MassFraction:
+                    prettyString = "massFrac";
+                    break;
+
+
             }
             return prettyString;
         }

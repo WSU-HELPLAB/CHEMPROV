@@ -18,7 +18,7 @@ namespace ChemProv.Library.OSBLE
                 return LocalAuthenticationEndpoint;
 #else
                 //otherwise, hit the real server
-                return RemoteOsbideServiceEndpoint;
+                return LocalAuthenticationEndpoint; //return RemoteOsbideServiceEndpoint;
 #endif
             }
         }

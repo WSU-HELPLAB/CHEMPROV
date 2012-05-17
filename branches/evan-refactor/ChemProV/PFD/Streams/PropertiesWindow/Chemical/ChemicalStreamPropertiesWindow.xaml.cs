@@ -74,6 +74,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         //this keeps the record of what table number the table is when it is created
         private const string massTablePrefix = "M";
         private const string moleTablePrefix = "N";
+        private const string percentTablePrefix = "X";
 
         //start with assuming a mass table
         private string tableName = massTablePrefix;
@@ -509,15 +510,25 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
         private void HeaderRowUnitsChanged(object sender, PropertyChangedEventArgs e)
         {
-            //Check to see if we're using moles.  Subtracting 1 because the header doesn't contain the % option
-            if (ItemSource[0].SelectedUnit == ChemicalUnits.Moles - 1 || ItemSource[0].SelectedUnit == ChemicalUnits.MolesPerSecond - 1)
+            //Check to see if we're using moles.
+            if (ItemSource[0].SelectedUnit == ChemicalUnits.Moles
+                || ItemSource[0].SelectedUnit == ChemicalUnits.MolesPerSecond
+                || ItemSource[0].SelectedUnit == ChemicalUnits.MolePercent
+                )
             {
-                ConvertModelLabels("^([mM])(\\d+)$", moleTablePrefix);                
+                ConvertModelLabels("^([mMxX])(\\d+)$", moleTablePrefix);                
+            }
+            else if (ItemSource[0].SelectedUnit == ChemicalUnits.MassFraction
+                || ItemSource[0].SelectedUnit == ChemicalUnits.MoleFraction
+                )
+            {
+                //percents should have "X"
+                ConvertModelLabels("^([nNmM])(\\d+)$", percentTablePrefix);
             }
             else
             {
                 //switch to mass labels
-                ConvertModelLabels("^([nN])(\\d+)$", massTablePrefix);                
+                ConvertModelLabels("^([nNxX])(\\d+)$", massTablePrefix);                
             }
         }
 
