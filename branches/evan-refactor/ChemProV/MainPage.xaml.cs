@@ -524,6 +524,14 @@ namespace ChemProV
 
         private void MainPage_KeyDown(object sender, KeyEventArgs e)
         {
+            // Temporary: capture Ctrl+M to show comment merging button
+            if (e.Key == Key.M && (ModifierKeys.Control == Keyboard.Modifiers))
+            {
+                btnLoadMergeComments.Visibility = System.Windows.Visibility.Visible;
+                e.Handled = true;
+                return;
+            }
+            
             if (WorkSpace.DrawingCanvas.HasFocus1)
             {
                 WorkSpace.DrawingCanvas.GotKeyDown(sender, e);
