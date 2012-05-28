@@ -75,6 +75,24 @@ namespace ChemProV.PFD.StickyNote
             ColorChange(StickyNoteColors.Yellow);
         }
 
+        public StickyNote(XElement xmlNote, DrawingCanvas canvas)
+            : this(canvas)
+        {
+            // Use UI-independent logic to load the note's properties. Ideally ChemProV 
+            // should be architected so that you could deal with ChemProV documents without 
+            // dependency on Silverlight (but it's not even close at this point). The UI-
+            // independent sticky note was a step in this direction.
+            StickyNote_UIIndependent memNote = new StickyNote_UIIndependent(xmlNote, null);
+
+            // Set properties
+            this.Height = memNote.Height;
+            this.CommentText = memNote.Text;
+            this.CommentUserName = memNote.UserName;
+            this.Width = memNote.Width;
+            this.SetValue(Canvas.LeftProperty, memNote.LocationX);
+            this.SetValue(Canvas.TopProperty, memNote.LocationY);
+        }
+
         /// <summary>
         /// This is not currently used but must have it since IPfdElement has it
         /// </summary>
@@ -261,10 +279,8 @@ namespace ChemProV.PFD.StickyNote
         }
 
         /// <summary>
-        /// This isn't used as the IProcessUnitFactory is responsible for the creation
-        /// of new process units.
+        /// (not used, see the FromXml method instead)
         /// </summary>
-        /// <param name="reader"></param>
         public void ReadXml(XmlReader reader)
         {
         }
@@ -277,20 +293,11 @@ namespace ChemProV.PFD.StickyNote
             writer.WriteElementString("Y", GetValue(Canvas.TopProperty).ToString());
             writer.WriteEndElement();
 
-            // The design decision on sticky note colors ended up being that they are to be 
-            // determined by the user that created them. Therefore, we don't save or load 
-            // them. Their colors will be determined when they are loaded and this depends on 
-            // whether you're just opening a file, doing a comment merge, etc.
-            //writer.WriteStartElement("Color");
-            //writer.WriteString(this.color.ToString());
-            //writer.WriteEndElement();
-
             //and the stickey note's content
             writer.WriteStartElement("Content");
             writer.WriteString(Note.Text);
             writer.WriteEndElement();
 
-            // E.O.
             // Write the size as well
             writer.WriteElementString("Size", string.Format("{0},{1}", Width, Height));
 
@@ -299,66 +306,6 @@ namespace ChemProV.PFD.StickyNote
             {
                 writer.WriteElementString("UserName", CommentUserName);
             }
-        }
-
-        /// <summary>
-        /// Creates a new StickyNote based on the supplied XML element
-        /// </summary>
-        /// <param name="xmlNote">The xml for a StickyNote</param>
-        /// <returns></returns>
-        public static StickyNote FromXml(XElement xmlNote, DrawingCanvas canvas)
-        {
-            StickyNote note = new StickyNote(canvas);
-
-            //pull out content & color
-            note.Note.Text = xmlNote.Element("Content").Value;
-            
-            // The design decision on sticky note colors ended up being that they are to be 
-            // determined by the user that created them. Therefore, we don't save or load 
-            // them. Their colors will be determined when they are loaded and this depends on 
-            // whether you're just opening a file, doing a comment merge, etc.
-            //note.ColorChange(StickyNoteColorsFromString(xmlNote.Element("Color").Value));
-
-            //use LINQ to find us the X,Y coords
-            var location = from c in xmlNote.Elements("Location")
-                           select new
-                           {
-                               x = (string)c.Element("X"),
-                               y = (string)c.Element("Y")
-                           };
-            note.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
-            note.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
-
-            // E.O.
-            // Load the size information. If it is not present, default to 100x100
-            XElement sizeEl = xmlNote.Element("Size");
-            if (null == sizeEl)
-            {
-                note.Width = note.Height = 100.0;
-            }
-            else
-            {
-                Point sizeAsPt;
-                if (Core.App.TryParsePoint(sizeEl.Value, out sizeAsPt))
-                {
-                    note.Width = sizeAsPt.X;
-                    note.Height = sizeAsPt.Y;
-                }
-                else
-                {
-                    note.Width = note.Height = 100.0;
-                }
-            }
-
-            // Look for a user name
-            XElement userEl = xmlNote.Element("UserName");
-            if (null != userEl)
-            {
-                note.CommentUserName = userEl.Value;
-            }
-
-            //return the processed note
-            return note;
         }
 
         #endregion IXmlSerializable Members
@@ -474,7 +421,7 @@ namespace ChemProV.PFD.StickyNote
             }
             else
             {
-                sn = FromXml(optionalToLoadFromXML, canvas);
+                sn = new StickyNote(optionalToLoadFromXML, canvas);
             }
             sn.m_commentParent = parent;
             canvas.AddNewChild(sn);
@@ -489,24 +436,44 @@ namespace ChemProV.PFD.StickyNote
             // Compute a location if we don't have XML data
             if (null == optionalToLoadFromXML)
             {
-                Point location;
-                AbstractStream stream = parent as AbstractStream;
-                if (null == stream)
+                int attempts = 0;
+                while (true)
                 {
-                    location = (parent as IProcessUnit).MidPoint;
-                }
-                else
-                {
-                    location = stream.StreamLineMidpoint;
-                }
+                    Point location;
+                    AbstractStream stream = parent as AbstractStream;
+                    if (null == stream)
+                    {
+                        location = (parent as IProcessUnit).MidPoint;
+                    }
+                    else
+                    {
+                        location = stream.StreamLineMidpoint;
+                    }
 
-                // Compute a location
-                double radius = 150.0;
-                int count = (parent as Core.ICommentCollection).CommentCount;
-                double angle = (double)(count % 6) * 60.0 / 180.0 * Math.PI;
-                sn.Location = new Point(
-                    location.X + radius * Math.Cos(angle),
-                    location.Y + radius * Math.Sin(angle));
+                    // Compute a location
+                    double radius = 150.0;
+                    int count = (parent as Core.ICommentCollection).CommentCount;
+                    double angle = (double)(count % 6) * 60.0 / 180.0 * Math.PI;
+                    sn.Location = new Point(
+                        location.X + radius * Math.Cos(angle),
+                        location.Y + radius * Math.Sin(angle));
+
+                    if (sn.IsOffCanvas(sn))
+                    {
+                        attempts++;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                    // Give up if we've tried too many times
+                    if (attempts > 6)
+                    {
+                        sn.Location = new Point(location.X + radius, location.Y);
+                        break;
+                    }
+                }
             }
 
             // Make sure that when the parent moves we update the line
@@ -650,6 +617,15 @@ namespace ChemProV.PFD.StickyNote
                 default:
                     return StickyNoteColors.Yellow;
             }
+        }
+
+        private bool IsOffCanvas(StickyNote sn)
+        {
+            double left = (double)sn.GetValue(Canvas.LeftProperty);
+            double top = (double)sn.GetValue(Canvas.TopProperty);
+            return (left < 0.0 || top < 0.0);
+
+            // TODO: Checks on the right and bottom edges with respect to the drawing canvas
         }
     }
 }

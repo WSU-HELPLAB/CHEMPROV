@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <MinimumVisualStudioVersion>10.0</MinimumVisualStudioVersion>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{CDF84A87-F71F-44FC-9FA4-2AC97133C983}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PortableChemProV</RootNamespace>
+    <AssemblyName>PortableChemProV</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkProfile>Profile4</TargetFrameworkProfile>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{786C830F-07A1-408B-BD7F-6EE04809D6DB};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\ChemProV\Core\CommentMerger.cs">
+      <Link>Core\CommentMerger.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationModel.cs">
+      <Link>PFD\EquationEditor\Model\EquationModel.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationModifierComparer.cs">
+      <Link>PFD\EquationEditor\Model\EquationModifierComparer.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationScope.cs">
+      <Link>PFD\EquationEditor\Model\EquationScope.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationScopeClassification.cs">
+      <Link>PFD\EquationEditor\Model\EquationScopeClassification.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationType.cs">
+      <Link>PFD\EquationEditor\Model\EquationType.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationTypeClassification.cs">
+      <Link>PFD\EquationEditor\Model\EquationTypeClassification.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\IEquationModifier.cs">
+      <Link>PFD\EquationEditor\Model\IEquationModifier.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\ReadOnlyEquationModel.cs">
+      <Link>PFD\EquationEditor\Model\ReadOnlyEquationModel.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\IPfdElement.cs">
+      <Link>PFD\IPfdElement.cs</Link>
+    </Compile>
+    <Compile Include="..\ChemProV\PFD\StickyNote\StickyNote_UIIndependent.cs">
+      <Link>PFD\StickyNote\StickyNote_UIIndependent.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Xml.Linq" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

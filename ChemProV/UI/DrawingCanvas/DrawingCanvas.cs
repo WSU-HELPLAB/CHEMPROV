@@ -777,7 +777,7 @@ namespace ChemProV.UI.DrawingCanvas
         /// </summary>
         /// <param name="doc"></param>
         public void LoadXmlElements(XElement doc)
-        {
+        {            
             // Process units first
             XElement processUnits = doc.Descendants("ProcessUnits").ElementAt(0);
             foreach (XElement unit in processUnits.Elements())
@@ -851,7 +851,7 @@ namespace ChemProV.UI.DrawingCanvas
             XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
             foreach (XElement note in stickyNoteList.Elements())
             {
-                StickyNote sn = StickyNote.FromXml(note, this);
+                StickyNote sn = new StickyNote(note, this);
                 AddNewChild(sn);
             }
 
@@ -867,9 +867,36 @@ namespace ChemProV.UI.DrawingCanvas
                 dse.EndpointConnectionChanged(dse.Type, null, null);
             }
 
+            // Go through all sticky notes on the canvas and assign colors
+            Dictionary<string, StickyNoteColors> clrs = new Dictionary<string, StickyNoteColors>();
+            foreach (UIElement uie in Children)
+            {
+                StickyNote sn = uie as StickyNote;
+                if (null == sn)
+                {
+                    continue;
+                }
+
+                // Assign a color based on the user name
+                if (!string.IsNullOrEmpty(sn.CommentUserName))
+                {
+                    if (!clrs.ContainsKey(sn.CommentUserName))
+                    {
+                        StickyNoteColors clr = StickyNote.GetNextUserStickyColor();
+                        clrs[sn.CommentUserName] = clr;
+                        sn.ColorChange(clr);
+                    }
+                    else
+                    {
+                        sn.ColorChange(clrs[sn.CommentUserName]);
+                    }
+                }
+            }
+
             PFDModified();
         }
 
+        [Obsolete("Use the UI-independent static logic in ChemProV.Core.CommentMerger")]
         public List<IUndoRedoAction> MergeCommentsFrom(XElement doc, string userNameIfNotInXml)
         {
             DrawingCanvas dc = new DrawingCanvas();
