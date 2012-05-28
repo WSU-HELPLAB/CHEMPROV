@@ -130,6 +130,7 @@
     </Compile>
     <Compile Include="Core\App.cs" />
     <Compile Include="Core\CommentLogic.cs" />
+    <Compile Include="Core\CommentMerger.cs" />
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\CommentDefs.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
@@ -159,6 +160,7 @@
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
     <Compile Include="PFD\EquationEditor\Models\IEquationModifier.cs" />
+    <Compile Include="PFD\EquationEditor\Models\ReadOnlyEquationModel.cs" />
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />
@@ -187,6 +189,7 @@
     <Compile Include="PFD\StickyNote\StickyNote.xaml.cs">
       <DependentUpon>StickyNote.xaml</DependentUpon>
     </Compile>
+    <Compile Include="PFD\StickyNote\StickyNote_UIIndependent.cs" />
     <Compile Include="PFD\Streams\AbstractStream.xaml.cs">
       <DependentUpon>AbstractStream.xaml</DependentUpon>
     </Compile>

@@ -249,6 +249,7 @@ namespace ChemProV.UI
             //clear out previous data
             DrawingCanvas.ClearDrawingCanvas();
             EquationEditor.ClearEquations();
+            m_snUserColors.Clear();
 
             //tell the drawing drawing_canvas to load its new children
             DrawingCanvas.LoadXmlElements(doc.Descendants("DrawingCanvas").ElementAt(0));
@@ -377,6 +378,7 @@ namespace ChemProV.UI
             }
         }
 
+        [Obsolete("Use the UI-independent static logic in ChemProV.Core.CommentMerger")]
         public void MergeCommentsFrom(System.IO.Stream stream)
         {
             XDocument doc = XDocument.Load(stream);

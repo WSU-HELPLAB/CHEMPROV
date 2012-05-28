@@ -36,8 +36,6 @@ namespace ChemProV.PFD.EquationEditor
 
         #region instance variables
 
-        private object selectedTool;
-
         private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
@@ -284,33 +282,17 @@ namespace ChemProV.PFD.EquationEditor
 
             newRow.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
 
-            // I think I have all of this taken care of in EquationControl.cs
-            // |
-            // |
-            // V
-            //ScopeControl scopeControl = new ScopeControl();
-            //scopeControl.SetValue(Grid.RowProperty, rowNumber);
-            //scopeControl.SetValue(Grid.ColumnProperty, 2);
-            //scopeControl.DataContext = newRowModel;
-            //try
-            //{
-            //    scopeControl.ScopeComboBox.SelectedItem = newRowModel.Scope;
-            //}
-            //catch (Exception)
-            //{
-            //    // This probably isn't a problem
-            //}
-            //EquationsGrid.Children.Add(scopeControl);
-
             return newRow.Model;
         }
 
         /// <summary>
-        /// Removes an equation row from the list of equations
+        /// Removes an equation row from the list
         /// </summary>
         private void RemoveEquationRow(int rowNumber)
         {
             // Every child in the stack panel is a row
+            // TODO: Make this more robust and resistant to changes that add more controls in the 
+            // equation stack panel
             EquationsGrid.Children.RemoveAt(rowNumber);
         }
 
@@ -358,7 +340,7 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             // Update all of the equation controls
-            for (int i = 0; i < EqRowCount; i++)
+            for (int i = 0; i < EquationRowCount; i++)
             {
                 EquationControl ec = GetRow(i);
                 ec.SetScopeOptions(EquationScopes);
@@ -470,7 +452,7 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             // Update the type options for each row
-            for (int i = 0; i < EqRowCount; i++)
+            for (int i = 0; i < EquationRowCount; i++)
             {
                 GetRow(i).SetTypeOptions(EquationTypes);
             }
@@ -576,7 +558,7 @@ namespace ChemProV.PFD.EquationEditor
 
             // Find the index of the last row that has a non-empty equation in it
             int lastNonEmpty = -1;
-            int i = EqRowCount - 1;
+            int i = EquationRowCount - 1;
             while (i >= 0)
             {
                 if (!string.IsNullOrEmpty(GetRow(i).Model.Equation))
@@ -589,7 +571,7 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             // Do we have a non-empty equation in the last row?  If so, add a new one
-            if (EqRowCount - 1 == lastNonEmpty)
+            if (EquationRowCount - 1 == lastNonEmpty)
             {
                 AddNewEquationRow();
             }
@@ -614,11 +596,32 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        private int EqRowCount
+        public int EquationRowCount
         {
             get
             {
-                return EquationsGrid.Children.Count;
+                int rowsSeen = 0;
+
+                // Iterate through the itms in the stack panel of equation controls. At the time of this writing, 
+                // the only items in here will be EquationControl objects, so we could just do:
+                //   return EquationsGrid.Children.Count
+                // However, in the future I could see things such as equation feedback elements being added beneath 
+                // equation controls in this panel for usability purposes. Therefore we do an iteration through the 
+                // children, which is more robust for the future.
+                foreach (UIElement uie in EquationsGrid.Children)
+                {
+                    EquationControl ec = uie as EquationControl;
+                    if (null == ec)
+                    {
+                        continue;
+                    }
+
+                    // We have passed up another row
+                    rowsSeen++;
+                }
+
+                // Return the number of rows we saw
+                return rowsSeen;
             }
         }
 
@@ -649,5 +652,35 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         #endregion IXmlSerializable Members
+
+        //public ReadOnlyEquationModel GetEquationModel(int rowIndex)
+        //{
+        //    EquationModel em = GetRow(rowIndex).Model;
+        //    if (null == em)
+        //    {
+        //        return null;
+        //    }
+
+        //    return new ReadOnlyEquationModel(em);
+        //}
+
+        /// <summary>
+        /// Use for testing purposes only. Ideally in the future the commented-out version above would 
+        /// be used so that equation model modifications could only happen through the control, but I 
+        /// just haven't done all the appropriate refactoring at this time.
+        /// </summary>
+        public EquationModel GetEquationModel(int rowIndex)
+        {
+            return GetRow(rowIndex).Model;
+        }
+
+        public void AddNewEquationRow(EquationType type, EquationScope scope, string equation, string annotation)
+        {
+            EquationModel model = AddNewEquationRow();
+            model.Type = type;
+            model.Scope = scope;
+            model.Equation = equation;
+            model.Annotation = annotation;
+        }
     }
 }
