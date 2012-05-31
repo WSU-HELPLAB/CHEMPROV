@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Web", "ChemProV.We
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.UnitTests", "ChemProV.UnitTests\ChemProV.UnitTests.csproj", "{2234DF9A-DE8E-44CC-A9F0-878954AD62E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProv.Library", "ChemProv.Library\ChemProv.Library.csproj", "{DF61D940-8605-4098-AFA7-26823E579870}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Library", "ChemProv.Library\ChemProV.Library.csproj", "{DF61D940-8605-4098-AFA7-26823E579870}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProV", "PortableChemProV\PortableChemProV.csproj", "{CDF84A87-F71F-44FC-9FA4-2AC97133C983}"
 EndProject

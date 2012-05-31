@@ -9,10 +9,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProv.Library.OSBLE.ViewModels;
+using ChemProV.Library.OSBLE.ViewModels;
 using System.Windows.Threading;
 
-namespace ChemProv.Library.OSBLE.Views
+namespace ChemProV.Library.OSBLE.Views
 {
     public partial class LoginWindow : ChildWindow
     {

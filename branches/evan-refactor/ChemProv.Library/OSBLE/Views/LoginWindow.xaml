@@ -1,4 +1,4 @@
-﻿<controls:ChildWindow x:Class="ChemProv.Library.OSBLE.Views.LoginWindow"
+﻿<controls:ChildWindow x:Class="ChemProV.Library.OSBLE.Views.LoginWindow"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"

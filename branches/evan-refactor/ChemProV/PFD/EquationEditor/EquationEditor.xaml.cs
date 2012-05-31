@@ -146,11 +146,17 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// Will remove all existing equations currently listed in the equation editor.
+        /// Will remove all existing equations currently listed in the equation editor. Can 
+        /// optionally add in the default blank row if desired.
         /// </summary>
-        public void ClearEquations()
+        public void ClearEquations(bool addDefaultBlank)
         {
             EquationsGrid.Children.Clear();
+
+            if (addDefaultBlank)
+            {
+                AddNewEquationRow();
+            }
         }
 
         public void LoadXmlElements(XElement doc)

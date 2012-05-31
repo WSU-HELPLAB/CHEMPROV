@@ -31,8 +31,8 @@ using ChemProV.UI.DrawingCanvas;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
-using ChemProv.Library.OSBLE.Views;
-using ChemProv.Library.OsbleServices;
+using ChemProV.Library.OSBLE.Views;
+using ChemProV.Library.OsbleServices;
 
 namespace ChemProV
 {
@@ -49,12 +49,6 @@ namespace ChemProV
 
     public partial class MainPage : UserControl
     {
-        /// <summary>
-        /// This requests for a NewBlankMainPage to be created
-        /// </summary>
-        public event EventHandler RequestNewBlankMainPage = delegate { };
-        public event RequestOpenFileEventHandler RequestOpenFile = delegate { };
-
         private string versionNumber = "";
         private const string saveFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml|Portable Network Graphics (*.png)|*.png";
         private const string loadFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml";
@@ -67,6 +61,14 @@ namespace ChemProV
         /// </summary>
         private OptionDifficultySetting currentDifficultySetting;
         private DispatcherTimer saveTimer = new DispatcherTimer();
+
+        /// <summary>
+        /// When non-null, this stream is where we write to when the "Save" button is clicked. The 
+        /// "Save as..." button click will change it if necessary.
+        /// </summary>
+        private Stream m_currentStream = null;
+
+        private bool m_lastSaveWasPNG = false;
 
         /// <summary>
         /// This gets or sets the current difficulty setting
@@ -123,7 +125,7 @@ namespace ChemProV
             return true;
         }
 
-        public MainPage(FileInfo fileInfo = null)
+        public MainPage()
         {
             // Required to initialize variables
             InitializeComponent();
@@ -164,21 +166,9 @@ namespace ChemProV
                 versionNumber = assemblyName.Version.ToString();
             }
 
-            if (fileInfo != null)
-            {
-                OpenFile(fileInfo);
-            }
-
             // E.O.
             // Intialize the static App class
             Core.App.Init(WorkSpace, PrimaryPalette);
-        }
-
-        private void OpenFile(FileInfo file)
-        {
-            FileStream fs = file.OpenRead();
-            LoadChemProVFile(fs);
-            fs.Dispose();
         }
 
         public void LoadChemProVFile(Stream stream)
@@ -212,7 +202,7 @@ namespace ChemProV
 
         private void WorkSpace_ValidationChecked(object sender, EventArgs e)
         {
-            if (saveTimer.IsEnabled == false)
+            if (!saveTimer.IsEnabled)
             {
                 saveTimer.Start();
                 Saving_TextBlock.Text = "";
@@ -318,6 +308,12 @@ namespace ChemProV
 
         public void SaveChemProVFile(Stream stream)
         {
+            // This stream may represent an existing file which could potentially be larger than the 
+            // data that we're about to write. Thus, we start by seeking to the beginning and setting the 
+            // length to 0.
+            stream.Position = 0;
+            stream.SetLength(0);
+            
             XmlSerializer canvasSerializer = new XmlSerializer(typeof(DrawingCanvas));
             XmlSerializer equationSerializer = new XmlSerializer(typeof(EquationEditor));
             XmlSerializer feedbackWindowSerializer = new XmlSerializer(typeof(FeedbackWindow));
@@ -357,7 +353,77 @@ namespace ChemProV
             saveTimer.Start();
         }
 
-        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
+        private void SavePNG(Stream output)
+        {
+            //when saving to image, we really need to keep track of three things:
+            //   1: the drawing drawing_canvas (duh?)
+            //   2: the list of equations
+            //   3: the feedback messages
+            //
+            //In order to do this, we need to create one master image that houses
+            //all three subcomponents.
+            //set 1: find the total size of the image to create:
+
+            //note that we're using the Max height of the equation editor and feedback window
+            //as they share the same space so we only need to know the size of the largest.
+            int height = (int)WorkSpace.DrawingCanvas.ActualHeight
+                       + Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
+
+            //width can just be the drawing_canvas as the drawing_canvas is always the largest object
+            int width = (int)WorkSpace.DrawingCanvas.ActualWidth;
+
+            //with width and height determined, create our writeable bitmap,
+            //along with bitmaps for the drawing drawing_canvas, equation editor, and feedback window
+            WriteableBitmap finalBmp = new WriteableBitmap(width, height);
+            WriteableBitmap canvasBmp = new WriteableBitmap((int)WorkSpace.DrawingCanvas.ActualWidth, (int)WorkSpace.DrawingCanvas.ActualHeight);
+            WriteableBitmap equationBmp = new WriteableBitmap((int)WorkSpace.EquationEditor.ActualWidth, (int)WorkSpace.EquationEditor.ActualHeight);
+            WriteableBitmap feedbackBmp = new WriteableBitmap((int)WorkSpace.FeedbackWindow.ActualWidth, (int)WorkSpace.FeedbackWindow.ActualHeight);
+
+            //step 2: tell each bmp to store an image of their respective controls
+            canvasBmp.Render(WorkSpace.DrawingCanvas, null);
+            canvasBmp.Invalidate();
+
+            equationBmp.Render(WorkSpace.EquationEditor, null);
+            equationBmp.Invalidate();
+
+            feedbackBmp.Render(WorkSpace.FeedbackWindow, null);
+            feedbackBmp.Invalidate();
+
+            //step 3: compose all sub images into the final image
+            //feedback / equations go on top
+            for (int x = 0; x < feedbackBmp.PixelWidth; x++)
+            {
+                for (int y = 0; y < feedbackBmp.PixelHeight; y++)
+                {
+                    finalBmp.Pixels[y * finalBmp.PixelWidth + x] = feedbackBmp.Pixels[y * feedbackBmp.PixelWidth + x];
+                }
+            }
+
+            //next to feedback goes equations
+            for (int x = 0; x < equationBmp.PixelWidth; x++)
+            {
+                for (int y = 0; y < equationBmp.PixelHeight; y++)
+                {
+                    finalBmp.Pixels[y * finalBmp.PixelWidth + (feedbackBmp.PixelWidth + x)] = equationBmp.Pixels[y * equationBmp.PixelWidth + x];
+                }
+            }
+
+            //finally, do the drawing drawing_canvas
+            int verticalOffset = Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
+            for (int x = 0; x < canvasBmp.PixelWidth; x++)
+            {
+                for (int y = 0; y < canvasBmp.PixelHeight; y++)
+                {
+                    finalBmp.Pixels[(y + verticalOffset) * finalBmp.PixelWidth + x] = canvasBmp.Pixels[y * canvasBmp.PixelWidth + x];
+                }
+            }
+
+            ImageTools.Image foo = finalBmp.ToImage();
+            PngEncoder encoder = new PngEncoder();
+            encoder.Encode(foo, output);
+        }
+
+        private void SaveFileAs_BtnClick(object sender, RoutedEventArgs e)
         {
             SaveFileDialog saveDialog = new SaveFileDialog();
             saveDialog.Filter = saveFileFilter;
@@ -374,103 +440,47 @@ namespace ChemProV
             {
                 //MessageBox.Show(ex.ToString());
             }
-            if (saveResult == true)
+
+            if (!saveResult.HasValue || !saveResult.Value)
             {
-                using (Stream stream = saveDialog.OpenFile())
+                // If the user didn't click "OK" in the dialog then we just return
+                return;
+            }
+
+            // Open the output file stream. We keep a reference to this and do NOT dispose it when 
+            // we're done writing.
+            m_currentStream = saveDialog.OpenFile();
+
+            // For whatever reason, filter indices start at 1. An index of 1 means that we want 
+            // to save the regular ChemProV XML.
+            if (1 == saveDialog.FilterIndex)
+            {
+                SaveChemProVFile(m_currentStream);
+                m_lastSaveWasPNG = false;
+                using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    //filterIndex of zero corresponds to XML
-                    if (saveDialog.FilterIndex == 1)
+                    //remove the temp file because we just saved;
+                    if (isf.FileExists(autoSaveFileName))
                     {
-                        SaveChemProVFile(stream);
-                        stream.Close();
-                        using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
-                        {
-                            //remove the temp file because we just saved;
-                            if (isf.FileExists(autoSaveFileName))
-                            {
-                                isf.DeleteFile(autoSaveFileName);
-                            }
-                        }
-                    }
-                    //filter index of 2 means save as PNG
-                    else if (saveDialog.FilterIndex == 2)
-                    {
-                        //when saving to image, we really need to keep track of three things:
-                        //   1: the drawing drawing_canvas (duh?)
-                        //   2: the list of equations
-                        //   3: the feedback messages
-                        //
-                        //In order to do this, we need to create one master image that houses
-                        //all three subcomponents.
-                        //set 1: find the total size of the image to create:
-
-                        //note that we're using the Max height of the equation editor and feedback window
-                        //as they share the same space so we only need to know the size of the largest.
-                        int height = (int)WorkSpace.DrawingCanvas.ActualHeight
-                                   + Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
-
-                        //width can just be the drawing_canvas as the drawing_canvas is always the largest object
-                        int width = (int)WorkSpace.DrawingCanvas.ActualWidth;
-
-                        //with width and height determined, create our writeable bitmap,
-                        //along with bitmaps for the drawing drawing_canvas, equation editor, and feedback window
-                        WriteableBitmap finalBmp = new WriteableBitmap(width, height);
-                        WriteableBitmap canvasBmp = new WriteableBitmap((int)WorkSpace.DrawingCanvas.ActualWidth, (int)WorkSpace.DrawingCanvas.ActualHeight);
-                        WriteableBitmap equationBmp = new WriteableBitmap((int)WorkSpace.EquationEditor.ActualWidth, (int)WorkSpace.EquationEditor.ActualHeight);
-                        WriteableBitmap feedbackBmp = new WriteableBitmap((int)WorkSpace.FeedbackWindow.ActualWidth, (int)WorkSpace.FeedbackWindow.ActualHeight);
-
-                        //step 2: tell each bmp to store an image of their respective controls
-                        canvasBmp.Render(WorkSpace.DrawingCanvas, null);
-                        canvasBmp.Invalidate();
-
-                        equationBmp.Render(WorkSpace.EquationEditor, null);
-                        equationBmp.Invalidate();
-
-                        feedbackBmp.Render(WorkSpace.FeedbackWindow, null);
-                        feedbackBmp.Invalidate();
-
-                        //step 3: compose all sub images into the final image
-                        //feedback / equations go on top
-                        for (int x = 0; x < feedbackBmp.PixelWidth; x++)
-                        {
-                            for (int y = 0; y < feedbackBmp.PixelHeight; y++)
-                            {
-                                finalBmp.Pixels[y * finalBmp.PixelWidth + x] = feedbackBmp.Pixels[y * feedbackBmp.PixelWidth + x];
-                            }
-                        }
-
-                        //next to feedback goes equations
-                        for (int x = 0; x < equationBmp.PixelWidth; x++)
-                        {
-                            for (int y = 0; y < equationBmp.PixelHeight; y++)
-                            {
-                                finalBmp.Pixels[y * finalBmp.PixelWidth + (feedbackBmp.PixelWidth + x)] = equationBmp.Pixels[y * equationBmp.PixelWidth + x];
-                            }
-                        }
-
-                        //finally, do the drawing drawing_canvas
-                        int verticalOffset = Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
-                        for (int x = 0; x < canvasBmp.PixelWidth; x++)
-                        {
-                            for (int y = 0; y < canvasBmp.PixelHeight; y++)
-                            {
-                                finalBmp.Pixels[(y + verticalOffset) * finalBmp.PixelWidth + x] = canvasBmp.Pixels[y * canvasBmp.PixelWidth + x];
-                            }
-                        }
-
-                        ImageTools.Image foo = finalBmp.ToImage();
-                        PngEncoder encoder = new PngEncoder();
-                        encoder.Encode(foo, stream);
+                        isf.DeleteFile(autoSaveFileName);
                     }
                 }
+
+                ToolTipService.SetToolTip(btnSave, "Save \"" + saveDialog.SafeFileName + "\"");
+            }
+            //filter index of 2 means save as PNG
+            else if (saveDialog.FilterIndex == 2)
+            {
+                m_lastSaveWasPNG = true;
+                SavePNG(m_currentStream);
+
+                ToolTipService.SetToolTip(btnSave, "Save \"" + saveDialog.SafeFileName + "\"");
             }
         }
 
         /// <summary>
         /// Will open a new file to edit
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openDialog = new OpenFileDialog();
@@ -479,35 +489,80 @@ namespace ChemProV
 
             openFileResult = openDialog.ShowDialog();
 
-            if (openFileResult == true)
+            // Make sure that the user selected a file and clicked OK
+            if (!openFileResult.HasValue || !openFileResult.Value)
             {
-                bool openFile = false;
-                if (WorkSpace.DrawingCanvas.Children.Count > 0)
-                {
-                    MessageBoxResult result = MessageBox.Show("Opening a new file will erase the current process flow diagram.  Click OK to continue or CANCEL to go back and save.  This action cannot be undone.", "Open File Confirmation", MessageBoxButton.OKCancel);
-                    if (result == MessageBoxResult.OK)
-                    {
-                        openFile = true;
-                    }
-                }
-                else
+                return;
+            }
+
+            bool openFile = false;
+            if (WorkSpace.DrawingCanvas.Children.Count > 0)
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Opening a new file will erase the current process flow diagram.  " + 
+                    "Click OK to continue or CANCEL to go back and save.  This action cannot be undone.",
+                    "Open File Confirmation", MessageBoxButton.OKCancel);
+                if (MessageBoxResult.OK == result)
                 {
                     openFile = true;
                 }
+            }
+            else
+            {
+                openFile = true;
+            }
 
-                if (openFile)
+            if (openFile)
+            {
+                //delete the tempory file as they do not want it
+                using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    //delete the tempory file as they do not want it
-                    using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+                    if (isf.FileExists(autoSaveFileName))
                     {
-                        if (isf.FileExists(autoSaveFileName))
-                        {
-                            isf.DeleteFile(autoSaveFileName);
-                        }
+                        isf.DeleteFile(autoSaveFileName);
                     }
-
-                    RequestOpenFile(this, new RequestOpenFileArgs(openDialog.File));
                 }
+
+                // Dispose the save file, if we have one
+                if (null != m_currentStream)
+                {
+                    m_currentStream.Dispose();
+                    m_currentStream = null;
+
+                    ToolTipService.SetToolTip(btnSave, "Save");
+                }
+
+                FileStream fs;
+                try
+                {
+                    fs = openDialog.File.Open(FileMode.Open, FileAccess.ReadWrite);
+                }
+                catch (Exception)
+                {
+                    // Try opening for reading only if opening read/write failed
+                    try
+                    {
+                        fs = openDialog.File.OpenRead();
+                        LoadChemProVFile(fs);
+                        fs.Dispose();
+                        return;
+                    }
+                    catch (Exception)
+                    {
+                        MessageBox.Show("The specified file could not be opened");
+                        return;
+                    }
+                }
+                
+                // This means we succeeded in opening the file for reading and writing
+                // Start by loading the actual PFD data
+                LoadChemProVFile(fs);
+                
+                // Store a reference to the stream so that when we save, we overwrite it
+                m_currentStream = fs;
+
+                // Set the tooltip on the save button
+                ToolTipService.SetToolTip(btnSave, "Save " + openDialog.File.Name);
             }
         }
 
@@ -573,8 +628,8 @@ namespace ChemProV
                     }
                 }
 
-                //why mess around this will completely reset everything
-                RequestNewBlankMainPage(this, EventArgs.Empty);
+                // Call the clear function to clear everything on the page
+                Clear();
             }
         }
 
@@ -679,6 +734,48 @@ namespace ChemProV
             {
                 return WorkSpace;
             }
+        }
+
+        private void btnSave_Click(object sender, RoutedEventArgs e)
+        {
+            // If we don't have an active stream to overwrite, then we call the "save as" function
+            if (null == m_currentStream)
+            {
+                SaveFileAs_BtnClick(sender, e);
+                return;
+            }
+
+            // Otherwise we overwrite
+            if (m_lastSaveWasPNG)
+            {
+                SavePNG(m_currentStream);
+            }
+            else
+            {
+                SaveChemProVFile(m_currentStream);
+            }
+        }
+
+        private void Clear()
+        {
+            // Clear the workspace (which will clear the drawing canvas and equation editor)
+            WorkSpace.ClearWorkSpace();
+
+            // Clear the "last save" label
+            Saving_TextBlock.Text = string.Empty;
+
+            // Set the save button's tooltip back to "Save"
+            ToolTipService.SetToolTip(btnSave, "Save");
+
+            // Reset the saving related stuff
+            m_lastSaveWasPNG = false;
+            if (null != m_currentStream)
+            {
+                m_currentStream.Dispose();
+            }
+            m_currentStream = null;
+
+            // TODO - anything else?
         }
     }
 }

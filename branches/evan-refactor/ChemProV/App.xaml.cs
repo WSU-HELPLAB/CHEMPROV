@@ -41,7 +41,8 @@ namespace ChemProV
             //check and download update
             this.CheckAndDownloadUpdateAsync();
 
-            this.RootVisual = new ChemProVHolder();
+            //this.RootVisual = new ChemProVHolder();
+            this.RootVisual = new MainPage();
         }
 
         private void Application_Exit(object sender, EventArgs e)

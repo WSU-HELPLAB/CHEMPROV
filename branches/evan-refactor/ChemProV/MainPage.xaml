@@ -34,8 +34,11 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Click="OpenFileButton_Click" ToolTipService.ToolTip="Open a saved file">
                     <Image Source="/UI/Icons/toolbar_open.png" />
                 </Button>
-                <Button Margin="0,0,5,0" Click="SaveFileButton_Click" ToolTipService.ToolTip="Save the current PFD">
+                <Button Margin="0,0,5,0" Name="btnSave" ToolTipService.ToolTip="Save" Click="btnSave_Click">
                     <Image Source="/UI/Icons/toolbar_save.png" />
+                </Button>
+                <Button Margin="0,0,5,0" Click="SaveFileAs_BtnClick" ToolTipService.ToolTip="Save as...">
+                    <Image Source="/UI/Icons/toolbar_saveas.png" />
                 </Button>
                 <Button Margin="0,0,5,0" Click="UndoButton_Click" ToolTipService.ToolTip="Undo last action">
                     <Image Source="/UI/Icons/toolbar_undo.png" />

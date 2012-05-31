@@ -458,7 +458,7 @@ namespace ChemProV.PFD.StickyNote
                         location.X + radius * Math.Cos(angle),
                         location.Y + radius * Math.Sin(angle));
 
-                    if (sn.IsOffCanvas(sn))
+                    if (sn.IsOffCanvas(sn) || StickyNote.ContainsCommentSNAt(sn.Location, parent))
                     {
                         attempts++;
                     }
@@ -467,10 +467,36 @@ namespace ChemProV.PFD.StickyNote
                         break;
                     }
 
-                    // Give up if we've tried too many times
+                    // Try cascading if radial position failed
                     if (attempts > 6)
                     {
-                        sn.Location = new Point(location.X + radius, location.Y);
+                        // Reset attempts because we're about to try another method of positioning
+                        attempts = 0;
+                        
+                        double offset = 10.0;
+                        while (true)
+                        {
+                            sn.Location = new Point(
+                                location.X + radius + offset, location.Y + offset);
+
+                            if (!sn.IsOffCanvas(sn) && 
+                                !StickyNote.ContainsCommentSNAt(sn.Location, parent))
+                            {
+                                // This position works
+                                break;
+                            }
+
+                            attempts++;
+                            if (attempts > 50)
+                            {
+                                // Just give up and choose an arbitrary position
+                                sn.Location = new Point(location.X + radius, location.Y);
+                                break;
+                            }
+
+                            // Increase the offset for the next attempt
+                            offset += 10.0;
+                        }
                         break;
                     }
                 }
@@ -626,6 +652,23 @@ namespace ChemProV.PFD.StickyNote
             return (left < 0.0 || top < 0.0);
 
             // TODO: Checks on the right and bottom edges with respect to the drawing canvas
+        }
+
+        private static bool ContainsCommentSNAt(Point location, Core.ICommentCollection parent)
+        {
+            for (int i = 0; i < parent.CommentCount; i++)
+            {
+                StickyNote sn = parent.GetCommentAt(i) as StickyNote;
+                if (null != sn)
+                {
+                    if (sn.Location.Equals(location))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
     }
 }

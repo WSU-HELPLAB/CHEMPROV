@@ -9,7 +9,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 
-namespace ChemProv.Library.OSBLE
+namespace ChemProV.Library.OSBLE
 {
     public class DelegateCommand : ICommand
     {
