@@ -125,9 +125,6 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ChemProVHolder.xaml.cs">
-      <DependentUpon>ChemProVHolder.xaml</DependentUpon>
-    </Compile>
     <Compile Include="Core\App.cs" />
     <Compile Include="Core\CommentLogic.cs" />
     <Compile Include="Core\CommentMerger.cs" />
@@ -307,10 +304,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Page Include="ChemProVHolder.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
     <Page Include="MainPage.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:MarkupCompilePass1</Generator>
@@ -542,9 +535,9 @@
     </Content>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ChemProv.Library\ChemProv.Library.csproj">
+    <ProjectReference Include="..\ChemProv.Library\ChemProV.Library.csproj">
       <Project>{DF61D940-8605-4098-AFA7-26823E579870}</Project>
-      <Name>ChemProv.Library</Name>
+      <Name>ChemProV.Library</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

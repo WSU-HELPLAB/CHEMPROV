@@ -187,7 +187,7 @@ namespace ChemProV.UI
         {
             //now, clear the drawing drawing_canvas
             DrawingCanvas.ClearDrawingCanvas();
-            EquationEditor.ClearEquations();
+            EquationEditor.ClearEquations(true);
 
             //clear any existing messages in the feedback window and rerun the error checker
             CheckRulesForPFD(this, EventArgs.Empty);
@@ -248,7 +248,7 @@ namespace ChemProV.UI
             isLoadingFile = true;
             //clear out previous data
             DrawingCanvas.ClearDrawingCanvas();
-            EquationEditor.ClearEquations();
+            EquationEditor.ClearEquations(false);
             m_snUserColors.Clear();
 
             //tell the drawing drawing_canvas to load its new children

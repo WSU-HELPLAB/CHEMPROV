@@ -5,7 +5,7 @@ using System.Text;
 using System.ServiceModel.Channels;
 using System.ServiceModel;
 
-namespace ChemProv.Library.OSBLE
+namespace ChemProV.Library.OSBLE
 {
     public class ServiceBindings
     {

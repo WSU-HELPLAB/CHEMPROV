@@ -8,11 +8,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProv.Library.OsbleServices;
+using ChemProV.Library.OsbleServices;
 using System.ComponentModel;
 using System.Windows.Threading;
 
-namespace ChemProv.Library.OSBLE.ViewModels
+namespace ChemProV.Library.OSBLE.ViewModels
 {
     public class LoginWindowViewModel : ViewModelBase
     {
