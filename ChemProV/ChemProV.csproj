@@ -266,7 +266,7 @@
     <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingNewStream.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingNewProcessUnit.cs" />
-    <Compile Include="UI\DrawingCanvas\States\PlacingStickyNote.cs" />
+    <Compile Include="UI\DrawingCanvas\States\PlacingNewCommentNote.cs" />
     <Compile Include="UI\DrawingCanvas\States\ResizingStickyNote.cs" />
     <Compile Include="UI\OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>

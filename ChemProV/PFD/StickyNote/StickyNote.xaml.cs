@@ -536,8 +536,8 @@ namespace ChemProV.PFD.StickyNote
         {
             if (null == m_commentParent)
             {
-                // The case is simple when we're not a comment
-                canvas.AddUndo(new UndoRedoCollection("Undo deletion of sticky note",
+                // The case is simple when we're not anchored
+                canvas.AddUndo(new UndoRedoCollection("Undo deleting comment",
                     new AddToCanvas(this, canvas)));
                 canvas.RemoveChild(this);
                 return;

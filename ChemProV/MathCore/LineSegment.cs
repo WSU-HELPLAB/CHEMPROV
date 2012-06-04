@@ -101,8 +101,15 @@ namespace ChemProV.MathCore
         /// </summary>
         public double GetDistance(Point point)
         {
-            Vector v = new Vector(point) - m_a;
+            Vector pt = new Vector(point);
+            Vector v = pt - m_a;
             double adj = v.ScalarProjectOnto(Direction);
+            if (adj < 0.0 || adj > Length)
+            {
+                // This means the closest point is an endpoint
+                return Math.Min(v.Length, (pt - m_b).Length);
+            }
+
             double hyp = v.Length;
             // opp^2 + adj^2 = hyp^2
             // opp^2 = hyp^2 - adj^2

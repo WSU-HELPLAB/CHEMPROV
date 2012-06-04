@@ -361,7 +361,8 @@ namespace ChemProV.PFD.Streams
                 m_isSelected = value;
 
                 // Set the stem color based on selection state
-                this.Stem.Stroke = new SolidColorBrush(m_isSelected ? Colors.Yellow : Colors.Black);
+                this.Stem.Stroke = m_isSelected ? 
+                    new SolidColorBrush(Colors.Yellow) : StreamLineNotSelected;
 
                 if (null != SelectionChanged)
                 {
@@ -677,6 +678,15 @@ namespace ChemProV.PFD.Streams
             if (m_table != null)
             {
                 m_table.RemoveFeedback();
+            }
+        }
+
+        public virtual Brush StreamLineNotSelected
+        {
+            get
+            {
+                // Default to black
+                return new SolidColorBrush(Colors.Black);
             }
         }
 

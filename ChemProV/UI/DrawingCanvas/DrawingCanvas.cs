@@ -385,10 +385,24 @@ namespace ChemProV.UI.DrawingCanvas
 
         public UIElement GetChildAtIncludeStreams(Point location)
         {
+            return GetChildAtIncludeStreams(location, null);
+        }
+
+        public UIElement GetChildAtIncludeStreams(Point location, params object[] excludeThese)
+        {
             UIElement element = null;
             
             foreach (UIElement uie in Children)
             {
+                // If it's in the exclusion list then ignore it
+                if (null != excludeThese)
+                {
+                    if (Array.IndexOf<object>(excludeThese, uie) >= 0)
+                    {
+                        continue;
+                    }
+                }
+                
                 double w = (double)uie.GetValue(Canvas.ActualWidthProperty);
                 double h = (double)uie.GetValue(Canvas.ActualHeightProperty);
                 double x = (double)uie.GetValue(Canvas.LeftProperty);
@@ -420,6 +434,15 @@ namespace ChemProV.UI.DrawingCanvas
                 double dist = 4.0;
                 foreach (UIElement uie in Children)
                 {
+                    // If it's in the exclusion list then ignore it
+                    if (null != excludeThese)
+                    {
+                        if (Array.IndexOf<object>(excludeThese, uie) >= 0)
+                        {
+                            continue;
+                        }
+                    }
+                    
                     AbstractStream stream = uie as AbstractStream;
                     if (null == stream)
                     {
