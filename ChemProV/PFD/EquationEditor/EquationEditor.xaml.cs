@@ -39,7 +39,7 @@ namespace ChemProV.PFD.EquationEditor
         private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
-        private bool isReadOnly = false;
+        private bool m_isReadOnly = false;
 
         private List<IPfdElement> pfdElements = new List<IPfdElement>();
 
@@ -105,10 +105,15 @@ namespace ChemProV.PFD.EquationEditor
 
         public bool IsReadOnly
         {
-            get { return isReadOnly; }
+            get { return m_isReadOnly; }
             set
             {
-                isReadOnly = value;
+                m_isReadOnly = value;
+
+                // The button to add a new row should only be visible if we're not in read 
+                // only mode
+                AddNewRowButton.Visibility = m_isReadOnly ?
+                    System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
             }
         }
 
@@ -123,9 +128,9 @@ namespace ChemProV.PFD.EquationEditor
             PfdElements = new List<IPfdElement>();
 
             //create our first row
+            AddNewEquationRow();
             updateCompounds();
             updateScopes();
-            AddNewEquationRow();
         }
         #endregion Constructor
 
@@ -161,15 +166,14 @@ namespace ChemProV.PFD.EquationEditor
 
         public void LoadXmlElements(XElement doc)
         {
-            //clear the equation stack
-            //EquationStackPanel.Children.Clear();
-
             //pull out the equations
             XElement equations = doc.Descendants("Equations").ElementAt(0);
             foreach (XElement xmlEquation in equations.Elements())
             {
                 EquationModel rowModel = AddNewEquationRow(xmlEquation);
             }
+
+            updateCompounds();
         }
 
         public List<IUndoRedoAction> MergeAnnotationsFrom(XDocument doc, string userNameIfNotInXml)
@@ -282,6 +286,11 @@ namespace ChemProV.PFD.EquationEditor
                 newRow.LoadFrom(optionalXmlEquation);
             }
 
+            // Set the deletion callback function
+            newRow.SetDeleteRequestDelegate(this.DeleteEquationRow);
+
+            // TODO: Make it readonly if necessary
+
             EquationsGrid.Children.Add(newRow);
             newRow.Model.RelatedElements = PfdElements;
             newRow.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
@@ -292,14 +301,22 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// Removes an equation row from the list
+        /// This is called from an equation control when it wants to delete itself. We must remove 
+        /// it from the stack panel.
         /// </summary>
-        private void RemoveEquationRow(int rowNumber)
+        private void DeleteEquationRow(EquationControl thisOne)
         {
-            // Every child in the stack panel is a row
-            // TODO: Make this more robust and resistant to changes that add more controls in the 
-            // equation stack panel
-            EquationsGrid.Children.RemoveAt(rowNumber);
+            UIElement uie = thisOne as UIElement;
+
+#if DEBUG
+            if (!EquationsGrid.Children.Contains(uie))
+            {
+                throw new ArgumentException(
+                    "Request was made to delete an equation row that was not in the stack");
+            }
+#endif
+            
+            EquationsGrid.Children.Remove(uie);
         }
 
         /// <summary>
@@ -575,31 +592,6 @@ namespace ChemProV.PFD.EquationEditor
 
                 i--;
             }
-
-            // Do we have a non-empty equation in the last row?  If so, add a new one
-            if (EquationRowCount - 1 == lastNonEmpty)
-            {
-                AddNewEquationRow();
-            }
-
-            // Do we have empty equations in rows before non-empty ones? If so, delete them
-            for (i = 0; i < lastNonEmpty; i++)
-            {
-                EquationControl ec = GetRow(i);
-
-                // If we have a focus in this row, then skip it
-                if (ec.HasFocus)
-                {
-                    continue;
-                }                
-
-                if (string.IsNullOrEmpty(ec.Model.Equation))
-                {
-                    RemoveEquationRow(i);
-                    i--;
-                    lastNonEmpty--;
-                }
-            }
         }
 
         public int EquationRowCount
@@ -687,6 +679,11 @@ namespace ChemProV.PFD.EquationEditor
             model.Scope = scope;
             model.Equation = equation;
             model.Annotation = annotation;
+        }
+
+        private void AddNewRowButton_Click(object sender, RoutedEventArgs e)
+        {
+            AddNewEquationRow();
         }
     }
 }

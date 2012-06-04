@@ -16,7 +16,7 @@ namespace ChemProV.Library.OSBLE.Views
 {
     public partial class LoginWindow : ChildWindow
     {
-        public LoginWindowViewModel ViewModel 
+        public LoginWindowViewModel ViewModel
         {
             get
             {
@@ -28,21 +28,34 @@ namespace ChemProV.Library.OSBLE.Views
             }
         }
 
+        public delegate void LoginAttemptCompletedDelegate(LoginWindow sender, LoginWindowViewModel model);
+
+        /// <summary>
+        /// Fires when the login attempt completes. Note that it could have completed with success or failure.
+        /// </summary>
+        public event LoginAttemptCompletedDelegate LoginAttemptCompleted = null;
+
         public LoginWindow()
         {
             InitializeComponent();
             ViewModel = new LoginWindowViewModel();
-            ViewModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ViewModel_PropertyChanged);    
+            ViewModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ViewModel_PropertyChanged);
         }
 
         void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
-            if (e.PropertyName.CompareTo("IsProcessingLogin") == 0)
+            if (0 == e.PropertyName.CompareTo("IsProcessingLogin"))
             {
                 OKButton.IsEnabled = !ViewModel.IsProcessingLogin;
                 if (ViewModel.IsLoggedIn)
                 {
                     this.DialogResult = true;
+
+                    // Fire the login completion event if non-null
+                    if (null != LoginAttemptCompleted)
+                    {
+                        LoginAttemptCompleted(this, ViewModel);
+                    }
                 }
             }
         }

@@ -54,9 +54,9 @@ namespace ChemProV.Validation.Feedback
         private List<Feedback> listOfFeedback = new List<Feedback>();
         private Feedback selectedFeedback;
 
-        private WorkSpace workSpaceReference;
+        private WorkspaceControl workSpaceReference;
 
-        public WorkSpace WorkSpaceReference
+        public WorkspaceControl WorkSpaceReference
         {
             get { return workSpaceReference; }
             set { workSpaceReference = value; }

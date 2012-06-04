@@ -6,7 +6,7 @@ This file is part of ChemProV (http://helplab.org/chemprov).
 ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 -->
-<UserControl x:Class="ChemProV.UI.WorkSpace"
+<UserControl x:Class="ChemProV.UI.WorkspaceControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"

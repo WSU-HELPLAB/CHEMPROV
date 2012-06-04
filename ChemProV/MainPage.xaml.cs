@@ -32,7 +32,6 @@ using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
 using ChemProV.Library.OSBLE.Views;
-using ChemProV.Library.OsbleServices;
 
 namespace ChemProV
 {
@@ -180,6 +179,8 @@ namespace ChemProV
 
             WorkSpace.LoadXmlElements(doc);
 
+            CompoundTable.WorkspaceChanged(WorkSpace, new Core.WorkspaceChangeDetails());
+
             //we dont want to load the config file so stop the event from firing
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);
         }
@@ -298,7 +299,7 @@ namespace ChemProV
 
         private void WorkSpace_UpdateCompounds(object sender, EventArgs e)
         {
-            CompoundTable.UpdateCompounds(WorkSpace.Compounds);
+            CompoundTable.WorkspaceChanged(WorkSpace, new Core.WorkspaceChangeDetails());
         }
 
         private void CompoundTable_ConstantClicked(object sender, EventArgs e)
@@ -636,11 +637,19 @@ namespace ChemProV
         private void RedoClick_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Redo();
+            FullWorkspaceChange();
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Undo();
+            FullWorkspaceChange();
+        }
+
+        private void FullWorkspaceChange()
+        {
+            Core.WorkspaceChangeDetails details = Core.WorkspaceChangeDetails.AllTrue;
+            CompoundTable.WorkspaceChanged(WorkSpace, details);
         }
 
         private void InstallButton_Click(object sender, RoutedEventArgs e)
@@ -728,7 +737,7 @@ namespace ChemProV
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);
         }
 
-        public WorkSpace WorkspaceReference
+        public WorkspaceControl WorkspaceReference
         {
             get
             {
@@ -774,8 +783,32 @@ namespace ChemProV
                 m_currentStream.Dispose();
             }
             m_currentStream = null;
+        }
 
-            // TODO - anything else?
+        private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: Deal with this. I've commented it out now because the live version of the OSBLE service 
+            // has some property naming related problems.
+
+            //ChemProV.Library.OSBLE.Views.LoginWindow lw = new LoginWindow();
+            //lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
+            //lw.Show();
+        }
+
+        private void OSBLELoginAttemptCompleted(LoginWindow sender, Library.OSBLE.ViewModels.LoginWindowViewModel model)
+        {
+            // TODO: Deal with this. I've commented it out now because the live version of the OSBLE service 
+            // has some property naming related problems.
+            
+            //if (!model.IsLoggedIn)
+            //{
+            //    // If we're not logged in then don't do anything
+            //    return;
+            //}
+
+            //// For testing purposes:
+            //// Get and display some info
+            //MessageBox.Show("User Info\nSchool.Name = " + model.Profile.School.Name);
         }
     }
 }

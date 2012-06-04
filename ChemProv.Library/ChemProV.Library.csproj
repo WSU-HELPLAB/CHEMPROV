@@ -70,52 +70,32 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service References\OsbleServices\Reference.cs">
+    <Compile Include="Service References\OsbleLocalServices\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\OsbleLocalServices\" />
+  </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\OsbleServices\AuthenticationService.wsdl" />
-    <None Include="Service References\OsbleServices\AuthenticationService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\AuthenticationService1.wsdl" />
-    <None Include="Service References\OsbleServices\AuthenticationService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\AuthenticationService2.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleServices\AuthenticationService3.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <Content Include="ServiceReferences.ClientConfig" />
-  </ItemGroup>
-  <ItemGroup>
-    <WCFMetadataStorage Include="Service References\OsbleServices\" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\AuthenticationService.disco" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\ChemProV.Library.OsbleServices.UserProfile1.datasource">
+    <None Include="Service References\OsbleLocalServices\AuthenticationService.disco" />
+    <None Include="Service References\OsbleLocalServices\ChemProV.Library.OsbleLocalServices.UserProfile.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\OsbleServices\configuration91.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\configuration.svcinfo" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleServices\Reference.svcmap">
+    <None Include="Service References\OsbleLocalServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleLocalServices\configuration.svcinfo" />
+    <None Include="Service References\OsbleLocalServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <Content Include="ServiceReferences.ClientConfig" />
+    <None Include="Service References\OsbleLocalServices\AuthenticationService3.xsd">
+      <SubType>Designer</SubType>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -123,6 +103,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService.wsdl" />
+    <None Include="Service References\OsbleLocalServices\AuthenticationService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService1.wsdl" />
+    <None Include="Service References\OsbleLocalServices\AuthenticationService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>

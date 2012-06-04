@@ -32,7 +32,7 @@ namespace ChemProV.Core
 
         private static ChemProV.UI.ControlPalette s_palette = null;
         
-        private static ChemProV.UI.WorkSpace s_workspace = null;
+        private static ChemProV.UI.WorkspaceControl s_workspace = null;
 
         public static ChemProV.UI.ControlPalette ControlPalette
         {
@@ -72,7 +72,7 @@ namespace ChemProV.Core
         /// <summary>
         /// This must be called upon application initialization
         /// </summary>
-        public static void Init(ChemProV.UI.WorkSpace workspace, ChemProV.UI.ControlPalette palette)
+        public static void Init(ChemProV.UI.WorkspaceControl workspace, ChemProV.UI.ControlPalette palette)
         {
             s_workspace = workspace;
             s_palette = palette;
@@ -148,7 +148,7 @@ namespace ChemProV.Core
             return false;
         }
 
-        public static ChemProV.UI.WorkSpace Workspace
+        public static ChemProV.UI.WorkspaceControl Workspace
         {
             get
             {

@@ -132,6 +132,7 @@
     <Compile Include="Core\CommentDefs.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Core\NamedColors.cs" />
+    <Compile Include="Core\IWorkspaceChangeListener.cs" />
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
@@ -271,8 +272,8 @@
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UI\WorkSpace.xaml.cs">
-      <DependentUpon>WorkSpace.xaml</DependentUpon>
+    <Compile Include="UI\WorkspaceControl.xaml.cs">
+      <DependentUpon>WorkspaceControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Validation\ErrorMessageGenerator.cs" />
     <Compile Include="Validation\Feedback\Feedback.cs" />
@@ -372,7 +373,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\WorkSpace.xaml">
+    <Page Include="UI\WorkspaceControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -382,6 +383,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UI\Icons\XBtn_16x16.png" />
     <None Include="Grammars\ChemProV.g" />
     <None Include="Grammars\ChemProV.tokens" />
     <None Include="Grammars\ChemProVTree.g" />
@@ -445,6 +447,9 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UI\Icons\logo_about.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\OSBLE_person_16x16.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="UI\Icons\palette_select.png">

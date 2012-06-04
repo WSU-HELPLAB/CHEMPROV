@@ -63,7 +63,14 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Name="btnLoadMergeComments" Click="btnLoadMergeComments_Click" Visibility="Collapsed">
                     <ToolTipService.ToolTip>Merge comments from another file</ToolTipService.ToolTip>
                     <Image Source="/UI/Icons/palette_stickyNote_16x16.png"></Image>
-                </Button>                
+                </Button>
+                
+                <!-- For tests and debugging -->
+                <!-- OSBLE login button -->
+                <Button Name="btnOSBLELogin" Margin="0,0,5,0" Click="btnOSBLELogin_Click" Visibility="Collapsed">
+                    <ToolTipService.ToolTip>OSBLE login...</ToolTipService.ToolTip>
+                    <Image Source="/UI/Icons/OSBLE_person_16x16.png"></Image>
+                </Button>
                 
             </StackPanel>
         </StackPanel>
@@ -77,8 +84,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             </ScrollViewer>
             <TextBlock x:Name="Saving_TextBlock"/>
         </StackPanel>
-        <ChemProV_UI:WorkSpace x:Name="WorkSpace">
+        <ChemProV_UI:WorkspaceControl x:Name="WorkSpace">
 
-        </ChemProV_UI:WorkSpace>
+        </ChemProV_UI:WorkspaceControl>
     </ctk:DockPanel>
 </UserControl>

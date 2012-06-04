@@ -27,7 +27,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             </StackPanel>
             <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20" />                    
+                    <ColumnDefinition Width="55" />                    
                     <ColumnDefinition Width="150"  />
                     <ColumnDefinition Width="150" />
                     <ColumnDefinition />
@@ -44,11 +44,22 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 BorderThickness="0" BorderBrush="Transparent"
                 >
                 
-                <!-- Stack panel for equation controls -->
-                <StackPanel x:Name="EquationsGrid" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
-                    <!-- EquationControl objects are added at runtime -->
-                </StackPanel>
+                <StackPanel Orientation="Vertical">
                 
+                    <!-- Stack panel for equation controls -->
+                    <StackPanel x:Name="EquationsGrid" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                        <!-- EquationControl objects are added at runtime -->
+                    </StackPanel>
+
+                    <!-- Button to add a new equation row. This should not be visible when the editor is in read-only mode. -->
+                    <Button Height="25" HorizontalAlignment="Stretch" Name="AddNewRowButton" Click="AddNewRowButton_Click">
+                        <ToolTipService.ToolTip>Add a new equation row</ToolTipService.ToolTip>
+                        
+                        <Image Width="16" Height="16" Source="/UI/Icons/toolbar_new.png" />
+                    </Button>
+
+                </StackPanel>
+
             </ScrollViewer>
         </StackPanel>
     </Grid>

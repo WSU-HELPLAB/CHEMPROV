@@ -11,7 +11,7 @@
         <client>
             <endpoint address="http://localhost:17532/Services/AuthenticationService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService"
-                contract="OsbleServices.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
+                contract="OsbleLocalServices.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
         </client>
     </system.serviceModel>
 </configuration>
