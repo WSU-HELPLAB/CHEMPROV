@@ -66,13 +66,13 @@ namespace ChemProV.UI.DrawingCanvas.States
             
             // Hide all sticky notes menu item
             menuItem = new MenuItem();
-            menuItem.Header = "Hide All Sticky Notes";
+            menuItem.Header = "Hide all comments";
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += new RoutedEventHandler(this.HideStickyNotes);
             
             // Show all sticky notes menu item
             menuItem = new MenuItem();
-            menuItem.Header = "Show All Sticky Notes";
+            menuItem.Header = "Show all comments";
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
@@ -151,32 +151,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         #endregion Unused Mouse Events
 
-        /// <summary>
-        /// This is used to changed color of the sticky notes
-        /// TODO: Delete since it is not used anymore (keeping temporarily for reference)
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void ChangeStickyNoteColor(object sender, EventArgs e)
-        {
-            // Start by adding an undo action that will restore the color we about to change
-            m_canvas.AddUndo(new UndoRedoCollection("Undo stick note color change",
-                new PFD.Undos.RestoreStickyNoteColor(m_canvas.SelectedElement as StickyNote)));
-            
-            // Change the color
-            string header = ((sender as MenuItem).Header as string);
-            StickyNoteColors color = StickyNote.StickyNoteColorsFromString(header);
-            (m_canvas.SelectedElement as StickyNote).ColorChange(color);
-
-            // Make sure to remove the popup menu from the canvas
-            m_canvas.Children.Remove(m_contextMenu);
-            m_contextMenu = null;
-
-            // Flip back to the default state for the canvas (null)
-            m_canvas.CurrentState = null;
-        }
-
-        public void HideStickyNotes(object sender, EventArgs e)
+        private void HideStickyNotes(object sender, EventArgs e)
         {
             foreach (UIElement uie in m_canvas.Children)
             {

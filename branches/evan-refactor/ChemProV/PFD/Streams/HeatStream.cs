@@ -15,6 +15,8 @@ namespace ChemProV.PFD.Streams
 {
     public class HeatStream : AbstractStream
     {
+        private Brush m_streamLineNotSelected;
+        
         public HeatStream()
             : this(Core.App.Workspace.DrawingCanvas)
         {
@@ -23,11 +25,8 @@ namespace ChemProV.PFD.Streams
         public HeatStream(DrawingCanvas canvas)
             : base(canvas)
         {
-            SolidColorBrush red = new SolidColorBrush(Colors.Red);
-            this.Stem.Stroke = red;
-            this.Stem.Fill = red;
-
-            this.SelectionChanged += new System.EventHandler(HeatStream_SelectionChanged);
+            m_streamLineNotSelected = new SolidColorBrush(Colors.Red);
+            this.Stem.Stroke = m_streamLineNotSelected;
         }
 
         protected override void CreatePropertiesTable()
@@ -36,12 +35,6 @@ namespace ChemProV.PFD.Streams
                 StreamType.Heat, m_canvas.CurrentDifficultySetting, false);
 
             m_table.ParentStream = this;
-        }
-
-        void HeatStream_SelectionChanged(object sender, System.EventArgs e)
-        {
-            // Yellow for selected, red for not selected
-            this.Stem.Stroke = new SolidColorBrush(m_isSelected ? Colors.Yellow : Colors.Red);
         }
 
         /// <summary>
@@ -60,10 +53,6 @@ namespace ChemProV.PFD.Streams
 
         public override bool IsValidSource(ProcessUnits.IProcessUnit unit)
         {
-            // E.O.
-            // Um, it looks like with the current version NOTHING is valid as 
-            // source for a heat stream
-            // TODO: Fix this, it can't be right
             return false;
         }
 
@@ -75,6 +64,11 @@ namespace ChemProV.PFD.Streams
             // TODO: Check with the chemistry guys to verify this
             return ((unit is PFD.ProcessUnits.Reactor) &&
                 unit.IsAcceptingIncomingStreams(this));
+        }
+
+        public override Brush StreamLineNotSelected
+        {
+            get { return m_streamLineNotSelected; }
         }
 
         /// <summary>

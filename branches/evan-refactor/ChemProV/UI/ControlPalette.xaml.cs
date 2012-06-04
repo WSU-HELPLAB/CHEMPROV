@@ -118,7 +118,7 @@ namespace ChemProV.UI
             else if (object.ReferenceEquals(sender, StickyNoteButton))
             {
                 // We have a custom state for placing sticky notes
-                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingStickyNote(
+                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewCommentNote(
                     canvas, this);
                 return;
             }
