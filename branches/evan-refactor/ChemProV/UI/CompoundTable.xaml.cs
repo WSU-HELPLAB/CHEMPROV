@@ -13,10 +13,11 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 
 namespace ChemProV.UI
 {
-    public partial class CompoundTable : UserControl
+    public partial class CompoundTable : UserControl, ChemProV.Core.IWorkspaceChangeListener
     {
         public CompoundTable()
         {
@@ -59,39 +60,6 @@ namespace ChemProV.UI
                 Compound_DataGrid.ItemsSource = elements;
                 Constants_DataGrid.ItemsSource = constants;
             }
-        }
-
-        /// <summary>
-        /// This is called when the pfd is changed not just when a compound is changed.  This gets a lit of ipfdElements
-        /// then it pulls out of those the tables and then makes a list of the compounds which it then sets as the elements source
-        /// to our combo_box
-        /// </summary>
-        /// <param name="ipfdElements"></param>
-        public void UpdateCompounds(IList<string> compounds)
-        {
-            int currentSelected = Compound_ComboBox.SelectedIndex;
-
-            Compound_ComboBox.ItemsSource = new ObservableCollection<string>(compounds);
-
-            if (compounds.Count <= 0)
-            {
-                Compound_ComboBox.SelectedIndex = -1;
-            }
-            else
-            {
-                if (currentSelected < compounds.Count)
-                {
-                    if (currentSelected != -1)
-                    {
-                        Compound_ComboBox.SelectedIndex = currentSelected;
-                    }
-                    else
-                    {
-                        Compound_ComboBox.SelectedIndex = 0;
-                    }
-                }
-            }
-            Compound_ComboBox_SelectionChanged(this, EventArgs.Empty as SelectionChangedEventArgs);
         }
 
         private void Constants_DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
@@ -156,5 +124,47 @@ namespace ChemProV.UI
         {
             ConstantClicked(sender, e);
         }
+
+        #region IWorkspaceChangeListener Members
+
+        public void WorkspaceChanged(WorkspaceControl workspace, Core.WorkspaceChangeDetails details)
+        {
+            // Backup the currently selected item
+            string currentSelection = Compound_ComboBox.SelectedItem as string;
+            
+            // Clear the combo box items
+            Compound_ComboBox.Items.Clear();
+
+            // Go through the PFD items and look for chemical stream properties windows
+            foreach (UIElement uie in workspace.DrawingCanvas.Children)
+            {
+                ChemicalStreamPropertiesWindow cspw = uie as ChemicalStreamPropertiesWindow;
+                if (null == cspw)
+                {
+                    continue;
+                }
+
+                // Go through the rows and look for compounds
+                foreach (ChemicalStreamData csd in cspw.ItemSource)
+                {
+                    if (Enum.IsDefined(typeof(ChemicalCompounds), (byte)csd.SelectedCompoundId))
+                    {
+                        Compound_ComboBox.Items.Add(csd.SelectedCompound.ToPrettyString());
+                    }
+                }
+            }
+
+            // Re-select what was previously selected
+            if (!string.IsNullOrEmpty(currentSelection) &&
+                Compound_ComboBox.Items.Contains(currentSelection))
+            {
+                Compound_ComboBox.SelectedItem = currentSelection;
+            }
+            
+            // Invoke the selection-changed event to ensure that everything works
+            Compound_ComboBox_SelectionChanged(this, EventArgs.Empty as SelectionChangedEventArgs);
+        }
+
+        #endregion
     }
 }

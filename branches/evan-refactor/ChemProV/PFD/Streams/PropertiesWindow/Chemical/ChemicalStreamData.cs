@@ -291,36 +291,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             writer.WriteEndElement();
         }
 
-        /// <summary>
-        /// Creates a new ChemicalStreamData based on the supplied XML element
-        /// </summary>
-        /// <param name="xmlNote">The xml for a ChemicalStreamData</param>
-        /// <returns></returns>
-        public static ChemicalStreamData FromXml(XElement xmlNote)
-        {
-            /*
-            StickyNote note = new StickyNote();
-
-            //pull out content & color
-            note.Note.Text = xmlNote.Element("Content").Value;
-            note.ColorChange(StickyNoteColorsFromString(xmlNote.Element("Color").Value));
-
-            //use LINQ to find us the X,Y coords
-            var location = from c in xmlNote.Elements("Location")
-                           select new
-                           {
-                               x = (string)c.Element("X"),
-                               y = (string)c.Element("Y")
-                           };
-            note.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
-            note.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
-
-            //return the processed note
-            return note;
-             * */
-            return new ChemicalStreamData();
-        }
-
         #endregion IXmlSerializable Members
     }
 }

@@ -25,7 +25,7 @@ using ChemProV.Validation.Rules.Adapters.Table;
 
 namespace ChemProV.UI
 {
-    public partial class WorkSpace : UserControl
+    public partial class WorkspaceControl : UserControl
     {
         #region Delegates
 
@@ -61,17 +61,14 @@ namespace ChemProV.UI
 
         #region Constructor
 
-        public WorkSpace()
+        public WorkspaceControl()
             : this(false)
         {
         }
 
-        public WorkSpace(bool isReadOnly)
+        public WorkspaceControl(bool isReadOnly)
         {
             InitializeComponent();
-
-            //this will make the workspace and everything in it read-only
-            //IsReadOnly = true;
             EquationEditor.IsReadOnly = isReadOnly;
 
             IsReadOnly = isReadOnly;
@@ -191,13 +188,6 @@ namespace ChemProV.UI
 
             //clear any existing messages in the feedback window and rerun the error checker
             CheckRulesForPFD(this, EventArgs.Empty);
-        }
-
-        public void RemoveScrollViewerFromDrawingCanvas()
-        {
-            this.WorkspaceGrid.Children.Remove(this.DrawingCanvasScollViewer);
-            this.DrawingCanvasScollViewer.Content = null;
-            this.WorkspaceGrid.Children.Add(this.DrawingCanvas);
         }
 
         public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)

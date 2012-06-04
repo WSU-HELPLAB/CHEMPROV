@@ -4,6 +4,7 @@
   <xs:complexType name="UserProfile">
     <xs:sequence>
       <xs:element minOccurs="0" name="AspNetUserName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="AuthenticationHash" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="CanCreateCourses" type="xs:boolean" />
       <xs:element minOccurs="0" name="DefaultCourse" type="xs:int" />
       <xs:element minOccurs="0" name="EmailAllActivityPosts" type="xs:boolean" />
@@ -12,7 +13,9 @@
       <xs:element minOccurs="0" name="ID" type="xs:int" />
       <xs:element minOccurs="0" name="Identification" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="IsAdmin" type="xs:boolean" />
+      <xs:element minOccurs="0" name="IsApproved" type="xs:boolean" />
       <xs:element minOccurs="0" name="LastName" nillable="true" type="xs:string" />
+      <xs:element minOccurs="0" name="Password" nillable="true" type="xs:string" />
       <xs:element xmlns:q1="http://schemas.datacontract.org/2004/07/OSBLE.Models" minOccurs="0" name="School" nillable="true" type="q1:School" />
       <xs:element minOccurs="0" name="SchoolID" type="xs:int" />
       <xs:element minOccurs="0" name="SortBy" type="xs:int" />

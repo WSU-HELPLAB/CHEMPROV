@@ -36,8 +36,8 @@ namespace ChemProV.UnitTests.PFD
             MainPage mp2 = new MainPage();
 
             // Get the workspaces
-            WorkSpace w1 = mp1.WorkspaceReference;
-            WorkSpace w2 = mp2.WorkspaceReference;
+            WorkspaceControl w1 = mp1.WorkspaceReference;
+            WorkspaceControl w2 = mp2.WorkspaceReference;
             
             // Add three process units to w1
             int puCount = 3;

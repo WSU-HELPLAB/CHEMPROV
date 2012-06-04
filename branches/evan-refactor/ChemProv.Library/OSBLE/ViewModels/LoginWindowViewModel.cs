@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProV.Library.OsbleServices;
+using ChemProV.Library.OsbleLocalServices;
 using System.ComponentModel;
 using System.Windows.Threading;
 
@@ -19,7 +19,7 @@ namespace ChemProV.Library.OSBLE.ViewModels
         private string _password = "";
         private bool _rememberMe = false;
         private Visibility _errorVisibility = Visibility.Collapsed;
-        private OsbleServices.AuthenticationServiceClient authClient;
+        private AuthenticationServiceClient authClient;
         private bool _isProcessingLogin = false;
         private string _errorText = "Error text here.";
         private DispatcherTimer _timer;

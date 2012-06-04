@@ -93,7 +93,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                                   quantity = (string)c.Element("Quantity"),
                                   unitId = (string)c.Element("UnitId"),
                                   compoundId = (string)c.Element("CompoundId"),
-                                  enabled = (string)c.Element("Enabled")
                               };
                 for (int i = 0; i < xmlData.Count(); i++)
                 {
@@ -102,7 +101,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                     d.Quantity = xmlData.ElementAt(i).quantity;
                     d.SelectedUnitId = Convert.ToInt32(xmlData.ElementAt(i).unitId);
                     d.SelectedCompoundId = Convert.ToInt32(xmlData.ElementAt(i).compoundId);
-                    d.Enabled = Convert.ToBoolean(xmlData.ElementAt(i).enabled);
+                    
+                    // E.O.
+                    // Was tracing through the code and it previously tried to pull this value from the "Enabled" 
+                    // element, but no such XML element is ever written to ChemProV files. So enabled will default 
+                    // to true.
+                    d.Enabled = true;
+
                     d.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler((table as ChemicalStreamPropertiesWindow).DataUpdated);
                     (table as ChemicalStreamPropertiesWindow).ItemSource.Add(d);
                 }
