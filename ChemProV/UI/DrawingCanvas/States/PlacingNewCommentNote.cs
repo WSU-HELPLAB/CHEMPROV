@@ -129,6 +129,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 m_canvas.AddNewChild(note);
                 note.Width = note.Height = 100.0;
                 note.Location = mousePt;
+                note.SetValue(Canvas.ZIndexProperty, (int)4);
 
                 // Create an undo
                 m_canvas.AddUndo(new UndoRedoCollection("Undo creation of free-floating comment",

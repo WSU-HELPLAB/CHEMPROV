@@ -309,6 +309,8 @@ namespace ChemProV
 
         public void SaveChemProVFile(Stream stream)
         {
+            saveTimer.Stop();
+            
             // This stream may represent an existing file which could potentially be larger than the 
             // data that we're about to write. Thus, we start by seeking to the beginning and setting the 
             // length to 0.

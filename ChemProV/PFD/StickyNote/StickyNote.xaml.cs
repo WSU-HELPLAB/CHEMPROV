@@ -426,6 +426,9 @@ namespace ChemProV.PFD.StickyNote
             sn.m_commentParent = parent;
             canvas.AddNewChild(sn);
 
+            // Give it a high z-index since we want comments above everything else
+            sn.SetValue(Canvas.ZIndexProperty, (int)4);
+
             // Create the line and add it to the drawing canvas
             sn.m_lineToParent = new Line();
             canvas.AddNewChild(sn.m_lineToParent);
