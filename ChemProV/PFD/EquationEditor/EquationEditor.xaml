@@ -25,27 +25,42 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             <StackPanel Background="Silver" HorizontalAlignment="Stretch">
                     <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
             </StackPanel>
-            <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="55" />                    
-                    <ColumnDefinition Width="150"  />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-            </Grid>
             <ScrollViewer
                 Width="Auto"
                 VerticalScrollBarVisibility="Auto"
                 HorizontalScrollBarVisibility="Auto"
                 Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
                 BorderThickness="0" BorderBrush="Transparent"
+                Padding="0,0,0,0"
                 >
                 
                 <StackPanel Orientation="Vertical">
-                
+
+                    <!-- Grid for the column headers -->
+                    <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="55" />
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="128" />
+                            <ColumnDefinition Width="22" />
+                            <ColumnDefinition Width="128" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Margin="40,0,0,0" Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
+                        <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Name="TypeColumnHelpBtn" Click="TypeColumnHelpBtn_Click">
+                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
+                                <ToolTipService.ToolTip>Click for info about the equation type</ToolTipService.ToolTip>
+                            </Image>
+                        </Button>
+                        <Button Grid.Row="0" Grid.Column="3" HorizontalAlignment="Stretch" Name="ScopeColumnHelpBtn" Click="ScopeColumnHelpBtn_Click">
+                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
+                                <ToolTipService.ToolTip>Click for info about the equation scope</ToolTipService.ToolTip>
+                            </Image>
+                        </Button>
+                        <TextBlock Margin="35,0,0,0" Grid.Row="0" Grid.Column="4" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
+                        <TextBlock Grid.Row="0" Grid.Column="5" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                    </Grid>
+
                     <!-- Stack panel for equation controls -->
                     <StackPanel x:Name="EquationsGrid" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
                         <!-- EquationControl objects are added at runtime -->

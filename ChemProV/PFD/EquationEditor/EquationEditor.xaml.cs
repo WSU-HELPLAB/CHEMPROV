@@ -685,5 +685,19 @@ namespace ChemProV.PFD.EquationEditor
         {
             AddNewEquationRow();
         }
+
+        private void TypeColumnHelpBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Indicates whether the equation expresses a fact given in the problem (problem " +
+                "specification), indicates a total input or output, or refers to a specific compound.",
+                "Equation Type", MessageBoxButton.OK);
+        }
+
+        private void ScopeColumnHelpBtn_Click(object sender, RoutedEventArgs e)
+        {
+            MessageBox.Show("Indicates the process unit or subprocess to which the equation refers. Choose \"" + 
+                "Overall\" if the equation expresses a balance over the entire process as a whole.",
+                "Equation Scope", MessageBoxButton.OK);
+        }
     }
 }
