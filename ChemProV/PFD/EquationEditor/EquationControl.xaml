@@ -31,8 +31,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 </Button>
 
                 <!-- Type and scope combo boxes -->
-                <ComboBox Height="25" x:Name="TypeComboBox" MinWidth="150" SelectionChanged="TypeComboBox_SelectionChanged" />
-                <ComboBox Height="25" x:Name="ScopeComboBox" MinWidth="150" SelectionChanged="ScopeComboBox_SelectionChanged"/>
+                <ComboBox Height="25" x:Name="TypeComboBox" MinWidth="130" SelectionChanged="TypeComboBox_SelectionChanged" />
+                <ComboBox Height="25" x:Name="ScopeComboBox" MinWidth="130" SelectionChanged="ScopeComboBox_SelectionChanged"/>
 
                 <!-- Equation text box -->
                 <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200"  

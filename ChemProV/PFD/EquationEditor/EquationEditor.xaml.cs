@@ -131,6 +131,11 @@ namespace ChemProV.PFD.EquationEditor
             AddNewEquationRow();
             updateCompounds();
             updateScopes();
+
+            // TEST: Try setting tooltips at runtime
+            // Doesn't fix the clipping issue
+            //ToolTipService.SetToolTip(TypeColumnHelpBtn, "Indicates whether the equation expresses a fact given in the problem (problem " +
+            //    "specification), indicates a total input or output, or refers to a specific compound.");
         }
         #endregion Constructor
 
