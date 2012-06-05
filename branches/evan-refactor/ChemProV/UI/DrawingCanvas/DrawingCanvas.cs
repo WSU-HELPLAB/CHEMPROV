@@ -1040,6 +1040,7 @@ namespace ChemProV.UI.DrawingCanvas
                         copy.Height = sn.Height;
                         copy.Location = sn.Location;
                         copy.CommentUserName = sn.CommentUserName;
+                        copy.SetValue(Canvas.ZIndexProperty, (int)4);
 
                         // Resolve the user name and set the color
                         if (string.IsNullOrEmpty(copy.CommentUserName))
