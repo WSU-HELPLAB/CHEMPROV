@@ -1,5 +1,5 @@
 <!--
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -15,8 +15,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     mc:Ignorable="d"
     d:DesignHeight="150" d:DesignWidth="321"
     xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
-             x:Name="Base"
-             >
+    x:Name="Base">
     <UserControl.Resources>
         <eq:ScollViewerHeightConverter x:Key="ScollViewerHeightConverter" />
     </UserControl.Resources>
@@ -40,25 +39,27 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="55" />
-                            <ColumnDefinition Width="22" />
-                            <ColumnDefinition Width="128" />
-                            <ColumnDefinition Width="22" />
-                            <ColumnDefinition Width="128" />
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="130" />
                             <ColumnDefinition />
                         </Grid.ColumnDefinitions>
-                        <TextBlock Margin="40,0,0,0" Grid.Row="0" Grid.Column="2" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
-                        <Button Grid.Row="0" Grid.Column="1" HorizontalAlignment="Stretch" Name="TypeColumnHelpBtn" Click="TypeColumnHelpBtn_Click">
-                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
-                                <ToolTipService.ToolTip>Click for info about the equation type</ToolTipService.ToolTip>
-                            </Image>
-                        </Button>
-                        <Button Grid.Row="0" Grid.Column="3" HorizontalAlignment="Stretch" Name="ScopeColumnHelpBtn" Click="ScopeColumnHelpBtn_Click">
-                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
-                                <ToolTipService.ToolTip>Click for info about the equation scope</ToolTipService.ToolTip>
-                            </Image>
-                        </Button>
-                        <TextBlock Margin="35,0,0,0" Grid.Row="0" Grid.Column="4" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
-                        <TextBlock Grid.Row="0" Grid.Column="5" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center">
+                            <TextBlock Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                            <Button HorizontalAlignment="Stretch" Name="TypeColumnHelpBtn" Click="TypeColumnHelpBtn_Click">
+                                <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
+                                    <ToolTipService.ToolTip>Click for info about the equation type</ToolTipService.ToolTip>
+                                </Image>
+                            </Button>
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
+                            <TextBlock Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
+                            <Button HorizontalAlignment="Stretch" Name="ScopeColumnHelpBtn" Click="ScopeColumnHelpBtn_Click">
+                                <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
+                                    <ToolTipService.ToolTip>Click for info about the equation scope</ToolTipService.ToolTip>
+                                </Image>
+                            </Button>
+                        </StackPanel>
+                        <TextBlock Grid.Row="0" Grid.Column="4" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
                     </Grid>
 
                     <!-- Stack panel for equation controls -->
@@ -70,7 +71,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <Button Height="25" HorizontalAlignment="Stretch" Name="AddNewRowButton" Click="AddNewRowButton_Click">
                         <ToolTipService.ToolTip>Add a new equation row</ToolTipService.ToolTip>
                         
-                        <Image Width="16" Height="16" Source="/UI/Icons/toolbar_new.png" />
+                        <Image Width="16" Height="16" Source="/UI/Icons/plus_16x16.png" />
                     </Button>
 
                 </StackPanel>

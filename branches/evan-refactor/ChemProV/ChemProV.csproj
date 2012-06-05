@@ -383,6 +383,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="UI\Icons\plus_16x16.png" />
     <Content Include="UI\Icons\XBtn_16x16.png" />
     <None Include="Grammars\ChemProV.g" />
     <None Include="Grammars\ChemProV.tokens" />
