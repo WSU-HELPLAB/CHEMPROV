@@ -49,14 +49,28 @@ namespace ChemProV.UI.DrawingCanvas.States
         private UI.ControlPalette m_palette;
 
         /// <summary>
-        /// Indicates whether or not we're in phase 2, which is where we've clicked down to 
-        /// place the source and are moving with the mouse down to place the destination when 
-        /// the mouse is released.
+        /// Indicates the phase we're in, which determines how we handle mouse events.
+        ///  1 = Moving the stream source icon around with the mouse, waiting for a mouse-
+        ///     down event to create the stream
+        ///  2 = Stream source has been placed, either in a blank space within the PFD or 
+        ///      connected to a process unit. We're waiting for a mouse-up event if we're 
+        ///      in this state. If we are in this state and release the mouse button in a 
+        ///      blank space or over a process unit that is not the same as the source, then 
+        ///      this finalizes the creation action.
+        ///  3 = The mouse was over the source process unit during the mouse-up event that was 
+        ///      received in phase 2. In this case we are in click-click stream creation mode, 
+        ///      meaning that the next mouse-down event should finalize the stream creation.
+        /// -1 = The state is finished
         /// </summary>
-        private bool m_phase2 = false;
+        private int m_phase = 1;
 
         /// <summary>
-        /// As we drag stream source and destination connectors over various process units, we 
+        /// Location of the mouse during the mouse-down event that was received in phase 1
+        /// </summary>
+        private MathCore.Vector m_phase1DownPt;
+
+        /// <summary>
+        /// As we move stream source and destination connectors over various process units, we 
         /// may change their border colors. If this value is non-null, then it references a 
         /// process unit whose border color has been changed and must be changed back when we 
         /// complete the placing action or move the mouse out of its area.
@@ -146,7 +160,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                         ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
                 }
             }
-            else if (m_phase2)
+            else
             {
                 // Move the destination icon around
                 m_newStream.DestinationDragIcon.Location = mousePt;
@@ -174,11 +188,14 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
 
             // See if we're in the phase where we're placing the source
-            if (null != m_initialIcon)
+            if (1 == m_phase)
             {
                 // Start by removing the floating icon
                 m_canvas.RemoveChild(m_initialIcon);
                 m_initialIcon = null;
+
+                // Store the mouse position
+                m_phase1DownPt = new MathCore.Vector(location.X, location.Y);
 
                 // See if we clicked on a valid destination object
                 GenericProcessUnit gpu = m_canvas.GetChildAt(location, m_newStream) as GenericProcessUnit;
@@ -191,9 +208,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 else if (gpu.IsAcceptingOutgoingStreams(m_newStream))
                 {
                     m_newStream.SourceDragIcon.Location = location;
-                    m_newStream.DestinationDragIcon.SetValue(Canvas.ZIndexProperty, 0);
                     m_newStream.DestinationDragIcon.Location = location;
-                    m_newStream.DestinationDragIcon.SetValue(Canvas.ZIndexProperty, 4);
                     gpu.AttachOutgoingStream(m_newStream);
                     m_newStream.Source = gpu;
                     m_newStream.UpdateStreamLocation();
@@ -201,6 +216,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 else
                 {
                     // Bad placement. Cancel everything
+                    m_phase = -1;
                     m_canvas.RemoveChild(m_newStream);
                     m_canvas.RemoveChild(m_newStream.SourceDragIcon);
                     m_canvas.RemoveChild(m_newStream.DestinationDragIcon);
@@ -210,35 +226,65 @@ namespace ChemProV.UI.DrawingCanvas.States
                     return;
                 }
 
-                // Position the table
-                m_newStream.Table.Location = m_newStream.CalculateTablePositon(location, location);
-
-                // Now is where we finally show the stream
+                // Now is where we finally show the stream (everything but the table)
                 m_newStream.Visibility = Visibility.Visible;
                 m_newStream.SourceDragIcon.Visibility = Visibility.Visible;
                 m_newStream.DestinationDragIcon.Visibility = Visibility.Visible;
-                (m_newStream.Table as UIElement).Visibility = Visibility.Visible;
+
+                // Position the table and make sure it is hidden
+                m_newStream.Table.Location = m_newStream.CalculateTablePositon(location, location);
+                m_newStream.HideTable();
 
                 // We're in phase 2 now
-                m_phase2 = true;
-            }            
+                m_phase = 2;
+            }
+            else if (3 == m_phase)
+            {
+                // This means that we need to place the stream endpoint. All the logic for this 
+                // is already in the mouse-up handler for phase 2. So we can simply switch to phase 
+                // 2 and call the mouse-up function.
+                m_phase = 2;
+                MouseLeftButtonUp(sender, e);
+            }
         }
 
         public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
         {
             // If we're not in phase two then we shouldn't be getting this event
-            if (!m_phase2)
+            if (2 != m_phase)
             {
                 return;
             }
 
             // Ending phase 2 by whatever we do here
-            m_phase2 = false;
+            m_phase = -1;
 
+            // Clear the border if we'd previously set one
+            if (null != m_puWithAlteredBorderColor)
+            {
+                m_puWithAlteredBorderColor.SetBorderColor(PFD.ProcessUnits.ProcessUnitBorderColor.NoBorder);
+                m_puWithAlteredBorderColor = null;
+            }
+
+            // Get the mouse position
             Point pos = e.GetPosition(m_canvas);
 
-            // Here is where we have to finalize the stream placement. Initialize the list of 
-            // undo actions.
+            // Check to see if we're over a process unit. If there is one then we check to see if 
+            // we can attach to it
+            GenericProcessUnit gpu = m_canvas.GetChildAt(pos, m_newStream) as GenericProcessUnit;
+
+            // There are 2 possible cases we can have that would send us to phase 3 from here:
+            // 1. If the mouse is let up while over the same process unit that was clicked on for the source.
+            // 2. If there is no source process unit and the mouse-up location is very close to the 
+            //    mouse-down location that was received in phase 1.
+            if ((null != gpu && object.ReferenceEquals(gpu, m_newStream.Source)) ||
+                (null == m_newStream.Source && ((new MathCore.Vector(pos)) - m_phase1DownPt).Length < 5.0))
+            {
+                m_phase = 3;
+                return;
+            }
+
+            // Initialize the list of undo actions.
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
 
             // If we attached to a source earlier then we need an undo to detach
@@ -247,9 +293,6 @@ namespace ChemProV.UI.DrawingCanvas.States
                 undos.Add(new DetachOutgoingStream(m_newStream.Source, m_newStream));
             }
 
-            // Check to see if we're over a process unit. If there is one then we check to see if 
-            // we can attach to it
-            GenericProcessUnit gpu = m_canvas.GetChildAt(pos, m_newStream) as GenericProcessUnit;
             if (null != gpu)
             {
                 if (!gpu.IsAcceptingIncomingStreams(m_newStream))
@@ -282,6 +325,9 @@ namespace ChemProV.UI.DrawingCanvas.States
             m_canvas.AddUndo(new UndoRedoCollection(
                 "Undo creation of new stream", undos.ToArray()));
 
+            // We've placed the stream so we can now show the table
+            m_newStream.ShowTable(true);
+
             m_newStream.UpdateStreamLocation();
 
             // Go back to the selecting state
@@ -300,11 +346,11 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         public void StateEnding()
         {
-            if (m_phase2)
+            if (m_phase > 1)
             {
                 EndWithoutDestConnection(false);
                 
-                m_phase2 = false;
+                m_phase = -1;
             }
             else if (null != m_initialIcon)
             {
@@ -330,8 +376,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // In this case we've already connected the source, so we don't want to delete the 
             // stream entirely, we just want to have the destination unconnected.
 
-            // End phase 2
-            m_phase2 = false;
+            m_phase = -1;
 
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
 
@@ -368,6 +413,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             m_canvas.AddUndo(new UndoRedoCollection("Undo creation of new stream", undos.ToArray()));
 
             // Update the stream's visual stuff
+            m_newStream.ShowTable(false);
             m_newStream.UpdateStreamLocation();
 
             if (switchPaletteBackToSelect)
