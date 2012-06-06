@@ -266,6 +266,9 @@ namespace ChemProV.PFD.Streams
 
                     // Add the new one to the canvas
                     m_canvas.AddNewChild(m_table as UIElement);
+
+                    // Make sure it has the right z-index
+                    (m_table as UIElement).SetValue(System.Windows.Controls.Canvas.ZIndexProperty, 3);
                 }
             }
         }
@@ -515,7 +518,7 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// Private constructor. This is used only to get designed view to work. It MUST NOT BE 
+        /// Private constructor. This is used only to get designed view to work. IT MUST NOT BE 
         /// MADE PUBLIC. For correct initialization the stream needs a DrawingCanvas reference.
         /// </summary>
         private AbstractStream()
@@ -588,23 +591,23 @@ namespace ChemProV.PFD.Streams
                 // Add it to the canvas and set it up
                 m_canvas.AddNewChild(m_table as UIElement);
 
-                UserControl puAsUiElement = m_table as UserControl;
+                UserControl tableAsUiElement = m_table as UserControl;
 
-                //width and height needed to calculate position, for some reaons it did not like puAsUiElemnt.Width had to
-                //go with ActualWidth and ActualHeight but everything else had to b e Width and Height.
-                double width = puAsUiElement.ActualWidth;
-                double height = puAsUiElement.ActualHeight;
+                //width and height needed to calculate position, for some reaons it did not like tableAsUiElement.Width 
+                //had to go with ActualWidth and ActualHeight but everything else had to b e Width and Height.
+                double width = tableAsUiElement.ActualWidth;
+                double height = tableAsUiElement.ActualHeight;
 
                 //This sets the tables index to the greatest so it will be above everything
-                puAsUiElement.SetValue(System.Windows.Controls.Canvas.ZIndexProperty, 3);
+                tableAsUiElement.SetValue(System.Windows.Controls.Canvas.ZIndexProperty, 3);
 
                 m_table.TableDataChanged -= new TableDataEventHandler((canvas as DrawingCanvas).TableDataChanged);
                 m_table.TableDataChanged += new TableDataEventHandler((canvas as DrawingCanvas).TableDataChanged);
 
                 m_table.TableDataChanging += new EventHandler((canvas as DrawingCanvas).TableDataChanging);
 
-                puAsUiElement.MouseLeftButtonDown += new MouseButtonEventHandler((canvas as DrawingCanvas).MouseLeftButtonDownHandler);
-                puAsUiElement.MouseLeftButtonUp += new MouseButtonEventHandler((canvas as DrawingCanvas).MouseLeftButtonUpHandler);
+                tableAsUiElement.MouseLeftButtonDown += new MouseButtonEventHandler((canvas as DrawingCanvas).MouseLeftButtonDownHandler);
+                tableAsUiElement.MouseLeftButtonUp += new MouseButtonEventHandler((canvas as DrawingCanvas).MouseLeftButtonUpHandler);
             }
         }
 
@@ -771,5 +774,29 @@ namespace ChemProV.PFD.Streams
         }
 
         #endregion
+
+        public void HideTable()
+        {
+            TableLine.Visibility = System.Windows.Visibility.Collapsed;
+            if (null != m_table)
+            {
+                (m_table as UIElement).Visibility = System.Windows.Visibility.Collapsed;
+            }
+        }
+
+        public void ShowTable(bool autoPosition)
+        {
+            TableLine.Visibility = System.Windows.Visibility.Visible;
+            if (null != m_table)
+            {
+                (m_table as UIElement).Visibility = System.Windows.Visibility.Visible;
+            }
+
+            // Position it if it was requested
+            if (autoPosition)
+            {
+                CalculateTablePositon(m_srcDragIcon.Location, m_dstDragIcon.Location);
+            }
+        }
     }
 }
