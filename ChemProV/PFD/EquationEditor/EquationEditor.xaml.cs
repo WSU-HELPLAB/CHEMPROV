@@ -146,27 +146,13 @@ namespace ChemProV.PFD.EquationEditor
 
         #region public methods
 
-        [Obsolete("Does nothing")]
-        public void InsertConstant(string constant)
-        {
-
-        }
-
-        [Obsolete("Does nothing")]
-        public void ChangeSolveabiltyStatus(bool solvable)
-        {
-            //Empty since solvability is turned off.
-            //We can't really say if something is solvable or not.
-            return;
-        }
-
         /// <summary>
         /// Will remove all existing equations currently listed in the equation editor. Can 
         /// optionally add in the default blank row if desired.
         /// </summary>
         public void ClearEquations(bool addDefaultBlank)
         {
-            EquationsGrid.Children.Clear();
+            EquationsStackPanel.Children.Clear();
 
             if (addDefaultBlank)
             {
@@ -301,13 +287,106 @@ namespace ChemProV.PFD.EquationEditor
 
             // TODO: Make it readonly if necessary
 
-            EquationsGrid.Children.Add(newRow);
+            EquationsStackPanel.Children.Add(newRow);
             newRow.Model.RelatedElements = PfdElements;
             newRow.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
 
             newRow.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
 
+            // Fix the move up/move down buttons on all rows
+            FixUpDownButtons();
+
+            // Link up events for move up/move down buttons
+            newRow.MoveDownButton.Click += new RoutedEventHandler(MoveDownButton_Click);
+            newRow.MoveUpButton.Click += new RoutedEventHandler(MoveUpButton_Click);
+
             return newRow.Model;
+        }
+
+        private void MoveDownButton_Click(object sender, RoutedEventArgs e)
+        {
+            EquationControl row = null;
+            
+            // Start by finding the row index in the stack panel
+            int indexOfThis = -1;
+            for (int i = 0; i < EquationsStackPanel.Children.Count; i++)
+            {
+                // Will throw an exception if it the object is not an EquationControl, but that's 
+                // what we want since the design contract is that all objects in the stack panel 
+                // must be EquationControl objects.
+                EquationControl ec = (EquationControl)EquationsStackPanel.Children[i];
+                
+                if (object.ReferenceEquals(sender, ec.MoveDownButton))
+                {
+                    indexOfThis = i;
+                    row = ec;
+                    break;
+                }
+            }
+
+
+            // If it's the last row then disable the button to move down and return
+            if (indexOfThis == EquationRowCount - 1)
+            {
+                row.MoveDownButton.IsEnabled = false;
+                return;
+            }
+
+            // Move it down by removing it then inserting it
+            EquationsStackPanel.Children.Remove(row);
+            EquationsStackPanel.Children.Insert(indexOfThis + 1, row);
+
+            FixUpDownButtons();
+        }
+
+        private void MoveUpButton_Click(object sender, RoutedEventArgs e)
+        {
+            EquationControl row = null;
+
+            // Start by finding the row index in the stack panel
+            int indexOfThis = -1;
+            for (int i = 0; i < EquationsStackPanel.Children.Count; i++)
+            {
+                // Will throw an exception if it the object is not an EquationControl, but that's 
+                // what we want since the design contract is that all objects in the stack panel 
+                // must be EquationControl objects.
+                EquationControl ec = (EquationControl)EquationsStackPanel.Children[i];
+
+                if (object.ReferenceEquals(sender, ec.MoveUpButton))
+                {
+                    indexOfThis = i;
+                    row = ec;
+                    break;
+                }
+            }
+
+
+            // If it's the first row then disable the button to move up and return
+            if (0 == indexOfThis)
+            {
+                row.MoveUpButton.IsEnabled = false;
+                return;
+            }
+
+            // Move it down by removing it then inserting it
+            EquationsStackPanel.Children.Remove(row);
+            EquationsStackPanel.Children.Insert(indexOfThis - 1, row);
+
+            FixUpDownButtons();
+        }
+
+        /// <summary>
+        /// Sets the proper IsEnabled state for the move up and move down buttons in each row
+        /// </summary>
+        private void FixUpDownButtons()
+        {
+            int count = EquationRowCount;
+            for (int i = 0; i < count; i++)
+            {
+                EquationControl ec = GetRow(i);
+                ec.MoveUpButton.IsEnabled = (i != 0);
+                ec.MoveDownButton.IsEnabled = (i < count - 1);
+            }
         }
 
         /// <summary>
@@ -319,14 +398,15 @@ namespace ChemProV.PFD.EquationEditor
             UIElement uie = thisOne as UIElement;
 
 #if DEBUG
-            if (!EquationsGrid.Children.Contains(uie))
+            if (!EquationsStackPanel.Children.Contains(uie))
             {
                 throw new ArgumentException(
                     "Request was made to delete an equation row that was not in the stack");
             }
 #endif
             
-            EquationsGrid.Children.Remove(uie);
+            EquationsStackPanel.Children.Remove(uie);
+            FixUpDownButtons();
         }
 
         /// <summary>
@@ -391,7 +471,7 @@ namespace ChemProV.PFD.EquationEditor
             get
             {
                 List<EquationModel> models = new List<EquationModel>();
-                foreach (UIElement uie in EquationsGrid.Children)
+                foreach (UIElement uie in EquationsStackPanel.Children)
                 {
                     EquationControl ec = uie as EquationControl;
                     if (null == ec)
@@ -409,42 +489,16 @@ namespace ChemProV.PFD.EquationEditor
         /// <summary>
         /// Gets the equation control at the specified row index.
         /// </summary>
-        /// <param name="index">Zero-based index of the row</param>
-        /// <returns>Null if not found, reference to the appropriate EquationControl otherwise</returns>
+        /// <param name="index">Zero-based index of the row.</param>
+        /// <returns>Null if index is invalid, reference to the appropriate EquationControl otherwise.</returns>
         private EquationControl GetRow(int index)
         {
-            if (index < 0)
+            if (index < 0 || index >= EquationsStackPanel.Children.Count)
             {
                 return null;
             }
 
-            int rowsSeen = 0;
-
-            // Iterate through the itms in the stack panel of equation controls. At the time of this writing, 
-            // the only items in here will be EquationControl objects, so we could just do:
-            //   return EquationsGrid.Children[index] as EquationControl
-            // However, in the future I could see things such as equation feedback elements being added beneath 
-            // equation controls in this panel for usability purposes. Therefore we do an iteration through the 
-            // children, which is more robust for the future.
-            foreach (UIElement uie in EquationsGrid.Children)
-            {
-                EquationControl ec = uie as EquationControl;
-                if (null == ec)
-                {
-                    continue;
-                }
-
-                if (index == rowsSeen)
-                {
-                    return ec;
-                }
-
-                // We have passed up another row
-                rowsSeen++;
-            }
-
-            // Coming here implies that we didn't find it
-            return null;
+            return (EquationControl)EquationsStackPanel.Children[index];
         }
 
         /// <summary>
@@ -588,40 +642,21 @@ namespace ChemProV.PFD.EquationEditor
             {
                 UpdateEquationModelElements(model);
             }
-
-            // Find the index of the last row that has a non-empty equation in it
-            int lastNonEmpty = -1;
-            int i = EquationRowCount - 1;
-            while (i >= 0)
-            {
-                if (!string.IsNullOrEmpty(GetRow(i).Model.Equation))
-                {
-                    lastNonEmpty = i;
-                    break;
-                }
-
-                i--;
-            }
         }
 
         public int EquationRowCount
         {
             get
-            {
+            {                
                 int rowsSeen = 0;
-
-                // Iterate through the itms in the stack panel of equation controls. At the time of this writing, 
-                // the only items in here will be EquationControl objects, so we could just do:
-                //   return EquationsGrid.Children.Count
-                // However, in the future I could see things such as equation feedback elements being added beneath 
-                // equation controls in this panel for usability purposes. Therefore we do an iteration through the 
-                // children, which is more robust for the future.
-                foreach (UIElement uie in EquationsGrid.Children)
+                foreach (UIElement uie in EquationsStackPanel.Children)
                 {
                     EquationControl ec = uie as EquationControl;
                     if (null == ec)
                     {
-                        continue;
+                        throw new InvalidOperationException(
+                            "Found a control that was not an EquationControl in the equation control stack. " +
+                            "Control was: " + uie.ToString());
                     }
 
                     // We have passed up another row

@@ -16,15 +16,29 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     mc:Ignorable="d"
     d:DesignHeight="50" d:DesignWidth="635" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
     <Border>
-        <Grid x:Name="LayoutRoot" Background="White">
+        <StackPanel x:Name="LayoutRoot" Background="White" Orientation="Vertical">
             <ctk:DockPanel>
                 <!-- Delete button -->
-                <Button Height="25" Width="25"  Margin="0,0,5,0" Name="DeleteRowButton" Click="DeleteRowButton_Click">
+                <Button Height="25" Width="25" Margin="0,0,5,0" Name="DeleteRowButton" Click="DeleteRowButton_Click">
                     <ToolTipService.ToolTip>Delete this equation row</ToolTipService.ToolTip>
                     
                     <Image Source="/UI/Icons/XBtn_16x16.png" Width="16" Height="16" />
                 </Button>
                 
+                <!-- Button to move the control up a row. Events handled by parent equation editor control. -->
+                <Button Height="25" Width="25" Name="MoveUpButton">
+                    <ToolTipService.ToolTip>Move this equation up one row</ToolTipService.ToolTip>
+
+                    <Image Source="/UI/Icons/up_arrow_16x16.png" Width="16" Height="16" />
+                </Button>
+
+                <!-- Button to move the control down a row. Events handled by parent equation editor control. -->
+                <Button Height="25" Width="25" Margin="0,0,5,0" Name="MoveDownButton">
+                    <ToolTipService.ToolTip>Move this equation down one row</ToolTipService.ToolTip>
+
+                    <Image Source="/UI/Icons/down_arrow_16x16.png" Width="16" Height="16" />
+                </Button>
+
                 <!-- annotation button -->
                 <Button Height="25" Width="25" Name="AnnotationButton">
                     <Image Source="/UI/Icons/palette_stickyNote_16x16_gray.png" Width="16" Height="16" />
@@ -38,7 +52,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200"  
                     TextWrapping="Wrap" Height="25" HorizontalAlignment="Stretch" TextChanged="EquationTextBox_TextChanged" />
             </ctk:DockPanel>
+            
+            <!-- Can put more controls here in the future for things like equation feedback messages -->
 
-        </Grid>
+        </StackPanel>
     </Border>
 </UserControl>
