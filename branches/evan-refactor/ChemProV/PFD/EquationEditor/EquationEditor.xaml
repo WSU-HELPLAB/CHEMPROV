@@ -22,7 +22,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     <Grid x:Name="LayoutRoot" Background="White">
         <StackPanel>
             <StackPanel Background="Silver" HorizontalAlignment="Stretch">
-                    <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
+                <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
             </StackPanel>
             <ScrollViewer
                 Width="Auto"
@@ -55,8 +55,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     </Grid>
 
                     <!-- Stack panel for equation controls -->
-                    <StackPanel x:Name="EquationsGrid" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                    <StackPanel x:Name="EquationsStackPanel" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
                         <!-- EquationControl objects are added at runtime -->
+                        <!-- ALL objects added to this stack panel must be EquationControl objects -->
                     </StackPanel>
 
                     <!-- Button to add a new equation row. This should not be visible when the editor is in read-only mode. -->

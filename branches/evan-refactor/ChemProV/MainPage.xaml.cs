@@ -314,7 +314,10 @@ namespace ChemProV
 
         private void CompoundTable_ConstantClicked(object sender, EventArgs e)
         {
-            WorkSpace.EquationEditor.InsertConstant((sender as Button).Content as string);
+            // E.O.
+            // This code used to insert the constant into an equation in the equation editor. At 
+            // some point we might bring that functionality back.
+            //WorkSpace.EquationEditor.InsertConstant((sender as Button).Content as string);
         }
 
         public void SaveChemProVFile(Stream stream)
@@ -650,12 +653,14 @@ namespace ChemProV
         {
             WorkSpace.Redo();
             FullWorkspaceChange();
+            WorkSpace.CheckRulesForPFD(null, null);
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Undo();
             FullWorkspaceChange();
+            WorkSpace.CheckRulesForPFD(null, null);
         }
 
         private void FullWorkspaceChange()
