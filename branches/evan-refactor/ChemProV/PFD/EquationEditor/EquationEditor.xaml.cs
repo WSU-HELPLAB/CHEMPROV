@@ -132,10 +132,15 @@ namespace ChemProV.PFD.EquationEditor
             updateCompounds();
             updateScopes();
 
-            // TEST: Try setting tooltips at runtime
-            // Doesn't fix the clipping issue
-            //ToolTipService.SetToolTip(TypeColumnHelpBtn, "Indicates whether the equation expresses a fact given in the problem (problem " +
-            //    "specification), indicates a total input or output, or refers to a specific compound.");
+            // Set tooltips at runtime
+            TextBlock tbTypeTip = new TextBlock();
+            tbTypeTip.Text = "Indicates whether the equation expresses a fact given in the problem (problem\n" +
+                "specification), indicates a total input or output, or refers to a specific compound.";
+            ToolTipService.SetToolTip(TypeColumnHelpIcon, tbTypeTip);
+            TextBlock tbScopeTip = new TextBlock();
+            tbScopeTip.Text = "Indicates the process unit or subprocess to which the equation refers. Choose\n\"" +
+                "Overall\" if the equation expresses a balance over the entire process as a whole.";
+            ToolTipService.SetToolTip(ScopeColumnHelpIcon, tbScopeTip);
         }
         #endregion Constructor
 
@@ -700,7 +705,7 @@ namespace ChemProV.PFD.EquationEditor
 
         private void ScopeColumnHelpBtn_Click(object sender, RoutedEventArgs e)
         {
-            MessageBox.Show("Indicates the process unit or subprocess to which the equation refers. Choose \"" + 
+            MessageBox.Show("Indicates the process unit or subprocess to which the equation refers. Choose \"" +
                 "Overall\" if the equation expresses a balance over the entire process as a whole.",
                 "Equation Scope", MessageBoxButton.OK);
         }

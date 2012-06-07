@@ -45,19 +45,11 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                         </Grid.ColumnDefinitions>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center">
                             <TextBlock Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                            <Button HorizontalAlignment="Stretch" Name="TypeColumnHelpBtn" Click="TypeColumnHelpBtn_Click">
-                                <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
-                                    <ToolTipService.ToolTip>Click for info about the equation type</ToolTipService.ToolTip>
-                                </Image>
-                            </Button>
+                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16" Name="TypeColumnHelpIcon" />
                         </StackPanel>
                         <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
                             <TextBlock Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
-                            <Button HorizontalAlignment="Stretch" Name="ScopeColumnHelpBtn" Click="ScopeColumnHelpBtn_Click">
-                                <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16">
-                                    <ToolTipService.ToolTip>Click for info about the equation scope</ToolTipService.ToolTip>
-                                </Image>
-                            </Button>
+                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16" Name="ScopeColumnHelpIcon" />
                         </StackPanel>
                         <TextBlock Grid.Row="0" Grid.Column="4" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
                     </Grid>

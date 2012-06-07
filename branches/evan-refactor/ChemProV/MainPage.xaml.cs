@@ -165,9 +165,19 @@ namespace ChemProV
                 versionNumber = assemblyName.Version.ToString();
             }
 
-            // E.O.
             // Intialize the static App class
             Core.App.Init(WorkSpace, PrimaryPalette);
+
+            // Make sure that when the equation editor or compounds control gets focus that the 
+            // control palette switches back to select mode
+            WorkSpace.EquationEditor.GotFocus += delegate(object sender, RoutedEventArgs e)
+            {
+                Core.App.ControlPalette.SwitchToSelect();
+            };
+            CompoundTable.GotFocus += delegate(object sender, RoutedEventArgs e)
+            {
+                Core.App.ControlPalette.SwitchToSelect();
+            };
         }
 
         public void LoadChemProVFile(Stream stream)

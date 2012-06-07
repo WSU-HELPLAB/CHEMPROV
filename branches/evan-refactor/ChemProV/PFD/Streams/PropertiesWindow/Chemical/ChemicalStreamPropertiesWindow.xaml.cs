@@ -109,10 +109,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         }
 
         public ChemicalStreamPropertiesWindow()
-        {
-            InitializeComponent();
-            LocalInit(false);
-        }
+            : this(false)
+        {  }
 
         public ChemicalStreamPropertiesWindow(bool isReadOnly)
         {
@@ -322,41 +320,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        /// <summary>
-        /// This method highlights the currently selected row in the chemical stream 
-        /// property window
-        /// </summary>
-        private void highlightRow(Brush brush, int index)
-        {
-            if (index >=0)
-            {
-                //highlight the label textbox in the selected row
-                TextBox tb = PropertiesGrid.GetUIElementAt(1, index + 1) as TextBox;
-                tb.Background = brush;
-                //highlight the qty textbox in the selected row
-                tb = PropertiesGrid.GetUIElementAt(2, index + 1) as TextBox;
-                tb.Background = brush;
-                //highlight the units combobox in the selected row
-                ComboBox cb = PropertiesGrid.GetUIElementAt(3, index + 1) as ComboBox;
-                cb.Background = brush;
-                cb.BorderBrush = brush; //combobox border highlighted to make more visible
-
-                //highlight the compound column in the selected row
-                if (index == 0) //the first row column 4 is a textblock
-                {
-                    TextBlock tbk = PropertiesGrid.GetUIElementAt(4, index + 1) as TextBlock;
-                    //tbk.Foreground = brush;
-                    tbk.FontWeight = FontWeights.ExtraBold;
-                }
-                else // otherwise the 4th column is a combobox
-                {
-                    cb = PropertiesGrid.GetUIElementAt(4, index + 1) as ComboBox;
-                    cb.Background = brush;
-                    cb.BorderBrush = brush; //combobox border highlighted to make more visible
-                }
-            }
-        }
-
         void LabelText_GotFocus(object sender, RoutedEventArgs e)
         {
             TextBox tb = sender as TextBox;            
@@ -373,8 +336,10 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 }
             }
             
-            highlightRow(highlightFeedbackBrush, tbIndex);
-            
+            // E.O.
+            // Taking out the highlight stuff since it's all broken at this point and not 
+            // being used anyway
+            //highlightRow(highlightFeedbackBrush, tbIndex);            
         }
 
         private void LabelText_Changed(object sender, TextChangedEventArgs e)
