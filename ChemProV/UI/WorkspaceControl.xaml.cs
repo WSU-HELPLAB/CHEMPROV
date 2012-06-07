@@ -391,5 +391,20 @@ namespace ChemProV.UI
                     new PFD.Undos.UndoRedoCollection("Undo comment merge", undos.ToArray()));
             }
         }
+
+        public Rect VisiblePFDArea
+        {
+            get
+            {
+                double hBarHeight = 
+                    (ScrollBarVisibility.Visible == DrawingCanvasScollViewer.HorizontalScrollBarVisibility) ? 
+                    30.0 : 0.0;
+                return new Rect(
+                    DrawingCanvasScollViewer.HorizontalOffset,
+                    DrawingCanvasScollViewer.VerticalOffset,
+                    DrawingCanvasScollViewer.Width,
+                    DrawingCanvasScollViewer.Height - hBarHeight);
+            }
+        }
     }
 }

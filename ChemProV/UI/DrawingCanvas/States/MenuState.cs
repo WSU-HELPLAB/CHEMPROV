@@ -100,8 +100,6 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 AddCommentCollectionMenuOptions(m_contextMenu);
             }
-            m_contextMenu.SetValue(Canvas.LeftProperty, location.X);
-            m_contextMenu.SetValue(Canvas.TopProperty, location.Y);
 
             // If the user has right-clicked on a process unit then we want to add subprocess options
             if (m_canvas.SelectedElement is PFD.ProcessUnits.IProcessUnit)
@@ -113,6 +111,35 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Set the Z-index to put the menu on top of everything else
             m_contextMenu.SetValue(Canvas.ZIndexProperty, 4);
             m_canvas.Children.Add(m_contextMenu);
+
+            m_contextMenu.Measure(new Size(2000.0, 2000.0));
+
+            // Compute the location for the menu
+            Rect workArea = Core.App.Workspace.VisiblePFDArea;
+            double menuX = location.X;
+            if (menuX < 0.0)
+            {
+                menuX = 0.0;
+            }
+            m_contextMenu.SetValue(Canvas.LeftProperty, menuX);
+            double menuY = location.Y;
+            if (menuY + m_contextMenu.DesiredSize.Height > workArea.Bottom)
+            {
+                // Move it up
+                menuY = workArea.Bottom - m_contextMenu.DesiredSize.Height;
+            }
+            if (menuY < workArea.Top)
+            {
+                menuY = workArea.Top;
+            }
+            m_contextMenu.SetValue(Canvas.TopProperty, menuY);
+
+            // TEST
+            //System.Windows.Controls.Primitives.Popup pop = new System.Windows.Controls.Primitives.Popup();
+            //pop.Child = m_contextMenu;
+            //pop.HorizontalOffset = menuX;
+            //pop.VerticalOffset = menuY;
+            //pop.IsOpen = true;
         }
 
         #region IState Members
