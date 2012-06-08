@@ -14,10 +14,8 @@ namespace ChemProV.Core
     public class NamedColors
     {
         /// <summary>
-        /// E.O.
-        /// Array of all possible subgroup colors. You can add or remove colors as you like 
-        /// and they will appear in the "Subprocess" popup menu when the user right-clicks on 
-        /// a process unit.
+        /// Array of all possible subgroup colors. You can add or remove colors as you like and 
+        /// they will appear as subprocess options when the user right-clicks on a process unit.
         /// </summary>
         public static readonly NamedColor[] All = new NamedColor[]{
             new NamedColor("None (white)", Colors.White), // White is the default
@@ -27,7 +25,6 @@ namespace ChemProV.Core
     }
 
     /// <summary>
-    /// E.O.
     /// Immutable structure for a color with a name.
     /// </summary>
     public struct NamedColor
