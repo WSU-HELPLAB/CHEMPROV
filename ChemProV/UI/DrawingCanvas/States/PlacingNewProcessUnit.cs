@@ -155,7 +155,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 // Create an undo that sets the stream source back to what it was and removes the 
                 // process unit from the canvas
                 m_canvas.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
-                    new SetStreamSource(endpoint.ParentStream, endpoint.ParentStream.Source, null, endpoint.Location),
+                    new SetStreamSource(endpoint.ParentStream, null, m_pu, endpoint.Location),
                     new RemoveFromCanvas(m_pu, m_canvas)));
                 
                 m_pu.AttachOutgoingStream(endpoint.ParentStream);

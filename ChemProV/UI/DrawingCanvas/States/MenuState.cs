@@ -117,9 +117,14 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Compute the location for the menu
             Rect workArea = Core.App.Workspace.VisiblePFDArea;
             double menuX = location.X;
-            if (menuX < 0.0)
+            if (menuX + m_contextMenu.DesiredSize.Width > workArea.Right)
             {
-                menuX = 0.0;
+                // Move it left
+                menuX = workArea.Right - m_contextMenu.DesiredSize.Width;
+            }
+            if (menuX < workArea.Left)
+            {
+                menuX = workArea.Left;
             }
             m_contextMenu.SetValue(Canvas.LeftProperty, menuX);
             double menuY = location.Y;
@@ -244,7 +249,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             menuItem.FontWeight = FontWeights.Bold;
 
             menuItem = new MenuItem();
-            menuItem.Header = "Add new comment...";
+            menuItem.Header = "Add new comment";
             menuItem.Tag = m_canvas.SelectedElement;
             newContextMenu.Items.Add(menuItem);
 
@@ -341,50 +346,70 @@ namespace ChemProV.UI.DrawingCanvas.States
             parentMenuItem.Foreground = new SolidColorBrush(Color.FromArgb(255, 100, 100, 100));
             parentMenuItem.FontWeight = FontWeights.Bold;
 
-            // Create a submenu for colors. See the declaration of the Core.NamedColors.All array for 
-            // the list of colors that are being used. Make changes in that array (not in this code) 
-            // to change the list of available colors.
-            foreach (Core.NamedColor nc in Core.NamedColors.All)
+            if (false)
             {
-                MenuItem menuItem = new MenuItem();
-                menuItem.Header = nc.Name;
-                menuItem.Tag = System.Tuple.Create<PFD.ProcessUnits.IProcessUnit, Color>(
-                    pu, nc.Color);
-
-                // Show the menu item with a check next to it if it's the current color
-                if (nc.Color.Equals(pu.Subprocess))
+                // Create a submenu for colors. See the declaration of the Core.NamedColors.All array for 
+                // the list of colors that are being used. Make changes in that array (not in this code) 
+                // to change the list of available colors.
+                foreach (Core.NamedColor nc in Core.NamedColors.All)
                 {
-                    menuItem.Icon = Core.App.CreateImageFromSource("check_16x16.png");
+                    MenuItem menuItem = new MenuItem();
+                    menuItem.Header = nc.Name;
+                    menuItem.Tag = System.Tuple.Create<PFD.ProcessUnits.IProcessUnit, Color>(
+                        pu, nc.Color);
+
+                    // Show the menu item with a check next to it if it's the current color
+                    if (nc.Color.Equals(pu.Subprocess))
+                    {
+                        menuItem.Icon = Core.App.CreateImageFromSource("check_16x16.png");
+                    }
+
+                    // Add it to the menu
+                    newContextMenu.Items.Add(menuItem);
+
+                    // Use an anonymous delegate to handle the click event
+                    menuItem.Click += delegate(object sender, RoutedEventArgs e)
+                    {
+                        // Get the objects we need
+                        MenuItem tempMI = sender as MenuItem;
+                        System.Tuple<PFD.ProcessUnits.IProcessUnit, Color> t = tempMI.Tag as
+                            System.Tuple<PFD.ProcessUnits.IProcessUnit, Color>;
+
+                        // Create undo item before setting the new subgroup
+                        m_canvas.AddUndo(new UndoRedoCollection("Undo subprocess change",
+                            new SetSubprocess(t.Item1)));
+
+                        // Set the subgroup
+                        t.Item1.Subprocess = t.Item2;
+
+                        m_canvas.PFDModified();
+
+                        // Make sure to remove the popup menu from the canvas
+                        m_canvas.Children.Remove(m_contextMenu);
+                        m_contextMenu = null;
+
+                        // Flip back to the default state for the canvas (null)
+                        m_canvas.CurrentState = null;
+                    };
                 }
-
-                // Add it to the menu
-                newContextMenu.Items.Add(menuItem);
-
-                // Use an anonymous delegate to handle the click event
-                menuItem.Click += delegate(object sender, RoutedEventArgs e)
-                {
-                    // Get the objects we need
-                    MenuItem tempMI = sender as MenuItem;
-                    System.Tuple<PFD.ProcessUnits.IProcessUnit, Color> t = tempMI.Tag as
-                        System.Tuple<PFD.ProcessUnits.IProcessUnit, Color>;
-                    
-                    // Create undo item before setting the new subgroup
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo subprocess change",
-                        new SetSubprocess(t.Item1)));
-
-                    // Set the subgroup
-                    t.Item1.Subprocess = t.Item2;
-
-                    m_canvas.PFDModified();
-
-                    // Make sure to remove the popup menu from the canvas
-                    m_canvas.Children.Remove(m_contextMenu);
-                    m_contextMenu = null;
-
-                    // Flip back to the default state for the canvas (null)
-                    m_canvas.CurrentState = null;
-                };
             }
+
+            MenuItem mi = new MenuItem();
+            mi.Header = "Select subprocess...";
+            mi.Click += delegate(object sender, RoutedEventArgs r)
+            {
+                SubprocessChooserWindow win = new SubprocessChooserWindow(
+                    pu as PFD.ProcessUnits.LabeledProcessUnit);
+                win.Show();
+
+                // Make sure to remove the popup menu from the canvas
+                m_canvas.Children.Remove(m_contextMenu);
+                m_contextMenu = null;
+
+                // Flip back to the default state for the canvas (null)
+                m_canvas.CurrentState = null;
+            };
+            newContextMenu.Items.Add(mi);
         }
     }
 }

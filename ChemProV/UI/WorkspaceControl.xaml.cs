@@ -396,13 +396,16 @@ namespace ChemProV.UI
         {
             get
             {
+                double vBarWidth =
+                    (ScrollBarVisibility.Visible == DrawingCanvasScollViewer.VerticalScrollBarVisibility) ?
+                    30.0 : 0.0;
                 double hBarHeight = 
                     (ScrollBarVisibility.Visible == DrawingCanvasScollViewer.HorizontalScrollBarVisibility) ? 
                     30.0 : 0.0;
                 return new Rect(
                     DrawingCanvasScollViewer.HorizontalOffset,
                     DrawingCanvasScollViewer.VerticalOffset,
-                    DrawingCanvasScollViewer.Width,
+                    DrawingCanvasScollViewer.Width - vBarWidth,
                     DrawingCanvasScollViewer.Height - hBarHeight);
             }
         }
