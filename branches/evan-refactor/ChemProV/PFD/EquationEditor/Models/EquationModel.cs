@@ -174,7 +174,6 @@ namespace ChemProV.PFD.EquationEditor.Models
             PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
         #endregion
-
         
     }
 }
