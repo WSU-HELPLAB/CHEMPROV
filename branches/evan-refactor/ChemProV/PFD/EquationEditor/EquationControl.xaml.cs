@@ -33,6 +33,8 @@ namespace ChemProV.PFD.EquationEditor
     public partial class EquationControl : UserControl//, IXmlSerializable, INotifyPropertyChanged
     {
         public delegate void DeleteRequestDelegate(EquationControl sender);
+
+        private bool m_commentsVisible = false;
         
         private EquationModel m_model;
 
@@ -49,13 +51,6 @@ namespace ChemProV.PFD.EquationEditor
 
             // Setup the annotation button
             RefreshAnnotationButton();
-            AnnotationButton.Click += delegate(object sender, RoutedEventArgs e)
-            {
-                PFD.EquationEditor.Views.AnnotateWindow window =
-                    new PFD.EquationEditor.Views.AnnotateWindow();
-                window.DataContext = m_model;
-                window.Show();
-            };
             // Monitor when the annotation changes so that we can set the button's icon to a grayed-out sticky 
             // note when the annotation is empty and a yellow sticky note when it's not
             m_model.PropertyChanged += delegate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -310,6 +305,26 @@ namespace ChemProV.PFD.EquationEditor
         private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             m_model.Type = TypeComboBox.SelectedItem as EquationType;
+        }
+
+        private void AnnotationButton_Click(object sender, RoutedEventArgs e)
+        {
+            PFD.EquationEditor.Views.AnnotateWindow window =
+                    new PFD.EquationEditor.Views.AnnotateWindow();
+            window.DataContext = m_model;
+            window.Show();
+        }
+
+        public bool CommentsVisible
+        {
+            get
+            {
+                return m_commentsVisible;
+            }
+            set
+            {
+                m_commentsVisible = value;
+            }
         }
     }
 }

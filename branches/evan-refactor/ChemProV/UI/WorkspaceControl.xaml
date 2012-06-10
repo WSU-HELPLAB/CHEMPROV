@@ -15,6 +15,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:ChemProV_UI_DrawingCanvas="clr-namespace:ChemProV.UI.DrawingCanvas"
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
     xmlns:ChemProV_Validation_Feedback="clr-namespace:ChemProV.Validation.Feedback"
+    xmlns:ChemProV_UI ="clr-namespace:ChemProV.UI"
     mc:Ignorable="d"
     >
 
@@ -27,6 +28,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
+            <ColumnDefinition Width="150" />
         </Grid.ColumnDefinitions>
 
         <!--drawing canvas -->
@@ -47,13 +49,13 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
         <!--resizer wiget -->
         <controls:GridSplitter
             x:Name="GridSplitter"
-			Grid.Row="1"
+			Grid.Row="1" Grid.Column="0"
 			HorizontalAlignment="Stretch"
 			VerticalAlignment="Center"
 			Background="LightGray"/>
 
         <!--feedback / equation window -->
-        <Grid Grid.Row="2">
+        <Grid Grid.Row="2" Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
@@ -64,5 +66,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             <ChemProV_Validation_Feedback:FeedbackWindow x:Name="FeedbackWindow" Visibility="Collapsed" />
             <ChemProV_EquationEditor:EquationEditor Grid.Column="0" Grid.ColumnSpan="2" x:Name="EquationEditor"/>
         </Grid>
+        
+        <!-- Side panel for comments -->
+        <ChemProV_UI:CommentPane Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Name="CommentsPane"></ChemProV_UI:CommentPane>
     </Grid>
 </UserControl>

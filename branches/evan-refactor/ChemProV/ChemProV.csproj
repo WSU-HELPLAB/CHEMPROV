@@ -251,6 +251,9 @@
     </Compile>
     <Compile Include="UI\Behaviors\MovePopupHeader.cs" />
     <Compile Include="UI\Behaviors\ResizePopupBorder.cs" />
+    <Compile Include="UI\CommentPane.xaml.cs">
+      <DependentUpon>CommentPane.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\CompoundTable.xaml.cs">
       <DependentUpon>CompoundTable.xaml</DependentUpon>
     </Compile>
@@ -268,6 +271,9 @@
     <Compile Include="UI\DrawingCanvas\States\PlacingNewProcessUnit.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingNewCommentNote.cs" />
     <Compile Include="UI\DrawingCanvas\States\ResizingStickyNote.cs" />
+    <Compile Include="UI\EqCommentControl.xaml.cs">
+      <DependentUpon>EqCommentControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
@@ -364,11 +370,19 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\CommentPane.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\CompoundTable.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ControlPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\EqCommentControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

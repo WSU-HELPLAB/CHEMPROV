@@ -11,6 +11,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 // This file contatins defintions for objects relevant to adding comments to items 
 // in ChemProV.
 
+using System;
 using System.Xml.Serialization;
 
 namespace ChemProV.Core
@@ -73,4 +74,64 @@ namespace ChemProV.Core
             get;
         }
     }
+
+    /// <summary>
+    /// Provides a basic implementation of the IComment interface. The object is mutable and has events 
+    /// for when properties change.
+    /// </summary>
+    public class BasicComment : IComment
+    {
+        private string m_text;
+
+        private string m_user;
+
+        public event EventHandler OnTextChanged = null;
+
+        public event EventHandler OnUserNameChanged = null;
+
+        public BasicComment(string text, string userName)
+        {
+            m_text = text;
+            m_user = userName;
+        }
+        
+        public string CommentText
+        {
+            get { return m_text; }
+            set
+            {
+                // See if this changes the comment text
+                if ((null != m_text && !m_text.Equals(value)) ||
+                    (null == m_text && null != value))
+                {
+                    m_text = value;
+
+                    if (null != OnTextChanged)
+                    {
+                        OnTextChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+
+        public string CommentUserName
+        {
+            get { return m_user; }
+            set
+            {
+                // See if this changes the comment user name
+                if ((null != m_user && !m_user.Equals(value)) ||
+                    (null == m_user && null != value))
+                {
+                    m_user = value;
+
+                    if (null != OnUserNameChanged)
+                    {
+                        OnUserNameChanged(this, EventArgs.Empty);
+                    }
+                }
+            }
+        }
+    }
+
 }
