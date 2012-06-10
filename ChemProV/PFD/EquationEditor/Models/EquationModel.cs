@@ -21,6 +21,12 @@ namespace ChemProV.PFD.EquationEditor.Models
         private EquationType _type = new EquationType();
         private string _equation = "";
         private string _annotation = "";
+
+        /// <summary>
+        /// List of comments for this equation
+        /// </summary>
+        private List<Core.BasicComment> m_comments = new List<Core.BasicComment>();
+
         #endregion
 
         #region properties
@@ -51,6 +57,14 @@ namespace ChemProV.PFD.EquationEditor.Models
             {
                 _annotation = value;
                 OnPropertyChanged("Annotation");
+            }
+        }
+
+        public IList<Core.BasicComment> Comments
+        {
+            get
+            {
+                return m_comments;
             }
         }
 
@@ -129,6 +143,8 @@ namespace ChemProV.PFD.EquationEditor.Models
             writer.WriteString(Equation);
             writer.WriteEndElement();
 
+            // TODO: Get rid of annotation and write all comments (but use the <Annotation> tag to maintain 
+            // compatibility)
             writer.WriteStartElement("Annotation");
             writer.WriteString(Annotation);
             writer.WriteEndElement();

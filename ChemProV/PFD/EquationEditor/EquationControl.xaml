@@ -40,9 +40,14 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 </Button>
 
                 <!-- annotation button -->
-                <Button Height="25" Width="25" Name="AnnotationButton">
+                <Button Height="25" Width="25" Name="AnnotationButton" Click="AnnotationButton_Click">
                     <Image Source="/UI/Icons/palette_stickyNote_16x16_gray.png" Width="16" Height="16" />
                 </Button>
+                
+                <!-- Comment icon + border -->
+                <Border Height="25" Width="25" BorderBrush="Gray" BorderThickness="2" CornerRadius="3" Name="CommentIconBorder">
+                    <Image Source="/UI/Icons/comment_16x16.png" Width="16" Height="16"></Image>
+                </Border>
 
                 <!-- Type and scope combo boxes -->
                 <ComboBox Height="25" x:Name="TypeComboBox" MinWidth="130" SelectionChanged="TypeComboBox_SelectionChanged" />

@@ -15,6 +15,7 @@ using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
@@ -300,6 +301,34 @@ namespace ChemProV.PFD.EquationEditor
             newRow.MoveDownButton.Click += new RoutedEventHandler(MoveDownButton_Click);
             newRow.MoveUpButton.Click += new RoutedEventHandler(MoveUpButton_Click);
 
+            // TEST: Set comment button border
+            newRow.CommentsVisible = false;
+            newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+            // Debug: add a few comments
+            newRow.Model.Comments.Add(new Core.BasicComment("Test comment 1", null));
+            newRow.Model.Comments.Add(new Core.BasicComment("Test comment 2", null));
+            newRow.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
+            {
+                newRow.CommentsVisible = !newRow.CommentsVisible;
+                if (newRow.CommentsVisible)
+                {
+                    int index = GetRowIndex(newRow);
+                    if (index >= 0 && index < Core.NamedColors.CommentKeys.Length)
+                    {
+                        newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(
+                            Core.NamedColors.CommentKeys[index].Color);
+                    }
+                }
+                else
+                {
+                    newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                }
+
+                // Update the comments pane
+                Core.App.Workspace.CommentsPane.UpdateComments(
+                    Core.App.Workspace.EquationEditor, null);
+            };
+
             return newRow.Model;
         }
 
@@ -499,6 +528,19 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             return (EquationControl)EquationsStackPanel.Children[index];
+        }
+
+        private int GetRowIndex(EquationControl row)
+        {
+            for (int i = 0; i < EquationsStackPanel.Children.Count; i++)
+            {
+                if (object.ReferenceEquals(row, EquationsStackPanel.Children[i]))
+                {
+                    return i;
+                }
+            }
+
+            return -1;
         }
 
         /// <summary>
@@ -731,18 +773,9 @@ namespace ChemProV.PFD.EquationEditor
             AddNewEquationRow();
         }
 
-        private void TypeColumnHelpBtn_Click(object sender, RoutedEventArgs e)
+        internal EquationControl GetRowControl(int index)
         {
-            MessageBox.Show("Indicates whether the equation expresses a fact given in the problem (problem " +
-                "specification), indicates a total input or output, or refers to a specific compound.",
-                "Equation Type", MessageBoxButton.OK);
-        }
-
-        private void ScopeColumnHelpBtn_Click(object sender, RoutedEventArgs e)
-        {
-            MessageBox.Show("Indicates the process unit or subprocess to which the equation refers. Choose \"" +
-                "Overall\" if the equation expresses a balance over the entire process as a whole.",
-                "Equation Scope", MessageBoxButton.OK);
+            return EquationsStackPanel.Children[index] as EquationControl;
         }
     }
 }

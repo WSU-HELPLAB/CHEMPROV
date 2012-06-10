@@ -37,6 +37,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\ChemProV\Core\CommentDefs.cs">
+      <Link>Core\CommentDefs.cs</Link>
+    </Compile>
     <Compile Include="..\ChemProV\Core\CommentMerger.cs">
       <Link>Core\CommentMerger.cs</Link>
     </Compile>
