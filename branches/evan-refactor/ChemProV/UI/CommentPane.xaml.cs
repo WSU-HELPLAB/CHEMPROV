@@ -19,6 +19,9 @@ namespace ChemProV.UI
         public CommentPane()
         {
             InitializeComponent();
+
+            // Clear anything that was put in as hints at design time
+            CommentsStack.Children.Clear();
         }
 
         private void AddCommentButtonClick(object sender, RoutedEventArgs e)
@@ -36,42 +39,59 @@ namespace ChemProV.UI
             for (int i = 0; i < editor.EquationRowCount; i++)
             {
                 EquationControl ec = editor.GetRowControl(i);
-                if (ec.CommentsVisible && ec.Model.Comments.Count > 0)
+
+                if (!ec.CommentsVisible)
                 {
-                    Border brdr = new Border();
-                    brdr.Margin = new Thickness(3.0, 3.0, 3.0, 0.0);
-                    brdr.CornerRadius = new CornerRadius(3.0);
-                    brdr.BorderThickness = new Thickness(2.0);
-                    brdr.BorderBrush = new SolidColorBrush(NamedColors.CommentKeys[i].Color);
-                    StackPanel sp = new StackPanel();
-                    sp.Orientation = Orientation.Vertical;
-                    brdr.Child = sp;
-
-                    // Add each comment (as a label for testing purposes)
-                    foreach (BasicComment bc in ec.Model.Comments)
-                    {
-                        EqCommentControl cc = new EqCommentControl();
-                        cc.CommentTextBox.Text = bc.CommentText;
-                        cc.Margin = new Thickness(3.0);
-                        cc.CommentTextBox.TextChanged += delegate(object sender, TextChangedEventArgs e)
-                        {
-                            bc.CommentText = cc.CommentTextBox.Text;
-                        };
-                        sp.Children.Add(cc);
-                    }
-
-                    // Add a button to allow addition of more comments
-                    Button btn = new Button();
-                    btn.Margin = new Thickness(3.0);
-                    Image btnIcon = Core.App.CreateImageFromSource("plus_16x16.png");
-                    btnIcon.Width = btnIcon.Height = 16;
-                    btn.Content = btnIcon;
-                    btn.Tag = ec;
-                    btn.Click += new RoutedEventHandler(AddCommentButtonClick);
-                    sp.Children.Add(btn);
-
-                    CommentsStack.Children.Add(brdr);
+                    continue;
                 }
+
+                // Determine the color
+                int clrIndex = i % NamedColors.CommentKeys.Length;
+                Brush clrBrush = new SolidColorBrush(NamedColors.CommentKeys[clrIndex].Color);
+
+                Border brdr = new Border();
+                brdr.Margin = new Thickness(3.0, 3.0, 3.0, 0.0);
+                brdr.CornerRadius = new CornerRadius(3.0);
+                brdr.BorderThickness = new Thickness(2.0);
+                brdr.BorderBrush = clrBrush;
+                StackPanel sp = new StackPanel();
+                sp.Orientation = Orientation.Vertical;
+                brdr.Child = sp;
+
+                // Add a color-coded number label at the top
+                Label numLabel = new Label();
+                numLabel.Content = (i + 1).ToString() + ".";
+                numLabel.Foreground = clrBrush;
+                numLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+                sp.Children.Add(numLabel);
+
+                // Add each comment
+                foreach (BasicComment bc in ec.Model.Comments)
+                {
+                    EqCommentControl cc = new EqCommentControl();
+                    cc.CommentObject = bc;
+                    cc.Margin = new Thickness(3.0);
+                    cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
+                    {
+                        ec.Model.Comments.Remove(cc.CommentObject);
+                        sp.Children.Remove(cc);
+
+                        Core.App.Workspace.EquationEditor.FixNumsAndButtons();
+                    };
+                    sp.Children.Add(cc);
+                }
+
+                // Add a button to allow addition of more comments
+                Button btn = new Button();
+                btn.Margin = new Thickness(3.0);
+                Image btnIcon = Core.App.CreateImageFromSource("plus_16x16.png");
+                btnIcon.Width = btnIcon.Height = 16;
+                btn.Content = btnIcon;
+                btn.Tag = ec;
+                btn.Click += new RoutedEventHandler(AddCommentButtonClick);
+                sp.Children.Add(btn);
+
+                CommentsStack.Children.Add(brdr);
             }
         }
     }

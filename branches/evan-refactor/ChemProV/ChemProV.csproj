@@ -166,9 +166,6 @@
       <DependentUpon>TokenList.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\Tokens\VariableToken.cs" />
-    <Compile Include="PFD\EquationEditor\Views\AnnotateWindow.xaml.cs">
-      <DependentUpon>AnnotateWindow.xaml</DependentUpon>
-    </Compile>
     <Compile Include="PFD\IPfdElement.cs" />
     <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
       <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
@@ -234,7 +231,6 @@
     <Compile Include="PFD\Undos\InsertComment.cs" />
     <Compile Include="PFD\Undos\RemoveComment.cs" />
     <Compile Include="PFD\Undos\RestoreStickyNoteColor.cs" />
-    <Compile Include="PFD\Undos\SetAnnotation.cs" />
     <Compile Include="PFD\Undos\SetProcessSubgroup.cs" />
     <Compile Include="PFD\Undos\DetachIncomingStream.cs" />
     <Compile Include="PFD\Undos\AttachIncomingStream.cs" />
@@ -331,10 +327,6 @@
     <Page Include="PFD\EquationEditor\Tokens\TokenList.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PFD\EquationEditor\Views\AnnotateWindow.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PFD\ProcessUnits\GenericProcessUnit.xaml">
       <Generator>MSBuild:MarkupCompilePass1</Generator>

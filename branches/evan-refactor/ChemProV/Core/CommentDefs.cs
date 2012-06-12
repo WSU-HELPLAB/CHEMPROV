@@ -132,6 +132,31 @@ namespace ChemProV.Core
                 }
             }
         }
+
+        public bool Equals(BasicComment other)
+        {
+            if (null == other)
+            {
+                return false;
+            }
+
+            bool usersMatch;
+            if (string.IsNullOrEmpty(other.m_user))
+            {
+                usersMatch = string.IsNullOrEmpty(this.m_user);
+            }
+            else
+            {
+                usersMatch = other.m_user.Equals(this.m_user);
+            }
+
+            return other.m_text.Equals(this.m_text) && usersMatch;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return this.Equals(obj as BasicComment);
+        }
     }
 
 }

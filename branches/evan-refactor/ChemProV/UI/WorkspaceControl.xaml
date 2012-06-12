@@ -18,56 +18,59 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:ChemProV_UI ="clr-namespace:ChemProV.UI"
     mc:Ignorable="d"
     >
-
+    
     <!--Where the meat of the application takes place -->
-    <Grid x:Name="WorkspaceGrid">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition x:Name="BottomToolBoxRow" Height="150" />
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition />
-            <ColumnDefinition Width="150" />
-        </Grid.ColumnDefinitions>
+        <Grid x:Name="WorkspaceGrid">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition x:Name="BottomToolBoxRow" Height="150" />
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="0" />
+            </Grid.ColumnDefinitions>
 
-        <!--drawing canvas -->
-        <ScrollViewer
+            <!--drawing canvas -->
+            <ScrollViewer
                 x:Name="DrawingCanvasScollViewer"
                 ScrollViewer.HorizontalScrollBarVisibility="Visible"
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
-                >
-            <ChemProV_UI_DrawingCanvas:DrawingCanvas
-            x:Name="DrawingCanvas"
-            Grid.Row="0"
-            Background="Gray"
-            Width="2000"
-            Height="2000" >
-            </ChemProV_UI_DrawingCanvas:DrawingCanvas>
-        </ScrollViewer>
+                Grid.Row="0" Grid.Column="0"
+                HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                    <ChemProV_UI_DrawingCanvas:DrawingCanvas
+                        x:Name="DrawingCanvas"
+                        Background="Gray"
+                        Width="2000"
+                        Height="2000" >
+                    </ChemProV_UI_DrawingCanvas:DrawingCanvas>
+            </ScrollViewer>
 
-        <!--resizer wiget -->
-        <controls:GridSplitter
-            x:Name="GridSplitter"
-			Grid.Row="1" Grid.Column="0"
-			HorizontalAlignment="Stretch"
-			VerticalAlignment="Center"
-			Background="LightGray"/>
+            <!--resizer widget -->
+            <controls:GridSplitter
+                x:Name="GridSplitter"
+			    Grid.Row="1" Grid.Column="0"
+			    HorizontalAlignment="Stretch"
+			    VerticalAlignment="Center"
+			    Background="LightGray"/>
 
-        <!--feedback / equation window -->
-        <Grid Grid.Row="2" Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="2*" />
-            </Grid.ColumnDefinitions>
-            <ChemProV_Validation_Feedback:FeedbackWindow x:Name="FeedbackWindow" Visibility="Collapsed" />
-            <ChemProV_EquationEditor:EquationEditor Grid.Column="0" Grid.ColumnSpan="2" x:Name="EquationEditor"/>
+            <!--feedback / equation window -->
+            <Grid Grid.Row="2" Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+                <ChemProV_Validation_Feedback:FeedbackWindow x:Name="FeedbackWindow" Visibility="Collapsed" />
+                <ChemProV_EquationEditor:EquationEditor Grid.Column="0" Grid.ColumnSpan="2" x:Name="EquationEditor"/>
+            </Grid>
+            
+            <!-- Side panel for comments. Collapsed by default. -->
+            <ChemProV_UI:CommentPane
+                Grid.Row="0" Grid.RowSpan="3" Grid.Column="1"
+                x:Name="CommentsPane"
+                Visibility="Collapsed"></ChemProV_UI:CommentPane>
         </Grid>
-        
-        <!-- Side panel for comments -->
-        <ChemProV_UI:CommentPane Grid.Row="0" Grid.RowSpan="3" Grid.Column="1" Name="CommentsPane"></ChemProV_UI:CommentPane>
-    </Grid>
 </UserControl>

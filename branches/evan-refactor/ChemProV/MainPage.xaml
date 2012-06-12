@@ -56,15 +56,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <Image Source="/UI/Icons/toolbar_about.png" />
                 </Button>
                 
-                <!-- Button to merge comments from another document -->
-                <!-- Merging is really supposed to happen only behind the scenes so this is pretty much
-                   just a debugging button (hence the collapsed visibility)
-                -->
-                <Button Margin="0,0,5,0" Name="btnLoadMergeComments" Click="btnLoadMergeComments_Click" Visibility="Collapsed">
-                    <ToolTipService.ToolTip>Merge comments from another file</ToolTipService.ToolTip>
-                    <Image Source="/UI/Icons/palette_stickyNote_16x16.png"></Image>
-                </Button>
-                
                 <!-- For tests and debugging -->
                 <!-- OSBLE login button -->
                 <Button Name="btnOSBLELogin" Margin="0,0,5,0" Click="btnOSBLELogin_Click" Visibility="Collapsed">

@@ -38,7 +38,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <!-- Grid for the column headers -->
                     <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="105" />
+                            <ColumnDefinition Width="135" />
                             <ColumnDefinition Width="130" />
                             <ColumnDefinition Width="130" />
                             <ColumnDefinition />

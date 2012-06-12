@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
@@ -20,7 +21,6 @@ namespace ChemProV.PFD.EquationEditor.Models
         private EquationScope _scope = new EquationScope();
         private EquationType _type = new EquationType();
         private string _equation = "";
-        private string _annotation = "";
 
         /// <summary>
         /// List of comments for this equation
@@ -44,19 +44,6 @@ namespace ChemProV.PFD.EquationEditor.Models
                     _staticId = _id + 1;
                 }
                 OnPropertyChanged("Id");
-            }
-        }
-
-        public string Annotation
-        {
-            get
-            {
-                return _annotation;
-            }
-            set
-            {
-                _annotation = value;
-                OnPropertyChanged("Annotation");
             }
         }
 
@@ -143,11 +130,18 @@ namespace ChemProV.PFD.EquationEditor.Models
             writer.WriteString(Equation);
             writer.WriteEndElement();
 
-            // TODO: Get rid of annotation and write all comments (but use the <Annotation> tag to maintain 
-            // compatibility)
-            writer.WriteStartElement("Annotation");
-            writer.WriteString(Annotation);
-            writer.WriteEndElement();
+            // Write all comments. Older versions used an "Annotation" tag for a single comment. A redesign 
+            // gave support for multiple comments but we still use the "Annotation" tag for compatibility.
+            foreach (Core.BasicComment bc in m_comments)
+            {
+                writer.WriteStartElement("Annotation");
+                if (!string.IsNullOrEmpty(bc.CommentUserName))
+                {
+                    writer.WriteAttributeString("UserName", bc.CommentUserName);
+                }
+                writer.WriteString(bc.CommentText);
+                writer.WriteEndElement();
+            }
         }
 
         public static EquationModel FromXml(XElement xmlModel)
@@ -162,7 +156,15 @@ namespace ChemProV.PFD.EquationEditor.Models
                 model.Id = id;
             }
             model.Equation = xmlModel.Element("Equation").Value;
-            model.Annotation = xmlModel.Element("Annotation").Value;
+            //model.Annotation = xmlModel.Element("Annotation").Value;
+
+            // Read in the comments
+            foreach (XElement cmtsEl in xmlModel.Elements("Annotation"))
+            {
+                XAttribute userAttr = cmtsEl.Attribute("UserName");
+                string userName = (null == userAttr) ? null : userAttr.Value;
+                model.m_comments.Add(new Core.BasicComment(cmtsEl.Value, userName));
+            }
 
             //scope
             XElement scope = xmlModel.Element("Scope");
@@ -180,6 +182,51 @@ namespace ChemProV.PFD.EquationEditor.Models
 
             return model;
         }
+
+        public bool ContainsComment(BasicComment comment, bool compareReferences = false)
+        {
+            if (compareReferences)
+            {
+                for (int i = 0; i < m_comments.Count; i++)
+                {
+                    if (object.ReferenceEquals(m_comments[i], comment))
+                    {
+                        return true;
+                    }
+                }
+
+                // Didn't find a matching reference
+                return false;
+            }
+
+            // Coming here means that we want to do a value comparison (not reference)
+            foreach (BasicComment bc in m_comments)
+            {
+                if (bc.Equals(comment))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Checks all the comments in this model to see if there's any one with matching comment text
+        /// </summary>
+        public bool ContainsComment(string commentText)
+        {
+            foreach (BasicComment bc in m_comments)
+            {
+                if (commentText.Equals(bc.CommentText))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         #endregion
 
         #endregion
