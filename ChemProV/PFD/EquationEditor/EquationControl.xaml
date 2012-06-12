@@ -18,6 +18,13 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     <Border>
         <StackPanel x:Name="LayoutRoot" Background="White" Orientation="Vertical">
             <ctk:DockPanel>
+                
+                <!-- Number label for this row. Will have it's value set by the parent container. -->
+                <sdk:Label
+                    Width="25" Height="25" FontSize="12"
+                    Foreground="Red" FontWeight="Bold"
+                    Name="NumberLabel">1.</sdk:Label>
+                
                 <!-- Delete button -->
                 <Button Height="25" Width="25" Margin="0,0,5,0" Name="DeleteRowButton" Click="DeleteRowButton_Click">
                     <ToolTipService.ToolTip>Delete this equation row</ToolTipService.ToolTip>
@@ -37,11 +44,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <ToolTipService.ToolTip>Move this equation down one row</ToolTipService.ToolTip>
 
                     <Image Source="/UI/Icons/down_arrow_16x16.png" Width="16" Height="16" />
-                </Button>
-
-                <!-- annotation button -->
-                <Button Height="25" Width="25" Name="AnnotationButton" Click="AnnotationButton_Click">
-                    <Image Source="/UI/Icons/palette_stickyNote_16x16_gray.png" Width="16" Height="16" />
                 </Button>
                 
                 <!-- Comment icon + border -->

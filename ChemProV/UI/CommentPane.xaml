@@ -4,16 +4,35 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="400" d:DesignWidth="150">
+    d:DesignHeight="400" d:DesignWidth="175">
     
-    <StackPanel x:Name="LayoutRoot" Background="White">
-        <sdk:Label HorizontalAlignment="Stretch" Background="LightGray">
-            Equation Comments
-        </sdk:Label>
-        <StackPanel Name="CommentsStack">
-            <Border CornerRadius="3.0" BorderBrush="Red" BorderThickness="2" Margin="3,3,3,3">
-                <TextBlock>Sticky notes go in here</TextBlock>
-            </Border>
-        </StackPanel>
-    </StackPanel>
+    <Grid x:Name="LayoutRoot" Background="LightGray">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="20" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <!-- Header area -->
+        <Grid Grid.Row="0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition />
+                <ColumnDefinition Width="18" />
+            </Grid.ColumnDefinitions>
+            
+            <sdk:Label Grid.Column="0" HorizontalAlignment="Stretch" Background="Gray" Foreground="White">
+                Equation Comments
+            </sdk:Label>
+            
+            <Button Name="CloseButton" Grid.Column="1" HorizontalAlignment="Stretch">
+                <ToolTipService.ToolTip>Hide comment pane</ToolTipService.ToolTip>
+                X
+            </Button>
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" VerticalAlignment="Stretch">
+            <StackPanel Name="CommentsStack">
+                <!-- Comment items will be inserted here at runtime -->
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
 </UserControl>

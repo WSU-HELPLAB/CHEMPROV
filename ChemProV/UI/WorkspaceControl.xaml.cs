@@ -77,8 +77,22 @@ namespace ChemProV.UI
             DrawingCanvas.PfdUpdated += new PfdUpdatedEventHandler(CheckRulesForPFD);
             EquationEditor.EquationTokensChanged += new EventHandler(CheckRulesForPFD);
 
-            GridSplitter.MouseMove += new MouseEventHandler(GridSplitter_MouseMove);
             SizeChanged += new SizeChangedEventHandler(WorkSpace_SizeChanged);
+
+            CommentsPane.CloseButton.Click += new RoutedEventHandler(CloseCommentPaneButton_Click);
+        }
+
+        private void CloseCommentPaneButton_Click(object sender, RoutedEventArgs e)
+        {
+            for (int i = 0; i < EquationEditor.EquationRowCount; i++)
+            {
+                EquationControl ec = EquationEditor.GetRowControl(i);
+                ec.CommentsVisible = false;
+            }
+            EquationEditor.FixNumsAndButtons();
+
+            // With all of the comments hidden, the update function will hide the pane
+            UpdateCommentsPane();
         }
 
         #endregion Constructor
@@ -188,6 +202,8 @@ namespace ChemProV.UI
 
             //clear any existing messages in the feedback window and rerun the error checker
             CheckRulesForPFD(this, EventArgs.Empty);
+
+            UpdateCommentsPane();
         }
 
         public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)
@@ -263,6 +279,7 @@ namespace ChemProV.UI
             //load the equations
             EquationEditor.LoadXmlElements(doc.Descendants("EquationEditor").ElementAt(0));
 
+            UpdateCommentsPane();
         }
 
         public object GetobjectFromId(string id)
@@ -311,7 +328,7 @@ namespace ChemProV.UI
 
         private void WorkSpace_SizeChanged(object sender, SizeChangedEventArgs e)
         {
-            FixSizeOfComponents();
+            //FixSizeOfComponents();
         }
 
         private void DrawingCanvas_ToolPlaced(object sender, EventArgs e)
@@ -319,40 +336,6 @@ namespace ChemProV.UI
             //update equation scope options
             EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
             ToolPlaced(this, EventArgs.Empty);
-        }
-
-        /// <summary>
-        /// Since Canvas object don't auto-resize, this method needs to be called
-        /// whenever the main window gets resized so that we can resize our drawing
-        /// drawing_canvas appropriately.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void GridSplitter_MouseMove(object sender, MouseEventArgs e)
-        {
-            FixSizeOfComponents();
-        }
-
-        private void FixSizeOfComponents()
-        {
-            //set the drawing_canvas' scroll viewer's size
-            double height = WorkspaceGrid.RowDefinitions[0].ActualHeight;
-            double width = WorkspaceGrid.ColumnDefinitions[0].ActualWidth;
-            DrawingCanvasScollViewer.Width = width;
-            DrawingCanvasScollViewer.Height = height;
-
-            DrawingCanvas.MinHeight = height;
-            DrawingCanvas.MinWidth = width;
-
-            //set the feedback and equation window height
-            height = WorkspaceGrid.RowDefinitions[2].ActualHeight;
-
-            if (height < 33)
-            {
-                height = 33;
-            }
-            FeedbackWindow.Height = height;
-            EquationEditor.Height = height;
         }
 
         #endregion Private Helper
@@ -365,30 +348,6 @@ namespace ChemProV.UI
             get
             {
                 return m_snUserColors;
-            }
-        }
-
-        [Obsolete("Use the UI-independent static logic in ChemProV.Core.CommentMerger")]
-        public void MergeCommentsFrom(System.IO.Stream stream)
-        {
-            XDocument doc = XDocument.Load(stream);
-
-            // Kind of hard to implement user-name-oriented functionality when there's really no 
-            // concept of user names in ChemProV
-            string userNameIfNotInXml = "Unknown user " + (UserStickyNoteColors.Count + 1).ToString();
-
-            // First tell the drawing canvas to do sticky note merging
-            List<PFD.Undos.IUndoRedoAction> undos = DrawingCanvas.MergeCommentsFrom(
-                doc.Element("ProcessFlowDiagram").Element("DrawingCanvas"), userNameIfNotInXml);
-
-            // We also want to bring in equation annotations
-            undos.AddRange(EquationEditor.MergeAnnotationsFrom(doc, userNameIfNotInXml).ToArray());
-
-            // Finish up by adding the undo
-            if (0 != undos.Count)
-            {
-                DrawingCanvas.AddUndo(
-                    new PFD.Undos.UndoRedoCollection("Undo comment merge", undos.ToArray()));
             }
         }
 
@@ -408,6 +367,22 @@ namespace ChemProV.UI
                     DrawingCanvasScollViewer.Width - vBarWidth,
                     DrawingCanvasScollViewer.Height - hBarHeight);
             }
+        }
+
+        public void UpdateCommentsPane()
+        {
+            // If there are no comments visible then hide the pane and return
+            if (0 == EquationEditor.CountRowsWithCommentsVisible())
+            {
+                CommentsPane.Visibility = System.Windows.Visibility.Collapsed;
+                WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(0.0);
+                return;
+            }
+
+            // Otherwise make sure its visible and then update
+            CommentsPane.Visibility = System.Windows.Visibility.Visible;
+            WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(175.0);
+            CommentsPane.UpdateComments(EquationEditor, null);
         }
     }
 }

@@ -595,14 +595,6 @@ namespace ChemProV
 
         private void MainPage_KeyDown(object sender, KeyEventArgs e)
         {
-            // Temporary: capture Ctrl+M to show comment merging button
-            if (e.Key == Key.M && (ModifierKeys.Control == Keyboard.Modifiers))
-            {
-                btnLoadMergeComments.Visibility = System.Windows.Visibility.Visible;
-                e.Handled = true;
-                return;
-            }
-            
             if (WorkSpace.DrawingCanvas.HasFocus1)
             {
                 WorkSpace.DrawingCanvas.GotKeyDown(sender, e);
@@ -731,27 +723,6 @@ namespace ChemProV
             //stop timer
             saveTimer.Tick -= new EventHandler(autoSave);
             saveTimer.Stop();
-        }
-
-        private void btnLoadMergeComments_Click(object sender, RoutedEventArgs e)
-        {
-            OpenFileDialog openDialog = new OpenFileDialog();
-            openDialog.Filter = loadFileFilter;
-            bool? openFileResult = false;
-
-            openFileResult = openDialog.ShowDialog();
-            if (!openFileResult.HasValue || !openFileResult.Value)
-            {
-                return;
-            }
-
-            FileInfo fi = openDialog.File;
-            FileStream fs = fi.OpenRead();
-            WorkSpace.MergeCommentsFrom(fs);
-            fs.Dispose();
-
-            //we dont want to load the config file so stop the event from firing
-            this.Loaded -= new RoutedEventHandler(LoadConfigFile);
         }
 
         public WorkspaceControl WorkspaceReference

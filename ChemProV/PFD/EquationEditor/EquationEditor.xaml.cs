@@ -20,7 +20,6 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using ChemProV.PFD.Streams.PropertiesWindow;
-using ChemProV.PFD.EquationEditor.Views;
 using ChemProV.PFD.EquationEditor.Models;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Undos;
@@ -47,6 +46,10 @@ namespace ChemProV.PFD.EquationEditor
         #endregion
 
         #region Properties
+
+        private static Brush s_grayBrush = new SolidColorBrush(Colors.Gray);
+
+        private static Brush s_lightGrayBrush = new SolidColorBrush(Colors.LightGray);
 
         public List<IPfdElement> PfdElements
         {
@@ -173,88 +176,6 @@ namespace ChemProV.PFD.EquationEditor
             updateCompounds();
         }
 
-        public List<IUndoRedoAction> MergeAnnotationsFrom(XDocument doc, string userNameIfNotInXml)
-        {
-            // Initialize the list of undo/redo actions
-            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
-            
-            // The root should be ProcessFlowDiagram
-            XElement root = doc.Element("ProcessFlowDiagram");
-            if (null == root)
-            {
-                return undos;
-            }
-
-            // Find the <EquationEditor> child and then <Equations> within that
-            XElement ee = root.Element("EquationEditor");
-            if (null == ee) { return undos; }
-            XElement eqs = ee.Element("Equations");
-            if (null == eqs) { return undos; }
-
-            // Iterate through <EquationModel> elements
-            foreach (XElement em in eqs.Elements("EquationModel"))
-            {
-                // See if we have an annotation stored
-                XElement annotationElement = em.Element("Annotation");
-                if (null == annotationElement)
-                {
-                    continue;
-                }
-
-                // Look for a user name attribute
-                string xmlUserName = null;
-                XAttribute userAttr = annotationElement.Attribute("UserName");
-                if (null != userAttr)
-                {
-                    xmlUserName = userAttr.Value;
-                }
-
-                // We need to make sure that we match up equation models with the same equation
-                XElement emEq = em.Element("Equation");
-                if (null == emEq)
-                {
-                    throw new Exception(
-                        "Element \"EquationModel\" is missing child \"Equation\" element");
-                }
-
-                // Look through the equation models and try to find a matching equation string
-                EquationModel match = null;
-                foreach (EquationModel emThis in this.equationModels)
-                {
-                    if (emThis.Equation.Equals(emEq.Value))
-                    {
-                        match = emThis;
-                        break;
-                    }
-                }
-
-                // Go to next <EquationModel> element if we didn't find a match
-                if (null == match)
-                {
-                    continue;
-                }
-                
-                string anno = annotationElement.Value;
-                if (!string.IsNullOrEmpty(anno))
-                {
-                    // Here's where we actually do the merge
-                    undos.Add(new SetAnnotation(match, match.Annotation));
-                    
-                    // Prioritize user names from the Xml over the function's parameter
-                    if (!string.IsNullOrEmpty(xmlUserName))
-                    {
-                        match.Annotation += "\r\n\r\n--- " + xmlUserName + " ---\r\n" + anno;
-                    }
-                    else
-                    {
-                        match.Annotation += "\r\n\r\n--- " + userNameIfNotInXml + " ---\r\n" + anno;
-                    }
-                }
-            }
-
-            return undos;
-        }
-
         #endregion
 
         #region Private methods
@@ -295,38 +216,32 @@ namespace ChemProV.PFD.EquationEditor
             newRow.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
 
             // Fix the move up/move down buttons on all rows
-            FixUpDownButtons();
+            FixNumsAndButtons();
 
             // Link up events for move up/move down buttons
             newRow.MoveDownButton.Click += new RoutedEventHandler(MoveDownButton_Click);
             newRow.MoveUpButton.Click += new RoutedEventHandler(MoveUpButton_Click);
 
-            // TEST: Set comment button border
+            // Set comment button border
             newRow.CommentsVisible = false;
             newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-            // Debug: add a few comments
-            newRow.Model.Comments.Add(new Core.BasicComment("Test comment 1", null));
-            newRow.Model.Comments.Add(new Core.BasicComment("Test comment 2", null));
-            newRow.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
+            newRow.CommentIconBorder.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
             {
                 newRow.CommentsVisible = !newRow.CommentsVisible;
-                if (newRow.CommentsVisible)
-                {
-                    int index = GetRowIndex(newRow);
-                    if (index >= 0 && index < Core.NamedColors.CommentKeys.Length)
-                    {
-                        newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(
-                            Core.NamedColors.CommentKeys[index].Color);
-                    }
-                }
-                else
-                {
-                    newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                }
+                FixNumsAndButtons();
+                //if (newRow.CommentsVisible)
+                //{
+                //    int index = GetRowIndex(newRow) % Core.NamedColors.CommentKeys.Length;
+                //    newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(
+                //        Core.NamedColors.CommentKeys[index].Color);
+                //}
+                //else
+                //{
+                //    newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+                //}
 
                 // Update the comments pane
-                Core.App.Workspace.CommentsPane.UpdateComments(
-                    Core.App.Workspace.EquationEditor, null);
+                Core.App.Workspace.UpdateCommentsPane();
             };
 
             return newRow.Model;
@@ -365,7 +280,7 @@ namespace ChemProV.PFD.EquationEditor
             EquationsStackPanel.Children.Remove(row);
             EquationsStackPanel.Children.Insert(indexOfThis + 1, row);
 
-            FixUpDownButtons();
+            FixNumsAndButtons();
         }
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
@@ -401,18 +316,61 @@ namespace ChemProV.PFD.EquationEditor
             EquationsStackPanel.Children.Remove(row);
             EquationsStackPanel.Children.Insert(indexOfThis - 1, row);
 
-            FixUpDownButtons();
+            FixNumsAndButtons();
         }
 
         /// <summary>
-        /// Sets the proper IsEnabled state for the move up and move down buttons in each row
+        /// Sets the proper number for each row as well as the and IsEnabled state for the move up and move down buttons
         /// </summary>
-        private void FixUpDownButtons()
+        public void FixNumsAndButtons()
         {
             int count = EquationRowCount;
             for (int i = 0; i < count; i++)
             {
                 EquationControl ec = GetRow(i);
+
+                // Row number label
+                Brush clrBrush = new SolidColorBrush(GetRowCommentColor(i));
+                ec.NumberLabel.Content = (i + 1).ToString() + ".";
+                ec.NumberLabel.Foreground = clrBrush;
+
+                // The "button" to show or hide comments for an equation can be in one of 4 states:
+                // 1. There are comments for the equation and CommentsVisible is false
+                // 2. There are comments for the equation and CommentsVisible is true
+                // 3. There are no comments for the equation and CommentsVisible is false
+                // 4. There are no comments for the equation and CommentsVisible is true
+
+                // If the comments are visible, then we have a colored border and background
+                if (ec.CommentsVisible)
+                {
+                    ec.CommentIconBorder.BorderBrush = ec.CommentIconBorder.Background = clrBrush;
+                    ToolTipService.SetToolTip(ec.CommentIconBorder,
+                        "Click to hide comments for this equation in the side pane");
+                }
+                else
+                {
+                    // Otherwise, if the comments are hidden, then we want some sort of visual cue to indicate whether 
+                    // or not there are any comments for that equation. We will do this by setting the border brush to gray 
+                    // if there are no comments and setting it to colored otherwise. The background will be gray in either 
+                    // case.
+                    ec.CommentIconBorder.BorderBrush = (ec.Model.Comments.Count > 0) ?
+                        clrBrush : s_grayBrush;
+                    ec.CommentIconBorder.Background = s_lightGrayBrush;
+
+                    // Also set a tooltip
+                    if (ec.Model.Comments.Count > 0)
+                    {
+                        ToolTipService.SetToolTip(ec.CommentIconBorder,
+                            "There are comments for this equation, click to show them");
+                    }
+                    else
+                    {
+                        ToolTipService.SetToolTip(ec.CommentIconBorder,
+                            "There are no comments for this equation, click to show the comment editor");
+                    }
+                }
+
+                // Up/down buttons
                 ec.MoveUpButton.IsEnabled = (i != 0);
                 ec.MoveDownButton.IsEnabled = (i < count - 1);
             }
@@ -435,7 +393,10 @@ namespace ChemProV.PFD.EquationEditor
 #endif
             
             EquationsStackPanel.Children.Remove(uie);
-            FixUpDownButtons();
+            FixNumsAndButtons();
+
+            // Update the comments pane
+            Core.App.Workspace.UpdateCommentsPane();
         }
 
         /// <summary>
@@ -765,7 +726,7 @@ namespace ChemProV.PFD.EquationEditor
             model.Type = type;
             model.Scope = scope;
             model.Equation = equation;
-            model.Annotation = annotation;
+            model.Comments.Add(new Core.BasicComment(annotation, null));
         }
 
         private void AddNewRowButton_Click(object sender, RoutedEventArgs e)
@@ -776,6 +737,25 @@ namespace ChemProV.PFD.EquationEditor
         internal EquationControl GetRowControl(int index)
         {
             return EquationsStackPanel.Children[index] as EquationControl;
+        }
+
+        public int CountRowsWithCommentsVisible()
+        {
+            int count = 0;
+            foreach (UIElement uie in EquationsStackPanel.Children)
+            {
+                if ((uie as EquationControl).CommentsVisible)
+                {
+                    count++;
+                }
+            }
+            return count;
+        }
+
+        private Color GetRowCommentColor(int rowIndex)
+        {
+            int index = rowIndex % Core.NamedColors.CommentKeys.Length;
+            return Core.NamedColors.CommentKeys[index].Color;
         }
     }
 }

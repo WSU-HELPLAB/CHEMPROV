@@ -12,11 +12,11 @@
             m_model = model;
         }
 
-        public string Annotation
+        public System.Collections.ObjectModel.ReadOnlyCollection<Core.BasicComment> Comments
         {
             get
             {
-                return m_model.Annotation;
+                return new System.Collections.ObjectModel.ReadOnlyCollection<Core.BasicComment>(m_model.Comments);
             }
         }
 

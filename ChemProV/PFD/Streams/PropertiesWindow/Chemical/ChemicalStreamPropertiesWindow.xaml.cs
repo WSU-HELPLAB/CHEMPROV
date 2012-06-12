@@ -109,20 +109,61 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         }
 
         public ChemicalStreamPropertiesWindow()
-            : this(false)
-        {  }
+            : this(false) { }
 
         public ChemicalStreamPropertiesWindow(bool isReadOnly)
-        {
-            InitializeComponent();
-            LocalInit(isReadOnly);
-        }
+            : this(null, isReadOnly) { }
 
         public ChemicalStreamPropertiesWindow(IStream parent, bool isReadOnly)
         {
             InitializeComponent();
             ParentStream = parent;
-            LocalInit(isReadOnly);
+
+            this.isReadOnly = isReadOnly;
+
+            //set header bush
+            headerBrush = new LinearGradientBrush();
+            GradientStopCollection gsc = new GradientStopCollection();
+            GradientStop gs = new GradientStop();
+            gs.Color = Color.FromArgb(225, 210, 215, 222);
+            gs.Offset = 0;
+            gsc.Add(gs);
+            gs = new GradientStop();
+            gs.Offset = .5;
+            gs.Color = Color.FromArgb(255, 230, 230, 235);
+            gsc.Add(gs);
+            gs = new GradientStop();
+            gs.Color = Color.FromArgb(225, 210, 215, 222);
+            gs.Offset = 1;
+            gsc.Add(gs);
+            headerBrush.StartPoint = new Point(0.5, 0);
+            headerBrush.EndPoint = new Point(0.5, 1);
+            headerBrush.GradientStops = gsc;
+
+            SolidColorBrush lightGray = new SolidColorBrush(Color.FromArgb(255, 230, 230, 230));
+
+            LayoutRoot.MouseRightButtonDown += new MouseButtonEventHandler(ChemicalStreamPropertiesWindowUserControl_MouseRightButtonDown);
+            LayoutRoot.MouseRightButtonUp += new MouseButtonEventHandler(ChemicalStreamPropertiesWindowUserControl_MouseRightButtonUp);
+            this.LayoutUpdated += new EventHandler(ChemicalStreamPropertiesWindow_LayoutUpdated);
+
+            PropertiesGrid.BorderBrush = lightGray;
+
+            this.LayoutRoot.Children.Add(PropertiesGrid.BaseGrid);
+
+            //Set this table's name
+            TableName = getNextAvailableTableName();
+
+            //Create bindings that listen for changes in the object's location
+            SetBinding(Canvas.LeftProperty, new Binding("LeftProperty") { Source = this, Mode = BindingMode.TwoWay });
+            SetBinding(Canvas.TopProperty, new Binding("TopProperty") { Source = this, Mode = BindingMode.TwoWay });
+
+            //create the header row
+            ItemSource.Add(CreateTableHeader());
+            ItemSource.Add(CreateNewDataRow());
+
+            ItemSource.CollectionChanged += new NotifyCollectionChangedEventHandler(ItemSource_CollectionChanged);
+
+            View = PropertiesWindow.View.Expanded;
         }
 
         /// <summary>
@@ -202,7 +243,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             PropertiesGrid.PlaceUIElement(tb, 1, 0);
 
             int column;
-            if (collapsed == false)
+            if (!collapsed)
             {
                 tb = new Label();
                 tb.Content = "Qty";
@@ -246,13 +287,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             gsc.Add(gs);
 
             ToggleViewButton.Background = new LinearGradientBrush(gsc, 90);
-            if (collapsed == false)
+            if (collapsed)
             {
-                ToggleViewButton.Content = "<";
+                ToggleViewButton.Content = ">";
             }
             else
             {
-                ToggleViewButton.Content = ">";
+                ToggleViewButton.Content = "<";
             }
             ToggleViewButton.Click += new RoutedEventHandler(ToggleView);
             System.Windows.Controls.ToolTip tp = new System.Windows.Controls.ToolTip();
@@ -627,33 +668,12 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        private Brush basicRadialGradientBrush(Color CenterColor, Color OutsideColor)
-        {
-            RadialGradientBrush brush = new RadialGradientBrush();
-            GradientStopCollection gsc = new GradientStopCollection();
-            GradientStop gs = new GradientStop();
-            brush = new RadialGradientBrush();
-            gsc = new GradientStopCollection();
-            gs = new GradientStop();
-            gs.Color = CenterColor;
-            gs.Offset = .025;
-            gsc.Add(gs);
-            gs = new GradientStop();
-            gs.Color = OutsideColor;
-            gs.Offset = 1;
-            gsc.Add(gs);
-            brush.GradientStops = gsc;
-            return brush;
-        }
-
         private void createButtons(int row, bool lastRow)
         {
             System.Windows.Controls.ToolTip tp = new Silverlight.Controls.ToolTip();
             if (row != 0)
             {
                 Button minusButton = new Button();
-                //ToggleViewButton.Style = this.Resources["RoundButton"] as Style;
-                //ToggleViewButton.Background = basicRadialGradientBrush(Colors.White, Colors.Red);
                 TextBlock tb = new TextBlock();
                 tb.Text = "-";
                 tb.TextAlignment = TextAlignment.Center;
@@ -669,7 +689,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 if (lastRow)
                 {
                     Button plusButton = new Button();
-                    //ToggleViewButton.Style = this.Resources["RoundButton"] as Style;
                     tb = new TextBlock();
                     tb.Text = "+";
                     tb.TextAlignment = TextAlignment.Center;
@@ -736,55 +755,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             {
                 View = PropertiesWindow.View.Collapsed;
             }
-        }
-
-        private void LocalInit(bool isReadOnly)
-        {
-            this.isReadOnly = isReadOnly;
-            
-            //set header bush
-            headerBrush = new LinearGradientBrush();
-            GradientStopCollection gsc = new GradientStopCollection();
-            GradientStop gs = new GradientStop();
-            gs.Color = Color.FromArgb(225, 210, 215, 222);
-            gs.Offset = 0;
-            gsc.Add(gs);
-            gs = new GradientStop();
-            gs.Offset = .5;
-            gs.Color = Color.FromArgb(255, 230, 230, 235);
-            gsc.Add(gs);
-            gs = new GradientStop();
-            gs.Color = Color.FromArgb(225, 210, 215, 222);
-            gs.Offset = 1;
-            gsc.Add(gs);
-            headerBrush.StartPoint = new Point(0.5, 0);
-            headerBrush.EndPoint = new Point(0.5, 1);
-            headerBrush.GradientStops = gsc;
-
-            SolidColorBrush lightGray = new SolidColorBrush(Color.FromArgb(255, 230, 230, 230));
-
-            LayoutRoot.MouseRightButtonDown += new MouseButtonEventHandler(ChemicalStreamPropertiesWindowUserControl_MouseRightButtonDown);
-            LayoutRoot.MouseRightButtonUp += new MouseButtonEventHandler(ChemicalStreamPropertiesWindowUserControl_MouseRightButtonUp);
-            this.LayoutUpdated += new EventHandler(ChemicalStreamPropertiesWindow_LayoutUpdated);
-
-            PropertiesGrid.BorderBrush = lightGray;
-
-            this.LayoutRoot.Children.Add(PropertiesGrid.BaseGrid);
-
-            //Set this table's name
-            TableName = getNextAvailableTableName();
-
-            //Create bindings that listen for changes in the object's location
-            SetBinding(Canvas.LeftProperty, new Binding("LeftProperty") { Source = this, Mode = BindingMode.TwoWay });
-            SetBinding(Canvas.TopProperty, new Binding("TopProperty") { Source = this, Mode = BindingMode.TwoWay });
-
-            //create the header row
-            ItemSource.Add(CreateTableHeader());
-            ItemSource.Add(CreateNewDataRow());
-
-            ItemSource.CollectionChanged += new NotifyCollectionChangedEventHandler(ItemSource_CollectionChanged);
-
-            View = PropertiesWindow.View.Expanded;
         }
 
         private void ChemicalStreamPropertiesWindow_LayoutUpdated(object sender, EventArgs e)
@@ -1021,28 +991,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
         #endregion IXmlSerializable Members
 
-        /// <summary>
-        /// This is called each time a label is loaded into the datagrid.  This is so we can get a reference to the label so that
-        /// we can set its tooltip using the "advanced tooltip" found online.  It cannot be done in xmal which is why we are using
-        /// this function.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void feedbackTextBlock_Loaded(object sender, RoutedEventArgs e)
-        {
-            Label lb = sender as Label;
-            Silverlight.Controls.ToolTip tooltip = new Silverlight.Controls.ToolTip();
-
-            //this sets the intial time to 1 second
-            tooltip.InitialDelay = new Duration(new TimeSpan(0, 0, 1));
-
-            //this sets the displayTime to 1 hour
-            tooltip.DisplayTime = new Duration(new TimeSpan(1, 0, 0));
-
-            //this attached it to the label
-            Silverlight.Controls.ToolTipService.SetToolTip(lb, tooltip);
-        }
-
         public int CompareTo(object obj)
         {
             //make sure that we're comparing two table elements
@@ -1055,15 +1003,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 ChemicalStreamPropertiesWindow other = obj as ChemicalStreamPropertiesWindow;
                 return TableName.CompareTo(other.TableName);
             }
-        }
-
-        private void feedbackTextBlock_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            Label lb = sender as Label;
-
-            Silverlight.Controls.ToolTip oldTooptip = Silverlight.Controls.ToolTipService.GetToolTip(lb);
-
-            oldTooptip.IsOpen = false;
         }
 
         public void HighlightFeedback(bool highlight)

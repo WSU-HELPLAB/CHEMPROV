@@ -48,19 +48,6 @@ namespace ChemProV.PFD.EquationEditor
             SetScopeOptions(parent.EquationScopes);
             SetTypeOptions(parent.EquationTypes);
             this.DataContext = m_model;
-
-            // Setup the annotation button
-            RefreshAnnotationButton();
-            // Monitor when the annotation changes so that we can set the button's icon to a grayed-out sticky 
-            // note when the annotation is empty and a yellow sticky note when it's not
-            m_model.PropertyChanged += delegate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName.Equals("Annotation"))
-                {
-                    // Refresh the button's icon
-                    RefreshAnnotationButton();
-                }
-            };
         }
 
         private void DeleteRowButton_Click(object sender, RoutedEventArgs e)
@@ -93,22 +80,6 @@ namespace ChemProV.PFD.EquationEditor
         {
             // Update the model
             m_model.Equation = EquationTextBox.Text;
-        }
-
-        /// <summary>
-        /// Gets a boolean value that indicates whether or not a control within this control 
-        /// is the current focused element.
-        /// </summary>
-        public bool HasFocus
-        {
-            get
-            {
-                object focus = FocusManager.GetFocusedElement();
-                return object.ReferenceEquals(focus, AnnotationButton) ||
-                    object.ReferenceEquals(focus, TypeComboBox) ||
-                    object.ReferenceEquals(focus, ScopeComboBox) ||
-                    object.ReferenceEquals(focus, EquationTextBox);
-            }
         }
 
         /// <summary>
@@ -176,19 +147,6 @@ namespace ChemProV.PFD.EquationEditor
             EquationTextBox.Text = m_model.Equation;
             this.DataContext = m_model;
 
-            // Setup the annotation button
-            RefreshAnnotationButton();
-            // Monitor when the annotation changes so that we can set the button's icon to a grayed-out sticky 
-            // note when the annotation is empty and a yellow sticky note when it's not
-            m_model.PropertyChanged += delegate(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-            {
-                if (e.PropertyName.Equals("Annotation"))
-                {
-                    // Refresh the button's icon
-                    RefreshAnnotationButton();
-                }
-            };
-
             // Setup the type combo box
             foreach (object typeObj in TypeComboBox.Items)
             {
@@ -212,28 +170,6 @@ namespace ChemProV.PFD.EquationEditor
 
             // Last but not least, the text box
             EquationTextBox.DataContext = m_model;
-        }
-
-        private void RefreshAnnotationButton()
-        {
-            bool hasComment = !string.IsNullOrEmpty(m_model.Annotation);
-            Image img2 = Core.App.CreateImageFromSource(hasComment ?
-                "palette_stickyNote_16x16.png" :
-                "palette_stickyNote_16x16_gray.png");
-            img2.Width = img2.Height = 16;
-            AnnotationButton.Content = img2;
-
-            // Set a tool-tip based on whether or not there's a comment
-            if (hasComment)
-            {
-                ToolTipService.SetToolTip(AnnotationButton,
-                    "Edit comment for this equation");
-            }
-            else
-            {
-                ToolTipService.SetToolTip(AnnotationButton,
-                    "There are no comments on this equation; click to add a comment");
-            }
         }
 
         private void ScopeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -305,14 +241,6 @@ namespace ChemProV.PFD.EquationEditor
         private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             m_model.Type = TypeComboBox.SelectedItem as EquationType;
-        }
-
-        private void AnnotationButton_Click(object sender, RoutedEventArgs e)
-        {
-            PFD.EquationEditor.Views.AnnotateWindow window =
-                    new PFD.EquationEditor.Views.AnnotateWindow();
-            window.DataContext = m_model;
-            window.Show();
         }
 
         public bool CommentsVisible

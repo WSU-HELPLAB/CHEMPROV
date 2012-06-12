@@ -8,12 +8,10 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
-using System.ComponentModel;
-using System.Windows.Media;
-using System.Xml.Serialization;
-using System.Xml;
-using System.Xml.Linq;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Xml;
+using System.Xml.Serialization;
 
 namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 {
@@ -216,18 +214,6 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
             get;
             set;
-        }
-
-        public Color BackgroundColor
-        {
-            get
-            {
-                if (Enabled)
-                {
-                    return Colors.White;
-                }
-                return Colors.LightGray;
-            }
         }
 
         public int CompareTo(object obj)

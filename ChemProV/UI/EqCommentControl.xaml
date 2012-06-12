@@ -24,11 +24,12 @@
             </sdk:Label>
 
             <sdk:Label Grid.Column="1" Grid.Row="0" Background="#FFCEC351" HorizontalAlignment="Stretch" 
-                       HorizontalContentAlignment="Center">X</sdk:Label>
+                HorizontalContentAlignment="Center"
+                Name="XLabel">X</sdk:Label>
         </Grid>
 
         <TextBox AcceptsReturn="True" TextWrapping="Wrap" Name="CommentTextBox"
-            Text="This is a test to see if the text wraps and expands the height of the control">
+            Text="This is a test to see if the text wraps and expands the height of the control" TextChanged="CommentTextBox_TextChanged">
             <TextBox.Background>
                 <LinearGradientBrush EndPoint="0.0,1.0" StartPoint="0.0,0.0">
                     <GradientStop Offset="0.0" Color="#FFFFFCA3" />

@@ -91,7 +91,7 @@ namespace ChemProV.Core
         /// Builds a dictionary that maps an equation model ID key to an equation model from 
         /// the document
         /// </summary>
-        private static Dictionary<int, EquationModel> LoadEquations(XDocument doc)
+        private static Dictionary<int, EquationModel> LoadEquations(XDocument doc, string userNameIfNotInXml)
         {
             Dictionary<int, EquationModel> d = new Dictionary<int, EquationModel>();
 
@@ -105,6 +105,15 @@ namespace ChemProV.Core
                 if (!string.IsNullOrEmpty(eqModel.Equation))
                 {
                     d[eqModel.Id] = eqModel;
+                }
+
+                // Fill in the user names in the comments if they are null or empty
+                foreach (BasicComment bc in eqModel.Comments)
+                {
+                    if (string.IsNullOrEmpty(bc.CommentUserName))
+                    {
+                        bc.CommentUserName = userNameIfNotInXml;
+                    }
                 }
             }
 
@@ -272,14 +281,15 @@ namespace ChemProV.Core
                 sn.WriteElement(stickyNoteXmlParent);
             }
 
-            // Now we need to take care of equation annotations. Start by loading from the 
-            // child document
-            Dictionary<int, EquationModel> childModels = LoadEquations(docChild);
+            // Now we need to take care of equation comments (annotations). Start by loading from 
+            // the child document
+            Dictionary<int, EquationModel> childModels = LoadEquations(docChild, childUserNameIfNotInXml);
             // Next find <Equations> node in parent XML
             XElement eqs = docParent.Descendants("Equations").ElementAt(0);
             if (null != eqs)
             {
-                // Iterate through <EquationModel> elements in the parent
+                // Iterate through <EquationModel> elements in the parent. These can have 0 or more 
+                // <Annotation> children that represent comments for that equation
                 foreach (XElement em in eqs.Elements("EquationModel"))
                 {
                     int parentElementId = Convert.ToInt32(em.Attribute("Id").Value);
@@ -290,37 +300,67 @@ namespace ChemProV.Core
                         continue;
                     }
 
-                    // Get the annotation from the matching child
-                    string childAnno = childModels[parentElementId].Annotation;
-                    // If it's null or empty then we don't need to merge
-                    if (string.IsNullOrEmpty(childAnno))
+                    // Get the model from the matching child
+                    EquationModel childModel = childModels[parentElementId];
+                    // If there are 0 comments then we don't need to merge
+                    if (0 == childModel.Comments.Count)
                     {
                         continue;
                     }
 
-                    // Get the parent annotation element
-                    XElement annotationElement = em.Element("Annotation");
-                    if (null == annotationElement)
+                    // Add user name to XML elements in parent if need be
+                    foreach (XElement parentAnnoEl in em.Elements("Annotation"))
                     {
-                        throw new Exception(
-                            "Element \"EquationModel\" is missing child \"Annotation\" element");
-                    }
-                    // Make sure it's not null (so we can append to it)
-                    if (null == annotationElement.Value)
-                    {
-                        annotationElement.Value = string.Empty;
+                        XAttribute attr = parentAnnoEl.Attribute("UserName");
+                        if (null == attr)
+                        {
+                            parentAnnoEl.SetAttributeValue("UserName", parentUserNameIfNotInXml);
+                        }
                     }
 
-                    // Merge the annotations
-                    if (!string.IsNullOrEmpty(childUserNameIfNotInXml))
+                    // Load the parent equation model from the XML node
+                    EquationModel parentModel = EquationModel.FromXml(em);
+
+                    // Add all comments to the parent XML that don't already exist
+                    foreach (BasicComment bcChild in childModel.Comments)
                     {
-                        annotationElement.Value += "\r\n\r\n--- " + childUserNameIfNotInXml + 
-                            " ---\r\n" + childAnno;
+                        // We don't want to add the comment if there is an existing comment with 
+                        // the exact same comment text value
+                        if (!parentModel.ContainsComment(bcChild.CommentText))
+                        {
+                            XElement annoElement = new XElement("Annotation");
+                            annoElement.Value = bcChild.CommentText;
+                            if (!string.IsNullOrEmpty(bcChild.CommentUserName))
+                            {
+                                annoElement.SetAttributeValue("UserName", bcChild.CommentUserName);
+                            }
+                            em.Add(annoElement);
+                        }
                     }
-                    else
-                    {
-                        annotationElement.Value += "\r\n\r\n--- (unknown user) ---\r\n" + childAnno;
-                    }                    
+
+                    //// Get the parent annotation element
+                    //XElement annotationElement = em.Element("Annotation");
+                    //if (null == annotationElement)
+                    //{
+                    //    throw new Exception(
+                    //        "Element \"EquationModel\" is missing child \"Annotation\" element");
+                    //}
+                    //// Make sure it's not null (so we can append to it)
+                    //if (null == annotationElement.Value)
+                    //{
+                    //    annotationElement.Value = string.Empty;
+                    //}
+
+                    //// Merge the annotations
+                    //if (!string.IsNullOrEmpty(childUserNameIfNotInXml))
+                    //{
+                    //    annotationElement.Value += "\r\n\r\n--- " + childUserNameIfNotInXml + 
+                    //        " ---\r\n" + childAnno;
+                    //}
+                    //else
+                    //{
+                    //    annotationElement.Value += "\r\n\r\n--- (unknown user) ---\r\n" + childAnno;
+                    //}                    
                 }
             }
 
