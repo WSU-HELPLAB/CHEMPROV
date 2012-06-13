@@ -149,7 +149,11 @@ namespace ChemProV.UI
                 {
                     if (Enum.IsDefined(typeof(ChemicalCompounds), (byte)csd.SelectedCompoundId))
                     {
-                        Compound_ComboBox.Items.Add(csd.SelectedCompound.ToPrettyString());
+                        string s = csd.SelectedCompound.ToPrettyString();
+                        if (!Compound_ComboBox.Items.Contains(s))
+                        {
+                            Compound_ComboBox.Items.Add(s);
+                        }
                     }
                 }
             }
