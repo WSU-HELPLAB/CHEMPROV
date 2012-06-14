@@ -30,7 +30,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         private ContextMenu m_contextMenu;
 
-        public MenuState(DrawingCanvas c, Point location)
+        public MenuState(DrawingCanvas c)
         {
             m_canvas = c;
 
@@ -107,44 +107,6 @@ namespace ChemProV.UI.DrawingCanvas.States
                 AddSubprocessMenuOptions(m_contextMenu,
                     m_canvas.SelectedElement as PFD.ProcessUnits.IProcessUnit);
             }
-
-            // Set the Z-index to put the menu on top of everything else
-            m_contextMenu.SetValue(Canvas.ZIndexProperty, 4);
-            m_canvas.Children.Add(m_contextMenu);
-
-            m_contextMenu.Measure(new Size(2000.0, 2000.0));
-
-            // Compute the location for the menu
-            Rect workArea = Core.App.Workspace.VisiblePFDArea;
-            double menuX = location.X;
-            if (menuX + m_contextMenu.DesiredSize.Width > workArea.Right)
-            {
-                // Move it left
-                menuX = workArea.Right - m_contextMenu.DesiredSize.Width;
-            }
-            if (menuX < workArea.Left)
-            {
-                menuX = workArea.Left;
-            }
-            m_contextMenu.SetValue(Canvas.LeftProperty, menuX);
-            double menuY = location.Y;
-            if (menuY + m_contextMenu.DesiredSize.Height > workArea.Bottom)
-            {
-                // Move it up
-                menuY = workArea.Bottom - m_contextMenu.DesiredSize.Height;
-            }
-            if (menuY < workArea.Top)
-            {
-                menuY = workArea.Top;
-            }
-            m_contextMenu.SetValue(Canvas.TopProperty, menuY);
-
-            // TEST
-            //System.Windows.Controls.Primitives.Popup pop = new System.Windows.Controls.Primitives.Popup();
-            //pop.Child = m_contextMenu;
-            //pop.HorizontalOffset = menuX;
-            //pop.VerticalOffset = menuY;
-            //pop.IsOpen = true;
         }
 
         #region IState Members
@@ -225,12 +187,8 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         public void StateEnding()
         {
-            if (null != m_contextMenu)
-            {
-                // Get rid of the popup menu if it's still on the drawing canvas
-                m_canvas.Children.Remove(m_contextMenu);
-                m_contextMenu = null;
-            }
+            // Ensure that the popup menu is hidden
+            Core.App.ClosePopup();
         }
 
         #endregion IState Members
@@ -410,6 +368,17 @@ namespace ChemProV.UI.DrawingCanvas.States
                 m_canvas.CurrentState = null;
             };
             newContextMenu.Items.Add(mi);
+        }
+
+        public void Show(MouseButtonEventArgs mbea)
+        {
+            if (null != m_contextMenu)
+            {
+                // Build a popup menu and show it
+                System.Windows.Controls.Primitives.Popup pop = new System.Windows.Controls.Primitives.Popup();
+                pop.Child = m_contextMenu;
+                Core.App.LaunchPopup(pop, mbea);
+            }
         }
     }
 }

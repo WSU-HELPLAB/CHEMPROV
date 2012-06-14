@@ -56,7 +56,10 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <ComboBox Height="25" x:Name="ScopeComboBox" MinWidth="130" SelectionChanged="ScopeComboBox_SelectionChanged"/>
 
                 <!-- Equation text box -->
-                <TextBox x:Name="EquationTextBox" FontSize="11" AcceptsReturn="False" MinWidth="200"  
+                <TextBox
+                    x:Name="EquationTextBox"
+                    FontSize="14" FontFamily="Courier New"
+                    AcceptsReturn="False" MinWidth="200"  
                     TextWrapping="Wrap" Height="25" HorizontalAlignment="Stretch" TextChanged="EquationTextBox_TextChanged" />
             </ctk:DockPanel>
             

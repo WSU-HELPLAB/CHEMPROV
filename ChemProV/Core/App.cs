@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Documents;
 using System.Windows.Ink;
 using System.Windows.Input;
@@ -30,9 +31,28 @@ namespace ChemProV.Core
     {
         private static List<LogItem> s_log = new List<LogItem>();
 
+        private static MainPage s_mainPage = null;
+
         private static ChemProV.UI.ControlPalette s_palette = null;
+
+        /// <summary>
+        /// Stores a reference to an active popup. Will be null if there is no active popup.
+        /// </summary>
+        private static Popup s_popup = null;
         
         private static ChemProV.UI.WorkspaceControl s_workspace = null;
+
+        /// <summary>
+        /// Closes the open popup menu, if one exists
+        /// </summary>
+        public static void ClosePopup()
+        {
+            if (null != s_popup)
+            {
+                s_popup.IsOpen = false;
+                s_popup = null;
+            }
+        }
 
         public static ChemProV.UI.ControlPalette ControlPalette
         {
@@ -72,10 +92,55 @@ namespace ChemProV.Core
         /// <summary>
         /// This must be called upon application initialization
         /// </summary>
-        public static void Init(ChemProV.UI.WorkspaceControl workspace, ChemProV.UI.ControlPalette palette)
+        public static void Init(MainPage mainPage, ChemProV.UI.ControlPalette palette)
         {
-            s_workspace = workspace;
+            s_mainPage = mainPage;
+            s_workspace = mainPage.WorkSpace;
             s_palette = palette;
+        }
+
+        /// <summary>
+        /// Sets up a right-click menu for the text box that has cut/copy/paste options
+        /// </summary>
+        /// <param name="textBox">Text box to initialize the menu for. The right-mouse-down 
+        /// event for this text box will then cause the popup menu to be shown.</param>
+        public static void InitRightClickMenu(TextBox textBox)
+        {
+            textBox.MouseRightButtonDown += new MouseButtonEventHandler(TextBox_MouseRightButtonDown);
+        }
+
+        /// <summary>
+        /// Launches the specified popup menu. Note that if the previous popup menu shown by this function 
+        /// is still open then it is closed before showing the new one.
+        /// </summary>
+        public static void LaunchPopup(System.Windows.Controls.Primitives.Popup popup, MouseEventArgs e)
+        {
+            // If a previous popup was open, close it first
+            if (null != s_popup)
+            {
+                s_popup.IsOpen = false;
+                s_popup = null;
+            }
+            
+            // Position the popup
+            Point pt = e.GetPosition(s_mainPage);
+            popup.HorizontalOffset = pt.X;
+            popup.VerticalOffset = pt.Y;
+
+            // Store a reference to it so that it can be hidden when the user clicks elsewhere
+            s_popup = popup;
+
+            // I've tried several things relating to smart positioning, but the size values of the 
+            // popup menu seem to ALWAYS be 0, so I don't know how to fix this.
+            //popup.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            //// Make sure we don't fly off an edge
+            //if (popup.HorizontalOffset + popup.DesiredSize.Width > s_mainPage.Width)
+            //{
+            //    popup.HorizontalOffset = s_mainPage.Width - popup.Width;
+            //}
+            
+            // Show it
+            popup.IsOpen = true;
         }
 
         /// <summary>
@@ -90,6 +155,94 @@ namespace ChemProV.Core
         public static void MessageBox(string message)
         {
             System.Windows.MessageBox.Show(message);
+        }
+
+        /// <summary>
+        /// Handles the right-mouse-button-down event for a text box in the properties window. Creates 
+        /// and displays a popup menu with cut/copy/paste options.
+        /// </summary>
+        private static void TextBox_MouseRightButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            if (null == tb)
+            {
+                return;
+            }
+
+            // Build context menu items
+            MenuItem cutItem = new MenuItem()
+            {
+                Header = "Cut",
+                IsEnabled = !string.IsNullOrEmpty(tb.SelectedText)
+            };
+            cutItem.Click += delegate(object senderMenuItem, RoutedEventArgs menuItemClickEventArgs)
+            {
+                try
+                {
+                    Clipboard.SetText(tb.SelectedText);
+                }
+                catch (System.Security.SecurityException)
+                {
+                    // Will be thrown if the user denies the app access to the clipboard. There's not 
+                    // much we can do in this case. We just need to make sure the popup menu is hidden
+                    Core.App.ClosePopup();
+                    return;
+                }
+                tb.SelectedText = string.Empty;
+                Core.App.ClosePopup();
+            };
+            MenuItem copyItem = new MenuItem()
+            {
+                Header = "Copy",
+                IsEnabled = !string.IsNullOrEmpty(tb.SelectedText)
+            };
+            copyItem.Click += delegate(object senderMenuItem, RoutedEventArgs menuItemClickEventArgs)
+            {
+                try
+                {
+                    Clipboard.SetText(tb.SelectedText);
+                }
+                catch (System.Security.SecurityException)
+                {
+                    // Will be thrown if the user denies the app access to the clipboard. There's not 
+                    // much we can do in this case. We just need to make sure the popup menu is hidden
+                    Core.App.ClosePopup();
+                    return;
+                }
+                Core.App.ClosePopup();
+            };
+            MenuItem pasteItem = new MenuItem()
+            {
+                Header = "Paste",
+                IsEnabled = Clipboard.ContainsText()
+            };
+            pasteItem.Click += delegate(object senderMenuItem, RoutedEventArgs menuItemClickEventArgs)
+            {
+                try
+                {
+                    tb.SelectedText = Clipboard.GetText();
+                }
+                catch (System.Security.SecurityException)
+                {
+                    // Will be thrown if the user denies the app access to the clipboard. There's not 
+                    // much we can do in this case. We just need to make sure the popup menu is hidden
+                    Core.App.ClosePopup();
+                    return;
+                }
+                Core.App.ClosePopup();
+            };
+
+            // Build the context menu from these items
+            ContextMenu cm = new ContextMenu();
+            cm.Items.Add(cutItem);
+            cm.Items.Add(copyItem);
+            cm.Items.Add(pasteItem);
+
+            // Create the popup menu
+            Popup popup = new Popup();
+            popup.Child = cm;
+            // Show it
+            LaunchPopup(popup, e);
         }
 
         /// <summary>

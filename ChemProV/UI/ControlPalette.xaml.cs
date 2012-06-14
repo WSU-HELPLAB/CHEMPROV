@@ -96,6 +96,9 @@ namespace ChemProV.UI
         {
             DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
 
+            // Make sure that if we have a popup menu that we close it at this point
+            Core.App.ClosePopup();
+
             // Now we want to set the canvas state appropriately. If we've clicked a button for a process 
             // unit, then we want to make sure that the canvas is in process-unit-placing mode. If we've 
             // clicked a button for a stream, then we want to make sure that the canvas is in stream-placing 

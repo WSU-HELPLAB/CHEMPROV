@@ -200,7 +200,6 @@
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindow.xaml.cs">
       <DependentUpon>ChemicalStreamPropertiesWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindowWithTemperature.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\CompoundFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\Compounds.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\DataUpdatedEventArgs.cs" />
@@ -219,7 +218,6 @@
       <DependentUpon>HeatStreamPropertiesWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\Streams\PropertiesWindow\Heat\UnitsFormatter.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\ICompound.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\IPropertiesWindow.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowFactory.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
