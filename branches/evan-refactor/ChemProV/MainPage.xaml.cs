@@ -166,7 +166,7 @@ namespace ChemProV
             }
 
             // Intialize the static App class
-            Core.App.Init(WorkSpace, PrimaryPalette);
+            Core.App.Init(this, PrimaryPalette);
 
             // Make sure that when the equation editor or compounds control gets focus that the 
             // control palette switches back to select mode
@@ -437,6 +437,7 @@ namespace ChemProV
             ImageTools.Image foo = finalBmp.ToImage();
             PngEncoder encoder = new PngEncoder();
             encoder.Encode(foo, output);
+            output.Flush();
         }
 
         private void SaveFileAs_BtnClick(object sender, RoutedEventArgs e)

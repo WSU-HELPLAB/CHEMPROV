@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -15,7 +15,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
             if (currentDifficultySetting == OptionDifficultySetting.MaterialAndEnergyBalance)
             {
-                return new ChemicalStreamPropertiesWindowWithTemperature(stream, isReadOnly);
+                return new ChemicalStreamPropertiesWindow(stream, isReadOnly, true);
             }
             else
             {

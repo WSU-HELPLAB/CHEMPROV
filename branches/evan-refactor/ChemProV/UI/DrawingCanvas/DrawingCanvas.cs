@@ -54,21 +54,43 @@ namespace ChemProV.UI.DrawingCanvas
         /// </summary>
         private bool m_endingAState = false;
 
+        /// <summary>
+        /// Used to prevent recursive sets to CurrentState
+        /// </summary>
+        private bool m_settingCurrentState = false;
+
         #region States
 
         /// <summary>
         /// This is a variable that saves the current state.
         /// </summary>
-        private IState currentState = null;
+        private IState m_currentState = null;
 
+        /// <summary>
+        /// Gets or sets the current state of the drawing canvas. State objects process mouse-input on 
+        /// the drawing canvas and perform actions accordingly.
+        /// </summary>
         public IState CurrentState
         {
-            get { return currentState; }
+            get { return m_currentState; }
             set
             {
+                if (m_settingCurrentState)
+                {
+                    return;
+                }
+                m_settingCurrentState = true;
+                
+                // Ensure that the popup menu is hidden, provided we aren't going into a menu state
+                if (!(value is MenuState))
+                {
+                    Core.App.ClosePopup();
+                }
+                
                 // Start with a check to see if we're currently ending a state
                 if (m_endingAState)
                 {
+                    m_settingCurrentState = false;
                     throw new InvalidOperationException(
                         "Objects that implement IState are NOT permitted to set the " +
                         "DrawingCanvas.CurrentState property when in their StateEnding() method.");
@@ -76,17 +98,18 @@ namespace ChemProV.UI.DrawingCanvas
                 
                 // The contract for items that implement IState is that when we're switching from 
                 // them to something else, we let them know that their state is ending
-                if (null != currentState &&
-                    !object.ReferenceEquals(value, currentState))
+                if (null != m_currentState &&
+                    !object.ReferenceEquals(value, m_currentState))
                 {
                     m_endingAState = true;
-                    currentState.StateEnding();
+                    m_currentState.StateEnding();
                     m_endingAState = false;
 
                     Core.App.Workspace.EquationEditorReference.PfdElements = ChildIPfdElements;
                 }
 
-                currentState = value;
+                m_currentState = value;
+                m_settingCurrentState = false;
             }
         }
 
@@ -542,14 +565,15 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             // A right mouse button down implies that we need to flip to the menu state
-            CurrentState = new UI.DrawingCanvas.States.MenuState(this, e.GetPosition(this));
+            CurrentState = new UI.DrawingCanvas.States.MenuState(this);
+            (m_currentState as MenuState).Show(e);
         }
 
         public void MouseLeftButtonUpHandler(object sender, MouseButtonEventArgs e)
         {
-            if (null != currentState)
+            if (null != m_currentState)
             {
-                currentState.MouseLeftButtonUp(sender, e);
+                m_currentState.MouseLeftButtonUp(sender, e);
             }
             hasFocus = true;
             e.Handled = true;
@@ -565,11 +589,13 @@ namespace ChemProV.UI.DrawingCanvas
             // canvas by setting Handled equal to true.
 
             // If the current state is non-null then send the mouse event to it
-            if (null != currentState)
+            if (null != m_currentState)
             {
-                currentState.MouseLeftButtonDown(sender, e);
+                m_currentState.MouseLeftButtonDown(sender, e);
                 return;
             }
+
+            Core.App.ClosePopup();
 
             // If our current state is null, then we want to create an appropriate one.
             // But first we need to check to see if we've selected an element
@@ -589,19 +615,19 @@ namespace ChemProV.UI.DrawingCanvas
             if (null != selectedObjState)
             {
                 // Set the state
-                currentState = selectedObjState;
+                m_currentState = selectedObjState;
             }
             else
             {
                 // If the selected element does not have its own mouse processing logic then 
                 // we create a MovingState object, which will drag around the selected element.
-                currentState = MovingState.Create(this);
+                m_currentState = MovingState.Create(this);
             }
 
             // Finish up by sending this mouse event to the current state
-            if (null != currentState)
+            if (null != m_currentState)
             {
-                currentState.MouseLeftButtonDown(sender, e);
+                m_currentState.MouseLeftButtonDown(sender, e);
             }
         }
 
@@ -611,25 +637,25 @@ namespace ChemProV.UI.DrawingCanvas
 
         public void MouseMoveHandler(object sender, MouseEventArgs e)
         {
-            if (null != currentState)
+            if (null != m_currentState)
             {
-                currentState.MouseMove(sender, e);
+                m_currentState.MouseMove(sender, e);
             }
         }
 
         public void MouseLeaveHandler(object sender, MouseEventArgs e)
         {
-            if (null != currentState)
+            if (null != m_currentState)
             {
-                currentState.MouseLeave(sender, e);
+                m_currentState.MouseLeave(sender, e);
             }
         }
 
         public void MouseEnterHandler(object sender, MouseEventArgs e)
         {
-            if (null != currentState)
+            if (null != m_currentState)
             {
-                currentState.MouseEnter(sender, e);
+                m_currentState.MouseEnter(sender, e);
             }
         }
 

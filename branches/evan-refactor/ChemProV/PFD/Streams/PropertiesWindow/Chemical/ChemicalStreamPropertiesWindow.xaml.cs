@@ -14,6 +14,7 @@ using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -26,6 +27,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
     public partial class ChemicalStreamPropertiesWindow : UserControl, IPropertiesWindow, IComparable
     {
+        private string[] TempUnits = { "celsius", "fahrenheit" };
+        
         public event EventHandler SelectionChanged = delegate { };
         public event EventHandler LocationChanged = delegate { };
 
@@ -92,6 +95,13 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         protected bool isReadOnly = false;
 
         /// <summary>
+        /// Indicates whether or not the window has the temperature related cells at the bottom. Eventually this 
+        /// class should have logic to be able to change this and update the table dynamically, but we're not 
+        /// there yet.
+        /// </summary>
+        private bool m_withTemperature = false;
+
+        /// <summary>
         /// This holds the tables current view state.  It is either collapsed or expanded.
         /// When this is set it automatically calls UpdateGrid to update it accordingly
         /// </summary>
@@ -114,12 +124,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         public ChemicalStreamPropertiesWindow(bool isReadOnly)
             : this(null, isReadOnly) { }
 
-        public ChemicalStreamPropertiesWindow(IStream parent, bool isReadOnly)
+        public ChemicalStreamPropertiesWindow(IStream parent, bool isReadOnly, bool withTemperature = false)
         {
             InitializeComponent();
             ParentStream = parent;
 
             this.isReadOnly = isReadOnly;
+
+            m_withTemperature = withTemperature;
 
             //set header bush
             headerBrush = new LinearGradientBrush();
@@ -180,7 +192,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             int row = 0;
             foreach (ChemicalStreamData data in ItemSource)
             {
-                createDataRow(false, data, row, row == ItemSource.Count - 1);
+                createDataRow(data, row, row == ItemSource.Count - 1);
                 row++;
             }
 
@@ -188,6 +200,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
 
             this.SetValue(Canvas.LeftProperty, expandedViewSavedLocation.X);
             this.SetValue(Canvas.TopProperty, expandedViewSavedLocation.Y);
+
+            if (m_withTemperature)
+            {
+                if (ItemSource.Count > 0)
+                {
+                    createTempatureCells(ItemSource[0]);
+                }
+            }
         }
 
         /// <summary>
@@ -231,39 +251,34 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
         {
             Label tb = new Label();
 
+            // Spacer element for the column that has the add and remove row buttons
             tb.Content = "";
             tb.Background = headerBrush;
             tb.BorderBrush = headerBrush;
             tb.BorderThickness = new Thickness(1);
             PropertiesGrid.PlaceUIElement(tb, 0, 0);
 
-            tb = new Label();
-            tb.Content = "Label";
-            tb.Background = headerBrush;
-            PropertiesGrid.PlaceUIElement(tb, 1, 0);
+            // "Compounds" label first
+            PropertiesGrid.PlaceUIElement(new Label() { Content = "Compounds", Background = headerBrush }, 1, 0);
 
+            // "Label" header next
+            PropertiesGrid.PlaceUIElement(new Label() { Content = "Label", Background = headerBrush }, 2, 0);
+
+            // Do quantity and units only if we aren't in collapsed mode
             int column;
             if (!collapsed)
             {
-                tb = new Label();
-                tb.Content = "Qty";
-                tb.Background = headerBrush;
-                PropertiesGrid.PlaceUIElement(tb, 2, 0);
+                PropertiesGrid.PlaceUIElement(new Label() { Content = "Qty", Background = headerBrush }, 3, 0);
+                PropertiesGrid.PlaceUIElement(new Label() { Content = "Units", Background = headerBrush }, 4, 0);
 
-                tb = new Label();
-                tb.Content = "Units";
-                tb.Background = headerBrush;
-                PropertiesGrid.PlaceUIElement(tb, 3, 0);
                 column = 4;
             }
             else
             {
                 column = 2;
             }
-            tb = new Label();
-            tb.Content = "Compounds";
-            tb.Background = headerBrush;
-            PropertiesGrid.PlaceUIElement(tb, column, 0);
+
+            // feedbackLabel is obsolete and needs to be removed (and re-written later if we need it)
             if (feedbackLabel != null)
             {
                 tb = new Label();
@@ -287,14 +302,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             gsc.Add(gs);
 
             ToggleViewButton.Background = new LinearGradientBrush(gsc, 90);
-            if (collapsed)
-            {
-                ToggleViewButton.Content = ">";
-            }
-            else
-            {
-                ToggleViewButton.Content = "<";
-            }
+            ToggleViewButton.Content = collapsed ? ">" : "<";
             ToggleViewButton.Click += new RoutedEventHandler(ToggleView);
             System.Windows.Controls.ToolTip tp = new System.Windows.Controls.ToolTip();
             tp.Content = "Click To Toggle Between The Collapsed View And The Expanded View";
@@ -307,7 +315,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             PropertiesGrid.PlaceUIElement(br, column + 2, 1);
         }
 
-        private void createDataRow(bool collapsedRow, ChemicalStreamData data, int row, bool lastRow)
+        private void createDataRow(ChemicalStreamData data, int row, bool lastRow)
         {
             if (!isReadOnly)
             {
@@ -316,21 +324,11 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
 
             //row + 1 because row does not take into account the header row so we must
-            PropertiesGrid.PlaceUIElement(CreateLabelCell(row), 1, row + 1);
 
-            if (collapsedRow == false)
-            { 
-                PropertiesGrid.PlaceUIElement(CreateQuantityCell(row), 2, row + 1);
-
-                PropertiesGrid.PlaceUIElement(CreateUnitsCell(row, data), 3, row + 1);
-
-                PropertiesGrid.PlaceUIElement(CreateCompoundCell(row, data), 4, row + 1);
-            }
-
-            else
-            {
-                PropertiesGrid.PlaceUIElement(CreateCompoundCell(row, data), 2, row + 1);
-            }
+            PropertiesGrid.PlaceUIElement(CreateCompoundCell(row, data), 1, row + 1);
+            PropertiesGrid.PlaceUIElement(CreateLabelCell(row), 2, row + 1);
+            PropertiesGrid.PlaceUIElement(CreateQuantityCell(row), 3, row + 1);
+            PropertiesGrid.PlaceUIElement(CreateUnitsCell(row, data), 4, row + 1);
         }
 
         private UIElement CreateLabelCell(int row)
@@ -357,6 +355,11 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 tb.TextChanged += new TextChangedEventHandler(LabelText_Changed);
                 tb.KeyDown += new KeyEventHandler(TextBox_KeyDown);
                 tb.GotFocus += new RoutedEventHandler(LabelText_GotFocus);
+
+                // E.O.
+                // We want a custom right-click menu for text boxes
+                Core.App.InitRightClickMenu(tb);
+
                 return tb;
             }
         }
@@ -399,22 +402,42 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             else
             {
                 TextBox tb = new TextBox();
+                tb.AcceptsReturn = false;
                 tb.BorderBrush = new SolidColorBrush(Colors.Transparent);
                 tb.Style = this.Resources["TextBoxWithNoMouseOverBorder"] as Style;
                 tb.Text = ItemSource[row].Quantity;
                 if (!isReadOnly)
                 {
-                    tb.LostFocus += new RoutedEventHandler(QuantityTextBox_LostFocus);
                     tb.GotFocus += new RoutedEventHandler(QuantityTextBox_GotFocus);
                     tb.TextChanged += new TextChangedEventHandler(QuantityTextBox_TextChanged);
                     tb.KeyDown += new KeyEventHandler(TextBox_KeyDown);
                 }
+
+                // E.O.
+                // We want a custom right-click menu for text boxes
+                Core.App.InitRightClickMenu(tb);
+
                 return tb;
             }
         }
 
         private void QuantityTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            TextBox tb = sender as TextBox;
+            
+            // We want to make sure that the quantity text box has a numerical value. If it does not then 
+            // we make the text red as an indication to the user that something is wrong. If it is a 
+            // numerical value then the text will be black.
+            double qty;
+            if (double.TryParse(tb.Text, out qty))
+            {
+                tb.Foreground = new SolidColorBrush(Colors.Black);
+            }
+            else
+            {
+                tb.Foreground = new SolidColorBrush(Colors.Red);
+            }
+            
             TableDataChanging(this, EventArgs.Empty);
         }
 
@@ -437,50 +460,53 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
-        private void QuantityTextBox_LostFocus(object sender, RoutedEventArgs e)
-        {
-            TextBox tb = (sender as TextBox);
-            tb.LostFocus -= new RoutedEventHandler(QuantityTextBox_LostFocus);
-            try
-            {
-                double qty;
-                //make sure the quantity is numeric to avoid format exception error
-                bool isNum = double.TryParse(tb.Text, out qty);
+        // E.O.
+        // This looks like old code that isn't needed and it's preventing the popup menu from working. Commenting it 
+        // out for now.
+        //private void QuantityTextBox_LostFocus(object sender, RoutedEventArgs e)
+        //{
+        //    TextBox tb = (sender as TextBox);
+        //    tb.LostFocus -= new RoutedEventHandler(QuantityTextBox_LostFocus);
+        //    try
+        //    {
+        //        double qty;
+        //        //make sure the quantity is numeric to avoid format exception error
+        //        bool isNum = double.TryParse(tb.Text, out qty);
 
-                if (isNum)
-                {
-                    if(tb.Parent != null) //handles the case where the textbox parent is null
-                        ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
-                }
-                else
-                {
-                    if (tb.Parent != null) //handles the case where the textbox parent is null
-                        ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = "?";
-                }
-            }
-            catch
-            {
-                try
-                {
-                    int i = tb.Text.IndexOf('/');
-                    double numerator = int.Parse(tb.Text.Substring(0, i));
-                    double denominator = int.Parse(tb.Text.Substring(i + 1));
-                    ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = (Math.Round(numerator / denominator, 4) * 100).ToString();
-                }
-                catch
-                {
-                    tb.Text = "?";
-                    try
-                    {
-                        ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = "?";
-                    }
-                    catch (System.Exception ex)
-                    {
-                    }
-                }
-            }
-            UpdateGrid();
-        }
+        //        if (isNum)
+        //        {
+        //            if(tb.Parent != null) //handles the case where the textbox parent is null
+        //                ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = qty.ToString();
+        //        }
+        //        else
+        //        {
+        //            if (tb.Parent != null) //handles the case where the textbox parent is null
+        //                ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = "?";
+        //        }
+        //    }
+        //    catch
+        //    {
+        //        try
+        //        {
+        //            int i = tb.Text.IndexOf('/');
+        //            double numerator = int.Parse(tb.Text.Substring(0, i));
+        //            double denominator = int.Parse(tb.Text.Substring(i + 1));
+        //            ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = (Math.Round(numerator / denominator, 4) * 100).ToString();
+        //        }
+        //        catch
+        //        {
+        //            tb.Text = "?";
+        //            try
+        //            {
+        //                ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = "?";
+        //            }
+        //            catch (System.Exception ex)
+        //            {
+        //            }
+        //        }
+        //    }
+        //    UpdateGrid();
+        //}
 
         private UIElement CreateUnitsCell(int row, ChemicalStreamData data)
         {
@@ -504,6 +530,9 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                     Mode = BindingMode.TwoWay
                 };
                 cb.SetBinding(ComboBox.SelectedValueProperty, valueBinding);
+
+                // We want nothing select by default
+                cb.SelectedIndex = -1;
 
                 //we only care about changes between made on the "overall" row, which should be row 1
                 if (row == 0)
@@ -627,14 +656,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             Button ToggleViewButton = new Button();
             ToggleViewButton.Style = this.Resources["SquareButton"] as Style;
             GradientStopCollection gsc = new GradientStopCollection();
-            GradientStop gs = new GradientStop();
-            gs.Color = Color.FromArgb(225, 200, 207, 230);
-            gs.Offset = 1;
-            gsc.Add(gs);
-            gs = new GradientStop();
-            gs.Color = Color.FromArgb(255, 225, 235, 250);
-            gs.Offset = 0.0;
-            gsc.Add(gs);
+            gsc.Add(new GradientStop() {Color = Color.FromArgb(225, 200, 207, 230), Offset = 1.0});
+            gsc.Add(new GradientStop() {Color = Color.FromArgb(255, 225, 235, 250), Offset = 0.0});
 
             ToggleViewButton.Background = new LinearGradientBrush(gsc, 90);
             ToggleViewButton.Content = ">";
@@ -644,18 +667,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             System.Windows.Controls.ToolTipService.SetToolTip(ToggleViewButton, tp);
 
             PropertiesGrid.PlaceUIElement(ToggleViewButton, 1, 0);
-            /*
-            PropertiesGrid.HideBordersForLastRow = false;
 
-            createHeaderRow(true);
-
-            int row = 0;
-            foreach (ChemicalStreamData data in ItemSource)
-            {
-                createDataRow(true, data, row, row == ItemSource.Count - 1);
-                row++;
-            }
-            */
             setFeedBack();
 
             expandedViewSavedLocation.X = (double)this.GetValue(Canvas.LeftProperty);
@@ -674,24 +686,18 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             if (row != 0)
             {
                 Button minusButton = new Button();
-                TextBlock tb = new TextBlock();
-                tb.Text = "-";
-                tb.TextAlignment = TextAlignment.Center;
                 minusButton.Content = "-";
                 minusButton.Height = 15;
                 minusButton.Width = 15;
                 minusButton.FontSize = 6;
                 minusButton.Click += new RoutedEventHandler(MinusRowButton_Click);
-                tp.Content = "Click To Delete This Row";
+                tp.Content = "Click to delete this row";
                 System.Windows.Controls.ToolTipService.SetToolTip(minusButton, tp);
                 PropertiesGrid.PlaceUIElement(minusButton, 0, row + 1);
 
                 if (lastRow)
                 {
                     Button plusButton = new Button();
-                    tb = new TextBlock();
-                    tb.Text = "+";
-                    tb.TextAlignment = TextAlignment.Center;
                     plusButton.Content = "+";
                     plusButton.Height = 15;
                     plusButton.Width = 15;
@@ -987,6 +993,14 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             writer.WriteElementString("X", expandedViewSavedLocation.X.ToString());
             writer.WriteElementString("Y", expandedViewSavedLocation.Y.ToString());
             writer.WriteEndElement();
+
+            if (m_withTemperature)
+            {
+                writer.WriteStartElement("Temperature");
+                writer.WriteElementString("Quantity", ItemSource[0].Temperature);
+                writer.WriteElementString("Units", ItemSource[0].TempUnits.ToString());
+                writer.WriteEndElement();
+            }
         }
 
         #endregion IXmlSerializable Members
@@ -1135,6 +1149,108 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
                 SetValue(Canvas.LeftProperty, value.X - ActualWidth / 2.0);
                 SetValue(Canvas.TopProperty, value.Y - 5.0);
             }
+        }
+
+        #endregion
+
+        #region Temperature window stuff
+
+        /// <summary>
+        /// This function creates the cells dealing with Tempature at the bottem
+        /// </summary>
+        private void createTempatureCells(ChemicalStreamData data)
+        {
+            TextBlock tb = new TextBlock();
+            int row = ItemSource.Count + 2;
+            tb.Text = "Temperature = ";
+            tb.VerticalAlignment = VerticalAlignment.Center;
+            PropertiesGrid.PlaceUIElement(tb, 1, row);
+
+            if (isReadOnly)
+            {
+                TextBlock txtBox = new TextBlock();
+                txtBox.Text = data.Temperature;
+                PropertiesGrid.PlaceUIElement(txtBox, 2, row);
+            }
+            else
+            {
+                TextBox txtBox = new TextBox();
+                txtBox.IsReadOnly = isReadOnly;
+                txtBox.Text = data.Temperature;
+                txtBox.TextChanged += new TextChangedEventHandler(Temperature_TextChanged);
+                txtBox.GotFocus += new RoutedEventHandler(QuantityTextBox_GotFocus);
+                txtBox.KeyDown += new KeyEventHandler(TextBox_KeyDown);
+
+                // E.O.
+                // We want a custom right-click menu for text boxes
+                Core.App.InitRightClickMenu(txtBox);
+
+                PropertiesGrid.PlaceUIElement(txtBox, 2, row);
+            }
+
+            tb = new TextBlock();
+            tb.Margin = new Thickness(2, 0, 0, 2);
+            tb.Text = "Temp. Units: ";
+            tb.VerticalAlignment = VerticalAlignment.Center;
+            PropertiesGrid.PlaceUIElement(tb, 3, row);
+
+            if (isReadOnly)
+            {
+                tb = new TextBlock();
+                tb.Text = TempUnits[data.TempUnits];
+                PropertiesGrid.PlaceUIElement(tb, 4, row);
+            }
+            else
+            {
+                ComboBox comboBox = new ComboBox();
+                comboBox.IsEnabled = !isReadOnly;
+                ComboBoxItem cbi;
+                foreach (string s in TempUnits)
+                {
+                    cbi = new ComboBoxItem();
+                    cbi.Content = s;
+                    comboBox.Items.Add(cbi);
+                }
+                comboBox.SelectedIndex = data.TempUnits;
+                comboBox.Background = new SolidColorBrush(Colors.White);
+                comboBox.BorderBrush = new SolidColorBrush(Colors.White);
+
+                if (!isReadOnly)
+                {
+                    comboBox.SelectionChanged += new SelectionChangedEventHandler(TempUnits_SelectionChanged);
+                }
+
+                PropertiesGrid.PlaceUIElement(comboBox, 4, row);
+            }
+        }
+
+        private void TempUnits_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ItemSource[0].TempUnits = (sender as ComboBox).SelectedIndex;
+        }
+
+        private void Temperature_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox tb = sender as TextBox;
+            tb.LostFocus += new RoutedEventHandler(TempertureTextBox_LostFocus);
+            ChangeInProgress(this, EventArgs.Empty);
+        }
+
+        private void TempertureTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            TextBox tb = (sender as TextBox);
+            tb.LostFocus -= new RoutedEventHandler(TempertureTextBox_LostFocus);
+
+            try
+            {
+                ItemSource[0].Temperature = double.Parse(tb.Text).ToString();
+            }
+            catch
+            {
+                tb.Text = "T" + ItemSource[0].Label;
+                ItemSource[0].Temperature = "T" + ItemSource[0].Label;
+            }
+            UpdateGrid();
         }
 
         #endregion

@@ -172,12 +172,20 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
                 tb.TextChanged += new TextChangedEventHandler(HeatLabel_TextChanged);
                 PropertiesGrid.PlaceUIElement(tb, 0, 1);
 
+                // E.O.
+                // We want a custom right-click menu for text boxes
+                Core.App.InitRightClickMenu(tb);
+
                 tb = new TextBox();
                 tb.Text = ItemSource[0].Quantity;
                 tb.GotFocus += new RoutedEventHandler(HeatQuantity_GotFocus);
                 tb.LostFocus += new RoutedEventHandler(HeatQuantity_LostFocus);
                 tb.KeyDown += new KeyEventHandler(HeatQuantity_KeyDown);
                 PropertiesGrid.PlaceUIElement(tb, 1, 1);
+                
+                // E.O.
+                // Again, custom right-click menu, now for the quantity text box
+                Core.App.InitRightClickMenu(tb);
 
                 ComboBox cb = new ComboBox();
                 ComboBoxItem cbi;

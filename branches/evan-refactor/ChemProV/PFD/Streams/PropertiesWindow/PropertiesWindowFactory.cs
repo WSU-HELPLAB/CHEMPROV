@@ -59,7 +59,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                 case StreamType.Chemical:
                     if (difficultySetting == OptionDifficultySetting.MaterialAndEnergyBalance)
                     {
-                        return new ChemicalStreamPropertiesWindowWithTemperature(isReadOnly);
+                        return new ChemicalStreamPropertiesWindow(null, isReadOnly, true);
                     }
                     else
                     {
