@@ -169,6 +169,9 @@ namespace ChemProV.Core
                 return;
             }
 
+            // Mark the mouse event as handled
+            e.Handled = true;
+
             // Build context menu items
             MenuItem cutItem = new MenuItem()
             {
