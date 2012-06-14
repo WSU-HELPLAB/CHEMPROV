@@ -26,7 +26,7 @@ namespace ChemProV.Core
         public static readonly NamedColor[] CommentKeys = new NamedColor[]{
             new NamedColor("Red", Colors.Red), new NamedColor("Green", Colors.Green),
             new NamedColor("Blue", Colors.Blue), new NamedColor("Cyan", Colors.Cyan),
-            new NamedColor("Magenta", Colors.Magenta), new NamedColor("Yellow", Colors.Yellow),
+            new NamedColor("Magenta", Colors.Magenta),
             new NamedColor("Orange", Color.FromArgb(255, 255, 128, 0)),
             new NamedColor("Olive", Color.FromArgb(255, 128, 128, 0)),
             new NamedColor("Sienna", Color.FromArgb(255, 160, 82, 45))};
