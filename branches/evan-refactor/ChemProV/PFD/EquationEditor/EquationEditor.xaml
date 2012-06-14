@@ -20,18 +20,28 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
         <eq:ScollViewerHeightConverter x:Key="ScollViewerHeightConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="White">
-        <StackPanel>
-            <StackPanel Background="Silver" HorizontalAlignment="Stretch">
-                <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
-            </StackPanel>
-            <ScrollViewer
-                Width="Auto"
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Auto"
-                Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
-                BorderThickness="0" BorderBrush="Transparent"
-                Padding="0,0,0,0"
-                >
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <sdk:Label
+            x:Name="EquationTitle"
+            Background="Silver"
+            Content="Equations"
+            Padding="3"
+            Grid.Row="0"
+            FontSize="14" HorizontalContentAlignment="Center" />
+        
+        <ScrollViewer
+            Grid.Row="1"
+            Width="Auto"
+            VerticalAlignment="Stretch"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto"
+            Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
+            BorderThickness="0" BorderBrush="Transparent"
+            Padding="0,0,0,0">
                 
                 <StackPanel Orientation="Vertical">
 
@@ -70,6 +80,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 </StackPanel>
 
             </ScrollViewer>
-        </StackPanel>
+
     </Grid>
 </UserControl>
