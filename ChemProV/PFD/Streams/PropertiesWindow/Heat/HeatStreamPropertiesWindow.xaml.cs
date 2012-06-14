@@ -179,8 +179,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
                 tb = new TextBox();
                 tb.Text = ItemSource[0].Quantity;
                 tb.GotFocus += new RoutedEventHandler(HeatQuantity_GotFocus);
-                tb.LostFocus += new RoutedEventHandler(HeatQuantity_LostFocus);
                 tb.KeyDown += new KeyEventHandler(HeatQuantity_KeyDown);
+                tb.TextChanged += new TextChangedEventHandler(HeatQuantity_TextChanged);
                 PropertiesGrid.PlaceUIElement(tb, 1, 1);
                 
                 // E.O.
@@ -204,36 +204,16 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
             }
         }
 
+        private void HeatQuantity_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            ItemSource[0].Quantity = (sender as TextBox).Text;
+        }
+
         private void HeatQuantity_KeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Enter)
             {
-                string text = (sender as TextBox).Text;
-                double doub;
-                if (double.TryParse(text, out doub))
-                {
-                    ItemSource[0].Quantity = (sender as TextBox).Text;
-                }
-                else
-                {
-                    ItemSource[0].Quantity = "?";
-                    (sender as TextBox).Text = "?";
-                }
-            }
-        }
-
-        private void HeatQuantity_LostFocus(object sender, RoutedEventArgs e)
-        {
-            string text = (sender as TextBox).Text;
-            double doub;
-            if (double.TryParse(text, out doub))
-            {
                 ItemSource[0].Quantity = (sender as TextBox).Text;
-            }
-            else
-            {
-                ItemSource[0].Quantity = "?";
-                (sender as TextBox).Text = "?";
             }
         }
 
@@ -286,7 +266,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
         {
             HeatStreamData d = new HeatStreamData();
             d.Label = this.TableName;
-            d.Quantity = "?";
+            d.Quantity = string.Empty;
             d.Units = 0;
             d.PropertyChanged += new PropertyChangedEventHandler(DataUpdated);
             return d;

@@ -437,6 +437,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             {
                 tb.Foreground = new SolidColorBrush(Colors.Red);
             }
+
+            ItemSource[(int)(tb.Parent).GetValue(Grid.RowProperty) - 1].Quantity = tb.Text;
             
             TableDataChanging(this, EventArgs.Empty);
         }

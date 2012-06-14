@@ -48,6 +48,9 @@ namespace ChemProV.PFD.EquationEditor
             SetScopeOptions(parent.EquationScopes);
             SetTypeOptions(parent.EquationTypes);
             this.DataContext = m_model;
+
+            // We want to make sure we have a right-click menu for the equation text box
+            Core.App.InitRightClickMenu(EquationTextBox);
         }
 
         private void DeleteRowButton_Click(object sender, RoutedEventArgs e)
