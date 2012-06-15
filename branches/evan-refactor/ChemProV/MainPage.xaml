@@ -67,16 +67,40 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
         </StackPanel>
 
         <!-- Left-Hand toolbar -->
-        <StackPanel x:Name="LeftHandToolBar_StackPanel">
-            <ChemProV_UI:ControlPalette x:Name="PrimaryPalette"></ChemProV_UI:ControlPalette>
-            <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
-            <ScrollViewer VerticalScrollBarVisibility="Auto" x:Name="CompoundTableScrollViewer" BorderBrush="Transparent">
-                <ChemProV_UI:CompoundTable x:Name="CompoundTable"/>
-            </ScrollViewer>
-            <TextBlock x:Name="Saving_TextBlock"/>
-        </StackPanel>
-        <ChemProV_UI:WorkspaceControl x:Name="WorkSpace">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        </ChemProV_UI:WorkspaceControl>
+            <StackPanel Grid.Row="0">
+                <ChemProV_UI:ControlPalette x:Name="PrimaryPalette" IsHitTestVisible="True">
+                </ChemProV_UI:ControlPalette>
+                <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
+            </StackPanel>
+
+            <!-- Tab control for compounds and degrees of freedom analysis -->
+            <sdk:TabControl VerticalAlignment="Stretch" Grid.Row="1" Width="175" x:Name="Compounds_DF_TabControl"
+                GotFocus="Compounds_DF_TabControl_GotFocus">
+                
+                <sdk:TabItem Header="Compounds" x:Name="CompoundTableTab">
+                    <ChemProV_UI:CompoundTable x:Name="CompoundTable"/>
+                </sdk:TabItem>
+                
+                <sdk:TabItem Header="DF Analysis" x:Name="DFAnalysisTab" GotFocus="DFAnalysisTab_GotFocus">
+                    <ToolTipService.ToolTip>Degrees of Freedom Analysis</ToolTipService.ToolTip>
+                    <TextBox x:Name="DFAnalysisTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                        TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" />
+                </sdk:TabItem>
+                
+            </sdk:TabControl>
+            <!-- End of tab control for compounds and degrees of freedom analysis -->
+
+            <TextBlock x:Name="Saving_TextBlock" Grid.Row="2" />
+        </Grid>
+        
+        <!-- Workspace control -->
+        <ChemProV_UI:WorkspaceControl x:Name="WorkSpace" />
     </ctk:DockPanel>
 </UserControl>

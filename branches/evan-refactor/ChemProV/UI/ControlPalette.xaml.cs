@@ -49,6 +49,7 @@ namespace ChemProV.UI
             // Create the "button". We're using Border objects as buttons because they have 
             // all the desired functionality and are easier to adjust in terms of visual styles
             Border btn = new Border();
+            btn.IsHitTestVisible = true;
             btn.CornerRadius = new CornerRadius(3.0);
             btn.BorderThickness = new Thickness(1.0);
             btn.Background = new SolidColorBrush(Colors.White);

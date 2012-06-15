@@ -22,7 +22,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <!-- Number label for this row. Will have it's value set by the parent container. -->
                 <sdk:Label
                     Width="25" Height="25" FontSize="12"
-                    Foreground="Red" FontWeight="Bold"
+                    Foreground="#2AB0F0" FontWeight="Bold"
                     Name="NumberLabel">1.</sdk:Label>
                 
                 <!-- Delete button -->

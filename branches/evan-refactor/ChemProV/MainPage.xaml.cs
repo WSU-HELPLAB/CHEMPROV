@@ -83,11 +83,12 @@ namespace ChemProV
 
                     if (currentDifficultySetting == OptionDifficultySetting.MaterialBalance)
                     {
-                        CompoundTable.Visibility = Visibility.Collapsed;
+                        Compounds_DF_TabControl.SelectedItem = DFAnalysisTab;
+                        CompoundTableTab.Visibility = Visibility.Collapsed;
                     }
                     else
                     {
-                        CompoundTable.Visibility = Visibility.Visible;
+                        CompoundTableTab.Visibility = Visibility.Visible;
                     }
                 }
             }
@@ -187,6 +188,17 @@ namespace ChemProV
             string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
             CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
 
+            // Check for degrees of freedom analysis
+            XElement df = doc.Element("ProcessFlowDiagram").Element("DegreesOfFreedomAnalysis");
+            if (null != df)
+            {
+                DFAnalysisTextBox.Text = df.Element("Text").Value;
+            }
+            else
+            {
+                DFAnalysisTextBox.Text = string.Empty;
+            }
+
             WorkSpace.LoadXmlElements(doc);
 
             CompoundTable.WorkspaceChanged(WorkSpace, new Core.WorkspaceChangeDetails());
@@ -217,12 +229,14 @@ namespace ChemProV
             {
                 saveTimer.Start();
                 Saving_TextBlock.Text = "";
+                Saving_TextBlock.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
 
         private void autoSave(object sender, EventArgs e)
         {
             Saving_TextBlock.Text = "Auto Saving...";
+            Saving_TextBlock.Visibility = System.Windows.Visibility.Visible;
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
                 using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(autoSaveFileName, FileMode.OpenOrCreate, isf))
@@ -360,6 +374,11 @@ namespace ChemProV
 
                 //write feedback
                 feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
+
+                // Write degrees of freedom analysis
+                writer.WriteStartElement("DegreesOfFreedomAnalysis");
+                writer.WriteElementString("Text", DFAnalysisTextBox.Text);
+                writer.WriteEndElement();
 
                 //end root node
                 writer.WriteEndElement();
@@ -756,11 +775,15 @@ namespace ChemProV
 
         private void Clear()
         {
+            // Clear the text in the degrees of freedom analysis text box
+            DFAnalysisTextBox.Text = string.Empty;
+            
             // Clear the workspace (which will clear the drawing canvas and equation editor)
             WorkSpace.ClearWorkSpace();
 
             // Clear the "last save" label
             Saving_TextBlock.Text = string.Empty;
+            Saving_TextBlock.Visibility = System.Windows.Visibility.Collapsed;
 
             // Set the save button's tooltip back to "Save"
             ToolTipService.SetToolTip(btnSave, "Save");
@@ -798,6 +821,16 @@ namespace ChemProV
             //// For testing purposes:
             //// Get and display some info
             //MessageBox.Show("User Info\nSchool.Name = " + model.Profile.School.Name);
+        }
+
+        private void DFAnalysisTab_GotFocus(object sender, RoutedEventArgs e)
+        {
+            Core.App.ClosePopup();
+        }
+
+        private void Compounds_DF_TabControl_GotFocus(object sender, RoutedEventArgs e)
+        {
+            Core.App.ClosePopup();
         }
     }
 }

@@ -330,7 +330,7 @@ namespace ChemProV.PFD.EquationEditor
                 EquationControl ec = GetRow(i);
 
                 // Row number label
-                Brush clrBrush = new SolidColorBrush(GetRowCommentColor(i));
+                Brush clrBrush = new SolidColorBrush(Color.FromArgb(255,42,176,240));
                 ec.NumberLabel.Content = (i + 1).ToString() + ".";
                 ec.NumberLabel.Foreground = clrBrush;
 
@@ -750,12 +750,6 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
             return count;
-        }
-
-        private Color GetRowCommentColor(int rowIndex)
-        {
-            int index = rowIndex % Core.NamedColors.CommentKeys.Length;
-            return Core.NamedColors.CommentKeys[index].Color;
         }
     }
 }

@@ -204,9 +204,13 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
             TextWrapping="Wrap"
             AcceptsReturn="True"
             Style="{StaticResource TextBoxWithOutBorder}"
+            VerticalScrollBarVisibility="Auto"
             />
             </StackPanel>
-            <Polygon Stroke="Transparent" Fill="Black" Points="7,0 0,7 7,7" x:Name="Bottem_Left_Corner" Height="15" Margin="93,93,0,0"  Cursor="SizeNWSE" MouseLeftButtonDown="Bottem_Left_Corner_MouseLeftButtonDown"/>
+            <Polygon
+                x:Name="Bottem_Left_Corner"
+                Stroke="Transparent" Fill="Black" Points="7,0 0,7 7,7" Height="15" Margin="93,93,0,0" Cursor="SizeNWSE"
+                MouseLeftButtonDown="Bottom_Left_Corner_MouseLeftButtonDown" />
         </Grid>
     </Border>
 </UserControl>
