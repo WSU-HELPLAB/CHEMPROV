@@ -16,6 +16,11 @@ namespace ChemProV.UI
 {
     public partial class CommentPane : UserControl
     {
+        /// <summary>
+        /// Brush for the border around equation comments
+        /// </summary>
+        private static Brush s_eqBorderBrush = new SolidColorBrush(Color.FromArgb(255,42,176,240));
+        
         public CommentPane()
         {
             InitializeComponent();
@@ -45,15 +50,11 @@ namespace ChemProV.UI
                     continue;
                 }
 
-                // Determine the color
-                int clrIndex = i % NamedColors.CommentKeys.Length;
-                Brush clrBrush = new SolidColorBrush(NamedColors.CommentKeys[clrIndex].Color);
-
                 Border brdr = new Border();
                 brdr.Margin = new Thickness(3.0, 3.0, 3.0, 0.0);
                 brdr.CornerRadius = new CornerRadius(3.0);
                 brdr.BorderThickness = new Thickness(2.0);
-                brdr.BorderBrush = clrBrush;
+                brdr.BorderBrush = s_eqBorderBrush;
                 StackPanel sp = new StackPanel();
                 sp.Orientation = Orientation.Vertical;
                 brdr.Child = sp;
@@ -61,7 +62,7 @@ namespace ChemProV.UI
                 // Add a color-coded number label at the top
                 Label numLabel = new Label();
                 numLabel.Content = (i + 1).ToString() + ".";
-                numLabel.Foreground = clrBrush;
+                numLabel.Foreground = s_eqBorderBrush;
                 numLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 sp.Children.Add(numLabel);
 

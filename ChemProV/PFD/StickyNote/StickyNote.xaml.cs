@@ -140,7 +140,7 @@ namespace ChemProV.PFD.StickyNote
         /// </summary>
         public event EventHandler SelectionChanged;
 
-        private void Bottem_Left_Corner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void Bottom_Left_Corner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
 
@@ -169,7 +169,8 @@ namespace ChemProV.PFD.StickyNote
                 this.Height = 23 + 7;
             }
 
-            Note.Height = (double)currentSize.Y - (double)Note.GetValue(System.Windows.Controls.Canvas.TopProperty);
+            //Note.Height = (double)currentSize.Y - (double)Note.GetValue(System.Windows.Controls.Canvas.TopProperty);
+            Note.Height = this.Height - 23.0;
             Note.Width = (double)currentSize.X - (double)Note.GetValue(System.Windows.Controls.Canvas.LeftProperty);
             try
             {
