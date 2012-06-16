@@ -130,17 +130,31 @@ namespace ChemProV.Core
             // Store a reference to it so that it can be hidden when the user clicks elsewhere
             s_popup = popup;
 
-            // I've tried several things relating to smart positioning, but the size values of the 
-            // popup menu seem to ALWAYS be 0, so I don't know how to fix this.
-            //popup.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
-            //// Make sure we don't fly off an edge
-            //if (popup.HorizontalOffset + popup.DesiredSize.Width > s_mainPage.Width)
-            //{
-            //    popup.HorizontalOffset = s_mainPage.Width - popup.Width;
-            //}
-            
-            // Show it
+            // Show the menu (required before getting its size)
             popup.IsOpen = true;
+            popup.UpdateLayout();
+
+            // Get sizes
+            Size popSize = (popup.Child as Control).DesiredSize;
+            Size s = s_mainPage.LayoutRoot.DesiredSize;
+
+            // Make sure we don't fly off an edge
+            if (popup.HorizontalOffset + popSize.Width > s.Width)
+            {
+                popup.HorizontalOffset = s.Width - popSize.Width;
+            }
+            if (popup.HorizontalOffset < 0.0)
+            {
+                popup.HorizontalOffset = 0.0;
+            }
+            if (popup.VerticalOffset + popSize.Height > s.Height)
+            {
+                popup.VerticalOffset = s.Height - popSize.Height;
+            }
+            if (popup.VerticalOffset < 0.0)
+            {
+                popup.VerticalOffset = 0.0;
+            }
         }
 
         /// <summary>
