@@ -34,23 +34,81 @@ namespace ChemProV.PFD.EquationEditor
     {
         public delegate void DeleteRequestDelegate(EquationControl sender);
 
-        private bool m_commentsVisible = false;
+        /// <summary>
+        /// Temporarily set to true in methods that change the model
+        /// </summary>
+        private bool m_changingModel = false;
         
+        /// <summary>
+        /// Reference to the model that this control represents. This control modifies this 
+        /// object but does not "own it". In other words, it is instantiated elsewhere and 
+        /// passed in to the constructor of this control.
+        /// </summary>
         private EquationModel m_model;
 
         private DeleteRequestDelegate m_requestDelete = null;
 
-        public EquationControl(EquationEditor parent)
+        public EquationControl(EquationEditor parent, EquationModel equationModel)
         {
             InitializeComponent();
-            
-            m_model = new EquationModel();
+
+            m_model = equationModel;
             SetScopeOptions(parent.EquationScopes);
             SetTypeOptions(parent.EquationTypes);
-            this.DataContext = m_model;
+            
+            // Set UI elements from the model
+
+            // Setup the type combo box
+            foreach (object typeObj in TypeComboBox.Items)
+            {
+                if (m_model.Type.Equals(typeObj))
+                {
+                    TypeComboBox.SelectedItem = typeObj;
+                }
+            }
+
+            // Setup the scope combo box
+            foreach (EquationScope item in ScopeComboBox.Items)
+            {
+                if (item.Equals(m_model.Scope))
+                {
+                    if (ScopeComboBox.SelectedItem != item)
+                    {
+                        ScopeComboBox.SelectedItem = item;
+                    }
+                }
+            }
+
+            EquationTextBox.Text = equationModel.Equation;
 
             // We want to make sure we have a right-click menu for the equation text box
             Core.App.InitRightClickMenu(EquationTextBox);
+        }
+
+        public bool CommentsVisible
+        {
+            get
+            {
+                return m_model.CommentsVisible;
+            }
+            set
+            {
+                // Avoid recursion
+                if (m_changingModel)
+                {
+                    return;
+                }
+                
+                if (value == m_model.CommentsVisible)
+                {
+                    // No change
+                    return;
+                }
+
+                m_changingModel = true;
+                m_model.CommentsVisible = value;
+                m_changingModel = false;
+            }
         }
 
         private void DeleteRowButton_Click(object sender, RoutedEventArgs e)
@@ -74,19 +132,35 @@ namespace ChemProV.PFD.EquationEditor
             }
             set
             {
+                // Avoid recursion
+                if (m_changingModel)
+                {
+                    return;
+                }
+
+                m_changingModel = true;
                 EquationTextBox.Text = value;
                 m_model.Equation = value;
+                m_changingModel = false;
             }
         }
 
         private void EquationTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // Avoid recursion
+            if (m_changingModel)
+            {
+                return;
+            }
+            
             // Update the model
+            m_changingModel = true;
             m_model.Equation = EquationTextBox.Text;
+            m_changingModel = false;
         }
 
         /// <summary>
-        /// Gets the equation model. This control exists to provide a user interface relevant to creating 
+        /// Gets the equation model. This control exists to provide a user interface relevant to editing 
         /// this equation model.
         /// </summary>
         public EquationModel Model
@@ -144,40 +218,17 @@ namespace ChemProV.PFD.EquationEditor
 
         #endregion
 
-        public void LoadFrom(XElement equationModelElement)
-        {
-            m_model = EquationModel.FromXml(equationModelElement);
-            EquationTextBox.Text = m_model.Equation;
-            this.DataContext = m_model;
-
-            // Setup the type combo box
-            foreach (object typeObj in TypeComboBox.Items)
-            {
-                if (m_model.Type.Equals(typeObj))
-                {
-                    TypeComboBox.SelectedItem = typeObj;
-                }
-            }
-            
-            // Setup the scope combo box
-            foreach (EquationScope item in ScopeComboBox.Items)
-            {
-                if (item.Equals(m_model.Scope))
-                {
-                    if (ScopeComboBox.SelectedItem != item)
-                    {
-                        ScopeComboBox.SelectedItem = item;
-                    }
-                }
-            }
-
-            // Last but not least, the text box
-            EquationTextBox.DataContext = m_model;
-        }
-
         private void ScopeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            // Avoid recursion
+            if (m_changingModel)
+            {
+                return;
+            }
+            
+            m_changingModel = true;            
             m_model.Scope = ScopeComboBox.SelectedItem as EquationScope;
+            m_changingModel = false;
         }
 
         public void SetDeleteRequestDelegate(DeleteRequestDelegate deleteFunc)
@@ -186,15 +237,13 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// Refreshes the options in the "Scope" combo box. Preserves the selected value if possible.
+        /// Refreshes the options in the "Scope" combo box. Sets the selected item to match the 
+        /// equation model, if possible.
         /// </summary>
         public void SetScopeOptions(ObservableCollection<EquationScope> options)
         {
             // We want to avoid firing the SelectionChanged event during this method
             ScopeComboBox.SelectionChanged -= ScopeComboBox_SelectionChanged;
-            
-            // Before we clear, store the selected element
-            object selected = ScopeComboBox.SelectedItem;
 
             // Clear and rebuild
             this.ScopeComboBox.Items.Clear();
@@ -202,8 +251,8 @@ namespace ChemProV.PFD.EquationEditor
             {
                 ScopeComboBox.Items.Add(es);
 
-                // If the item we just added is equal to the previously selected one, then select it
-                if (es.Equals(selected))
+                // If the item we just added is equal to the value in the model, then select it
+                if (es.Equals(m_model.Scope))
                 {
                     ScopeComboBox.SelectedItem = es;
                 }
@@ -214,15 +263,13 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// Refreshes the options in the "Type" combo box. Preserves the selected value if possible.
+        /// Refreshes the options in the "Type" combo box. Sets the selected item to match the 
+        /// equation model, if possible.
         /// </summary>
         public void SetTypeOptions(ObservableCollection<EquationType> options)
         {
             // We want to avoid firing the SelectionChanged event during this method
             TypeComboBox.SelectionChanged -= TypeComboBox_SelectionChanged;
-            
-            // Before we clear, store the selected element
-            object selected = TypeComboBox.SelectedItem;
 
             // Clear and rebuild
             this.TypeComboBox.Items.Clear();
@@ -230,8 +277,8 @@ namespace ChemProV.PFD.EquationEditor
             {
                 TypeComboBox.Items.Add(et);
 
-                // If the item we just added is equal to the previously selected one, then select it
-                if (et.Equals(selected))
+                // If the item we just added is equal to the value in the model, then select it
+                if (et.Equals(m_model.Type))
                 {
                     TypeComboBox.SelectedItem = et;
                 }
@@ -243,19 +290,15 @@ namespace ChemProV.PFD.EquationEditor
 
         private void TypeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            m_model.Type = TypeComboBox.SelectedItem as EquationType;
-        }
+            // Avoid recursion
+            if (m_changingModel)
+            {
+                return;
+            }
 
-        public bool CommentsVisible
-        {
-            get
-            {
-                return m_commentsVisible;
-            }
-            set
-            {
-                m_commentsVisible = value;
-            }
+            m_changingModel = true;
+            m_model.Type = TypeComboBox.SelectedItem as EquationType;
+            m_changingModel = false;
         }
     }
 }

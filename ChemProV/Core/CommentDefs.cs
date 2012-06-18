@@ -89,6 +89,8 @@ namespace ChemProV.Core
 
         public event EventHandler OnUserNameChanged = null;
 
+        public BasicComment() : this(string.Empty, string.Empty) { }
+        
         public BasicComment(string text, string userName)
         {
             m_text = text;

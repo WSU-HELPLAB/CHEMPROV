@@ -90,8 +90,23 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 
                 <sdk:TabItem Header="DF Analysis" x:Name="DFAnalysisTab" GotFocus="DFAnalysisTab_GotFocus">
                     <ToolTipService.ToolTip>Degrees of Freedom Analysis</ToolTipService.ToolTip>
-                    <TextBox x:Name="DFAnalysisTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
-                        TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" />
+                    <Border x:Name="DFCommentsBorder" Grid.Row="1"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        CornerRadius="3" BorderThickness="0" BorderBrush="#F02AB0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                        
+                            <TextBox x:Name="DFAnalysisTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Grid.Row="0"
+                                TextChanged="DFAnalysisTextBox_TextChanged"/>
+                            
+                            <!-- Button to add, show, or hide comments. -->
+                            <Button x:Name="DFCommentsButton" Grid.Row="1" Margin="3,3,3,3" Click="DFCommentsButton_Click" >Add a comment</Button>
+                        </Grid>
+                    </Border>
                 </sdk:TabItem>
                 
             </sdk:TabControl>

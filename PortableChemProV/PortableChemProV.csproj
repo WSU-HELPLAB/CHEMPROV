@@ -46,9 +46,6 @@
     <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationModel.cs">
       <Link>PFD\EquationEditor\Model\EquationModel.cs</Link>
     </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationModifierComparer.cs">
-      <Link>PFD\EquationEditor\Model\EquationModifierComparer.cs</Link>
-    </Compile>
     <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationScope.cs">
       <Link>PFD\EquationEditor\Model\EquationScope.cs</Link>
     </Compile>

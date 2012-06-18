@@ -10,6 +10,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,8 +41,6 @@ namespace ChemProV.UI
 
         private bool isLoadingFile = false;
 
-        private bool m_isReadOnly = false;
-
         private RuleManager ruleManager = RuleManager.GetInstance();
 
         private bool checkRules = true;
@@ -62,16 +62,9 @@ namespace ChemProV.UI
         #region Constructor
 
         public WorkspaceControl()
-            : this(false)
-        {
-        }
-
-        public WorkspaceControl(bool isReadOnly)
         {
             InitializeComponent();
-            EquationEditor.IsReadOnly = isReadOnly;
 
-            IsReadOnly = isReadOnly;
             DrawingCanvas.PfdChanging += new EventHandler(DrawingCanvas_PfdChanging);
             DrawingCanvas.ToolPlaced += new EventHandler(DrawingCanvas_ToolPlaced);
             DrawingCanvas.PfdUpdated += new PfdUpdatedEventHandler(CheckRulesForPFD);
@@ -91,8 +84,10 @@ namespace ChemProV.UI
             }
             EquationEditor.FixNumsAndButtons();
 
+            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible = false;
+
             // With all of the comments hidden, the update function will hide the pane
-            UpdateCommentsPane();
+            UpdateCommentsPaneVisibility();
         }
 
         #endregion Constructor
@@ -122,16 +117,6 @@ namespace ChemProV.UI
         {
             get { return elements; }
             set { elements = value; }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return m_isReadOnly; }
-            set
-            {
-                m_isReadOnly = value;
-                DrawingCanvas.IsReadOnly = value;
-            }
         }
 
         public bool CheckRules
@@ -203,7 +188,7 @@ namespace ChemProV.UI
             //clear any existing messages in the feedback window and rerun the error checker
             CheckRulesForPFD(this, EventArgs.Empty);
 
-            UpdateCommentsPane();
+            UpdateCommentsPaneVisibility();
         }
 
         public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)
@@ -254,7 +239,6 @@ namespace ChemProV.UI
             isLoadingFile = true;
             //clear out previous data
             DrawingCanvas.ClearDrawingCanvas();
-            EquationEditor.ClearEquations(false);
             m_snUserColors.Clear();
 
             //tell the drawing drawing_canvas to load its new children
@@ -276,10 +260,10 @@ namespace ChemProV.UI
             //Now, update the list of PFD elements
             EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
 
-            //load the equations
-            EquationEditor.LoadXmlElements(doc.Descendants("EquationEditor").ElementAt(0));
+            // Update the equations
+            EquationEditor.UpdateCompounds();
 
-            UpdateCommentsPane();
+            UpdateCommentsPaneVisibility();
         }
 
         public object GetobjectFromId(string id)
@@ -369,10 +353,11 @@ namespace ChemProV.UI
             }
         }
 
-        public void UpdateCommentsPane()
+        public void UpdateCommentsPaneVisibility()
         {
             // If there are no comments visible then hide the pane and return
-            if (0 == EquationEditor.CountRowsWithCommentsVisible())
+            if (0 == EquationEditor.CountRowsWithCommentsVisible() &&
+                !Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible)
             {
                 CommentsPane.Visibility = System.Windows.Visibility.Collapsed;
                 WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(0.0);
@@ -382,7 +367,6 @@ namespace ChemProV.UI
             // Otherwise make sure its visible and then update
             CommentsPane.Visibility = System.Windows.Visibility.Visible;
             WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(175.0);
-            CommentsPane.UpdateComments(EquationEditor, null);
         }
     }
 }

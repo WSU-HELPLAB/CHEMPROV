@@ -20,7 +20,7 @@
             </Grid.ColumnDefinitions>
             
             <sdk:Label Grid.Column="0" HorizontalAlignment="Stretch" Background="Gray" Foreground="White">
-                Equation Comments
+                Comments
             </sdk:Label>
             
             <Button Name="CloseButton" Grid.Column="1" HorizontalAlignment="Stretch">

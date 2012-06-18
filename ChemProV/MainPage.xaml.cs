@@ -69,6 +69,8 @@ namespace ChemProV
 
         private bool m_lastSaveWasPNG = false;
 
+        private bool m_ignoreWorkspaceChanges = false;
+
         /// <summary>
         /// This gets or sets the current difficulty setting
         /// </summary>
@@ -130,6 +132,14 @@ namespace ChemProV
             // Required to initialize variables
             InitializeComponent();
 
+            // Set the workspace for the equation editor and other controls
+            Core.App.CurrentWorkspace.Equations.Add(new PFD.EquationEditor.Models.EquationModel());
+            WorkSpace.EquationEditor.SetWorkspace(Core.App.CurrentWorkspace);
+            WorkSpace.CommentsPane.SetWorkspace(Core.App.CurrentWorkspace);
+            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.PropertyChanged += 
+                new PropertyChangedEventHandler(DegreesOfFreedomAnalysis_PropertyChanged);
+            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+
             if (Application.Current.IsRunningOutOfBrowser)
             {
                 Install_Button.Click -= new RoutedEventHandler(InstallButton_Click);
@@ -188,16 +198,7 @@ namespace ChemProV
             string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
             CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
 
-            // Check for degrees of freedom analysis
-            XElement df = doc.Element("ProcessFlowDiagram").Element("DegreesOfFreedomAnalysis");
-            if (null != df)
-            {
-                DFAnalysisTextBox.Text = df.Element("Text").Value;
-            }
-            else
-            {
-                DFAnalysisTextBox.Text = string.Empty;
-            }
+            Core.App.CurrentWorkspace.Load(doc);
 
             WorkSpace.LoadXmlElements(doc);
 
@@ -267,12 +268,7 @@ namespace ChemProV
                         {
                             try
                             {
-                                XDocument doc = XDocument.Load(isfs);
-
-                                string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
-                                CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
-
-                                WorkSpace.LoadXmlElements(doc);
+                                LoadChemProVFile(isfs);
                                 loadConfigFile = false;
                             }
                             catch (Exception ex)
@@ -376,9 +372,7 @@ namespace ChemProV
                 feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
 
                 // Write degrees of freedom analysis
-                writer.WriteStartElement("DegreesOfFreedomAnalysis");
-                writer.WriteElementString("Text", DFAnalysisTextBox.Text);
-                writer.WriteEndElement();
+                Core.App.CurrentWorkspace.WriteDegreesOfFreedomAnalysis(writer);
 
                 //end root node
                 writer.WriteEndElement();
@@ -657,6 +651,7 @@ namespace ChemProV
                 }
 
                 // Call the clear function to clear everything on the page
+                Core.App.CurrentWorkspace.Clear();
                 Clear();
             }
         }
@@ -831,6 +826,60 @@ namespace ChemProV
         private void Compounds_DF_TabControl_GotFocus(object sender, RoutedEventArgs e)
         {
             Core.App.ClosePopup();
+        }
+
+        private void DegreesOfFreedomAnalysis_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (m_ignoreWorkspaceChanges)
+            {
+                return;
+            }
+
+            Core.DegreesOfFreedomAnalysis df = (sender as Core.DegreesOfFreedomAnalysis);
+            if (e.PropertyName.Equals("CommentsVisible"))
+            {
+                if (df.CommentsVisible)
+                {
+                    DFCommentsBorder.BorderThickness = new Thickness(2.0);
+                    DFCommentsButton.Content = "Hide comments";
+                }
+                else
+                {
+                    DFCommentsBorder.BorderThickness = new Thickness(0.0);
+                    DFCommentsButton.Content = (df.Comments.Count > 0) ?
+                        "Show comments" : "Add comments";
+                }
+            }
+            else if (e.PropertyName.Equals("Text"))
+            {
+                m_ignoreWorkspaceChanges = true;
+                DFAnalysisTextBox.Text = df.Text;
+                m_ignoreWorkspaceChanges = false;
+            }
+        }
+
+        private void DFCommentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible =
+                !Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible;
+            WorkSpace.UpdateCommentsPaneVisibility();
+        }
+
+        private void DFAnalysisTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Prevent events from firing
+            m_ignoreWorkspaceChanges = true;
+
+            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.Text = DFAnalysisTextBox.Text;
+            
+            // Watch for events again
+            m_ignoreWorkspaceChanges = false;
+        }
+
+        private void Comments_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        {
+            DegreesOfFreedomAnalysis_PropertyChanged(
+                Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis, new PropertyChangedEventArgs("CommentsVisible"));
         }
     }
 }
