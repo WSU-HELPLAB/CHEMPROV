@@ -39,9 +39,10 @@ namespace ChemProV.PFD.EquationEditor
         private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
-        private bool m_isReadOnly = false;
 
         private List<IPfdElement> pfdElements = new List<IPfdElement>();
+
+        private ChemProV.Core.Workspace m_workspace = null;
 
         #endregion
 
@@ -103,21 +104,7 @@ namespace ChemProV.PFD.EquationEditor
             set
             {
                 compounds = value;
-                updateCompounds();
-            }
-        }
-
-        public bool IsReadOnly
-        {
-            get { return m_isReadOnly; }
-            set
-            {
-                m_isReadOnly = value;
-
-                // The button to add a new row should only be visible if we're not in read 
-                // only mode
-                AddNewRowButton.Visibility = m_isReadOnly ?
-                    System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+                UpdateCompounds();
             }
         }
 
@@ -133,7 +120,7 @@ namespace ChemProV.PFD.EquationEditor
 
             //create our first row
             AddNewEquationRow();
-            updateCompounds();
+            UpdateCompounds();
             updateScopes();
 
             // Set tooltips at runtime
@@ -164,18 +151,6 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        public void LoadXmlElements(XElement doc)
-        {
-            //pull out the equations
-            XElement equations = doc.Descendants("Equations").ElementAt(0);
-            foreach (XElement xmlEquation in equations.Elements())
-            {
-                EquationModel rowModel = AddNewEquationRow(xmlEquation);
-            }
-
-            updateCompounds();
-        }
-
         #endregion
 
         #region Private methods
@@ -196,55 +171,27 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         private EquationModel AddNewEquationRow(XElement optionalXmlEquation)
         {
-            // E.O.
-            // Create a new equation control and add it to the stack panel
-            EquationControl newRow = new EquationControl(this);
-            if (null != optionalXmlEquation)
+            // We can't do anything here without a workspace reference
+            if (null == m_workspace)
             {
-                newRow.LoadFrom(optionalXmlEquation);
+                return null;
+            }
+            
+            // Create a new equation model
+            EquationModel model;
+            if (null == optionalXmlEquation)
+            {
+                model = new EquationModel();
+            }
+            else
+            {
+                model = EquationModel.FromXml(optionalXmlEquation);
             }
 
-            // Set the deletion callback function
-            newRow.SetDeleteRequestDelegate(this.DeleteEquationRow);
+            // Add it to the workspace. Event listeners will update the UI appropriately.
+            m_workspace.Equations.Add(model);
 
-            // TODO: Make it readonly if necessary
-
-            EquationsStackPanel.Children.Add(newRow);
-            newRow.Model.RelatedElements = PfdElements;
-            newRow.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
-
-            newRow.HorizontalContentAlignment = System.Windows.HorizontalAlignment.Right;
-
-            // Fix the move up/move down buttons on all rows
-            FixNumsAndButtons();
-
-            // Link up events for move up/move down buttons
-            newRow.MoveDownButton.Click += new RoutedEventHandler(MoveDownButton_Click);
-            newRow.MoveUpButton.Click += new RoutedEventHandler(MoveUpButton_Click);
-
-            // Set comment button border
-            newRow.CommentsVisible = false;
-            newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-            newRow.CommentIconBorder.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
-            {
-                newRow.CommentsVisible = !newRow.CommentsVisible;
-                FixNumsAndButtons();
-                //if (newRow.CommentsVisible)
-                //{
-                //    int index = GetRowIndex(newRow) % Core.NamedColors.CommentKeys.Length;
-                //    newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(
-                //        Core.NamedColors.CommentKeys[index].Color);
-                //}
-                //else
-                //{
-                //    newRow.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
-                //}
-
-                // Update the comments pane
-                Core.App.Workspace.UpdateCommentsPane();
-            };
-
-            return newRow.Model;
+            return (EquationsStackPanel.Children[EquationsStackPanel.Children.Count - 1] as EquationControl).Model;
         }
 
         private void MoveDownButton_Click(object sender, RoutedEventArgs e)
@@ -391,12 +338,13 @@ namespace ChemProV.PFD.EquationEditor
                     "Request was made to delete an equation row that was not in the stack");
             }
 #endif
-            
-            EquationsStackPanel.Children.Remove(uie);
-            FixNumsAndButtons();
 
-            // Update the comments pane
-            Core.App.Workspace.UpdateCommentsPane();
+            // Remove it from the workspace. There are event listeners that will update the UI 
+            // when doing this
+            m_workspace.Equations.Remove(thisOne.Model);
+            
+            // Fix row numbers and buttons
+            FixNumsAndButtons();
         }
 
         /// <summary>
@@ -507,7 +455,7 @@ namespace ChemProV.PFD.EquationEditor
         /// <summary>
         /// Updates the list of available compounds that an equation can balance across
         /// </summary>
-        private void updateCompounds()
+        public void UpdateCompounds()
         {
             equationTypes = new ObservableCollection<EquationType>();
             elements.Clear();
@@ -750,6 +698,103 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
             return count;
+        }
+
+        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        {
+            if (object.ReferenceEquals(m_workspace, workspace))
+            {
+                // No change
+                return;
+            }
+
+            // Detach listeners from old workspace
+            if (null != m_workspace)
+            {
+                // This function should really only be called once, so we should never hit this 
+                // code, but future versions might change this.
+                throw new NotImplementedException();
+            }
+
+            // Store a reference to the workspace
+            m_workspace = workspace;
+
+            UpdateFromWorkspace();
+
+            // Attach listeners
+            m_workspace.Equations.CollectionChanged += new NotifyCollectionChangedEventHandler(Equations_CollectionChanged);
+        }
+
+        private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            if (NotifyCollectionChangedAction.Add == e.Action)
+            {
+                // An item was added, meaning we need to add a new row. In this case the number of rows 
+                // that we currently have should be one less than the number in the workspace.
+                if (EquationsStackPanel.Children.Count != m_workspace.Equations.Count - 1)
+                {
+                    // Do a full update for safety
+                    UpdateFromWorkspace();
+                    return;
+                }
+
+                EquationControl ec = new EquationControl(
+                    this, m_workspace.Equations[m_workspace.Equations.Count - 1]);
+                SetupEquationControlEvents(ec);
+                EquationsStackPanel.Children.Add(ec);
+                FixNumsAndButtons();
+            }
+            else
+            {
+                // Could probably make this more efficient
+                UpdateFromWorkspace();
+            }
+        }
+
+        /// <summary>
+        /// Clears and re-creates the entire set of equation controls based on data from the workspace object
+        /// </summary>
+        private void UpdateFromWorkspace()
+        {
+            // Create appropriate UI elements for the workspace content
+            ClearEquations(false);
+            foreach (EquationModel em in m_workspace.Equations)
+            {
+                EquationControl ec = new EquationControl(this, em);
+                SetupEquationControlEvents(ec);
+                EquationsStackPanel.Children.Add(ec);
+            }
+
+            // Fix the move up/move down buttons on all rows
+            FixNumsAndButtons();
+        }
+
+        private void SetupEquationControlEvents(EquationControl control)
+        {
+            // Set the deletion callback function
+            control.SetDeleteRequestDelegate(this.DeleteEquationRow);
+
+            control.Model.RelatedElements = PfdElements;
+            control.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
+
+            // Link up events for move up/move down buttons
+            control.MoveDownButton.Click += new RoutedEventHandler(MoveDownButton_Click);
+            control.MoveUpButton.Click += new RoutedEventHandler(MoveUpButton_Click);
+
+            // Set comment button border
+            control.CommentsVisible = false;
+            control.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
+            control.CommentIconBorder.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
+            {
+                // Toggle the comment visibility. All relevant UI elements that need to know about this 
+                // will have attached event listeners and will update themselves appropriately
+                control.CommentsVisible = !control.CommentsVisible;
+
+                FixNumsAndButtons();
+
+                // Tell the workspace to update visibility for the comment pane
+                Core.App.Workspace.UpdateCommentsPaneVisibility();
+            };
         }
     }
 }

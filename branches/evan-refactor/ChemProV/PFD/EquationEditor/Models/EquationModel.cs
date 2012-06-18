@@ -27,6 +27,12 @@ namespace ChemProV.PFD.EquationEditor.Models
         /// </summary>
         private List<Core.BasicComment> m_comments = new List<Core.BasicComment>();
 
+        /// <summary>
+        /// Indicates whether or not comments for this equation are visible somewhere in 
+        /// the interface
+        /// </summary>
+        private bool m_commentsVisible = false;
+
         #endregion
 
         #region properties
@@ -91,6 +97,31 @@ namespace ChemProV.PFD.EquationEditor.Models
                 OnPropertyChanged("Equation");
             }
         }
+
+        public bool CommentsVisible
+        {
+            get
+            {
+                return m_commentsVisible;
+            }
+            set
+            {
+                if (m_commentsVisible == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_commentsVisible = value;
+
+                // Invoke the property change event, if non-null
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("CommentsVisible"));
+                }
+            }
+        }
+
         #endregion
 
         #region public methods
@@ -161,9 +192,16 @@ namespace ChemProV.PFD.EquationEditor.Models
             // Read in the comments
             foreach (XElement cmtsEl in xmlModel.Elements("Annotation"))
             {
+                string cmtText = cmtsEl.Value;
+                if (string.IsNullOrEmpty(cmtText))
+                {
+                    // Ignore empty comments
+                    continue;
+                }
+                
                 XAttribute userAttr = cmtsEl.Attribute("UserName");
                 string userName = (null == userAttr) ? null : userAttr.Value;
-                model.m_comments.Add(new Core.BasicComment(cmtsEl.Value, userName));
+                model.m_comments.Add(new Core.BasicComment(cmtText, userName));
             }
 
             //scope

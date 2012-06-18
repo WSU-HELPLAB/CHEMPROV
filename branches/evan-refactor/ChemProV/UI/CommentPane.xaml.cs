@@ -1,21 +1,27 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿using System.Collections.Specialized;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using ChemProV.Core;
-using ChemProV.PFD.EquationEditor;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.UI
 {
+    /// <summary>
+    /// Control to show comments for a workspace. Currently only supports equation comments and 
+    /// comments for the degrees of freedom analysis.
+    /// </summary>
     public partial class CommentPane : UserControl
     {
+        private Workspace m_workspace = null;
+
+        /// <summary>
+        /// Brush for the border around degrees of freedom analysis comments
+        /// </summary>
+        private static Brush s_dfBorderBrush = new SolidColorBrush(Color.FromArgb(255, 240, 42, 176));
+        
         /// <summary>
         /// Brush for the border around equation comments
         /// </summary>
@@ -31,21 +37,70 @@ namespace ChemProV.UI
 
         private void AddCommentButtonClick(object sender, RoutedEventArgs e)
         {
-            EquationControl ec = (sender as Button).Tag as EquationControl;
-            ec.Model.Comments.Add(new BasicComment(string.Empty, null));
-            UpdateComments(Core.App.Workspace.EquationEditor, null);
+            EquationModel model = (sender as Button).Tag as EquationModel;
+            model.Comments.Add(new BasicComment(string.Empty, null));
+            UpdateComments();
         }
 
-        public void UpdateComments(EquationEditor editor, EquationControl focusRow)
+        private void AddDFCommentButtonClick(object sender, RoutedEventArgs e)
+        {
+            m_workspace.DegreesOfFreedomAnalysis.Comments.Add(new BasicComment());
+            UpdateComments();
+        }
+
+        private void Comments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateComments();
+        }
+
+        private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            UpdateComments();
+        }
+
+        private void Equations_EquationModelPropertyChanged(EquationModel sender, string propertyName)
+        {
+            // We only care about comment visibility
+            if (propertyName.Equals("CommentsVisible"))
+            {
+                UpdateComments();
+            }
+        }
+
+        private void DFPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // We only care about comment visibility
+            if (e.PropertyName.Equals("CommentsVisible"))
+            {
+                UpdateComments();
+            }
+        }
+
+        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        {
+            m_workspace = workspace;
+
+            // Attach listeners
+            workspace.DegreesOfFreedomAnalysis.PropertyChanged += this.DFPropertyChanged;
+            workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+            workspace.Equations.CollectionChanged += new NotifyCollectionChangedEventHandler(Equations_CollectionChanged);
+            workspace.Equations.EquationModelPropertyChanged += new EquationCollection.EquationModelPropertyChangedDelegate(Equations_EquationModelPropertyChanged);
+            
+            // Do an update
+            UpdateComments();
+        }
+
+        private void UpdateComments()
         {
             // Clear first
             CommentsStack.Children.Clear();
 
-            for (int i = 0; i < editor.EquationRowCount; i++)
+            // Start with equation comments
+            for (int i = 0; i < m_workspace.Equations.Count; i++)
             {
-                EquationControl ec = editor.GetRowControl(i);
+                EquationModel model = m_workspace.Equations[i];
 
-                if (!ec.CommentsVisible)
+                if (!model.CommentsVisible)
                 {
                     continue;
                 }
@@ -59,25 +114,23 @@ namespace ChemProV.UI
                 sp.Orientation = Orientation.Vertical;
                 brdr.Child = sp;
 
-                // Add a color-coded number label at the top
+                // Add an equation number label at the top
                 Label numLabel = new Label();
-                numLabel.Content = (i + 1).ToString() + ".";
+                numLabel.Content = "Equation " + (i + 1).ToString();
                 numLabel.Foreground = s_eqBorderBrush;
                 numLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 sp.Children.Add(numLabel);
 
                 // Add each comment
-                foreach (BasicComment bc in ec.Model.Comments)
+                foreach (BasicComment bc in model.Comments)
                 {
                     EqCommentControl cc = new EqCommentControl();
                     cc.CommentObject = bc;
                     cc.Margin = new Thickness(3.0);
                     cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
                     {
-                        ec.Model.Comments.Remove(cc.CommentObject);
+                        model.Comments.Remove(cc.CommentObject);
                         sp.Children.Remove(cc);
-
-                        Core.App.Workspace.EquationEditor.FixNumsAndButtons();
                     };
                     sp.Children.Add(cc);
                 }
@@ -88,8 +141,54 @@ namespace ChemProV.UI
                 Image btnIcon = Core.App.CreateImageFromSource("plus_16x16.png");
                 btnIcon.Width = btnIcon.Height = 16;
                 btn.Content = btnIcon;
-                btn.Tag = ec;
+                btn.Tag = model;
                 btn.Click += new RoutedEventHandler(AddCommentButtonClick);
+                sp.Children.Add(btn);
+
+                CommentsStack.Children.Add(brdr);
+            }
+
+            // Next do comments for the degrees of freedom analysis
+            if (m_workspace.DegreesOfFreedomAnalysis.CommentsVisible)
+            {
+                Border brdr = new Border();
+                brdr.Margin = new Thickness(3.0, 3.0, 3.0, 0.0);
+                brdr.CornerRadius = new CornerRadius(3.0);
+                brdr.BorderThickness = new Thickness(2.0);
+                brdr.BorderBrush = s_dfBorderBrush;
+                StackPanel sp = new StackPanel();
+                sp.Orientation = Orientation.Vertical;
+                brdr.Child = sp;
+
+                // Add a label at the top
+                Label numLabel = new Label();
+                numLabel.Content = "DF Analysis";
+                numLabel.Foreground = s_dfBorderBrush;
+                numLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
+                sp.Children.Add(numLabel);
+                
+                foreach (BasicComment bc in m_workspace.DegreesOfFreedomAnalysis.Comments)
+                {
+                    EqCommentControl cc = new EqCommentControl();
+                    cc.CommentObject = bc;
+                    cc.Margin = new Thickness(3.0);
+                    cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
+                    {
+                        m_workspace.DegreesOfFreedomAnalysis.Comments.Remove(cc.CommentObject);
+
+                        // TODO: Figure out if we want this or if event listeners are going to take care of it
+                        sp.Children.Remove(cc);
+                    };
+                    sp.Children.Add(cc);
+                }
+
+                // Add a button to allow addition of more comments
+                Button btn = new Button();
+                btn.Margin = new Thickness(3.0);
+                Image btnIcon = Core.App.CreateImageFromSource("plus_16x16.png");
+                btnIcon.Width = btnIcon.Height = 16;
+                btn.Content = btnIcon;
+                btn.Click += new RoutedEventHandler(AddDFCommentButtonClick);
                 sp.Children.Add(btn);
 
                 CommentsStack.Children.Add(brdr);

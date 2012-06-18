@@ -128,11 +128,14 @@
     <Compile Include="Core\App.cs" />
     <Compile Include="Core\CommentLogic.cs" />
     <Compile Include="Core\CommentMerger.cs" />
+    <Compile Include="Core\DegreesOfFreedomAnalysis.cs" />
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\CommentDefs.cs" />
+    <Compile Include="Core\EquationCollection.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Core\NamedColors.cs" />
     <Compile Include="Core\IWorkspaceChangeListener.cs" />
+    <Compile Include="Core\Workspace.cs" />
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
@@ -153,7 +156,6 @@
     </Compile>
     <Compile Include="PFD\EquationEditor\Models\EquationModel.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScopeClassification.cs" />
-    <Compile Include="PFD\EquationEditor\Models\EquationModifierComparer.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
