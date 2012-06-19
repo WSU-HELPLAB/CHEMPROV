@@ -57,6 +57,8 @@ namespace ChemProV.UI
         private Dictionary<string, PFD.StickyNote.StickyNoteColors> m_snUserColors =
             new Dictionary<string, PFD.StickyNote.StickyNoteColors>();
 
+        private Core.Workspace m_workspace = null;
+
         #endregion Fields
 
         #region Constructor
@@ -84,7 +86,7 @@ namespace ChemProV.UI
             }
             EquationEditor.UpdateRowProperties();
 
-            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible = false;
+            m_workspace.DegreesOfFreedomAnalysis.CommentsVisible = false;
 
             // With all of the comments hidden, the update function will hide the pane
             UpdateCommentsPaneVisibility();
@@ -324,6 +326,26 @@ namespace ChemProV.UI
 
         #endregion Private Helper
 
+        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        {
+            if (object.ReferenceEquals(m_workspace, workspace))
+            {
+                // No change
+                return;
+            }
+
+            // Detach listeners from old workspace
+            if (null != m_workspace)
+            {
+                // This function should really only be called once, so we should never hit this 
+                // code, but future versions might change this.
+                throw new NotImplementedException();
+            }
+
+            // Store a reference to the workspace
+            m_workspace = workspace;
+        }
+
         /// <summary>
         /// Dictionary that maps a user name string to a sticky note color
         /// </summary>
@@ -357,7 +379,7 @@ namespace ChemProV.UI
         {
             // If there are no comments visible then hide the pane and return
             if (0 == EquationEditor.CountRowsWithCommentsVisible() &&
-                !Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible)
+                !m_workspace.DegreesOfFreedomAnalysis.CommentsVisible)
             {
                 CommentsPane.Visibility = System.Windows.Visibility.Collapsed;
                 WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(0.0);

@@ -79,9 +79,9 @@ namespace ChemProV.UI.DrawingCanvas.States
                 foreach (UIElement uie in m_canvas.Children)
                 {
                     // Change visibility if it's a sticky note
-                    if (uie is StickyNote)
+                    if (uie is StickyNoteControl)
                     {
-                        (uie as StickyNote).Show();
+                        (uie as StickyNoteControl).Show();
                     }
                 }
 
@@ -149,9 +149,9 @@ namespace ChemProV.UI.DrawingCanvas.States
         {
             foreach (UIElement uie in m_canvas.Children)
             {
-                if (uie is StickyNote)
+                if (uie is StickyNoteControl)
                 {
-                    (uie as StickyNote).Hide();
+                    (uie as StickyNoteControl).Hide();
                 }
             }
 
@@ -218,9 +218,9 @@ namespace ChemProV.UI.DrawingCanvas.States
                 Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
 
                 // Build the new comment sticky note on the canvas and add undo
-                StickyNote sn;
+                StickyNoteControl sn;
                 m_canvas.AddUndo(new UndoRedoCollection("Undo creation of comment",
-                    StickyNote.CreateCommentNote(m_canvas, cc, null, out sn).ToArray()));
+                    StickyNoteControl.CreateCommentNote(m_canvas, cc, null, out sn).ToArray()));
 
                 // Make sure to remove the popup menu from the canvas
                 m_canvas.Children.Remove(m_contextMenu);
@@ -252,7 +252,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
                 for (int i = 0; i < cc.CommentCount; i++)
                 {
-                    StickyNote sn = cc.GetCommentAt(i) as StickyNote;
+                    StickyNoteControl sn = cc.GetCommentAt(i) as StickyNoteControl;
                     sn.Hide();
                 }
 
@@ -276,7 +276,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
                 for (int i = 0; i < cc.CommentCount; i++)
                 {
-                    StickyNote sn = cc.GetCommentAt(i) as StickyNote;
+                    StickyNoteControl sn = cc.GetCommentAt(i) as StickyNoteControl;
                     sn.Show();
                 }
 

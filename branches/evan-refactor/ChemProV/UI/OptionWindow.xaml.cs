@@ -14,6 +14,8 @@ namespace ChemProV.UI
 {
     public partial class OptionWindow : ChildWindow
     {
+        private Core.Workspace m_workspace = null;
+        
         public OptionDifficultySetting OptionSelection
         {
             get
@@ -33,9 +35,11 @@ namespace ChemProV.UI
             }
         }
 
-        public OptionWindow()
+        public OptionWindow(Core.Workspace workspace)
         {
             InitializeComponent();
+
+            m_workspace = workspace;
 
             // Try to select the appropriate item for the current font size
             foreach (object o in EEFontSizeCombo.Items)
@@ -43,7 +47,7 @@ namespace ChemProV.UI
                 ComboBoxItem cbi = o as ComboBoxItem;
                 if (null != cbi)
                 {
-                    if (cbi.Content.ToString().Equals(Core.App.CurrentWorkspace.EquationEditorFontSize.ToString()))
+                    if (cbi.Content.ToString().Equals(m_workspace.EquationEditorFontSize.ToString()))
                     {
                         EEFontSizeCombo.SelectedItem = o;
                         break;
@@ -60,7 +64,7 @@ namespace ChemProV.UI
                 double d;
                 if (double.TryParse(cbi.Content.ToString(), out d))
                 {
-                    Core.App.CurrentWorkspace.EquationEditorFontSize = d;
+                    m_workspace.EquationEditorFontSize = d;
                 }
             }
             this.DialogResult = true;

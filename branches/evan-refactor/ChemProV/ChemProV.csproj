@@ -159,7 +159,6 @@
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
     <Compile Include="PFD\EquationEditor\Models\IEquationModifier.cs" />
-    <Compile Include="PFD\EquationEditor\Models\ReadOnlyEquationModel.cs" />
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
     <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />
@@ -182,8 +181,8 @@
     <Compile Include="PFD\ProcessUnits\Reactor.cs" />
     <Compile Include="PFD\ProcessUnits\Separator.cs" />
     <Compile Include="PFD\ProcessUnits\TemporaryProcessUnit.cs" />
-    <Compile Include="PFD\StickyNote\StickyNote.xaml.cs">
-      <DependentUpon>StickyNote.xaml</DependentUpon>
+    <Compile Include="PFD\StickyNote\StickyNoteControl.xaml.cs">
+      <DependentUpon>StickyNoteControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\StickyNote\StickyNote_UIIndependent.cs" />
     <Compile Include="PFD\Streams\AbstractStream.xaml.cs">
@@ -289,7 +288,6 @@
     <Compile Include="Validation\Rules\Adapters\Table\ITableAdapter.cs" />
     <Compile Include="Validation\Rules\Adapters\Table\TableAdapterFactory.cs" />
     <Compile Include="Validation\Rules\Adapters\Table\ChemicalTableAdapter.cs" />
-    <Compile Include="Validation\Rules\EquationRules\EquationRule.cs" />
     <Compile Include="Validation\Rules\ProcessUnitRules\HeatExchangerWithoutUtilityProcessUnitRule.cs" />
     <Compile Include="Validation\Rules\ProcessUnitRules\ProcessUnitRuleFactory.cs" />
     <Compile Include="Validation\Rules\ProcessUnitRules\ReactorProcessUnitRule.cs" />
@@ -337,7 +335,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PFD\StickyNote\StickyNote.xaml">
+    <Page Include="PFD\StickyNote\StickyNoteControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

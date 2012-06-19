@@ -58,9 +58,6 @@
     <Compile Include="..\ChemProV\PFD\EquationEditor\Models\IEquationModifier.cs">
       <Link>PFD\EquationEditor\Model\IEquationModifier.cs</Link>
     </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\ReadOnlyEquationModel.cs">
-      <Link>PFD\EquationEditor\Model\ReadOnlyEquationModel.cs</Link>
-    </Compile>
     <Compile Include="..\ChemProV\PFD\IPfdElement.cs">
       <Link>PFD\IPfdElement.cs</Link>
     </Compile>

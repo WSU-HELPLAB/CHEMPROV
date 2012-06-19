@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -8,7 +8,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -16,22 +15,18 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using ChemProV.Library.OSBLE.Views;
 using ChemProV.PFD.EquationEditor;
-using ChemProV.PFD.ProcessUnits;
-using ChemProV.PFD.StickyNote;
-using ChemProV.PFD.Streams;
 using ChemProV.UI;
 using ChemProV.UI.DrawingCanvas;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
-using ChemProV.Library.OSBLE.Views;
 
 namespace ChemProV
 {
@@ -70,6 +65,13 @@ namespace ChemProV
         private bool m_lastSaveWasPNG = false;
 
         private bool m_ignoreWorkspaceChanges = false;
+
+        /// <summary>
+        /// Represents the logical workspace. Refactoring is still happening but the long term goal 
+        /// is to have all data stored in this object and all UI elements would attach listeners 
+        /// and do their modifications through this object.
+        /// </summary>
+        private Core.Workspace m_workspace = new Core.Workspace();
 
         /// <summary>
         /// This gets or sets the current difficulty setting
@@ -133,12 +135,13 @@ namespace ChemProV
             InitializeComponent();
 
             // Set the workspace for the equation editor and other controls
-            Core.App.CurrentWorkspace.Equations.Add(new PFD.EquationEditor.Models.EquationModel());
-            WorkSpace.EquationEditor.SetWorkspace(Core.App.CurrentWorkspace);
-            WorkSpace.CommentsPane.SetWorkspace(Core.App.CurrentWorkspace);
-            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.PropertyChanged += 
+            m_workspace.Equations.Add(new PFD.EquationEditor.Models.EquationModel());
+            WorkSpace.EquationEditor.SetWorkspace(m_workspace);
+            WorkSpace.CommentsPane.SetWorkspace(m_workspace);
+            m_workspace.DegreesOfFreedomAnalysis.PropertyChanged += 
                 new PropertyChangedEventHandler(DegreesOfFreedomAnalysis_PropertyChanged);
-            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+            m_workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+            WorkSpace.SetWorkspace(m_workspace);
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
@@ -198,7 +201,7 @@ namespace ChemProV
             string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
             CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
 
-            Core.App.CurrentWorkspace.Load(doc);
+            m_workspace.Load(doc);
 
             WorkSpace.LoadXmlElements(doc);
 
@@ -372,7 +375,7 @@ namespace ChemProV
                 feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
 
                 // Write degrees of freedom analysis
-                Core.App.CurrentWorkspace.WriteDegreesOfFreedomAnalysis(writer);
+                m_workspace.WriteDegreesOfFreedomAnalysis(writer);
 
                 //end root node
                 writer.WriteEndElement();
@@ -651,7 +654,7 @@ namespace ChemProV
                 }
 
                 // Call the clear function to clear everything on the page
-                Core.App.CurrentWorkspace.Clear();
+                m_workspace.Clear();
                 Clear();
             }
         }
@@ -693,7 +696,7 @@ namespace ChemProV
 
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
-            OptionWindow optionWindow = new OptionWindow();
+            OptionWindow optionWindow = new OptionWindow(m_workspace);
             optionWindow.Simplest.IsChecked = OptionDifficultySetting.MaterialBalance == currentDifficultySetting;
             optionWindow.Medium.IsChecked = OptionDifficultySetting.MaterialBalanceWithReactors == currentDifficultySetting;
             optionWindow.MostComplex.IsChecked = OptionDifficultySetting.MaterialAndEnergyBalance == currentDifficultySetting;
@@ -860,8 +863,8 @@ namespace ChemProV
 
         private void DFCommentsButton_Click(object sender, RoutedEventArgs e)
         {
-            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible =
-                !Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible;
+            m_workspace.DegreesOfFreedomAnalysis.CommentsVisible =
+                !m_workspace.DegreesOfFreedomAnalysis.CommentsVisible;
             WorkSpace.UpdateCommentsPaneVisibility();
         }
 
@@ -870,7 +873,7 @@ namespace ChemProV
             // Prevent events from firing
             m_ignoreWorkspaceChanges = true;
 
-            Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.Text = DFAnalysisTextBox.Text;
+            m_workspace.DegreesOfFreedomAnalysis.Text = DFAnalysisTextBox.Text;
             
             // Watch for events again
             m_ignoreWorkspaceChanges = false;
@@ -879,7 +882,12 @@ namespace ChemProV
         private void Comments_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
         {
             DegreesOfFreedomAnalysis_PropertyChanged(
-                Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis, new PropertyChangedEventArgs("CommentsVisible"));
+                m_workspace.DegreesOfFreedomAnalysis, new PropertyChangedEventArgs("CommentsVisible"));
+        }
+
+        public Core.Workspace GetLogicalWorkspace()
+        {
+            return m_workspace;
         }
     }
 }

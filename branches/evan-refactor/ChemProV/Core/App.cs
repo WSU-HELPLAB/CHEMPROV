@@ -31,12 +31,6 @@ namespace ChemProV.Core
     {
         private static List<LogItem> s_log = new List<LogItem>();
 
-        /// <summary>
-        /// The hope is that eventually this will be used to store all data
-        /// (not there yet)
-        /// </summary>
-        private static Workspace s_logicWorkspace = new Workspace();
-
         private static MainPage s_mainPage = null;
 
         private static ChemProV.UI.ControlPalette s_palette = null;
@@ -85,14 +79,6 @@ namespace ChemProV.Core
             img.SetValue(Image.SourceProperty, bmp);
 
             return img;
-        }
-
-        public static Workspace CurrentWorkspace
-        {
-            get
-            {
-                return s_logicWorkspace;
-            }
         }
 
         public static OptionDifficultySetting DifficultySetting
