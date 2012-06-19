@@ -53,10 +53,10 @@ namespace ChemProV.Core
             }
 
             // There are several different possibilities for what we're about to delete.
-            if (element is PFD.StickyNote.StickyNote)
+            if (element is PFD.StickyNote.StickyNoteControl)
             {
                 // Case 1: deleting a sticky note
-                (element as PFD.StickyNote.StickyNote).DeleteWithUndo(canvas);
+                (element as PFD.StickyNote.StickyNoteControl).DeleteWithUndo(canvas);
             }
             else if (element is AbstractStream)
             {
@@ -141,7 +141,7 @@ namespace ChemProV.Core
             // Delete all comment sticky notes for the process unit
             for (i = 0; i < he.CommentCount; i++)
             {
-                PFD.StickyNote.StickyNote sn = he.GetCommentAt(i) as PFD.StickyNote.StickyNote;
+                PFD.StickyNote.StickyNoteControl sn = he.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
 
                 // We will not remove the comment from the collection, but we must remove it
                 // from the canvas. Comment sticky notes have both a sticky note control and 
@@ -159,7 +159,7 @@ namespace ChemProV.Core
             {
                 for (i = 0; i < cc.CommentCount; i++)
                 {
-                    PFD.StickyNote.StickyNote sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNote;
+                    PFD.StickyNote.StickyNoteControl sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
 
                     // We will not remove the comment from the collection, but we must remove it
                     // from the canvas. Comment sticky notes have both a sticky note control and 
@@ -227,7 +227,7 @@ namespace ChemProV.Core
             {
                 for (i = 0; i < cc.CommentCount; i++)
                 {
-                    PFD.StickyNote.StickyNote sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNote;
+                    PFD.StickyNote.StickyNoteControl sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
                     
                     // We will not remove the comment from the collection, but we must remove it
                     // from the canvas. Comment sticky notes have both a sticky note control and 
@@ -306,7 +306,7 @@ namespace ChemProV.Core
             {
                 for (i = 0; i < cc.CommentCount; i++)
                 {
-                    PFD.StickyNote.StickyNote sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNote;
+                    PFD.StickyNote.StickyNoteControl sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
 
                     // We will not remove the comment from the collection, but we must remove it
                     // from the canvas. Comment sticky notes have both a sticky note control and 

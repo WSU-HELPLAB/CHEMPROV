@@ -286,7 +286,7 @@ namespace ChemProV.UI
             ReplaceMeWithProcessUnits.Text = "Loading...";
             ReplaceMeWithStreams.Text = "Loading...";
 
-            StickyNoteButton.Tag = typeof(PFD.StickyNote.StickyNote);
+            StickyNoteButton.Tag = typeof(PFD.StickyNote.StickyNoteControl);
         }
     }
 }

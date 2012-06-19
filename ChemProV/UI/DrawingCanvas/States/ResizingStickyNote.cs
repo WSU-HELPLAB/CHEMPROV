@@ -45,11 +45,11 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// <summary>
         /// Reference to the note that we're resizing
         /// </summary>
-        private ChemProV.PFD.StickyNote.StickyNote m_note;
+        private ChemProV.PFD.StickyNote.StickyNoteControl m_note;
 
         private Size m_sizeOnMouseDown = new Size();
 
-        public ResizingStickyNote(DrawingCanvas canvas, ChemProV.PFD.StickyNote.StickyNote note)
+        public ResizingStickyNote(DrawingCanvas canvas, ChemProV.PFD.StickyNote.StickyNoteControl note)
         {
             m_canvas = canvas;
             m_note = note;

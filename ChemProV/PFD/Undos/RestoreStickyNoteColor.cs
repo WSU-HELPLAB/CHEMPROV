@@ -35,9 +35,9 @@ namespace ChemProV.PFD.Undos
         /// </summary>
         private StickyNote.StickyNoteColors m_color;
 
-        private ChemProV.PFD.StickyNote.StickyNote m_note;
+        private ChemProV.PFD.StickyNote.StickyNoteControl m_note;
 
-        public RestoreStickyNoteColor(ChemProV.PFD.StickyNote.StickyNote stickyNote)
+        public RestoreStickyNoteColor(ChemProV.PFD.StickyNote.StickyNoteControl stickyNote)
         {
             m_color = stickyNote.ColorScheme;
             m_note = stickyNote;

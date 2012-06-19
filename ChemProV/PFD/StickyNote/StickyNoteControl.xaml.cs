@@ -34,11 +34,8 @@ namespace ChemProV.PFD.StickyNote
         Yellow
     }
 
-    public partial class StickyNote : UserControl, IPfdElement, IXmlSerializable, Core.ICanvasElement, Core.IComment
+    public partial class StickyNoteControl : UserControl, IPfdElement, IXmlSerializable, Core.ICanvasElement, Core.IComment
     {
-        [Obsolete("Sticky note handles all it's own closing details and other objects shouldn't capture the event")]
-        public event MouseButtonEventHandler Closing = delegate { };
-
         private DrawingCanvas m_canvas = null;
 
         /// <summary>
@@ -61,12 +58,12 @@ namespace ChemProV.PFD.StickyNote
         /// <summary>
         /// Default constructor that exists only to make design view work. Must stay private.
         /// </summary>
-        private StickyNote()
+        private StickyNoteControl()
             : this(null)
         {
         }
         
-        public StickyNote(DrawingCanvas canvas)
+        public StickyNoteControl(DrawingCanvas canvas)
         {
             InitializeComponent();
             m_canvas = canvas;
@@ -75,7 +72,7 @@ namespace ChemProV.PFD.StickyNote
             ColorChange(StickyNoteColors.Yellow);
         }
 
-        public StickyNote(XElement xmlNote, DrawingCanvas canvas)
+        public StickyNoteControl(XElement xmlNote, DrawingCanvas canvas)
             : this(canvas)
         {
             // Use UI-independent logic to load the note's properties. Ideally ChemProV 
@@ -405,7 +402,7 @@ namespace ChemProV.PFD.StickyNote
         /// pack more undo items into a single collection as it sees fit.
         /// </summary>
         public static List<IUndoRedoAction> CreateCommentNote(DrawingCanvas canvas, Core.ICommentCollection parent,
-            XElement optionalToLoadFromXML, out StickyNote createdNote)
+            XElement optionalToLoadFromXML, out StickyNoteControl createdNote)
         {
             if (!(parent is AbstractStream) && !(parent is IProcessUnit))
             {
@@ -413,16 +410,16 @@ namespace ChemProV.PFD.StickyNote
                     "The parent element for a comment-sticky-note must be a stream or process unit");
             }
             
-            StickyNote sn;
+            StickyNoteControl sn;
             if (null == optionalToLoadFromXML)
             {
-                sn = new StickyNote(canvas);
+                sn = new StickyNoteControl(canvas);
                 sn.Width = 100.0;
                 sn.Height = 100.0;
             }
             else
             {
-                sn = new StickyNote(optionalToLoadFromXML, canvas);
+                sn = new StickyNoteControl(optionalToLoadFromXML, canvas);
             }
             sn.m_commentParent = parent;
             canvas.AddNewChild(sn);
@@ -462,7 +459,7 @@ namespace ChemProV.PFD.StickyNote
                         location.X + radius * Math.Cos(angle),
                         location.Y + radius * Math.Sin(angle));
 
-                    if (sn.IsOffCanvas(sn) || StickyNote.ContainsCommentSNAt(sn.Location, parent))
+                    if (sn.IsOffCanvas(sn) || StickyNoteControl.ContainsCommentSNAt(sn.Location, parent))
                     {
                         attempts++;
                     }
@@ -484,7 +481,7 @@ namespace ChemProV.PFD.StickyNote
                                 location.X + radius + offset, location.Y + offset);
 
                             if (!sn.IsOffCanvas(sn) && 
-                                !StickyNote.ContainsCommentSNAt(sn.Location, parent))
+                                !StickyNoteControl.ContainsCommentSNAt(sn.Location, parent))
                             {
                                 // This position works
                                 break;
@@ -649,7 +646,7 @@ namespace ChemProV.PFD.StickyNote
             }
         }
 
-        private bool IsOffCanvas(StickyNote sn)
+        private bool IsOffCanvas(StickyNoteControl sn)
         {
             double left = (double)sn.GetValue(Canvas.LeftProperty);
             double top = (double)sn.GetValue(Canvas.TopProperty);
@@ -662,7 +659,7 @@ namespace ChemProV.PFD.StickyNote
         {
             for (int i = 0; i < parent.CommentCount; i++)
             {
-                StickyNote sn = parent.GetCommentAt(i) as StickyNote;
+                StickyNoteControl sn = parent.GetCommentAt(i) as StickyNoteControl;
                 if (null != sn)
                 {
                     if (sn.Location.Equals(location))

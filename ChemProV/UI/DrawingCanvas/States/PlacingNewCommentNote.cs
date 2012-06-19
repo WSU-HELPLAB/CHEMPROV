@@ -125,7 +125,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             if (null == collection)
             {
                 // Create the sticky note and add it to the canvas
-                StickyNote note = new StickyNote(m_canvas);
+                StickyNoteControl note = new StickyNoteControl(m_canvas);
                 m_canvas.AddNewChild(note);
                 note.Width = note.Height = 100.0;
                 note.Location = mousePt;
@@ -144,8 +144,8 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
             else
             {
-                StickyNote newNote;
-                List<IUndoRedoAction> undos = StickyNote.CreateCommentNote(
+                StickyNoteControl newNote;
+                List<IUndoRedoAction> undos = StickyNoteControl.CreateCommentNote(
                     m_canvas, collection, null, out newNote);
 
                 // Create an undo

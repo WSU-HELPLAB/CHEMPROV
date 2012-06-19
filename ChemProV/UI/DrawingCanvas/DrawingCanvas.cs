@@ -184,12 +184,12 @@ namespace ChemProV.UI.DrawingCanvas
             }
         }
 
-        public List<StickyNote> ChildStickyNotes
+        public List<StickyNoteControl> ChildStickyNotes
         {
             get
             {
-                var snElements = from c in this.Children where c is StickyNote select c as StickyNote;
-                return new List<StickyNote>(snElements);
+                var snElements = from c in this.Children where c is StickyNoteControl select c as StickyNoteControl;
+                return new List<StickyNoteControl>(snElements);
             }
         }
 
@@ -842,8 +842,8 @@ namespace ChemProV.UI.DrawingCanvas
                 {
                     foreach (XElement child in cmtElement.Elements())
                     {                        
-                        StickyNote sn;
-                        StickyNote.CreateCommentNote(
+                        StickyNoteControl sn;
+                        StickyNoteControl.CreateCommentNote(
                             this, pu as Core.ICommentCollection, child, out sn);
                     }
                 }
@@ -900,7 +900,7 @@ namespace ChemProV.UI.DrawingCanvas
             XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
             foreach (XElement note in stickyNoteList.Elements())
             {
-                StickyNote sn = new StickyNote(note, this);
+                StickyNoteControl sn = new StickyNoteControl(note, this);
                 AddNewChild(sn);
             }
 
@@ -920,7 +920,7 @@ namespace ChemProV.UI.DrawingCanvas
             Dictionary<string, StickyNoteColors> clrs = new Dictionary<string, StickyNoteColors>();
             foreach (UIElement uie in Children)
             {
-                StickyNote sn = uie as StickyNote;
+                StickyNoteControl sn = uie as StickyNoteControl;
                 if (null == sn)
                 {
                     continue;
@@ -931,7 +931,7 @@ namespace ChemProV.UI.DrawingCanvas
                 {
                     if (!clrs.ContainsKey(sn.CommentUserName))
                     {
-                        StickyNoteColors clr = StickyNote.GetNextUserStickyColor();
+                        StickyNoteColors clr = StickyNoteControl.GetNextUserStickyColor();
                         clrs[sn.CommentUserName] = clr;
                         sn.ColorChange(clr);
                     }
@@ -945,152 +945,13 @@ namespace ChemProV.UI.DrawingCanvas
             PFDModified();
         }
 
-        [Obsolete("Use the UI-independent static logic in ChemProV.Core.CommentMerger")]
-        public List<IUndoRedoAction> MergeCommentsFrom(XElement doc, string userNameIfNotInXml)
-        {
-            DrawingCanvas dc = new DrawingCanvas();
-            dc.LoadXmlElements(doc);
-
-            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
-
-            // Determine a color
-            StickyNoteColors clr = StickyNote.GetNextUserStickyColor();
-
-            List<StickyNote> existing = ChildStickyNotes;
-            foreach (UIElement uie in dc.Children)
-            {
-                if (!(uie is StickyNote))
-                {
-                    continue;
-                }
-
-                StickyNote sn = uie as StickyNote;
-
-                // The sticky note that we're potentially importing will either have a comment-collection 
-                // parent or be free floating
-                if (sn.HasCommentCollectionParent)
-                {
-                    // Comment sticky note
-                    // We need to make sure that the parent item exists within this document
-                    Core.ICommentCollection snParent = sn.CommentCollectionParent;
-
-                    // It will be either a process unit or a stream
-                    AbstractStream stream = snParent as AbstractStream;
-                    if (null != stream)
-                    {
-                        // Look for the stream on this drawing canvas that has the same Id
-                        AbstractStream current = GetStreamById(stream.Id);
-                        if (null == current)
-                        {
-                            continue;
-                        }
-
-                        // Make sure we don't load duplicate messages
-                        if (Core.CommentLogic.ContainsCommentWithText(current, sn.CommentText))
-                        {
-                            continue;
-                        }
-
-                        // Add this comment to the stream
-                        StickyNote snNew;
-                        undos.AddRange(StickyNote.CreateCommentNote(this, current, null, out snNew).ToArray());
-                        snNew.Note.Text = sn.Note.Text;
-                        snNew.Width = sn.Width;
-                        snNew.Height = sn.Height;
-                        snNew.CommentUserName = sn.CommentUserName;
-
-                        // Resolve the user name and set the color
-                        if (string.IsNullOrEmpty(snNew.CommentUserName))
-                        {
-                            snNew.CommentUserName = userNameIfNotInXml;
-                        }
-                        snNew.ColorChange(GetStickyNoteColor(snNew));
-                    }
-                    else
-                    {
-                        // It's a process unit that contains this comment
-                        LabeledProcessUnit lpu = GetProcessUnitById((snParent as GenericProcessUnit).Id);
-                        if (null == lpu)
-                        {
-                            continue;
-                        }
-
-                        // Make sure we don't load duplicate messages
-                        if (Core.CommentLogic.ContainsCommentWithText(lpu, sn.CommentText))
-                        {
-                            continue;
-                        }
-
-                        // Add this comment to the process unit
-                        StickyNote snNew;
-                        undos.AddRange(StickyNote.CreateCommentNote(this, lpu, null, out snNew).ToArray());
-                        snNew.Note.Text = sn.Note.Text;
-                        snNew.Width = sn.Width;
-                        snNew.Height = sn.Height;
-                        snNew.CommentUserName = sn.CommentUserName;
-                        
-                        // Resolve the user name and set the color
-                        if (string.IsNullOrEmpty(snNew.CommentUserName))
-                        {
-                            snNew.CommentUserName = userNameIfNotInXml;
-                        }
-                        snNew.ColorChange(GetStickyNoteColor(snNew));
-                    }
-                }
-                else // Free-floating sticky note
-                {
-                    // First go through all sticky notes in this workspace and make sure we don't 
-                    // already have one with the same text
-                    bool addIt = true;
-                    foreach (StickyNote snThis in ChildStickyNotes)
-                    {
-                        if (snThis.HasCommentCollectionParent)
-                        {
-                            // Not free-floating ==> skip
-                            continue;
-                        }
-
-                        if (snThis.CommentText.Equals(sn.CommentText))
-                        {
-                            addIt = false;
-                            break;
-                        }
-                    }
-
-                    if (addIt)
-                    {
-                        StickyNote copy = new StickyNote(this);
-                        AddNewChild(copy);
-                        copy.Note.Text = sn.Note.Text;
-                        copy.Width = sn.Width;
-                        copy.Height = sn.Height;
-                        copy.Location = sn.Location;
-                        copy.CommentUserName = sn.CommentUserName;
-                        copy.SetValue(Canvas.ZIndexProperty, (int)4);
-
-                        // Resolve the user name and set the color
-                        if (string.IsNullOrEmpty(copy.CommentUserName))
-                        {
-                            copy.CommentUserName = userNameIfNotInXml;
-                        }
-                        copy.ColorChange(GetStickyNoteColor(copy));           
-
-                        // Don't forget the undo
-                        undos.Add(new RemoveFromCanvas(copy, this));
-                    }
-                }
-            }
-
-            return undos;
-        }
-
-        private StickyNoteColors GetStickyNoteColor(StickyNote forThis)
+        private StickyNoteColors GetStickyNoteColor(StickyNoteControl forThis)
         {
             if (!Core.App.Workspace.UserStickyNoteColors.ContainsKey(forThis.CommentUserName))
             {
                 // New user = new color. We need to get a new color and then add this user to
                 // the dictionary
-                StickyNoteColors clr = StickyNote.GetNextUserStickyColor();
+                StickyNoteColors clr = StickyNoteControl.GetNextUserStickyColor();
                 Core.App.Workspace.UserStickyNoteColors.Add(forThis.CommentUserName, clr);
                 return clr;
             }
@@ -1129,7 +990,7 @@ namespace ChemProV.UI.DrawingCanvas
             List<IProcessUnit> processUnits = new List<IProcessUnit>();
             List<IStream> streams = new List<IStream>();
             List<IPropertiesWindow> PropertiesWindows = new List<IPropertiesWindow>();
-            List<StickyNote> stickyNotes = new List<StickyNote>();
+            List<StickyNoteControl> stickyNotes = new List<StickyNoteControl>();
             List<IPfdElement> other = new List<IPfdElement>();
 
             //create the lists by looping through all children
@@ -1149,9 +1010,9 @@ namespace ChemProV.UI.DrawingCanvas
                     {
                         PropertiesWindows.Add(element as IPropertiesWindow);
                     }
-                    else if (element is StickyNote)
+                    else if (element is StickyNoteControl)
                     {
-                        stickyNotes.Add(element as StickyNote);
+                        stickyNotes.Add(element as StickyNoteControl);
                     }
                     else
                     {
@@ -1189,7 +1050,7 @@ namespace ChemProV.UI.DrawingCanvas
             writer.WriteStartElement("StickyNotes");
             foreach (IPfdElement element in stickyNotes)
             {
-                if (!((StickyNote)element).HasCommentCollectionParent)
+                if (!((StickyNoteControl)element).HasCommentCollectionParent)
                 {
                     objectFromIPfdElement(element).Serialize(writer, element);
                 }
@@ -1228,9 +1089,9 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 return new XmlSerializer(typeof(HeatStreamPropertiesWindow));
             }
-            else if (element is StickyNote)
+            else if (element is StickyNoteControl)
             {
-                return new XmlSerializer(typeof(StickyNote));
+                return new XmlSerializer(typeof(StickyNoteControl));
             }
             return new XmlSerializer(typeof(NullSerializer));
         }

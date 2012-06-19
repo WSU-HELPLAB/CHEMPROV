@@ -400,31 +400,6 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// E.O.
-        /// For compatibility since I significantly changed the equation control stuff
-        /// Will remove at a later date after some refactoring
-        /// </summary>
-        private List<EquationModel> equationModels
-        {
-            get
-            {
-                List<EquationModel> models = new List<EquationModel>();
-                foreach (UIElement uie in EquationsStackPanel.Children)
-                {
-                    EquationControl ec = uie as EquationControl;
-                    if (null == ec)
-                    {
-                        continue;
-                    }
-
-                    models.Add(ec.Model);
-                }
-
-                return models;
-            }
-        }
-
-        /// <summary>
         /// Gets the equation control at the specified row index.
         /// </summary>
         /// <param name="index">Zero-based index of the row.</param>
@@ -437,19 +412,6 @@ namespace ChemProV.PFD.EquationEditor
             }
 
             return (EquationControl)EquationsStackPanel.Children[index];
-        }
-
-        private int GetRowIndex(EquationControl row)
-        {
-            for (int i = 0; i < EquationsStackPanel.Children.Count; i++)
-            {
-                if (object.ReferenceEquals(row, EquationsStackPanel.Children[i]))
-                {
-                    return i;
-                }
-            }
-
-            return -1;
         }
 
         /// <summary>
@@ -638,7 +600,7 @@ namespace ChemProV.PFD.EquationEditor
             XmlSerializer serializer = new XmlSerializer(typeof(EquationModel));
 
             writer.WriteStartElement("Equations");
-            foreach (EquationModel model in equationModels)
+            foreach (EquationModel model in m_workspace.Equations)
             {
                 serializer.Serialize(writer, model);
             }
@@ -647,34 +609,9 @@ namespace ChemProV.PFD.EquationEditor
 
         #endregion IXmlSerializable Members
 
-        //public ReadOnlyEquationModel GetEquationModel(int rowIndex)
-        //{
-        //    EquationModel em = GetRow(rowIndex).Model;
-        //    if (null == em)
-        //    {
-        //        return null;
-        //    }
-
-        //    return new ReadOnlyEquationModel(em);
-        //}
-
-        /// <summary>
-        /// Use for testing purposes only. Ideally in the future the commented-out version above would 
-        /// be used so that equation model modifications could only happen through the control, but I 
-        /// just haven't done all the appropriate refactoring at this time.
-        /// </summary>
         public EquationModel GetEquationModel(int rowIndex)
         {
             return GetRow(rowIndex).Model;
-        }
-
-        public void AddNewEquationRow(EquationType type, EquationScope scope, string equation, string annotation)
-        {
-            EquationModel model = AddNewEquationRow();
-            model.Type = type;
-            model.Scope = scope;
-            model.Equation = equation;
-            model.Comments.Add(new Core.BasicComment(annotation, null));
         }
 
         private void AddNewRowButton_Click(object sender, RoutedEventArgs e)

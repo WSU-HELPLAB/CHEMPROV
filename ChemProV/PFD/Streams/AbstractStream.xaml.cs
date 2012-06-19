@@ -446,7 +446,7 @@ namespace ChemProV.PFD.Streams
                 writer.WriteStartElement("Comments");
                 for (int i = 0; i < m_comments.Count; i++)
                 {
-                    StickyNote.StickyNote sn = m_comments[i] as StickyNote.StickyNote;
+                    StickyNote.StickyNoteControl sn = m_comments[i] as StickyNote.StickyNoteControl;
                     writer.WriteStartElement("Comment");
                     sn.WriteXml(writer);
                     writer.WriteEndElement();
