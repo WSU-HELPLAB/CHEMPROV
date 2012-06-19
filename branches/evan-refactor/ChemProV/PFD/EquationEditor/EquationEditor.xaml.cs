@@ -227,7 +227,7 @@ namespace ChemProV.PFD.EquationEditor
             EquationsStackPanel.Children.Remove(row);
             EquationsStackPanel.Children.Insert(indexOfThis + 1, row);
 
-            FixNumsAndButtons();
+            UpdateRowProperties();
         }
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
@@ -263,13 +263,10 @@ namespace ChemProV.PFD.EquationEditor
             EquationsStackPanel.Children.Remove(row);
             EquationsStackPanel.Children.Insert(indexOfThis - 1, row);
 
-            FixNumsAndButtons();
+            UpdateRowProperties();
         }
 
-        /// <summary>
-        /// Sets the proper number for each row as well as the and IsEnabled state for the move up and move down buttons
-        /// </summary>
-        public void FixNumsAndButtons()
+        public void UpdateRowProperties()
         {
             int count = EquationRowCount;
             for (int i = 0; i < count; i++)
@@ -320,6 +317,9 @@ namespace ChemProV.PFD.EquationEditor
                 // Up/down buttons
                 ec.MoveUpButton.IsEnabled = (i != 0);
                 ec.MoveDownButton.IsEnabled = (i < count - 1);
+
+                // Ensure that the font size is correct
+                ec.EquationTextBox.FontSize = m_workspace.EquationEditorFontSize;
             }
         }
 
@@ -344,7 +344,7 @@ namespace ChemProV.PFD.EquationEditor
             m_workspace.Equations.Remove(thisOne.Model);
             
             // Fix row numbers and buttons
-            FixNumsAndButtons();
+            UpdateRowProperties();
         }
 
         /// <summary>
@@ -723,6 +723,7 @@ namespace ChemProV.PFD.EquationEditor
 
             // Attach listeners
             m_workspace.Equations.CollectionChanged += new NotifyCollectionChangedEventHandler(Equations_CollectionChanged);
+            m_workspace.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(WorkspacePropertyChanged);
         }
 
         private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -742,31 +743,13 @@ namespace ChemProV.PFD.EquationEditor
                     this, m_workspace.Equations[m_workspace.Equations.Count - 1]);
                 SetupEquationControlEvents(ec);
                 EquationsStackPanel.Children.Add(ec);
-                FixNumsAndButtons();
+                UpdateRowProperties();
             }
             else
             {
                 // Could probably make this more efficient
                 UpdateFromWorkspace();
             }
-        }
-
-        /// <summary>
-        /// Clears and re-creates the entire set of equation controls based on data from the workspace object
-        /// </summary>
-        private void UpdateFromWorkspace()
-        {
-            // Create appropriate UI elements for the workspace content
-            ClearEquations(false);
-            foreach (EquationModel em in m_workspace.Equations)
-            {
-                EquationControl ec = new EquationControl(this, em);
-                SetupEquationControlEvents(ec);
-                EquationsStackPanel.Children.Add(ec);
-            }
-
-            // Fix the move up/move down buttons on all rows
-            FixNumsAndButtons();
         }
 
         private void SetupEquationControlEvents(EquationControl control)
@@ -790,11 +773,38 @@ namespace ChemProV.PFD.EquationEditor
                 // will have attached event listeners and will update themselves appropriately
                 control.CommentsVisible = !control.CommentsVisible;
 
-                FixNumsAndButtons();
+                UpdateRowProperties();
 
                 // Tell the workspace to update visibility for the comment pane
                 Core.App.Workspace.UpdateCommentsPaneVisibility();
             };
+        }
+
+        /// <summary>
+        /// Clears and re-creates the entire set of equation controls based on data from the workspace object
+        /// </summary>
+        private void UpdateFromWorkspace()
+        {
+            // Create appropriate UI elements for the workspace content
+            ClearEquations(false);
+            foreach (EquationModel em in m_workspace.Equations)
+            {
+                EquationControl ec = new EquationControl(this, em);
+                SetupEquationControlEvents(ec);
+                EquationsStackPanel.Children.Add(ec);
+            }
+
+            // Fix the move up/move down buttons on all rows
+            UpdateRowProperties();
+        }
+
+        private void WorkspacePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("EquationEditorFontSize"))
+            {
+                // Update the font size for all rows
+                UpdateRowProperties();
+            }
         }
     }
 }

@@ -155,7 +155,6 @@
       <DependentUpon>EquationEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\Models\EquationModel.cs" />
-    <Compile Include="PFD\EquationEditor\Models\EquationScopeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />

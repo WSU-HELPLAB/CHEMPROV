@@ -82,7 +82,7 @@ namespace ChemProV.UI
                 EquationControl ec = EquationEditor.GetRowControl(i);
                 ec.CommentsVisible = false;
             }
-            EquationEditor.FixNumsAndButtons();
+            EquationEditor.UpdateRowProperties();
 
             Core.App.CurrentWorkspace.DegreesOfFreedomAnalysis.CommentsVisible = false;
 

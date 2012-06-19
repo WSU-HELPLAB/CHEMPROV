@@ -49,9 +49,6 @@
     <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationScope.cs">
       <Link>PFD\EquationEditor\Model\EquationScope.cs</Link>
     </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationScopeClassification.cs">
-      <Link>PFD\EquationEditor\Model\EquationScopeClassification.cs</Link>
-    </Compile>
     <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationType.cs">
       <Link>PFD\EquationEditor\Model\EquationType.cs</Link>
     </Compile>

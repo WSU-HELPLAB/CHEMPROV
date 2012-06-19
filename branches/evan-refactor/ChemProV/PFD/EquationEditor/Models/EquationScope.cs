@@ -11,6 +11,14 @@ using System;
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
+    public enum EquationScopeClassification
+    {
+        Overall,
+        SubProcess,
+        SingleUnit,
+        Unknown
+    }
+
     public class EquationScope : IEquationModifier, IComparable, IEquatable<EquationScope>
     {
         public EquationScopeClassification Classification { get; set; }
