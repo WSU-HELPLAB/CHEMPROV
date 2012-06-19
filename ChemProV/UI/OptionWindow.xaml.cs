@@ -36,10 +36,33 @@ namespace ChemProV.UI
         public OptionWindow()
         {
             InitializeComponent();
+
+            // Try to select the appropriate item for the current font size
+            foreach (object o in EEFontSizeCombo.Items)
+            {
+                ComboBoxItem cbi = o as ComboBoxItem;
+                if (null != cbi)
+                {
+                    if (cbi.Content.ToString().Equals(Core.App.CurrentWorkspace.EquationEditorFontSize.ToString()))
+                    {
+                        EEFontSizeCombo.SelectedItem = o;
+                        break;
+                    }
+                }
+            }
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
+            ComboBoxItem cbi = EEFontSizeCombo.SelectedItem as ComboBoxItem;
+            if (null != cbi)
+            {
+                double d;
+                if (double.TryParse(cbi.Content.ToString(), out d))
+                {
+                    Core.App.CurrentWorkspace.EquationEditorFontSize = d;
+                }
+            }
             this.DialogResult = true;
         }
 

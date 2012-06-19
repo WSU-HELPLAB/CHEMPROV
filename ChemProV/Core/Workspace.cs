@@ -9,6 +9,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 // Original file author: Evan Olds
 using ChemProV.PFD.EquationEditor.Models;
+using System;
+using System.ComponentModel;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
@@ -23,12 +25,14 @@ namespace ChemProV.Core
     /// All UI controls should hook up events as needed to monitor changes in the workspace that 
     /// they need to know about.
     /// </summary>
-    public class Workspace
+    public class Workspace : INotifyPropertyChanged
     {
         /// <summary>
         /// Degrees of freedom analysis object
         /// </summary>
         private DegreesOfFreedomAnalysis m_dfAnalysis = new DegreesOfFreedomAnalysis();
+
+        private double m_equationEditorFontSize = 14.0;
 
         protected EquationCollection m_equations = new EquationCollection();
 
@@ -47,6 +51,42 @@ namespace ChemProV.Core
             get
             {
                 return m_dfAnalysis;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the font size for equation text in the equations editor. An exception will be 
+        /// thrown if an attempt is made to set the value to a number less than or equal to zero.
+        /// 
+        /// Do not rename this property. Changing it will fire the PropertyChanged event (if non-null) 
+        /// and subscribers to this event rely on the property name staying the same.
+        /// </summary>
+        public double EquationEditorFontSize
+        {
+            get
+            {
+                return m_equationEditorFontSize;
+            }
+            set
+            {
+                if (value == m_equationEditorFontSize)
+                {
+                    // No change
+                    return;
+                }
+
+                if (value <= 0.0)
+                {
+                    throw new ArgumentException("Equation editor font size must be greater than 0");
+                }
+
+                // Set the new value
+                m_equationEditorFontSize = value;
+
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("EquationEditorFontSize"));
+                }
             }
         }
 
@@ -120,5 +160,7 @@ namespace ChemProV.Core
             }
             writer.WriteEndElement();
         }
+
+        public event PropertyChangedEventHandler PropertyChanged = null;
     }
 }
