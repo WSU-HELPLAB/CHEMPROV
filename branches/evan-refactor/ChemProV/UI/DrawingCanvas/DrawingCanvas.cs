@@ -1052,7 +1052,9 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 if (!((StickyNoteControl)element).HasCommentCollectionParent)
                 {
-                    objectFromIPfdElement(element).Serialize(writer, element);
+                    writer.WriteStartElement("StickyNote");
+                    (element as StickyNoteControl).WriteXml(writer);
+                    writer.WriteEndElement();
                 }
             }
             writer.WriteEndElement();

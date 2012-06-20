@@ -336,31 +336,70 @@ namespace ChemProV.Core
                             }
                             em.Add(annoElement);
                         }
+                    }                
+                }
+            }
+
+            // Now do comments for the degrees of freedom analysis. We ONLY do this if the text for 
+            // each analysis is the same in the two documents. The commens are considered to be specific 
+            // to the analysis, so it wouldn't make sense to include comments from the child if the child 
+            // has a different analysis.
+            XElement dfParentEl = docParent.Descendants("DegreesOfFreedomAnalysis").ElementAt(0);
+            XElement dfChildEl = docChild.Descendants("DegreesOfFreedomAnalysis").ElementAt(0);
+            if (null != dfParentEl && null != dfChildEl)
+            {
+                string parentDFText = dfParentEl.Element("Text").Value;
+                string childDFText = dfChildEl.Element("Text").Value;
+                if (null != parentDFText && null != childDFText && parentDFText.Equals(childDFText))
+                {
+                    // First load the comments from the parent into memory
+                    List<string> existing = new List<string>();
+                    foreach (XElement parentDFCommentEl in dfParentEl.Elements("Comment"))
+                    {
+                        if (!string.IsNullOrEmpty(parentDFCommentEl.Value))
+                        {
+                            existing.Add(parentDFCommentEl.Value);
+                        }
+
+                        // See if it has a "UserName" attribute. If not, we want to add one, provided 
+                        // we have one that was passed into this method.
+                        if (!string.IsNullOrEmpty(parentUserNameIfNotInXml))
+                        {
+                            XAttribute tempAttr = parentDFCommentEl.Attribute("UserName");
+                            if (null == tempAttr)
+                            {
+                                parentDFCommentEl.SetAttributeValue("UserName", parentUserNameIfNotInXml);
+                            }
+                        }
                     }
 
-                    //// Get the parent annotation element
-                    //XElement annotationElement = em.Element("Annotation");
-                    //if (null == annotationElement)
-                    //{
-                    //    throw new Exception(
-                    //        "Element \"EquationModel\" is missing child \"Annotation\" element");
-                    //}
-                    //// Make sure it's not null (so we can append to it)
-                    //if (null == annotationElement.Value)
-                    //{
-                    //    annotationElement.Value = string.Empty;
-                    //}
-
-                    //// Merge the annotations
-                    //if (!string.IsNullOrEmpty(childUserNameIfNotInXml))
-                    //{
-                    //    annotationElement.Value += "\r\n\r\n--- " + childUserNameIfNotInXml + 
-                    //        " ---\r\n" + childAnno;
-                    //}
-                    //else
-                    //{
-                    //    annotationElement.Value += "\r\n\r\n--- (unknown user) ---\r\n" + childAnno;
-                    //}                    
+                    // Now add any comments from the children that aren't in the parent
+                    foreach (XElement childDFComment in dfChildEl.Elements("Comment"))
+                    {
+                        string childDFCommentString = childDFComment.Value;
+                        string childDFUserName = null;
+                        XAttribute tempAttr = childDFComment.Attribute("UserName");
+                        if (null != tempAttr)
+                        {
+                            childDFUserName = tempAttr.Value;
+                        }
+                        else
+                        {
+                            childDFUserName = childUserNameIfNotInXml;
+                        }
+                        
+                        if (!string.IsNullOrEmpty(childDFCommentString) && 
+                            !existing.Contains(childDFCommentString))
+                        {
+                            XElement dfCommentEl = new XElement("Comment");
+                            dfCommentEl.Value = childDFCommentString;
+                            if (!string.IsNullOrEmpty(childDFUserName))
+                            {
+                                dfCommentEl.SetAttributeValue("UserName", childDFUserName);
+                            }
+                            dfParentEl.Add(dfCommentEl);
+                        }
+                    }
                 }
             }
 
