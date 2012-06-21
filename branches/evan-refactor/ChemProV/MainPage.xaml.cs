@@ -57,14 +57,13 @@ namespace ChemProV
         private DispatcherTimer saveTimer = new DispatcherTimer();
 
         /// <summary>
-        /// When non-null, this stream is where we write to when the "Save" button is clicked. The 
-        /// "Save as..." button click will change it if necessary.
+        /// Flag to indicate that events from m_workspace should be ignored. This is set to true when 
+        /// we are modifying the workspace and thus want to ignore the events that are fired during 
+        /// this modification.
         /// </summary>
-        private Stream m_currentStream = null;
-
-        private bool m_lastSaveWasPNG = false;
-
         private bool m_ignoreWorkspaceChanges = false;
+
+        private SaveFileDialog m_saveDialog = null;
 
         /// <summary>
         /// Represents the logical workspace. Refactoring is still happening but the long term goal 
@@ -458,8 +457,11 @@ namespace ChemProV
 
         private void SaveFileAs_BtnClick(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog saveDialog = new SaveFileDialog();
-            saveDialog.Filter = saveFileFilter;
+            if (null == m_saveDialog)
+            {
+                m_saveDialog = new SaveFileDialog();
+                m_saveDialog.Filter = saveFileFilter;
+            }
             bool? saveResult = false;
 
             //BIG NOTE: When debuggin this application, make sure to put a breakpoint
@@ -467,7 +469,7 @@ namespace ChemProV
             //throw an exception.  This is a known issue with Silverlight.
             try
             {
-                saveResult = saveDialog.ShowDialog();
+                saveResult = m_saveDialog.ShowDialog();
             }
             catch (Exception ex)
             {
@@ -480,16 +482,14 @@ namespace ChemProV
                 return;
             }
 
-            // Open the output file stream. We keep a reference to this and do NOT dispose it when 
-            // we're done writing.
-            m_currentStream = saveDialog.OpenFile();
+            // Open the output file stream. We will dispose it after writing the file.
+            Stream stream = m_saveDialog.OpenFile();
 
             // For whatever reason, filter indices start at 1. An index of 1 means that we want 
             // to save the regular ChemProV XML.
-            if (1 == saveDialog.FilterIndex)
+            if (1 == m_saveDialog.FilterIndex)
             {
-                SaveChemProVFile(m_currentStream);
-                m_lastSaveWasPNG = false;
+                SaveChemProVFile(stream);
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     //remove the temp file because we just saved;
@@ -498,17 +498,19 @@ namespace ChemProV
                         isf.DeleteFile(autoSaveFileName);
                     }
                 }
-
-                ToolTipService.SetToolTip(btnSave, "Save \"" + saveDialog.SafeFileName + "\"");
             }
             //filter index of 2 means save as PNG
-            else if (saveDialog.FilterIndex == 2)
+            else if (m_saveDialog.FilterIndex == 2)
             {
-                m_lastSaveWasPNG = true;
-                SavePNG(m_currentStream);
-
-                ToolTipService.SetToolTip(btnSave, "Save \"" + saveDialog.SafeFileName + "\"");
+                SavePNG(stream);
             }
+
+            // Put the file name info in the save button's tooltip
+            ToolTipService.SetToolTip(SaveAsButton, "Save as... (last save was \"" +
+                m_saveDialog.SafeFileName + "\")");
+
+            // Dispose the stream
+            stream.Dispose();
         }
 
         /// <summary>
@@ -556,46 +558,29 @@ namespace ChemProV
                     }
                 }
 
-                // Dispose the save file, if we have one
-                if (null != m_currentStream)
-                {
-                    m_currentStream.Dispose();
-                    m_currentStream = null;
-
-                    ToolTipService.SetToolTip(btnSave, "Save");
-                }
+                // Put the file name info in the save button's tooltip
+                ToolTipService.SetToolTip(SaveAsButton, "Save as... (file was opened as \"" +
+                    openDialog.File.Name + "\")");
 
                 FileStream fs;
+                // Open the file for reading
                 try
                 {
-                    fs = openDialog.File.Open(FileMode.Open, FileAccess.ReadWrite);
+                    fs = openDialog.File.OpenRead();
                 }
                 catch (Exception)
                 {
-                    // Try opening for reading only if opening read/write failed
-                    try
-                    {
-                        fs = openDialog.File.OpenRead();
-                        LoadChemProVFile(fs);
-                        fs.Dispose();
-                        return;
-                    }
-                    catch (Exception)
-                    {
-                        MessageBox.Show("The specified file could not be opened");
-                        return;
-                    }
+                    MessageBox.Show("The specified file could not be opened");
+                    return;
                 }
                 
                 // This means we succeeded in opening the file for reading and writing
                 // Start by loading the actual PFD data
                 LoadChemProVFile(fs);
-                
-                // Store a reference to the stream so that when we save, we overwrite it
-                m_currentStream = fs;
 
-                // Set the tooltip on the save button
-                ToolTipService.SetToolTip(btnSave, "Save " + openDialog.File.Name);
+                // We've loaded, so we're done with the stream
+                fs.Dispose();
+                fs = null;
             }
         }
 
@@ -751,26 +736,6 @@ namespace ChemProV
             }
         }
 
-        private void btnSave_Click(object sender, RoutedEventArgs e)
-        {
-            // If we don't have an active stream to overwrite, then we call the "save as" function
-            if (null == m_currentStream)
-            {
-                SaveFileAs_BtnClick(sender, e);
-                return;
-            }
-
-            // Otherwise we overwrite
-            if (m_lastSaveWasPNG)
-            {
-                SavePNG(m_currentStream);
-            }
-            else
-            {
-                SaveChemProVFile(m_currentStream);
-            }
-        }
-
         private void Clear()
         {
             // Clear the text in the degrees of freedom analysis text box
@@ -783,16 +748,8 @@ namespace ChemProV
             Saving_TextBlock.Text = string.Empty;
             Saving_TextBlock.Visibility = System.Windows.Visibility.Collapsed;
 
-            // Set the save button's tooltip back to "Save"
-            ToolTipService.SetToolTip(btnSave, "Save");
-
             // Reset the saving related stuff
-            m_lastSaveWasPNG = false;
-            if (null != m_currentStream)
-            {
-                m_currentStream.Dispose();
-            }
-            m_currentStream = null;
+            ToolTipService.SetToolTip(SaveAsButton, "Save as...");
         }
 
         private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
