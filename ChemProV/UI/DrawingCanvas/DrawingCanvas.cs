@@ -732,6 +732,20 @@ namespace ChemProV.UI.DrawingCanvas
                     }
                 }
             }
+
+            // If we come here it means that we didn't find any problems with switching to the difficulty, so 
+            // we should update all chemical stream tables
+            foreach (UIElement uie in Children)
+            {
+                ChemicalStreamPropertiesWindow table = uie as ChemicalStreamPropertiesWindow;
+                if (null == table)
+                {
+                    continue;
+                }
+
+                // Whether or not the temperature row is shown is dependent on the difficulty level
+                table.ShowTemperatureRow = (newValue == OptionDifficultySetting.MaterialAndEnergyBalance);
+            }
         }
 
         /// <summary>
