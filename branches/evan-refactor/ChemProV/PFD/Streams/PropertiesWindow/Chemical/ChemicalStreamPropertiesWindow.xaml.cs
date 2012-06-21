@@ -1234,6 +1234,25 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Chemical
             }
         }
 
+        public bool ShowTemperatureRow
+        {
+            get
+            {
+                return m_withTemperature;
+            }
+            set
+            {
+                if (m_withTemperature == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_withTemperature = value;
+                UpdateGrid();
+            }
+        }
+
         private void TempUnits_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ItemSource[0].TempUnits = (sender as ComboBox).SelectedIndex;
