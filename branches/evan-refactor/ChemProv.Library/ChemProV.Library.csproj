@@ -83,7 +83,20 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService.disco" />
+    <None Include="Service References\OsbleLocalServices\AuthenticationService2.wsdl" />
+    <None Include="Service References\OsbleLocalServices\AuthenticationService21.wsdl" />
+    <None Include="Service References\OsbleLocalServices\AuthenticationService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService41.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService42.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService43.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OsbleLocalServices\ChemProV.Library.OsbleLocalServices.UserProfile.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -93,29 +106,14 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
+    <None Include="Service References\OsbleLocalServices\AuthenticationService1.disco" />
     <Content Include="ServiceReferences.ClientConfig" />
-    <None Include="Service References\OsbleLocalServices\AuthenticationService3.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <ItemGroup>
     <Page Include="OSBLE\Views\LoginWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService.wsdl" />
-    <None Include="Service References\OsbleLocalServices\AuthenticationService.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService1.wsdl" />
-    <None Include="Service References\OsbleLocalServices\AuthenticationService1.xsd">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService2.xsd">
-      <SubType>Designer</SubType>
-    </None>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <ProjectExtensions>

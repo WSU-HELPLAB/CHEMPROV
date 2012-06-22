@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Net;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Documents;
@@ -52,6 +53,36 @@ namespace ChemProV.UnitTests
                 ws.Equations.Count == mp.WorkspaceReference.EquationEditorReference.EquationRowCount,
                 string.Format("FAIL: Expected equation count after removal={0}, actual={1}",
                     ws.Equations.Count, mp.WorkspaceReference.EquationEditorReference.EquationRowCount));
+        }
+
+        [TestMethod]
+        public void TestOSBLELoginEncDec()
+        {
+            Random rand = new Random();
+            
+            // Outer loop is for string lengths in the range [1, 50]
+            for (int i = 1; i <= 50; i++)
+            {
+                // Inner loop is for the number of random tests for this length
+                for (int j = 0; j < 10; j++)
+                {
+                    string s = BuildRandomString(i, rand);
+                    byte[] enc = ChemProV.Library.OSBLE.Views.LoginWindow.Enc(s);
+                    string s2 = ChemProV.Library.OSBLE.Views.LoginWindow.Dec(enc);
+                    Assert.IsTrue(s.Equals(s2),
+                        "Encryption/decryption failed on string: " + s);
+                }
+            }
+        }
+
+        private static string BuildRandomString(int length, Random rand)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < length; i++)
+            {
+                sb.Append((char)(rand.Next(255 - 32) + 32));
+            }
+            return sb.ToString();
         }
     }
 }
