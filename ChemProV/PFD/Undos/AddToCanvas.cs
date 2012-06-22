@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.Undos
 {
@@ -36,7 +37,7 @@ namespace ChemProV.PFD.Undos
             m_element = element;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             // Start by making the opposite action that will remove it
             IUndoRedoAction opposite = new RemoveFromCanvas(m_element, m_canvas);

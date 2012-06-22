@@ -7,14 +7,11 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
-using System;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
-using ChemProV.PFD;
-using ChemProV.Core;
 using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
@@ -34,6 +31,8 @@ namespace ChemProV.UI.DrawingCanvas.States
         private MathCore.Vector m_originalLocation;
 
         private GenericProcessUnit m_puThatGotBorderChange = null;
+
+        private Workspace m_workspace;
         
         /// <summary>
         /// Private constructor. Use the static "Create" method to create an instance of a moving state. There 
@@ -41,12 +40,13 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// checking.
         /// </summary>
         /// <param name="c"></param>
-        private MovingState(DrawingCanvas c)
+        private MovingState(DrawingCanvas c, Workspace workspace)
         {
             m_canvas = c;
+            m_workspace = workspace;
         }
 
-        public static MovingState Create(DrawingCanvas canvas)
+        public static MovingState Create(DrawingCanvas canvas, Workspace workspace)
         {
             // It's implied that the element we want to move is the selected item on the canvas
             object elementToMove = canvas.SelectedElement;
@@ -57,7 +57,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 return null;
             }
 
-            MovingState ms = new MovingState(canvas);
+            MovingState ms = new MovingState(canvas, workspace);
             ICanvasElement ce = elementToMove as ICanvasElement;
             ms.m_originalLocation = new MathCore.Vector(ce.Location);
             return ms;
@@ -139,7 +139,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 // All we have to do here is create an undo and then fall through to 
                 // below and go back to the null state
-                m_canvas.AddUndo(new UndoRedoCollection("Undo move",
+                m_workspace.AddUndo(new UndoRedoCollection("Undo move",
                     new PFD.Undos.RestoreLocation((ICanvasElement)m_canvas.SelectedElement, 
                         m_originalLocation.ToPoint())));
             }
@@ -195,7 +195,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             if (null == dropTarget || !(dropTarget is DraggableStreamEndpoint))
             {
                 // Add an undo that will move the process unit back to where it was
-                m_canvas.AddUndo(new UndoRedoCollection("Undo moving process unit",
+                m_workspace.AddUndo(new UndoRedoCollection("Undo moving process unit",
                     new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
 
                 // The control is already in the right position from the mouse-move event, so we're done
@@ -210,7 +210,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 switch (streamEndpoint.Type)
                 {
                     case DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected:
-                        m_canvas.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
+                        m_workspace.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
                             new PFD.Undos.DetachIncomingStream(pu, streamEndpoint.ParentStream),
                             new PFD.Undos.SetStreamDestination(streamEndpoint.ParentStream, m_originalLocation.ToPoint(), pu)));
                         pu.AttachIncomingStream(streamEndpoint.ParentStream);
@@ -218,7 +218,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                         break;
 
                     case DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected:
-                        m_canvas.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
+                        m_workspace.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
                             new DetachOutgoingStream(pu, streamEndpoint.ParentStream),
                             new SetStreamSource(streamEndpoint.ParentStream, null, pu, streamEndpoint.Location)));
                         pu.AttachOutgoingStream(streamEndpoint.ParentStream);

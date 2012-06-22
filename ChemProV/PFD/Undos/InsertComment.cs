@@ -8,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.Undos
 {
@@ -26,7 +27,7 @@ namespace ChemProV.PFD.Undos
             m_index = insertionIndex;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             m_cc.InsertCommentAt(m_comment, m_index);
 

@@ -10,23 +10,14 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 // Original file author: Evan Olds
 
 using System;
-using System.Xml;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using ChemProV.UI.DrawingCanvas.States;
-using ChemProV.UI.DrawingCanvas;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
-using ChemProV.MathCore;
-using ChemProV.PFD.Undos;
+using ChemProV.UI.DrawingCanvas;
+using ChemProV.UI.DrawingCanvas.States;
 
 namespace ChemProV.PFD.Streams
 {
@@ -450,6 +441,9 @@ namespace ChemProV.PFD.Streams
                 return;
             }
 
+            // Get a reference to the workspace
+            Workspace ws = m_canvas.GetWorkspace();
+
             // The mouse button is no longer down
             m_isMouseDown = false;
 
@@ -484,7 +478,7 @@ namespace ChemProV.PFD.Streams
             {
                 if (null == m_connectedToOnMouseDown)
                 {
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
+                    ws.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
                         new Undos.RestoreLocation(this, m_locationOnLMBDown)));
                     m_canvas.CurrentState = null;
                     return;
@@ -492,14 +486,14 @@ namespace ChemProV.PFD.Streams
 
                 if (m_type == EndpointType.StreamDestinationNotConnected)
                 {
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
+                    ws.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
                         //new Undos.RestoreLocation(this, m_locationOnLMBDown),
                         new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
                         new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, null)));
                 }
                 else
                 {
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
+                    ws.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
                         new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
                         new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, null, this.Location)));
                 }
@@ -543,7 +537,7 @@ namespace ChemProV.PFD.Streams
                     }
 
                     // Create an undo that will detach and reattach
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
+                    ws.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
                         new Undos.DetachOutgoingStream(pu, m_owner),
                         new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
                         new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, pu, new Point())));
@@ -554,7 +548,7 @@ namespace ChemProV.PFD.Streams
                     // 1. Detach the stream from the process unit that we're about to connect it to
                     // 2. Set the stream source back to null (this sets the draggable icon back to 
                     //    where it was when the drag first started)
-                    m_canvas.AddUndo(new UndoRedoCollection(
+                    ws.AddUndo(new UndoRedoCollection(
                         "Undo linking stream source to process unit",
                         new Undos.DetachOutgoingStream(pu, m_owner),
                         new Undos.SetStreamSource(m_owner, null, pu, m_locationOnLMBDown)));
@@ -579,7 +573,8 @@ namespace ChemProV.PFD.Streams
                     }
 
                     // Create an undo that will detach and reattach
-                    m_canvas.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
+                    ws.AddUndo(new UndoRedoCollection(
+                        "Undo linking stream source to different process unit",
                         new Undos.DetachIncomingStream(pu, m_owner),
                         new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
                         new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, pu)));
@@ -595,7 +590,7 @@ namespace ChemProV.PFD.Streams
                     //    new Undos.RestoreLocation(this, m_locationOnLMBDown),
                     //    new Undos.DetachIncomingStream(pu, m_owner),
                     //    new Undos.SetStreamDestination(m_owner, null)));
-                    m_canvas.AddUndo(new UndoRedoCollection(
+                    ws.AddUndo(new UndoRedoCollection(
                         "Undo linking stream source to process unit",
                         new Undos.DetachIncomingStream(pu, m_owner),
                         new Undos.SetStreamDestination(m_owner, m_locationOnLMBDown, pu)));

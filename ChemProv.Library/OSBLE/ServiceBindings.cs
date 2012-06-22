@@ -13,13 +13,7 @@ namespace ChemProV.Library.OSBLE
         {
             get
             {
-#if DEBUG
-                //go to the debug endpoint address if we're in debug mode
-                return LocalAuthenticationEndpoint;
-#else
-                //otherwise, hit the real server
-                return LocalAuthenticationEndpoint; //return RemoteOsbideServiceEndpoint;
-#endif
+                return RemoteAuthenticationEndpoint;
             }
         }
 
@@ -27,7 +21,7 @@ namespace ChemProV.Library.OSBLE
         {
             get
             {
-                EndpointAddress endpoint = new EndpointAddress("http://localhost:17532/Services/AuthenticationService.svc");
+                EndpointAddress endpoint = new EndpointAddress("https://localhost:17532/Services/AuthenticationService.svc");
                 return endpoint;
             }
         }
@@ -36,7 +30,7 @@ namespace ChemProV.Library.OSBLE
         {
             get
             {
-                EndpointAddress endpoint = new EndpointAddress("http://osble.org/Services/AuthenticationService.svc");
+                EndpointAddress endpoint = new EndpointAddress("https://osble.org/Services/AuthenticationService.svc");
                 return endpoint;
             }
         }
@@ -54,7 +48,7 @@ namespace ChemProV.Library.OSBLE
                     ReceiveTimeout = new TimeSpan(0, 0, 15, 0, 0),
                 };
 
-#if DEBUG
+#if false
                 binding.Security.Mode = BasicHttpSecurityMode.None;
 #else
                 binding.Security.Mode = BasicHttpSecurityMode.Transport;

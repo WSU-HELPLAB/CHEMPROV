@@ -19,6 +19,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
@@ -76,7 +77,7 @@ namespace ChemProV.PFD.Undos
             m_opposite = opposite;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {            
             // Set the destination
             m_stream.Destination = m_pu;

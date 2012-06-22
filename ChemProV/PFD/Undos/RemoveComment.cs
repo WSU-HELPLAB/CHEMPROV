@@ -33,7 +33,7 @@ namespace ChemProV.PFD.Undos
             m_index = index;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             IComment current = m_owner.GetCommentAt(m_index);
             m_owner.RemoveCommentAt(m_index);

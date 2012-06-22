@@ -256,6 +256,9 @@ namespace ChemProV.UI.DrawingCanvas.States
                 return;
             }
 
+            // Get a reference to the workspace
+            Workspace ws = m_canvas.GetWorkspace();
+
             // Ending phase 2 by whatever we do here
             m_phase = -1;
 
@@ -322,7 +325,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             undos.Add(new RemoveFromCanvas(m_newStream.Table as UIElement, m_canvas));
 
             // Add the undo
-            m_canvas.AddUndo(new UndoRedoCollection(
+            ws.AddUndo(new UndoRedoCollection(
                 "Undo creation of new stream", undos.ToArray()));
 
             // We've placed the stream so we can now show the table
@@ -410,7 +413,8 @@ namespace ChemProV.UI.DrawingCanvas.States
             undos.Add(new RemoveFromCanvas(m_newStream.Table as UIElement, m_canvas));
 
             // Create an undo to delete the stream
-            m_canvas.AddUndo(new UndoRedoCollection("Undo creation of new stream", undos.ToArray()));
+            m_canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
+                "Undo creation of new stream", undos.ToArray()));
 
             // Update the stream's visual stuff
             m_newStream.ShowTable(false);

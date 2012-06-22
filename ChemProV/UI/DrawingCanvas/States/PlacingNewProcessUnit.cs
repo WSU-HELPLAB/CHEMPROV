@@ -10,19 +10,12 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 // Original file author: Evan Olds
 
 using System;
-using System.Net;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.Reflection;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
-using ChemProV.UI.DrawingCanvas;
 using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
@@ -34,11 +27,14 @@ namespace ChemProV.UI.DrawingCanvas.States
         private ControlPalette m_palette;
         
         private GenericProcessUnit m_pu;
+
+        private Workspace m_workspace;
         
         public PlacingNewProcessUnit(ControlPalette sender, DrawingCanvas canvas, Type processUnitType)
         {
             m_canvas = canvas;
             m_palette = sender;
+            m_workspace = canvas.GetWorkspace();
             
             // Create a new instance of the process unit
             m_pu = (GenericProcessUnit)Activator.CreateInstance(processUnitType);
@@ -107,7 +103,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // If there's not an endpoint, we just create an undo and we're finished
             if (null == endpoint)
             {
-                m_canvas.AddUndo(new UndoRedoCollection("Undo process unit creation",
+                m_workspace.AddUndo(new UndoRedoCollection("Undo process unit creation",
                     new RemoveFromCanvas(m_pu, m_canvas)));
 
                 // Select the process unit we just placed on the canvas
@@ -143,7 +139,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 // Create an undo that sets the stream destination back to what it was and removes the 
                 // process unit from the canvas
-                m_canvas.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
+                m_workspace.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
                     new PFD.Undos.SetStreamDestination(endpoint.ParentStream, endpoint.ParentStream.Destination, m_pu),
                     new PFD.Undos.RemoveFromCanvas(m_pu, m_canvas)));
                 
@@ -154,7 +150,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 // Create an undo that sets the stream source back to what it was and removes the 
                 // process unit from the canvas
-                m_canvas.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
+                m_workspace.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
                     new SetStreamSource(endpoint.ParentStream, null, m_pu, endpoint.Location),
                     new RemoveFromCanvas(m_pu, m_canvas)));
                 
@@ -245,8 +241,8 @@ namespace ChemProV.UI.DrawingCanvas.States
                 s.SourceDragIcon.Visibility = Visibility.Visible;
                 s.DestinationDragIcon.Visibility = Visibility.Visible;
                 (s.Table as UIElement).Visibility = Visibility.Visible;
-                
-                m_canvas.AddUndo(new UndoRedoCollection("Undo creation of heat exchanger with utility",
+
+                m_workspace.AddUndo(new UndoRedoCollection("Undo creation of heat exchanger with utility",
                     new RemoveFromCanvas(m_pu, m_canvas),
                     new RemoveFromCanvas(s, m_canvas),
                     new RemoveFromCanvas(s.SourceDragIcon, m_canvas),

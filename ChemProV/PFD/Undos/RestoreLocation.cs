@@ -58,7 +58,7 @@ namespace ChemProV.PFD.Undos
             m_pt = location;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             // Start by creating a redo that moves the control back to where it
             // is now

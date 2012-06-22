@@ -9,7 +9,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -18,10 +17,11 @@ using System.Windows.Shapes;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using ChemProV.UI.DrawingCanvas;
-using ChemProV.PFD.Undos;
-using ChemProV.PFD.Streams;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
+using ChemProV.PFD.Streams;
+using ChemProV.PFD.Undos;
+using ChemProV.UI.DrawingCanvas;
 
 namespace ChemProV.PFD.StickyNote
 {
@@ -538,8 +538,8 @@ namespace ChemProV.PFD.StickyNote
             if (null == m_commentParent)
             {
                 // The case is simple when we're not anchored
-                canvas.AddUndo(new UndoRedoCollection("Undo deleting comment",
-                    new AddToCanvas(this, canvas)));
+                canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
+                    "Undo deleting comment", new AddToCanvas(this, canvas)));
                 canvas.RemoveChild(this);
                 return;
             }
@@ -559,7 +559,8 @@ namespace ChemProV.PFD.StickyNote
             // 1. Remove sticky note (and add undo item for this)
             // 2. Removing the line that connects it to the parent (undo item too)
             // 3. Remove it from parent collection (undo item too)
-            canvas.AddUndo(new UndoRedoCollection("Undo deleting comment",
+            canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
+                "Undo deleting comment",
                 new AddToCanvas(this, canvas),
                 new AddToCanvas(m_lineToParent, canvas),
                 new InsertComment(cc, this, commentIndex)));

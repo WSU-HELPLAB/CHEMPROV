@@ -166,23 +166,45 @@ namespace ChemProV.UI
 
         public void GotKeyDown(object sender, KeyEventArgs e)
         {
-            DrawingCanvas.GotKeyDown(sender, e);
-        }
-
-        public void Redo()
-        {
-            //pass it on down
-            DrawingCanvas.Redo();
+            if (e.Key == Key.Z && (Keyboard.Modifiers == ModifierKeys.Control))
+            {
+                Undo();
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Y && (Keyboard.Modifiers == ModifierKeys.Control))
+            {
+                Redo();
+                e.Handled = true;
+            }
+            else
+            {
+                DrawingCanvas.GotKeyDown(sender, e);
+            }
         }
 
         public void Undo()
         {
-            //pass it on down
-            DrawingCanvas.Undo();
+            // Go back to the null state for the drawing canvas
+            DrawingCanvas.CurrentState = null;
+
+            // Execute the workspace undo
+            m_workspace.Undo();
+        }
+
+        public void Redo()
+        {
+            // Go back to the null state for the drawing canvas
+            DrawingCanvas.CurrentState = null;
+
+            // Execute the workspace redo
+            m_workspace.Redo();
         }
 
         public void ClearWorkSpace()
         {
+            // Clear the workspace
+            m_workspace.Clear();
+            
             //now, clear the drawing drawing_canvas
             DrawingCanvas.ClearDrawingCanvas();
             EquationEditor.ClearEquations(true);
@@ -344,6 +366,9 @@ namespace ChemProV.UI
 
             // Store a reference to the workspace
             m_workspace = workspace;
+
+            // Set it for the drawing canvas too
+            DrawingCanvas.SetWorkspace(workspace);
         }
 
         /// <summary>

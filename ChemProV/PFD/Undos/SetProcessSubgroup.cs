@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.PFD.ProcessUnits;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.Undos
 {
@@ -35,7 +36,7 @@ namespace ChemProV.PFD.Undos
             m_pu = processUnit;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             // Use the current color for the opposite action
             IUndoRedoAction opposite = new SetSubprocess(m_pu);

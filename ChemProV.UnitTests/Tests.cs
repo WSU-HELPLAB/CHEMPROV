@@ -84,5 +84,38 @@ namespace ChemProV.UnitTests
             }
             return sb.ToString();
         }
+
+        /// <summary>
+        /// Tests the ChemProV.Core.Expression class.
+        /// </summary>
+        [TestMethod]
+        public void ExpressionEvaluatorTests()
+        {
+            string errors;
+            ChemProV.Core.Expression exp = ChemProV.Core.Expression.Create(
+                "(-VarA + VarB) * VarC", out errors);
+            Assert.IsNotNull(exp, errors);
+
+            // Make sure 3 variables were recognized in the expression
+            Assert.IsTrue(3 == exp.CountVariables(),
+                "Expression parser did not generate the right number of variables");
+
+            // Do 100 tests with random, non-negative integer values
+            Random rand = new Random();
+            for (int i = 0; i < 100; i++)
+            {
+                double a = (double)rand.Next(1001);
+                double b = (double)rand.Next(1001);
+                double c = (double)rand.Next(1001);
+                exp.SetSymbolValue("VarA", a);
+                exp.SetSymbolValue("VarB", b);
+                exp.SetSymbolValue("VarC", c);
+                double eval = exp.Evaluate();
+                Assert.IsTrue((-a + b) * c == eval,
+                    "Expression evaluator returned " + eval.ToString() + " while compiled code returned " +
+                    ((-a + b) * c).ToString() + ". If these values are very close it's probably just a " + 
+                    "rounding error and not a bug.");
+            }
+        }
     }
 }

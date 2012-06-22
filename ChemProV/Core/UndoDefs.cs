@@ -10,7 +10,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System;
 using System.Collections.Generic;
 
-namespace ChemProV.PFD.Undos
+namespace ChemProV.Core
 {
     /// <summary>
     /// An undo/redo action is an object that provides an undo or redo for a specific action. 
@@ -24,31 +24,7 @@ namespace ChemProV.PFD.Undos
     /// </summary>
     public interface IUndoRedoAction
     {
-        IUndoRedoAction Execute(UndoRedoExecutionParameters parameters);
-    }
-
-    /// <summary>
-    /// While objects that implement the IUndoRedoAction interface are expected to be constructed 
-    /// with most of the information that they need, relevant application data is also provided 
-    /// to the undo/redo object at the time of execution. Such information is stored in an 
-    /// UndoRedoExecutionParameters object.
-    /// </summary>
-    public class UndoRedoExecutionParameters
-    {
-        private UI.DrawingCanvas.DrawingCanvas m_canvas;
-
-        public UndoRedoExecutionParameters(UI.DrawingCanvas.DrawingCanvas canvas)
-        {
-            m_canvas = canvas;
-        }
-
-        public UI.DrawingCanvas.DrawingCanvas DrawingCanvas
-        {
-            get
-            {
-                return m_canvas;
-            }
-        }
+        IUndoRedoAction Execute(Workspace sender);
     }
 
     /// <summary>
@@ -123,7 +99,7 @@ namespace ChemProV.PFD.Undos
         /// Undos are executed from the beginning of the collection in the same order as they 
         /// were in within the array that was passed to the constructor.
         /// </summary>
-        public UndoRedoCollection Execute(UndoRedoExecutionParameters parameters)
+        public UndoRedoCollection Execute(Workspace sender)
         {
             // Stores the return values from IUndoRedoAction.Execute.
             // This will be used to create the UndoRedoCollection that gets returned from 
@@ -134,7 +110,7 @@ namespace ChemProV.PFD.Undos
             // of opposites
             foreach (IUndoRedoAction undoRedo in m_items)
             {
-                opposites.Add(undoRedo.Execute(parameters));
+                opposites.Add(undoRedo.Execute(sender));
             }
 
             // Determine the new title by changing "Undo" to "Redo" or "Redo" to "Undo"

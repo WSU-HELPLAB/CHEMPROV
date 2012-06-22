@@ -8,12 +8,14 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 // Original file author: Evan Olds
-using ChemProV.PFD.EquationEditor.Models;
+
 using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using ChemProV.PFD.EquationEditor.Models;
 
 namespace ChemProV.Core
 {
@@ -36,7 +38,48 @@ namespace ChemProV.Core
 
         protected EquationCollection m_equations = new EquationCollection();
 
+        /// <summary>
+        /// This is the redo stack. When the "Redo()" function is called, the top collection will be 
+        /// popped of this stack and executed. The return value from the execution function will be 
+        /// pushed onto the undo stack.
+        /// NEVER add anything to this stack or m_undos. Use the AddUndo function. The undo system 
+        /// is intentially designed so that redos are created automatically in the Undo() function. 
+        /// The Undo() function should be the ONLY place where you see m_redos.Push and the Redo() 
+        /// function is the ONLY place where you should see m_redos.Pop().
+        /// </summary>
+        private Stack<UndoRedoCollection> m_redos = new Stack<UndoRedoCollection>();
+
+        /// <summary>
+        /// This is the undo stack. When the "Undo()" function is called, the top collection will be 
+        /// popped of this stack and executed. The return value from the execution function will be 
+        /// pushed onto the redo stack.
+        /// </summary>
+        private Stack<UndoRedoCollection> m_undos = new Stack<UndoRedoCollection>();
+
         public Workspace() { }
+
+        /// <summary>
+        /// Adds an undo action to the undo stack. You'll notice there is no AddRedo function. This is 
+        /// intentional because upon execution of an undo (via a call to "Undo()") the redo action is 
+        /// automatically created and pushed onto the redo stack.
+        /// </summary>
+        /// <param name="collection">Collection of undo actions to push.</param>
+        /// <returns>True if the collection was successfully added to the stack, false otherwise.</returns>
+        public bool AddUndo(UndoRedoCollection collection)
+        {
+            m_undos.Push(collection);
+
+            // Adding a new undo clears the redo stack
+            m_redos.Clear();
+
+            // Send a notification that this may have changed the undo title
+            if (null != PropertyChanged)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs("UndoTitle"));
+            }
+
+            return true;
+        }
 
         public void Clear()
         {
@@ -44,6 +87,10 @@ namespace ChemProV.Core
             m_dfAnalysis.Comments.Clear();
             m_dfAnalysis.CommentsVisible = false;
             m_dfAnalysis.Text = string.Empty;
+
+            // Clear undos/redos
+            m_undos.Clear();
+            m_redos.Clear();
         }
 
         public DegreesOfFreedomAnalysis DegreesOfFreedomAnalysis
@@ -104,8 +151,7 @@ namespace ChemProV.Core
         public void Load(XDocument doc)
         {
             // Start by clearing
-            m_equations.Clear();
-            m_dfAnalysis.Comments.Clear();
+            Clear();
 
             // Load equations
             XElement equations = doc.Descendants("Equations").ElementAt(0);
@@ -138,6 +184,96 @@ namespace ChemProV.Core
             }
         }
 
+        public void Redo()
+        {
+            if (m_redos.Count > 0)
+            {
+                // Logic:
+                // 1. Pop redo collection on top of stack
+                // 2. Execute it
+                // 3. Take its return value and push it onto the undo stack
+                // (done in 1 line below)
+                m_undos.Push(m_redos.Pop().Execute(this));
+
+                // Send a notification that this may have changed the undo/redo titles
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("UndoTitle"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("RedoTitle"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of redos currently on the redo stack.
+        /// </summary>
+        public int RedoCount
+        {
+            get
+            {
+                return m_redos.Count;
+            }
+        }
+
+        public string RedoTitle
+        {
+            get
+            {
+                if (0 == m_redos.Count)
+                {
+                    return "Redo";
+                }
+                return m_redos.Peek().Title;
+            }
+        }
+
+        /// <summary>
+        /// Executes the undo collection that is on the top of the undo stack. If the undo stack 
+        /// is empty then no action is taken.
+        /// </summary>
+        public void Undo()
+        {
+            if (m_undos.Count > 0)
+            {
+                // Logic:
+                // 1. Pop undo collection on top of stack
+                // 2. Execute it
+                // 3. Take its return value and push it onto the redo stack
+                // (done in 1 line below)
+                m_redos.Push(m_undos.Pop().Execute(this));
+
+                // Send a notification that this may have changed the undo/redo titles
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("UndoTitle"));
+                    PropertyChanged(this, new PropertyChangedEventArgs("RedoTitle"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets the number of undos currently on the undo stack.
+        /// </summary>
+        public int UndoCount
+        {
+            get
+            {
+                return m_undos.Count;
+            }
+        }
+
+        public string UndoTitle
+        {
+            get
+            {
+                if (0 == m_undos.Count)
+                {
+                    return "Undo";
+                }
+                return m_undos.Peek().Title;
+            }
+        }
+
         /// <summary>
         /// TEMPORARY until further refactoring. In the future this class should have 1 load and 1 save method that 
         /// load from/save to streams.
@@ -161,6 +297,10 @@ namespace ChemProV.Core
             writer.WriteEndElement();
         }
 
+        #region Events
+
         public event PropertyChangedEventHandler PropertyChanged = null;
+
+        #endregion
     }
 }

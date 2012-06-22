@@ -1,14 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+﻿/*
+Copyright 2010 - 2012 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+*/
+
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Undos;
 
@@ -19,16 +21,19 @@ namespace ChemProV.UI
         private LabeledProcessUnit m_lpu;
         
         private Core.NamedColor m_nc = new Core.NamedColor(null, Colors.Transparent);
+
+        private Workspace m_workspace;
         
         public SubprocessChooserWindow()
-            : this(null) { }
+            : this(null, null) { }
         
-        public SubprocessChooserWindow(LabeledProcessUnit lpu)
+        public SubprocessChooserWindow(LabeledProcessUnit lpu, Workspace workspace)
         {
             InitializeComponent();
 
-            // Store a reference to the process unit
+            // Store a reference to the process unit and workspace
             m_lpu = lpu;
+            m_workspace = workspace;
 
             if (null != lpu)
             {                
@@ -82,7 +87,7 @@ namespace ChemProV.UI
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             // Add the undo item before setting the new subgroup
-            Core.App.Workspace.DrawingCanvas.AddUndo(
+            m_workspace.AddUndo(
                 new UndoRedoCollection("Undo subprocess change", new SetSubprocess(m_lpu)));
 
             // Set the new subprocess

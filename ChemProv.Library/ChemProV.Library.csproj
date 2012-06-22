@@ -70,43 +70,94 @@
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Service References\OsbleLocalServices\Reference.cs">
+    <Compile Include="Service References\OsbleAuthServices\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\OsbleRemoteServices\Reference.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.svcmap</DependentUpon>
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadataStorage Include="Service References\OsbleLocalServices\" />
+    <WCFMetadataStorage Include="Service References\OsbleAuthServices\" />
+    <WCFMetadataStorage Include="Service References\OsbleRemoteServices\" />
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService2.wsdl" />
-    <None Include="Service References\OsbleLocalServices\AuthenticationService21.wsdl" />
-    <None Include="Service References\OsbleLocalServices\AuthenticationService4.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService.wsdl" />
+    <None Include="Service References\OsbleAuthServices\AuthenticationService.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService41.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService1.wsdl" />
+    <None Include="Service References\OsbleAuthServices\AuthenticationService1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService42.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService43.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService3.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleLocalServices\ChemProV.Library.OsbleLocalServices.UserProfile.datasource">
+    <None Include="Service References\OsbleAuthServices\ChemProV.Library.OsbleAuthServices.UserProfile.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\OsbleLocalServices\configuration91.svcinfo" />
-    <None Include="Service References\OsbleLocalServices\configuration.svcinfo" />
-    <None Include="Service References\OsbleLocalServices\Reference.svcmap">
+    <None Include="Service References\OsbleAuthServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleAuthServices\configuration.svcinfo" />
+    <None Include="Service References\OsbleAuthServices\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Service References\OsbleLocalServices\AuthenticationService1.disco" />
+    <None Include="Service References\OsbleAuthServices\AuthenticationService.disco" />
+    <None Include="Service References\OsbleRemoteServices\ChemProV.Library.OsbleRemoteServices.Assignment.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\ChemProV.Library.OsbleRemoteServices.Course.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\ChemProV.Library.OsbleRemoteServices.CourseRole.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\configuration91.svcinfo" />
+    <None Include="Service References\OsbleRemoteServices\configuration.svcinfo" />
+    <None Include="Service References\OsbleRemoteServices\OsbleService.wsdl" />
+    <None Include="Service References\OsbleRemoteServices\OsbleService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService1.wsdl" />
+    <None Include="Service References\OsbleRemoteServices\OsbleService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService8.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\OsbleRemoteServices\OsbleService.disco" />
     <Content Include="ServiceReferences.ClientConfig" />
   </ItemGroup>
   <ItemGroup>

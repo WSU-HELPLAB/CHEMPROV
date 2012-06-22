@@ -132,6 +132,7 @@
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\CommentDefs.cs" />
     <Compile Include="Core\EquationCollection.cs" />
+    <Compile Include="Core\Expression.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Core\NamedColors.cs" />
     <Compile Include="Core\IWorkspaceChangeListener.cs" />
@@ -238,7 +239,7 @@
     <Compile Include="PFD\Undos\SetProcessUnitLabel.cs" />
     <Compile Include="PFD\Undos\SetStreamDestination.cs" />
     <Compile Include="PFD\Undos\SetStreamSource.cs" />
-    <Compile Include="PFD\Undos\UndoDefs.cs" />
+    <Compile Include="Core\UndoDefs.cs" />
     <Compile Include="RequestOpenFileArgs.cs" />
     <Compile Include="UI\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>

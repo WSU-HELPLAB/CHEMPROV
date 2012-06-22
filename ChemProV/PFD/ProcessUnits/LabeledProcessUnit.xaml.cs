@@ -1,19 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Net;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using System.ComponentModel;
-using System.Windows.Data;
 using System.Xml.Linq;
-using ChemProV.PFD.Undos;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.ProcessUnits
 {
@@ -125,7 +119,7 @@ namespace ChemProV.PFD.ProcessUnits
                 {
                     string undoText = "Undo renaming process unit from " + m_labelOnEditStart +
                         " to " + ProcessUnitLabel;
-                    Core.App.Workspace.DrawingCanvasReference.AddUndo(
+                    Core.App.Workspace.DrawingCanvasReference.GetWorkspace().AddUndo(
                         new UndoRedoCollection(undoText,
                         new Undos.SetProcessUnitLabel(this, m_labelOnEditStart)));
                 }

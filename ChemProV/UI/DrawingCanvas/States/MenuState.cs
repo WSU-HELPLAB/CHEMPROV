@@ -8,12 +8,12 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
-using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using ChemProV.PFD.StickyNote;
 using System.Windows.Media;
+using ChemProV.Core;
+using ChemProV.PFD.StickyNote;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 
@@ -30,31 +30,40 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         private ContextMenu m_contextMenu;
 
-        public MenuState(DrawingCanvas c)
+        private Workspace m_workspace;
+
+        public MenuState(DrawingCanvas c, Workspace workspace)
         {
             m_canvas = c;
+            m_workspace = workspace;
 
             // Create the context menu
             m_contextMenu = new ContextMenu();
 
             // Undo menu item
             MenuItem menuItem = new MenuItem();
-            menuItem.Header = c.UndoTitle;
-            menuItem.IsEnabled = (c.UndoCount > 0);
+            menuItem.Header = m_workspace.UndoTitle;
+            menuItem.IsEnabled = (m_workspace.UndoCount > 0);
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
-                m_canvas.Undo();
+                m_workspace.Undo();
+
+                // Flip back to the default state for the canvas (null)
+                m_canvas.CurrentState = null;
             };
 
             // Redo menu item
             menuItem = new MenuItem();
-            menuItem.Header = c.RedoTitle;
-            menuItem.IsEnabled = (c.RedoCount > 0);
+            menuItem.Header = m_workspace.RedoTitle;
+            menuItem.IsEnabled = (m_workspace.RedoCount > 0);
             m_contextMenu.Items.Add(menuItem);
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
-                m_canvas.Redo();
+                m_workspace.Redo();
+
+                // Flip back to the default state for the canvas (null)
+                m_canvas.CurrentState = null;
             };
 
             // Delete (selected object) menu item
@@ -84,10 +93,6 @@ namespace ChemProV.UI.DrawingCanvas.States
                         (uie as StickyNoteControl).Show();
                     }
                 }
-
-                // Make sure to remove the popup menu from the canvas
-                m_canvas.Children.Remove(m_contextMenu);
-                m_contextMenu = null;
 
                 // Flip back to the default state for the canvas (null)
                 m_canvas.CurrentState = null;
@@ -219,7 +224,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
                 // Build the new comment sticky note on the canvas and add undo
                 StickyNoteControl sn;
-                m_canvas.AddUndo(new UndoRedoCollection("Undo creation of comment",
+                m_workspace.AddUndo(new UndoRedoCollection("Undo creation of comment",
                     StickyNoteControl.CreateCommentNote(m_canvas, cc, null, out sn).ToArray()));
 
                 // Make sure to remove the popup menu from the canvas
@@ -334,7 +339,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                             System.Tuple<PFD.ProcessUnits.IProcessUnit, Color>;
 
                         // Create undo item before setting the new subgroup
-                        m_canvas.AddUndo(new UndoRedoCollection("Undo subprocess change",
+                        m_workspace.AddUndo(new UndoRedoCollection("Undo subprocess change",
                             new SetSubprocess(t.Item1)));
 
                         // Set the subgroup
@@ -357,7 +362,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             mi.Click += delegate(object sender, RoutedEventArgs r)
             {
                 SubprocessChooserWindow win = new SubprocessChooserWindow(
-                    pu as PFD.ProcessUnits.LabeledProcessUnit);
+                    pu as PFD.ProcessUnits.LabeledProcessUnit, m_workspace);
                 win.Show();
 
                 // Make sure to remove the popup menu from the canvas

@@ -14,10 +14,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.StickyNote;
-using ChemProV.PFD.Undos;
 using ChemProV.PFD.Streams;
+using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
@@ -132,8 +133,8 @@ namespace ChemProV.UI.DrawingCanvas.States
                 note.SetValue(Canvas.ZIndexProperty, (int)4);
 
                 // Create an undo
-                m_canvas.AddUndo(new UndoRedoCollection("Undo creation of free-floating comment",
-                    new RemoveFromCanvas(note, m_canvas)));
+                m_canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
+                    "Undo creation of free-floating comment", new RemoveFromCanvas(note, m_canvas)));
 
                 // Select the note on the canvas
                 m_canvas.SelectedElement = note;
@@ -149,7 +150,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                     m_canvas, collection, null, out newNote);
 
                 // Create an undo
-                m_canvas.AddUndo(
+                m_canvas.GetWorkspace().AddUndo(
                     new UndoRedoCollection("Undo creation of anchored comment", undos.ToArray()));
 
                 // Select the note on the canvas

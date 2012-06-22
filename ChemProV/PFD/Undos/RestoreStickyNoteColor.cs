@@ -20,6 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.PFD.Undos;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.Undos
 {
@@ -45,7 +46,7 @@ namespace ChemProV.PFD.Undos
         
         #region IUndoRedoAction Members
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             // Create the opposite item that will set the color back to what it is now
             IUndoRedoAction opposite = new RestoreStickyNoteColor(m_note);

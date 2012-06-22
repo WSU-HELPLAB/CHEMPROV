@@ -839,6 +839,12 @@ namespace ChemProV
                 m_workspace.DegreesOfFreedomAnalysis, new PropertyChangedEventArgs("CommentsVisible"));
         }
 
+        /// <summary>
+        /// A MainPage object represents an entire UI for creating and editing a workspace. A workspace is a 
+        /// data object that can be obtained with this call.
+        /// At the time of this writing the Core.Workspace class doesn't yet contain all the relevant data, 
+        /// but future refactoring should change this.
+        /// </summary>
         public Core.Workspace GetLogicalWorkspace()
         {
             return m_workspace;
