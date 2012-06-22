@@ -10,17 +10,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 // Original file author: Evan Olds
 
 using System;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
 using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using ChemProV.UI.DrawingCanvas;
-using ChemProV.UI.DrawingCanvas.States;
+using ChemProV.Core;
 using ChemProV.PFD.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
@@ -101,8 +93,9 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // Releasing the mouse button signifies completion of the resize and 
             // requires us to create an undo
-            m_canvas.AddUndo(new UndoRedoCollection("Undo sticky note resizing",
-                new ResizeControl(m_note, m_sizeOnMouseDown)));
+            m_canvas.GetWorkspace().AddUndo(
+                new UndoRedoCollection("Undo sticky note resizing",
+                    new ResizeControl(m_note, m_sizeOnMouseDown)));
 
             m_isMouseDown = false;
 

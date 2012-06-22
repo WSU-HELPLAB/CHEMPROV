@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using ChemProV.Core;
 using ChemProV.PFD;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.StickyNote;
@@ -58,6 +59,8 @@ namespace ChemProV.UI.DrawingCanvas
         /// Used to prevent recursive sets to CurrentState
         /// </summary>
         private bool m_settingCurrentState = false;
+
+        private Core.Workspace m_workspace = null;
 
         #region States
 
@@ -203,127 +206,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         #endregion Properties
-
-        #region Undo/Redo
-
-        /// <summary>
-        /// E.O.
-        /// This is the undo stack. When the "Undo()" function is called, the top collection will be 
-        /// popped of this stack and executed. The return value from the execution function will be 
-        /// pushed onto the redo stack.
-        /// </summary>
-        private Stack<UndoRedoCollection> m_undos = new Stack<UndoRedoCollection>();
-
-        /// <summary>
-        /// E.O.
-        /// This is the redo stack. When the "Redo()" function is called, the top collection will be 
-        /// popped of this stack and executed. The return value from the execution function will be 
-        /// pushed onto the undo stack.
-        /// NEVER add anything to this stack or m_undos. Use the AddUndo function. The undo system 
-        /// is intentially designed so that redos are created automatically in the Undo() function. 
-        /// The Undo() function should be the ONLY place where you see m_redos.Push and the Redo() 
-        /// function is the ONLY place where you should see m_redos.Pop();
-        /// </summary>
-        private Stack<UndoRedoCollection> m_redos = new Stack<UndoRedoCollection>();
-
-        /// <summary>
-        /// E.O.
-        /// Adds an undo action to the undo stack. You'll notice there is no AddRedo function. This is 
-        /// intentional because upon execution of an undo (via a call to "Undo()") the redo action is 
-        /// automatically created and pushed onto the redo stack.
-        /// </summary>
-        /// <param name="collection">Collection of undo actions to push.</param>
-        /// <returns>True if the collection was successfully added to the stack, false otherwise.</returns>
-        public bool AddUndo(UndoRedoCollection collection)
-        {
-            m_undos.Push(collection);
-
-            // Adding a new undo clears the redo stack
-            m_redos.Clear();
-
-            return true;
-        }
-
-        /// <summary>
-        /// Gets the number of undos currently on the undo stack.
-        /// </summary>
-        public int UndoCount
-        {
-            get
-            {
-                return m_undos.Count;
-            }
-        }
-
-        public string UndoTitle
-        {
-            get
-            {
-                if (0 == m_undos.Count)
-                {
-                    return "Undo";
-                }
-                return m_undos.Peek().Title;
-            }
-        }
-
-        /// <summary>
-        /// Gets the number of redos currently on the redo stack.
-        /// </summary>
-        public int RedoCount
-        {
-            get
-            {
-                return m_redos.Count;
-            }
-        }
-
-        public string RedoTitle
-        {
-            get
-            {
-                if (0 == m_redos.Count)
-                {
-                    return "Redo";
-                }
-                return m_redos.Peek().Title;
-            }
-        }
-
-        public void Redo()
-        {
-            // Set the state to null just in case
-            CurrentState = null;
-
-            if (m_redos.Count > 0)
-            {
-                // Logic:
-                // 1. Pop redo collection on top of stack
-                // 2. Execute it
-                // 3. Take its return value and push it onto the undo stack
-                // (done in 1 line below)
-                m_undos.Push(m_redos.Pop().Execute(new UndoRedoExecutionParameters(this)));
-            }
-        }
-
-        public void Undo()
-        {
-            // First we flip back to the null state
-            CurrentState = null;
-
-            // Then we execute the undo (if there is one)
-            if (m_undos.Count > 0)
-            {
-                // Logic:
-                // 1. Pop undo collection on top of stack
-                // 2. Execute it
-                // 3. Take its return value and push it onto the redo stack
-                // (done in 1 line below)
-                m_redos.Push(m_undos.Pop().Execute(new UndoRedoExecutionParameters(this)));
-            }
-        }
-
-        #endregion Undo/Redo
 
         /// <summary>
         /// Raised whenever the drawing_canvas places a drawing tool
@@ -565,7 +447,7 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             // A right mouse button down implies that we need to flip to the menu state
-            CurrentState = new UI.DrawingCanvas.States.MenuState(this);
+            CurrentState = new UI.DrawingCanvas.States.MenuState(this, m_workspace);
             (m_currentState as MenuState).Show(e);
         }
 
@@ -621,7 +503,7 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 // If the selected element does not have its own mouse processing logic then 
                 // we create a MovingState object, which will drag around the selected element.
-                m_currentState = MovingState.Create(this);
+                m_currentState = MovingState.Create(this, m_workspace);
             }
 
             // Finish up by sending this mouse event to the current state
@@ -792,23 +674,12 @@ namespace ChemProV.UI.DrawingCanvas
 
         /// <summary>
         /// This is called from main page whenever it gets a key press and drawing drawing_canvas has focus.
-        /// NOTE: HasFocus1 is what we use for focus since drawing_canvas cannot have built-in focus
         /// </summary>
         public void GotKeyDown(object sender, KeyEventArgs e)
         {
             if (e.Key == Key.Delete && null != selectedElement)
             {
                 Core.DrawingCanvasCommands.DeleteSelectedElement(this);
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Z && (Keyboard.Modifiers == ModifierKeys.Control))
-            {
-                Undo();
-                e.Handled = true;
-            }
-            else if (e.Key == Key.Y && (Keyboard.Modifiers == ModifierKeys.Control))
-            {
-                Redo();
                 e.Handled = true;
             }
         }
@@ -1147,10 +1018,6 @@ namespace ChemProV.UI.DrawingCanvas
             this.Children.Clear();
             ChemicalStreamPropertiesWindow.ResetTableCounter();
             HeatStreamPropertiesWindow.ResetTableCounter();
-
-            // Clear undos/redos
-            m_undos.Clear();
-            m_redos.Clear();
         }
 
         /// <summary>
@@ -1179,6 +1046,31 @@ namespace ChemProV.UI.DrawingCanvas
             Children.Remove(childElement);
             PFDModified();
             return true;
+        }
+
+        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        {
+            if (object.ReferenceEquals(m_workspace, workspace))
+            {
+                // No change
+                return;
+            }
+
+            // Detach listeners from old workspace
+            if (null != m_workspace)
+            {
+                // This function should really only be called once, so we should never hit this 
+                // code, but future versions might change this.
+                throw new NotImplementedException();
+            }
+
+            // Store a reference to the workspace
+            m_workspace = workspace;
+        }
+
+        public Workspace GetWorkspace()
+        {
+            return m_workspace;
         }
     }
 }

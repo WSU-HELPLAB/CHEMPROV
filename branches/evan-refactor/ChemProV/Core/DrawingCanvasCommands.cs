@@ -52,6 +52,9 @@ namespace ChemProV.Core
                 return;
             }
 
+            // Get a reference to the workspace
+            Workspace ws = canvas.GetWorkspace();
+
             // There are several different possibilities for what we're about to delete.
             if (element is PFD.StickyNote.StickyNoteControl)
             {
@@ -93,7 +96,7 @@ namespace ChemProV.Core
             else
             {
                 // Generic case - just remove whatever's selected with an undo to re-add it
-                canvas.AddUndo(new UndoRedoCollection("Undo", new AddToCanvas(element, canvas)));
+                ws.AddUndo(new UndoRedoCollection("Undo", new AddToCanvas(element, canvas)));
                 canvas.Children.Remove(element);
             }
 
@@ -108,6 +111,7 @@ namespace ChemProV.Core
         private static void DeleteHEWU(HeatExchanger he, DrawingCanvas canvas)
         {
             int i;
+            Workspace ws = canvas.GetWorkspace();
             
             // Heat exchangers with utilities must also delete the heat stream that's incoming
             // Normally the heat stream is at index 0 among the incoming streams, but it seems like 
@@ -188,7 +192,7 @@ namespace ChemProV.Core
                 s.Destination = null;
             }
 
-            canvas.AddUndo(new UndoRedoCollection(
+            ws.AddUndo(new UndoRedoCollection(
                 "Undo deletion of heat exchanger with utility", undos.ToArray()));
 
             // Remove the pieces from the canvas
@@ -240,7 +244,7 @@ namespace ChemProV.Core
                 }
             }
 
-            canvas.AddUndo(new UndoRedoCollection(
+            canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
                 "Undo deletion of process unit", undos.ToArray()));
 
             // Remove the process unit
@@ -327,7 +331,8 @@ namespace ChemProV.Core
             canvas.RemoveChild(stream.Table as UIElement);
 
             // Add the undo that we built
-            canvas.AddUndo(new UndoRedoCollection("Undo deletion of stream", actions.ToArray()));
+            canvas.GetWorkspace().AddUndo(
+                new UndoRedoCollection("Undo deletion of stream", actions.ToArray()));
         }
     }
 }

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="VmnHOO8Ziy9eZoh8VnAUNS9eb3E=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="UutyTlbu1n42BgtUks89ZWwtYZY=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_AuthenticationService">
       <properties>
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_AuthenticationService" contract="OsbleLocalServices.AuthenticationService" bindingType="basicHttpBinding" address="http://peppermint.arvixe.com/Services/AuthenticationService.svc" bindingConfiguration="BasicHttpBinding_AuthenticationService">
+    <endpoint name="BasicHttpBinding_AuthenticationService" contract="OsbleAuthServices.AuthenticationService" bindingType="basicHttpBinding" address="http://peppermint.arvixe.com/services/AuthenticationService.svc" bindingConfiguration="BasicHttpBinding_AuthenticationService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://peppermint.arvixe.com/Services/AuthenticationService.svc</serializedValue>
+          <serializedValue>http://peppermint.arvixe.com/services/AuthenticationService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
@@ -127,7 +127,7 @@
           <serializedValue>BasicHttpBinding_AuthenticationService</serializedValue>
         </property>
         <property path="/contract" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>OsbleLocalServices.AuthenticationService</serializedValue>
+          <serializedValue>OsbleAuthServices.AuthenticationService</serializedValue>
         </property>
         <property path="/headers" isComplexType="true" isExplicitlyDefined="false" clrType="System.ServiceModel.Configuration.AddressHeaderCollectionElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue>System.ServiceModel.Configuration.AddressHeaderCollectionElement</serializedValue>

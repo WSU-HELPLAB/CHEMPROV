@@ -21,6 +21,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.Undos
 {
@@ -47,7 +48,7 @@ namespace ChemProV.PFD.Undos
             m_stream = incomingStream;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             m_pu.DettachOutgoingStream(m_stream);
 

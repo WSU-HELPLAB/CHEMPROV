@@ -16,8 +16,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
     xmlns:ChemProV_Validation_Feedback="clr-namespace:ChemProV.Validation.Feedback"
     xmlns:ChemProV_UI ="clr-namespace:ChemProV.UI"
-    mc:Ignorable="d"
-    >
+    mc:Ignorable="d" KeyDown="GotKeyDown">
     
     <!--Where the meat of the application takes place -->
         <Grid x:Name="WorkspaceGrid">

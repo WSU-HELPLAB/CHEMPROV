@@ -16,6 +16,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using ChemProV.Core;
 
 namespace ChemProV.PFD.Undos
 {
@@ -43,7 +44,7 @@ namespace ChemProV.PFD.Undos
             m_size = sizeToRestore;
         }
 
-        public IUndoRedoAction Execute(UndoRedoExecutionParameters parameters)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             // Create the opposite action first
             IUndoRedoAction opposite = new ResizeControl(m_control);

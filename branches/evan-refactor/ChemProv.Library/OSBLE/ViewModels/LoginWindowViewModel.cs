@@ -8,7 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProV.Library.OsbleLocalServices;
+using ChemProV.Library.OsbleAuthServices;
 using System.ComponentModel;
 using System.Windows.Threading;
 
@@ -179,7 +179,6 @@ namespace ChemProV.Library.OSBLE.ViewModels
             ErrorVisibility = Visibility.Collapsed;
             _timer.Start();
             authClient.ValidateUserAsync(UserName, Password);
-
         }
 
         private bool CanLogIn(object param)
