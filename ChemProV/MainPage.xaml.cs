@@ -754,12 +754,9 @@ namespace ChemProV
 
         private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: Deal with this. I've commented it out now because the live version of the OSBLE service 
-            // has some property naming related problems.
-
-            //ChemProV.Library.OSBLE.Views.LoginWindow lw = new LoginWindow();
-            //lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
-            //lw.Show();
+            ChemProV.Library.OSBLE.Views.LoginWindow lw = new LoginWindow();
+            lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
+            lw.Show();
         }
 
         private void OSBLELoginAttemptCompleted(LoginWindow sender, Library.OSBLE.ViewModels.LoginWindowViewModel model)

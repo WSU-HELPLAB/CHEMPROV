@@ -26,6 +26,16 @@ namespace ChemProV.Core
     /// </summary>
     public static class CommentMerger
     {
+        private static XElement FirstNodeOrNull(XDocument doc, string nodeName)
+        {
+            if (doc.Descendants(nodeName).Count() > 0)
+            {
+                return doc.Descendants(nodeName).ElementAt(0);
+            }
+
+            return null;
+        }
+        
         /// <summary>
         /// Loads comments from the document, adding the user name to the XML tree where necessary
         /// </summary>
@@ -344,8 +354,8 @@ namespace ChemProV.Core
             // each analysis is the same in the two documents. The commens are considered to be specific 
             // to the analysis, so it wouldn't make sense to include comments from the child if the child 
             // has a different analysis.
-            XElement dfParentEl = docParent.Descendants("DegreesOfFreedomAnalysis").ElementAt(0);
-            XElement dfChildEl = docChild.Descendants("DegreesOfFreedomAnalysis").ElementAt(0);
+            XElement dfParentEl = FirstNodeOrNull(docParent, "DegreesOfFreedomAnalysis");
+            XElement dfChildEl = FirstNodeOrNull(docChild, "DegreesOfFreedomAnalysis");
             if (null != dfParentEl && null != dfChildEl)
             {
                 string parentDFText = dfParentEl.Element("Text").Value;

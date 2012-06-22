@@ -59,11 +59,13 @@ namespace ChemProV.Library.OSBLE.ViewModels
         {
             get
             {
-                return Profile.UserName;
+                return Profile.UserNamek__BackingField;
+                //return Profile.UserName;
             }
             set
             {
-                Profile.UserName = value;
+                //Profile.UserName = value;
+                Profile.UserNamek__BackingField = value;
                 OnPropertyChanged("UserName");
             }
         }

@@ -42,7 +42,6 @@
             HorizontalAlignment="Right" 
             Grid.Row="3" 
             Grid.Column="1" 
-            Margin="3,3,3,3" 
-            />
+            Margin="3,3,3,3" Click="OKButton_Click" />
     </Grid>
 </controls:ChildWindow>

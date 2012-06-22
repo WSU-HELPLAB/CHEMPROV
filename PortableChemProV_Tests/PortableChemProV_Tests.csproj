@@ -38,8 +38,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="PortableChemProV">
-      <HintPath>..\PortableChemProV\bin\Debug\PortableChemProV.dll</HintPath>
+    <Reference Include="PortableChemProvNet4">
+      <HintPath>..\PortableChemProvNet4\bin\Release\PortableChemProvNet4.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
