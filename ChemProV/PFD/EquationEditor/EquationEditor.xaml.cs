@@ -17,11 +17,10 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
-using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.EquationEditor.Models;
 using ChemProV.PFD.ProcessUnits;
+using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Undos;
 
 namespace ChemProV.PFD.EquationEditor
@@ -118,8 +117,6 @@ namespace ChemProV.PFD.EquationEditor
 
             PfdElements = new List<IPfdElement>();
 
-            //create our first row
-            AddNewEquationRow();
             UpdateCompounds();
             updateScopes();
 
@@ -137,62 +134,9 @@ namespace ChemProV.PFD.EquationEditor
 
         #region public methods
 
-        /// <summary>
-        /// Will remove all existing equations currently listed in the equation editor. Can 
-        /// optionally add in the default blank row if desired.
-        /// </summary>
-        public void ClearEquations(bool addDefaultBlank)
-        {
-            EquationsStackPanel.Children.Clear();
-
-            if (addDefaultBlank)
-            {
-                AddNewEquationRow();
-            }
-        }
-
         #endregion
 
         #region Private methods
-
-        /// <summary>
-        /// Adds a blank new equation row to the equations grid
-        /// </summary>
-        /// <returns></returns>
-        private EquationModel AddNewEquationRow()
-        {
-            return AddNewEquationRow(null);
-        }
-
-        /// <summary>
-        /// Adds a new equation row to the equations list. If the optional Xml equation element is non-null 
-        /// then it will be used to fill the row's data appropriately. If it is null then the new row will 
-        /// be blank.
-        /// </summary>
-        private EquationModel AddNewEquationRow(XElement optionalXmlEquation)
-        {
-            // We can't do anything here without a workspace reference
-            if (null == m_workspace)
-            {
-                return null;
-            }
-            
-            // Create a new equation model
-            EquationModel model;
-            if (null == optionalXmlEquation)
-            {
-                model = new EquationModel();
-            }
-            else
-            {
-                model = EquationModel.FromXml(optionalXmlEquation);
-            }
-
-            // Add it to the workspace. Event listeners will update the UI appropriately.
-            m_workspace.Equations.Add(model);
-
-            return (EquationsStackPanel.Children[EquationsStackPanel.Children.Count - 1] as EquationControl).Model;
-        }
 
         private void MoveDownButton_Click(object sender, RoutedEventArgs e)
         {
@@ -285,7 +229,7 @@ namespace ChemProV.PFD.EquationEditor
                 // 4. There are no comments for the equation and CommentsVisible is true
 
                 // If the comments are visible, then we have a colored border and background
-                if (ec.CommentsVisible)
+                if (ec.Model.CommentsVisible)
                 {
                     ec.CommentIconBorder.BorderBrush = ec.CommentIconBorder.Background = clrBrush;
                     ToolTipService.SetToolTip(ec.CommentIconBorder,
@@ -329,15 +273,20 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         private void DeleteEquationRow(EquationControl thisOne)
         {
-            UIElement uie = thisOne as UIElement;
+            int index = m_workspace.Equations.IndexOf(thisOne.Model);
 
 #if DEBUG
-            if (!EquationsStackPanel.Children.Contains(uie))
+            if (index < 0)
             {
                 throw new ArgumentException(
-                    "Request was made to delete an equation row that was not in the stack");
+                    "Request was made to delete an equation that was not found in the collection");
             }
 #endif
+            
+            // Create an undo that will add it back
+            m_workspace.AddUndo(new Core.UndoRedoCollection(
+                "Undo deleting equation row",
+                new InsertEquation(m_workspace, thisOne.Model, index)));
 
             // Remove it from the workspace. There are event listeners that will update the UI 
             // when doing this
@@ -616,7 +565,20 @@ namespace ChemProV.PFD.EquationEditor
 
         private void AddNewRowButton_Click(object sender, RoutedEventArgs e)
         {
-            AddNewEquationRow();
+            // We can't do anything here without a workspace reference
+            if (null == m_workspace)
+            {
+                return;
+            }
+
+            // Create a new equation mode and add it to the workspace. Event 
+            // listeners will update the UI appropriately.
+            m_workspace.Equations.Add(new EquationModel());
+
+            // Add an undo that will delete that row
+            m_workspace.AddUndo(new Core.UndoRedoCollection(
+                "Undo adding new equation row",
+                new RemoveEquation(m_workspace, m_workspace.Equations.Count - 1)));
         }
 
         internal EquationControl GetRowControl(int index)
@@ -629,7 +591,7 @@ namespace ChemProV.PFD.EquationEditor
             int count = 0;
             foreach (UIElement uie in EquationsStackPanel.Children)
             {
-                if ((uie as EquationControl).CommentsVisible)
+                if ((uie as EquationControl).Model.CommentsVisible)
                 {
                     count++;
                 }
@@ -665,28 +627,7 @@ namespace ChemProV.PFD.EquationEditor
 
         private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
-            if (NotifyCollectionChangedAction.Add == e.Action)
-            {
-                // An item was added, meaning we need to add a new row. In this case the number of rows 
-                // that we currently have should be one less than the number in the workspace.
-                if (EquationsStackPanel.Children.Count != m_workspace.Equations.Count - 1)
-                {
-                    // Do a full update for safety
-                    UpdateFromWorkspace();
-                    return;
-                }
-
-                EquationControl ec = new EquationControl(
-                    this, m_workspace.Equations[m_workspace.Equations.Count - 1]);
-                SetupEquationControlEvents(ec);
-                EquationsStackPanel.Children.Add(ec);
-                UpdateRowProperties();
-            }
-            else
-            {
-                // Could probably make this more efficient
-                UpdateFromWorkspace();
-            }
+            UpdateFromWorkspace();
         }
 
         private void SetupEquationControlEvents(EquationControl control)
@@ -702,13 +643,12 @@ namespace ChemProV.PFD.EquationEditor
             control.MoveUpButton.Click += new RoutedEventHandler(MoveUpButton_Click);
 
             // Set comment button border
-            control.CommentsVisible = false;
             control.CommentIconBorder.BorderBrush = new SolidColorBrush(Colors.Gray);
             control.CommentIconBorder.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
             {
                 // Toggle the comment visibility. All relevant UI elements that need to know about this 
                 // will have attached event listeners and will update themselves appropriately
-                control.CommentsVisible = !control.CommentsVisible;
+                control.Model.CommentsVisible = !control.Model.CommentsVisible;
 
                 UpdateRowProperties();
 
@@ -718,17 +658,45 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// Clears and re-creates the entire set of equation controls based on data from the workspace object
+        /// Updates the UI and the set of equation controls based on data from the workspace object
         /// </summary>
         private void UpdateFromWorkspace()
         {
-            // Create appropriate UI elements for the workspace content
-            ClearEquations(false);
-            foreach (EquationModel em in m_workspace.Equations)
+            // Tests show that creating the equation row controls is somewhat slow, so here we want 
+            // to minimize the number of controls we create. Thus instead of clearing out all 
+            // controls and creating new ones, which would certainly work, we'll take a more efficient 
+            // approach. We start by creating the exact number of row controls that are needed. This 
+            // may require deleting or adding rows.
+            
+            // If there are too many equation row controls, then we have to delete
+            while (EquationsStackPanel.Children.Count > m_workspace.Equations.Count)
             {
-                EquationControl ec = new EquationControl(this, em);
+                // Remove the last one
+                EquationControl ec = 
+                    EquationsStackPanel.Children[EquationsStackPanel.Children.Count - 1] as EquationControl;
+                ec.SetModel(null);
+                EquationsStackPanel.Children.Remove(ec);
+            }
+
+            // If there are too few equation row controls then add additional ones
+            while (EquationsStackPanel.Children.Count < m_workspace.Equations.Count)
+            {
+                EquationControl ec = new EquationControl(
+                    this, m_workspace.Equations[EquationsStackPanel.Children.Count]);
                 SetupEquationControlEvents(ec);
                 EquationsStackPanel.Children.Add(ec);
+            }
+            
+            // Now we have the correct number of controls to match the number of equations in the workspace. Go 
+            // through each one and set the data.
+            for (int i = 0; i < m_workspace.Equations.Count; i++)
+            {
+                // If the control doesn't already have the correct model then update it
+                if (!object.ReferenceEquals(m_workspace.Equations[i],
+                    (EquationsStackPanel.Children[i] as EquationControl).Model))
+                {
+                    (EquationsStackPanel.Children[i] as EquationControl).SetModel(m_workspace.Equations[i]);
+                }
             }
 
             // Fix the move up/move down buttons on all rows

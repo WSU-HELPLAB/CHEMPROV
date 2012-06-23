@@ -228,7 +228,9 @@
     <Compile Include="PFD\Undos\AttachOutgoingStream.cs" />
     <Compile Include="PFD\Undos\DetachOutgoingStream.cs" />
     <Compile Include="PFD\Undos\InsertComment.cs" />
+    <Compile Include="PFD\Undos\InsertEquation.cs" />
     <Compile Include="PFD\Undos\RemoveComment.cs" />
+    <Compile Include="PFD\Undos\RemoveEquation.cs" />
     <Compile Include="PFD\Undos\RestoreStickyNoteColor.cs" />
     <Compile Include="PFD\Undos\SetProcessSubgroup.cs" />
     <Compile Include="PFD\Undos\DetachIncomingStream.cs" />

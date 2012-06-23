@@ -82,7 +82,7 @@ namespace ChemProV.UI
             for (int i = 0; i < EquationEditor.EquationRowCount; i++)
             {
                 EquationControl ec = EquationEditor.GetRowControl(i);
-                ec.CommentsVisible = false;
+                ec.Model.CommentsVisible = false;
             }
             EquationEditor.UpdateRowProperties();
 
@@ -204,10 +204,12 @@ namespace ChemProV.UI
         {
             // Clear the workspace
             m_workspace.Clear();
+
+            // Add the default equation row
+            m_workspace.Equations.Add(new PFD.EquationEditor.Models.EquationModel());
             
             //now, clear the drawing drawing_canvas
             DrawingCanvas.ClearDrawingCanvas();
-            EquationEditor.ClearEquations(true);
 
             //clear any existing messages in the feedback window and rerun the error checker
             CheckRulesForPFD(this, EventArgs.Empty);
