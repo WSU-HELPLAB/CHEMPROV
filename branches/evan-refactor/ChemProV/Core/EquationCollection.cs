@@ -151,6 +151,38 @@ namespace ChemProV.Core
             return GetEnumerator();
         }
 
+        public int IndexOf(EquationModel item)
+        {
+            return m_eqs.IndexOf(item);
+        }
+
+        public void Insert(int index, EquationModel item)
+        {
+            if (m_readOnly)
+            {
+                throw new NotSupportedException(
+                    "Cannot insert an item into a read-only equation collection");
+            }
+            
+            if (index < 0)
+            {
+                throw new ArgumentOutOfRangeException(
+                    "Index value for insertion into an equation collection cannot be " +
+                    "negative (was " + index.ToString() + ")");
+            }
+
+            m_eqs.Insert(index, item);
+
+            // Watch for property changes on this item
+            item.PropertyChanged += new PropertyChangedEventHandler(Model_PropertyChanged);
+
+            // Fire the CollectionChanged event if non-null
+            if (null != CollectionChanged)
+            {
+                CollectionChanged(this, new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
+            }
+        }
+
         public bool IsReadOnly
         {
             get
