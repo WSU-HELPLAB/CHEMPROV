@@ -682,15 +682,18 @@ namespace ChemProV.PFD.StickyNote
             Workspace ws = canvas.GetWorkspace();
 
             // Start by unsubscribing from events
-            if (m_commentParent is ProcessUnitControl)
+            if (null != m_commentParent)
             {
-                (m_commentParent as ProcessUnitControl).ProcessUnit.PropertyChanged -=
-                    ProcessUnitParentPropertyChanged;
-            }
-            else
-            {
-                (m_commentParent as PFD.Streams.AbstractStream).Stream.PropertyChanged -=
-                    StreamParentPropertyChanged;
+                if (m_commentParent is ProcessUnitControl)
+                {
+                    (m_commentParent as ProcessUnitControl).ProcessUnit.PropertyChanged -=
+                        ProcessUnitParentPropertyChanged;
+                }
+                else
+                {
+                    (m_commentParent as PFD.Streams.AbstractStream).Stream.PropertyChanged -=
+                        StreamParentPropertyChanged;
+                }
             }
             
             // Get a reference to the relevant comment collection

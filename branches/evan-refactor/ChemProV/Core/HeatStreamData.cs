@@ -24,14 +24,17 @@ namespace ChemProV.Core
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         
-        private string label = string.Empty;
         private string quantity = string.Empty;
         private string feedback = string.Empty;
         private string toolTipMessage = string.Empty;
 
+        private string m_label = string.Empty;
+
         private string m_selectedUnits = string.Empty;
 
-        private static string[] s_energyUnits = { "BTU", "BTU/sec", "J", "W" };
+        private bool m_userHasRenamed = false;
+
+        private static readonly string[] s_energyUnits = { "BTU", "BTU/sec", "J", "W" };
 
         public HeatStreamData() { }
 
@@ -42,7 +45,7 @@ namespace ChemProV.Core
                 throw new InvalidOperationException();
             }
 
-            label = loadFromMe.Element("Label").Value;
+            m_label = loadFromMe.Element("Label").Value;
             quantity = loadFromMe.Element("Quantity").Value;
 
             XElement selectedUnitsEl = loadFromMe.Element("SelectedUnits");
@@ -68,6 +71,42 @@ namespace ChemProV.Core
             toolTipMessage = loadFromMe.Element("ToolTipMessage").Value;
         }
 
+        private void CheckIfEnabled(string propertyName = "")
+        {
+            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (!(obj is HeatStreamData))
+            {
+                return -1;
+            }
+            HeatStreamData other = obj as HeatStreamData;
+            return this.Label.CompareTo(other.Label);
+        }
+
+        public static string[] EnergyUnitOptions
+        {
+            get
+            {
+                return s_energyUnits;
+            }
+        }
+
+        public string Feedback
+        {
+            get
+            {
+                return feedback;
+            }
+            set
+            {
+                feedback = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Feedback"));
+            }
+        }
+
         public object GetColumnUIObject(int columnIndex, out string propertyName)
         {
             switch (columnIndex)
@@ -75,7 +114,7 @@ namespace ChemProV.Core
                 case 0:
                     // Label column (string field)
                     propertyName = "Label";
-                    return label;
+                    return m_label;
 
                 case 1:
                     // Quantity column (string field)
@@ -97,12 +136,18 @@ namespace ChemProV.Core
         {
             get
             {
-                return label;
+                return m_label;
             }
             set
             {
-                label = value;
-                CheckIfEnabled("Label");
+                if (m_label == value)
+                {
+                    // No change
+                    return;
+                }
+                
+                m_label = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Label"));
             }
         }
 
@@ -132,62 +177,10 @@ namespace ChemProV.Core
                     // No change
                     return;
                 }
-                
+
                 m_selectedUnits = value;
                 PropertyChanged(this, new PropertyChangedEventArgs("SelectedUnits"));
             }
-        }
-
-        public string Feedback
-        {
-            get
-            {
-                return feedback;
-            }
-            set
-            {
-                feedback = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("Feedback"));
-            }
-        }
-
-        public string ToolTipMessage
-        {
-            get
-            {
-                return toolTipMessage;
-            }
-            set
-            {
-                toolTipMessage = value;
-                PropertyChanged(this, new PropertyChangedEventArgs("ToolTipMessage"));
-            }
-        }
-
-        private void CheckIfEnabled(string propertyName = "")
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
-        }
-
-        public bool Enabled
-        {
-            get
-            {
-                return true;
-            }
-            set
-            {
-            }
-        }
-
-        public int CompareTo(object obj)
-        {
-            if (!(obj is HeatStreamData))
-            {
-                return -1;
-            }
-            HeatStreamData other = obj as HeatStreamData;
-            return this.Label.CompareTo(other.Label);
         }
 
         public object this[int index]
@@ -197,7 +190,7 @@ namespace ChemProV.Core
                 switch (index)
                 {
                     case 0:
-                        return label;
+                        return m_label;
 
                     case 1:
                         return quantity;
@@ -214,7 +207,7 @@ namespace ChemProV.Core
                 switch (index)
                 {
                     case 0:
-                        label = value as string;
+                        m_label = value as string;
                         break;
 
                     case 1:
@@ -228,10 +221,36 @@ namespace ChemProV.Core
             }
         }
 
+        public string ToolTipMessage
+        {
+            get
+            {
+                return toolTipMessage;
+            }
+            set
+            {
+                toolTipMessage = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("ToolTipMessage"));
+            }
+        }
+
         public bool UserHasRenamed
         {
-            get;
-            set;
+            get
+            {
+                return m_userHasRenamed;
+            }
+            set
+            {
+                if (m_userHasRenamed == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_userHasRenamed = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("UserHasRenamed"));
+            }
         }
 
         public void WriteXml(System.Xml.XmlWriter writer)
