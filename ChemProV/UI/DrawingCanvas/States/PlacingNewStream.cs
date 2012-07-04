@@ -98,8 +98,25 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 m_stream.PropertiesTable.AddNewRow();
             }
-            // Choose a default label
-            m_stream.PropertiesTable.Rows[0].Label = "M" + m_stream.Id.ToString();
+
+            // Set some defaults based on the stream type
+            if (StreamType.Heat == streamType)
+            {
+                // Choose a default label
+                m_stream.PropertiesTable.Rows[0].Label = "Q" + m_stream.Id.ToString();
+
+                // Select default units
+                (m_stream.PropertiesTable.Rows[0] as Core.HeatStreamData).SelectedUnits =
+                    Core.HeatStreamData.EnergyUnitOptions[0];
+            }
+            else
+            {
+                // Choose a default label
+                m_stream.PropertiesTable.Rows[0].Label = "M" + m_stream.Id.ToString();
+
+                // Default to "Overall" for the selected compound option
+                (m_stream.PropertiesTable.Rows[0] as Core.ChemicalStreamData).SelectedCompound = "Overall";
+            }
             // Flag it as not renamed by the user yet
             m_stream.PropertiesTable.Rows[0].UserHasRenamed = false;
 

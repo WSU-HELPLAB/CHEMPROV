@@ -39,6 +39,8 @@ namespace ChemProV.UI
         /// </summary>
         private bool m_ignoreRowPropertyChanges = false;
 
+        private bool m_programmaticallyChanging = false;
+
         private Core.StreamPropertiesTable m_table;
 
         private Workspace m_ws = null;
@@ -51,6 +53,21 @@ namespace ChemProV.UI
             m_table = table;
             m_ws = workspace;
             m_canvas = canvas;
+
+            // We have a work item that says specifically NOT to do this
+            //   |    |
+            //   |    |
+            //   v    v
+            // Add the default row for chemical streams property tables if it's not already there
+            //if (0 == m_table.RowCount)
+            //{
+            //    if (StreamType.Chemical == table.StreamType)
+            //    {
+            //        ChemicalStreamData csd = m_table.AddNewRow() as ChemicalStreamData;
+            //        csd.SelectedCompound = "Overall";
+            //        csd.Label = "M" + table.Stream.Id.ToString();
+            //    }
+            //}
 
             // Do the initial UI setup
             HeaderTextBlock.Text = "Stream #" + m_table.Stream.Id.ToString();
@@ -77,6 +94,27 @@ namespace ChemProV.UI
             m_table.PropertyChanged += new PropertyChangedEventHandler(TablePropertyChanged);
         }
 
+        private string AutoLabel(string existing, string units)
+        {
+            if (units == ChemicalUnits.MassFraction.ToPrettyString() ||
+                units == ChemicalUnits.MoleFraction.ToPrettyString())
+            {
+                // X,x for fractions
+                return existing.Replace('n', 'x').Replace('N', 'X').Replace('m', 'x').Replace('M', 'X');
+            }
+            else if (ChemicalUnits.MassPercent.ToPrettyString() == units ||
+                ChemicalUnits.MolePercent.ToPrettyString() == units)
+            {
+                // N,n for percents
+                return existing.Replace('x', 'n').Replace('X', 'n').Replace('m', 'n').Replace('M', 'N');
+            }
+            else
+            {
+                // M,m for everything else
+                return existing.Replace('x', 'm').Replace('X', 'M').Replace('n', 'm').Replace('N', 'M');
+            }
+        }
+
         private void ComboBoxField_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // Get the column index for the control.Remember that there's an extra column in the 
@@ -97,6 +135,28 @@ namespace ChemProV.UI
                 m_ignoreRowPropertyChanges = true;
                 info.Item1[column] = newValue;
                 m_ignoreRowPropertyChanges = false;
+
+                // If we just changed the "SelectedUnits" field, then check if we have to auto-
+                // rename the row
+                ChemicalStreamData csd = info.Item1 as ChemicalStreamData;
+                if (info.Item2.Equals("SelectedUnits") && !info.Item1.UserHasRenamed &&
+                    null != csd)
+                {
+                    m_programmaticallyChanging = true;
+
+                    // Remove the event handler for the label text box while we change the label
+                    TextBox tbLabel = GetControl(info.Item1, "Label") as TextBox;
+                    tbLabel.TextChanged -= this.TextField_TextChanged;
+                    
+                    // Change the label in the data structure
+                    csd.Label = AutoLabel(csd.Label, newValue);
+
+                    // Re-subscribe to the label text box changes
+                    tbLabel.TextChanged += this.TextField_TextChanged;
+
+                    m_programmaticallyChanging = false;
+                    csd.UserHasRenamed = false;
+                }
             }
         }
 
@@ -110,6 +170,33 @@ namespace ChemProV.UI
             {
                 return m_table;
             }
+        }
+
+        public Control GetControl(Core.IStreamData row, string propertyName)
+        {
+            foreach (UIElement uie in MainGrid.Children)
+            {
+                Control c = uie as Control;
+                if (null == c)
+                {
+                    continue;
+                }
+                
+                // If it's a control that corresponds to an item in the data structure then it will 
+                // have information in its tag
+                Tuple<Core.IStreamData, string> info = c.Tag as Tuple<Core.IStreamData, string>;
+                if (null == info)
+                {
+                    continue;
+                }
+
+                if (object.ReferenceEquals(info.Item1, row) && propertyName == info.Item2)
+                {
+                    return c;
+                }
+            }
+
+            return null;
         }
 
         private void HeaderBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -155,9 +242,6 @@ namespace ChemProV.UI
         {
             Core.IStreamData row = (sender as Button).Tag as Core.IStreamData;
             m_table.RemoveRow(row);
-
-            // TODO: Setup event handlers and take this out:
-            UpdateUI();
         }
 
         /// <summary>
@@ -223,6 +307,12 @@ namespace ChemProV.UI
                 m_ignoreRowPropertyChanges = true;
                 info.Item1[column] = (sender as TextBox).Text;
                 m_ignoreRowPropertyChanges = false;
+
+                // If this was a label change by the user then we need to mark it as user-renamed
+                if (info.Item2.Equals("Label") && !m_programmaticallyChanging)
+                {
+                    info.Item1.UserHasRenamed = true;
+                }
             }
         }
 
@@ -433,7 +523,13 @@ namespace ChemProV.UI
                 {
                     m_table.AddNewRow();
                     int count = m_table.RowCount;
+
+                    m_programmaticallyChanging = true;
+                    TextBox tbLabel = GetControl(m_table.Rows[count - 1], "Label") as TextBox;
+                    tbLabel.TextChanged -= this.TextField_TextChanged;
                     m_table.Rows[count - 1].Label = "m" + m_table.Stream.Id.ToString() + count.ToString();
+                    tbLabel.TextChanged += this.TextField_TextChanged;
+                    m_programmaticallyChanging = false;
                 };
 
                 i++;

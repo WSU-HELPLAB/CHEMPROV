@@ -38,6 +38,8 @@ namespace ChemProV.Core
 
         private ObservableCollection<string> m_unitOptions = new ObservableCollection<string>();
 
+        private bool m_userHasRenamed = false;
+
         public ChemicalStreamData()
         {
             foreach (ChemicalUnits unit in Enum.GetValues(typeof(ChemicalUnits)))
@@ -314,10 +316,28 @@ namespace ChemProV.Core
             }
         }
 
+        /// <summary>
+        /// Gets or sets a boolean value indicating whether or not the user has manually 
+        /// changed the label for this row. This defaults to false and must be set to 
+        /// true by the UI layer when the user renames the row.
+        /// </summary>
         public bool UserHasRenamed
         {
-            get;
-            set;
+            get
+            {
+                return m_userHasRenamed;
+            }
+            set
+            {
+                if (m_userHasRenamed == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_userHasRenamed = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("UserHasRenamed"));
+            }
         }
 
         public void WriteXml(XmlWriter writer)
