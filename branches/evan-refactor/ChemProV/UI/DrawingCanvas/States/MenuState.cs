@@ -8,6 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -100,17 +101,18 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // ----- Now we start into stuff that's dependent on the selected item -----
 
-            // Show comment options if the item implements ICommentCollection
-            if (m_canvas.SelectedElement is Core.ICommentCollection)
+            // Show comment options if the item can have comments
+            if (m_canvas.SelectedElement is PFD.Streams.AbstractStream ||
+                m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
             {
                 AddCommentCollectionMenuOptions(m_contextMenu);
             }
 
             // If the user has right-clicked on a process unit then we want to add subprocess options
-            if (m_canvas.SelectedElement is PFD.ProcessUnits.IProcessUnit)
+            if (m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
             {
                 AddSubprocessMenuOptions(m_contextMenu,
-                    m_canvas.SelectedElement as PFD.ProcessUnits.IProcessUnit);
+                    m_canvas.SelectedElement as PFD.ProcessUnits.ProcessUnitControl);
             }
         }
 
@@ -220,12 +222,38 @@ namespace ChemProV.UI.DrawingCanvas.States
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
                 MenuItem tempMI = sender as MenuItem;
-                Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
+                PFD.Streams.AbstractStream stream = tempMI.Tag as PFD.Streams.AbstractStream;
+                PFD.ProcessUnits.ProcessUnitControl unit = tempMI.Tag as PFD.ProcessUnits.ProcessUnitControl;
 
-                // Build the new comment sticky note on the canvas and add undo
-                StickyNoteControl sn;
+                // Get a reference to the comment collection
+                IList<StickyNote_UIIndependent> comments;
+                if (null != stream)
+                {
+                    comments = stream.Stream.Comments;
+                }
+                else
+                {
+                    comments = unit.ProcessUnit.Comments;
+                }
+
+                // Compute the location for the new comment
+                MathCore.Vector location = StickyNoteControl.ComputeNewCommentNoteLocation(
+                    m_canvas, tempMI.Tag, 100.0, 100.0);
+
+                // Create the new sticky note and add it to the workspace. Event handlers will update 
+                // the UI appropriately
+                StickyNote_UIIndependent sn = new StickyNote_UIIndependent()
+                {
+                    Width = 100.0,
+                    Height = 100.0,
+                    LocationX = location.X,
+                    LocationY = location.Y
+                };
+                comments.Add(sn);
+
+                // Add an undo that will remove the comment
                 m_workspace.AddUndo(new UndoRedoCollection("Undo creation of comment",
-                    StickyNoteControl.CreateCommentNote(m_canvas, cc, null, out sn).ToArray()));
+                    new RemoveComment(comments, comments.IndexOf(sn))));
 
                 // Make sure to remove the popup menu from the canvas
                 m_canvas.Children.Remove(m_contextMenu);
@@ -236,11 +264,11 @@ namespace ChemProV.UI.DrawingCanvas.States
             };
 
             string objName = "selected object";
-            if (m_canvas.SelectedElement is PFD.ProcessUnits.LabeledProcessUnit)
+            if (m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
             {
-                objName = (m_canvas.SelectedElement as PFD.ProcessUnits.LabeledProcessUnit).ProcessUnitLabel;
+                objName = (m_canvas.SelectedElement as PFD.ProcessUnits.ProcessUnitControl).ProcessUnit.Label;
             }
-            else if (m_canvas.SelectedElement is AbstractStream)
+            else if (m_canvas.SelectedElement is ChemProV.PFD.Streams.AbstractStream)
             {
                 objName = "selected stream";
             }
@@ -253,13 +281,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
                 MenuItem tempMI = sender as MenuItem;
-                Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
-
-                for (int i = 0; i < cc.CommentCount; i++)
-                {
-                    StickyNoteControl sn = cc.GetCommentAt(i) as StickyNoteControl;
-                    sn.Hide();
-                }
+                (tempMI.Tag as UI.ICommentControlManager).HideAllComments();
 
                 // Make sure to remove the popup menu from the canvas
                 m_canvas.Children.Remove(m_contextMenu);
@@ -277,13 +299,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
                 MenuItem tempMI = sender as MenuItem;
-                Core.ICommentCollection cc = tempMI.Tag as Core.ICommentCollection;
-
-                for (int i = 0; i < cc.CommentCount; i++)
-                {
-                    StickyNoteControl sn = cc.GetCommentAt(i) as StickyNoteControl;
-                    sn.Show();
-                }
+                (tempMI.Tag as UI.ICommentControlManager).ShowAllComments();
 
                 // Make sure to remove the popup menu from the canvas
                 m_canvas.Children.Remove(m_contextMenu);
@@ -297,7 +313,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// <summary>
         /// Adds menu options for the subprocess color changing
         /// </summary>
-        private void AddSubprocessMenuOptions(ContextMenu newContextMenu, PFD.ProcessUnits.IProcessUnit pu)
+        private void AddSubprocessMenuOptions(ContextMenu newContextMenu, PFD.ProcessUnits.ProcessUnitControl pu)
         {
             MenuItem parentMenuItem = new MenuItem();
             parentMenuItem.Header = "Subprocess";
@@ -318,7 +334,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Header = nc.Name;
-                    menuItem.Tag = System.Tuple.Create<PFD.ProcessUnits.IProcessUnit, Color>(
+                    menuItem.Tag = System.Tuple.Create<PFD.ProcessUnits.ProcessUnitControl, Color>(
                         pu, nc.Color);
 
                     // Show the menu item with a check next to it if it's the current color
@@ -335,12 +351,12 @@ namespace ChemProV.UI.DrawingCanvas.States
                     {
                         // Get the objects we need
                         MenuItem tempMI = sender as MenuItem;
-                        System.Tuple<PFD.ProcessUnits.IProcessUnit, Color> t = tempMI.Tag as
-                            System.Tuple<PFD.ProcessUnits.IProcessUnit, Color>;
+                        System.Tuple<PFD.ProcessUnits.ProcessUnitControl, Color> t = tempMI.Tag as
+                            System.Tuple<PFD.ProcessUnits.ProcessUnitControl, Color>;
 
                         // Create undo item before setting the new subgroup
                         m_workspace.AddUndo(new UndoRedoCollection("Undo subprocess change",
-                            new SetSubprocess(t.Item1)));
+                            new Logic.Undos.SetSubprocess(t.Item1.ProcessUnit)));
 
                         // Set the subgroup
                         t.Item1.Subprocess = t.Item2;
@@ -362,7 +378,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             mi.Click += delegate(object sender, RoutedEventArgs r)
             {
                 SubprocessChooserWindow win = new SubprocessChooserWindow(
-                    pu as PFD.ProcessUnits.LabeledProcessUnit, m_workspace);
+                    pu as PFD.ProcessUnits.ProcessUnitControl, m_workspace);
                 win.Show();
 
                 // Make sure to remove the popup menu from the canvas

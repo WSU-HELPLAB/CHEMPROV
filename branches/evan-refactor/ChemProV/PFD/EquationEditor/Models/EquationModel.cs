@@ -11,7 +11,7 @@ namespace ChemProV.PFD.EquationEditor.Models
     {
         #region public members
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
-        public IList<IPfdElement> RelatedElements { get; set; }
+        public IList<object> RelatedElements { get; set; }
         #endregion
 
         #region private members
@@ -129,7 +129,7 @@ namespace ChemProV.PFD.EquationEditor.Models
         {
             _staticId++;
             Id = _staticId;
-            RelatedElements = new List<IPfdElement>();
+            RelatedElements = new List<object>();
         }
 
         #region serialization methods

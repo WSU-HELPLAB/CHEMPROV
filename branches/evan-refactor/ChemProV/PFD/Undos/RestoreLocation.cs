@@ -58,6 +58,12 @@ namespace ChemProV.PFD.Undos
             m_pt = location;
         }
 
+        /// <summary>
+        /// Creates an instance that will restore the control's position to the specified location.
+        /// </summary>
+        public RestoreLocation(ICanvasElement control, MathCore.Vector location)
+            : this(control, new Point(location.X, location.Y)) { }
+
         public IUndoRedoAction Execute(Workspace sender)
         {
             // Start by creating a redo that moves the control back to where it

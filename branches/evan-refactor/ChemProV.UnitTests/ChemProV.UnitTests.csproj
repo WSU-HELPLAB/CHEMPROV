@@ -101,7 +101,6 @@
     </Compile>
     <Compile Include="Grammars\GrammarTest.cs" />
     <Compile Include="PFD\ChemicalStreamTests.cs" />
-    <Compile Include="PFD\CommentMerge.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tests.cs" />
   </ItemGroup>

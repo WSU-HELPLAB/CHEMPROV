@@ -2,6 +2,16 @@
 
 namespace ChemProV.PFD.EquationEditor.Models
 {
+    public enum EquationTypeClassification
+    {
+        Total,
+        Compound,
+        Atom,
+        VariableDefinition,
+        Energy,
+        Specification,
+    }
+    
     public class EquationType : IEquationModifier, IComparable
     {
         public EquationTypeClassification Classification { get; set; }

@@ -195,9 +195,9 @@ namespace ChemProV.Validation.Feedback
 
         private void ApplyFeedback(changeFeedback action, object target, bool highlight = false, string message = "", int errorNumber = 0)
         {
-            if (target is IEnumerable<IStream>)
+            if (target is IEnumerable<ChemProV.PFD.Streams.AbstractStream>)
             {
-                foreach (IStream stream in (target as IEnumerable<IStream>))
+                foreach (ChemProV.PFD.Streams.AbstractStream stream in (target as IEnumerable<ChemProV.PFD.Streams.AbstractStream>))
                 {
                     if (action == changeFeedback.HighlightFeedback)
                     {
@@ -360,12 +360,12 @@ namespace ChemProV.Validation.Feedback
                 {
                     string[] targetIds = (xmlFeedback.Attribute("target").Value as string).Split(", ".ToCharArray());
                     object targets;
-                    if (workSpaceReference.GetobjectFromId(targetIds[0]) is IStream)
+                    if (workSpaceReference.GetobjectFromId(targetIds[0]) is ChemProV.PFD.Streams.AbstractStream)
                     {
-                        List<IStream> list = new List<IStream>();
+                        List<ChemProV.PFD.Streams.AbstractStream> list = new List<ChemProV.PFD.Streams.AbstractStream>();
                         foreach (string targetID in targetIds)
                         {
-                            list.Add(workSpaceReference.GetobjectFromId(targetID) as IStream);
+                            list.Add(workSpaceReference.GetobjectFromId(targetID) as ChemProV.PFD.Streams.AbstractStream);
                         }
                         targets = list;
                     }
@@ -409,11 +409,11 @@ namespace ChemProV.Validation.Feedback
                 object target = feedback.Target;
 
                 string targetIds = "";
-                if (target is IEnumerable<IStream>)
+                if (target is IEnumerable<ChemProV.PFD.Streams.AbstractStream>)
                 {
-                    if ((target as IEnumerable<IStream>).Count<IStream>() > 0)
+                    if ((target as IEnumerable<ChemProV.PFD.Streams.AbstractStream>).Count<ChemProV.PFD.Streams.AbstractStream>() > 0)
                     {
-                        foreach (IStream stream in (target as IEnumerable<IStream>))
+                        foreach (ChemProV.PFD.Streams.AbstractStream stream in (target as IEnumerable<ChemProV.PFD.Streams.AbstractStream>))
                         {
                             targetIds += ", " + stream.Id;
                         }

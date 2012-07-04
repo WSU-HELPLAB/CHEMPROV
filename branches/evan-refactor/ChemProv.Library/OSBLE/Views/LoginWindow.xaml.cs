@@ -195,6 +195,21 @@ namespace ChemProV.Library.OSBLE.Views
                     catch (Exception) { }
                 }
             }
+
+            #region DEBUG
+
+            WebClient wc = new WebClient();
+            wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
+            //wc.DownloadStringAsync(new Uri("https://osble.org/Services/AuthenticationService.svc"));
+            wc.DownloadStringAsync(new Uri("http://www.evanolds.com/"));
+
+            #endregion
+        }
+
+        private void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        {
+            string result = e.Result;
+            bool breakHere = true;
         }
 
         private void PasswordBox_KeyUp(object sender, KeyEventArgs e)

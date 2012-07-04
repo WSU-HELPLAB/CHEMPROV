@@ -30,17 +30,6 @@ using ImageTools.IO.Png;
 
 namespace ChemProV
 {
-    /// <summary>
-    /// Each of these builds of the previous therefore order matters.
-    /// The first (0) is the simplest the last is the most complex
-    /// </summary>
-    public enum OptionDifficultySetting
-    {
-        MaterialBalance = 0,
-        MaterialBalanceWithReactors = 1,
-        MaterialAndEnergyBalance = 2
-    }
-
     public partial class MainPage : UserControl
     {
         private string versionNumber = "";
@@ -50,10 +39,6 @@ namespace ChemProV
         private const string configFile = "cpv.config";
         private TimeSpan autoSaveTimeSpan = new TimeSpan(0, 1, 0);
 
-        /// <summary>
-        /// Use the public version of this unless you want to change it without having everyone know
-        /// </summary>
-        private OptionDifficultySetting currentDifficultySetting;
         private DispatcherTimer saveTimer = new DispatcherTimer();
 
         /// <summary>
@@ -72,54 +57,29 @@ namespace ChemProV
         /// </summary>
         private Core.Workspace m_workspace = new Core.Workspace();
 
-        /// <summary>
-        /// This gets or sets the current difficulty setting
-        /// </summary>
-        public OptionDifficultySetting CurrentDifficultySetting
-        {
-            get { return currentDifficultySetting; }
-            set
-            {
-                if (OptionDifficultySettingChanged(value))
-                {
-                    currentDifficultySetting = value;
-
-                    if (currentDifficultySetting == OptionDifficultySetting.MaterialBalance)
-                    {
-                        Compounds_DF_TabControl.SelectedItem = DFAnalysisTab;
-                        CompoundTableTab.Visibility = Visibility.Collapsed;
-                    }
-                    else
-                    {
-                        CompoundTableTab.Visibility = Visibility.Visible;
-                    }
-                }
-            }
-        }
-
         private bool OptionDifficultySettingChanged(OptionDifficultySetting value)
         {
-            try
+            //save the change in the config file
+            using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                //tell workspace that the difficultyChanged
-                WorkSpace.CurrentDifficultySetting = value;
-
-                //save the change in the config file
-                using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(configFile, FileMode.Create, isf))
                 {
-                    using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(configFile, FileMode.Create, isf))
+                    using (StreamWriter sr = new StreamWriter(isfs))
                     {
-                        using (StreamWriter sr = new StreamWriter(isfs))
-                        {
-                            sr.WriteLine(value.ToString());
-                        }
+                        sr.WriteLine(value.ToString());
                     }
                 }
             }
-            catch
+
+            // Show or hide UI elements appropriately
+            if (m_workspace.Difficulty == OptionDifficultySetting.MaterialBalance)
             {
-                MessageBox.Show("Use of advance process units or streams detected. Please remove them before changing the setting.");
-                return false;
+                Compounds_DF_TabControl.SelectedItem = DFAnalysisTab;
+                CompoundTableTab.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                CompoundTableTab.Visibility = Visibility.Visible;
             }
 
             // Tell the control palette that the difficulty changed
@@ -141,6 +101,16 @@ namespace ChemProV
                 new PropertyChangedEventHandler(DegreesOfFreedomAnalysis_PropertyChanged);
             m_workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
             WorkSpace.SetWorkspace(m_workspace);
+            CompoundTable.SetWorkspace(m_workspace);
+
+            // Monitor when the difficulty changes so we can update the config file
+            m_workspace.PropertyChanged += delegate(object o, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName.Equals("Difficulty"))
+                {
+                    OptionDifficultySettingChanged(m_workspace.Difficulty);
+                }
+            };
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
@@ -161,7 +131,6 @@ namespace ChemProV
             }
 
             //listen for selection changes in our children
-            WorkSpace.CompoundsUpdated += new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked += new EventHandler(WorkSpace_ValidationChecked);
 
             CompoundTable.ConstantClicked += new EventHandler(CompoundTable_ConstantClicked);
@@ -191,20 +160,71 @@ namespace ChemProV
             {
                 Core.App.ControlPalette.SwitchToSelect();
             };
+
+            // Show the debug tab if this is a debug build
+#if DEBUG
+            DebugTab.Visibility = System.Windows.Visibility.Visible;
+
+            m_workspace.StreamsCollectionChanged += new EventHandler(WorkspaceStreamsCollectionChanged);
+#endif
         }
+
+#if DEBUG
+        private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
+        {
+            // Remove previous event listeners
+            foreach (TreeViewItem child in StreamsDebugNode.Items)
+            {
+                Core.AbstractStream stream = child.Tag as Core.AbstractStream;
+                stream.PropertyChanged -= DebugStream_PropertyChanged;
+            }
+            
+            // Clear and rebuild
+            StreamsDebugNode.Items.Clear();
+            foreach (Core.AbstractStream stream in m_workspace.Streams)
+            {
+                StreamsDebugNode.Items.Add(new TreeViewItem()
+                {
+                    Header = stream.UIDString + "\n(src @ " + stream.SourceLocation.ToString() +
+                        ")\n(dst @ " + stream.DestinationLocation.ToString() + ")",
+                    
+                    Tag = stream
+                });
+
+                stream.PropertyChanged += new PropertyChangedEventHandler(DebugStream_PropertyChanged);
+            }
+        }
+
+        private void DebugStream_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("SourceLocation") || e.PropertyName.Equals("DestinationLocation"))
+            {
+                Core.AbstractStream stream = sender as Core.AbstractStream;
+                
+                // Find the tree view item for this stream
+                TreeViewItem tvi = null;
+                foreach (TreeViewItem tviTemp in StreamsDebugNode.Items)
+                {
+                    if (object.ReferenceEquals(tviTemp.Tag, stream))
+                    {
+                        tvi = tviTemp;
+                        break;
+                    }
+                }
+
+                if (null != tvi)
+                {
+                    tvi.Header = stream.UIDString + "\n(src @ " + stream.SourceLocation.ToString() +
+                        ")\n(dst @ " + stream.DestinationLocation.ToString() + ")";
+                }
+            }
+        }
+#endif
 
         public void LoadChemProVFile(Stream stream)
         {
             XDocument doc = XDocument.Load(stream);
-
-            string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
-            CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
-
             m_workspace.Load(doc);
-
-            WorkSpace.LoadXmlElements(doc);
-
-            CompoundTable.WorkspaceChanged(WorkSpace, new Core.WorkspaceChangeDetails());
 
             //we dont want to load the config file so stop the event from firing
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);
@@ -308,7 +328,7 @@ namespace ChemProV
                         }
                     }
 
-                    CurrentDifficultySetting = loadedSetting;
+                    m_workspace.TrySetDifficulty(loadedSetting);
 
                     if (showOptionsWindow)
                     {
@@ -317,11 +337,6 @@ namespace ChemProV
                     }
                 }
             }
-        }
-
-        private void WorkSpace_UpdateCompounds(object sender, EventArgs e)
-        {
-            CompoundTable.WorkspaceChanged(WorkSpace, new Core.WorkspaceChangeDetails());
         }
 
         private void CompoundTable_ConstantClicked(object sender, EventArgs e)
@@ -335,53 +350,59 @@ namespace ChemProV
         public void SaveChemProVFile(Stream stream)
         {
             saveTimer.Stop();
-            
-            // This stream may represent an existing file which could potentially be larger than the 
-            // data that we're about to write. Thus, we start by seeking to the beginning and setting the 
-            // length to 0.
-            stream.Position = 0;
-            stream.SetLength(0);
-            
-            XmlSerializer canvasSerializer = new XmlSerializer(typeof(DrawingCanvas));
-            XmlSerializer equationSerializer = new XmlSerializer(typeof(EquationEditor));
-            XmlSerializer feedbackWindowSerializer = new XmlSerializer(typeof(FeedbackWindow));
-            // XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(EquationEditor));
-            //make sure that out XML turns out pretty
-            XmlWriterSettings settings = new XmlWriterSettings();
-            saveTimer.Stop();
-            settings.Indent = true;
-            settings.IndentChars = "   ";
 
-            //create our XML writer
-            using (XmlWriter writer = XmlWriter.Create(stream, settings))
-            {
-                //root node
-                writer.WriteStartElement("ProcessFlowDiagram");
-
-                //version number
-                writer.WriteAttributeString("ChemProV.version", versionNumber);
-
-                //setting
-                writer.WriteAttributeString("DifficultySetting", currentDifficultySetting.ToString());
-
-                //write drawing_canvas properties
-                canvasSerializer.Serialize(writer, WorkSpace.DrawingCanvas);
-
-                //write equations
-                equationSerializer.Serialize(writer, WorkSpace.EquationEditor);
-
-                //write feedback
-                feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
-
-                // Write degrees of freedom analysis
-                m_workspace.WriteDegreesOfFreedomAnalysis(writer);
-
-                //end root node
-                writer.WriteEndElement();
-            }
+            m_workspace.Save(stream, versionNumber);
 
             // Restart the auto-save timer
             saveTimer.Start();
+            
+            // Old junk below, should delete after some testing
+            
+            //// This stream may represent an existing file which could potentially be larger than the 
+            //// data that we're about to write. Thus, we start by seeking to the beginning and setting the 
+            //// length to 0.
+            //stream.Position = 0;
+            //stream.SetLength(0);
+            
+            //XmlSerializer canvasSerializer = new XmlSerializer(typeof(DrawingCanvas));
+            //XmlSerializer equationSerializer = new XmlSerializer(typeof(EquationEditor));
+            //XmlSerializer feedbackWindowSerializer = new XmlSerializer(typeof(FeedbackWindow));
+            //// XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(EquationEditor));
+            ////make sure that out XML turns out pretty
+            //XmlWriterSettings settings = new XmlWriterSettings();
+            //saveTimer.Stop();
+            //settings.Indent = true;
+            //settings.IndentChars = "   ";
+
+            ////create our XML writer
+            //using (XmlWriter writer = XmlWriter.Create(stream, settings))
+            //{
+            //    //root node
+            //    writer.WriteStartElement("ProcessFlowDiagram");
+
+            //    //version number
+            //    writer.WriteAttributeString("ChemProV.version", versionNumber);
+
+            //    //setting
+            //    writer.WriteAttributeString("DifficultySetting", currentDifficultySetting.ToString());
+
+            //    //write drawing_canvas properties
+            //    canvasSerializer.Serialize(writer, WorkSpace.DrawingCanvas);
+
+            //    //write equations
+            //    equationSerializer.Serialize(writer, WorkSpace.EquationEditor);
+
+            //    //write feedback
+            //    feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
+
+            //    // Write degrees of freedom analysis
+            //    m_workspace.WriteDegreesOfFreedomAnalysis(writer);
+
+            //    //end root node
+            //    writer.WriteEndElement();
+            //}
+
+            
         }
 
         private void SavePNG(Stream output)
@@ -549,6 +570,8 @@ namespace ChemProV
 
             if (openFile)
             {
+                WorkSpace.DrawingCanvas.ClearDrawingCanvas();
+                
                 //delete the tempory file as they do not want it
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
@@ -561,6 +584,9 @@ namespace ChemProV
                 // Put the file name info in the save button's tooltip
                 ToolTipService.SetToolTip(SaveAsButton, "Save as... (file was opened as \"" +
                     openDialog.File.Name + "\")");
+
+                // Make sure we don't have a palette tool active
+                PrimaryPalette.SwitchToSelect();
 
                 FileStream fs;
                 // Open the file for reading
@@ -647,21 +673,13 @@ namespace ChemProV
         private void RedoClick_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Redo();
-            FullWorkspaceChange();
             WorkSpace.CheckRulesForPFD(null, null);
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Undo();
-            FullWorkspaceChange();
             WorkSpace.CheckRulesForPFD(null, null);
-        }
-
-        private void FullWorkspaceChange()
-        {
-            Core.WorkspaceChangeDetails details = Core.WorkspaceChangeDetails.AllTrue;
-            CompoundTable.WorkspaceChanged(WorkSpace, details);
         }
 
         private void InstallButton_Click(object sender, RoutedEventArgs e)
@@ -682,21 +700,10 @@ namespace ChemProV
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
             OptionWindow optionWindow = new OptionWindow(m_workspace);
-            optionWindow.Simplest.IsChecked = OptionDifficultySetting.MaterialBalance == currentDifficultySetting;
-            optionWindow.Medium.IsChecked = OptionDifficultySetting.MaterialBalanceWithReactors == currentDifficultySetting;
-            optionWindow.MostComplex.IsChecked = OptionDifficultySetting.MaterialAndEnergyBalance == currentDifficultySetting;
-            optionWindow.Closed += new EventHandler(optionWindow_Closed);
+            optionWindow.Simplest.IsChecked = OptionDifficultySetting.MaterialBalance == m_workspace.Difficulty;
+            optionWindow.Medium.IsChecked = OptionDifficultySetting.MaterialBalanceWithReactors == m_workspace.Difficulty;
+            optionWindow.MostComplex.IsChecked = OptionDifficultySetting.MaterialAndEnergyBalance == m_workspace.Difficulty;
             optionWindow.Show();
-        }
-
-        private void optionWindow_Closed(object sender, EventArgs e)
-        {
-            OptionWindow optionWindow = sender as OptionWindow;
-            optionWindow.Closed -= new EventHandler(optionWindow_Closed);
-            if (optionWindow.DialogResult.Value == true)
-            {
-                CurrentDifficultySetting = optionWindow.OptionSelection;
-            }
         }
 
         /// <summary>
@@ -718,7 +725,6 @@ namespace ChemProV
             }
 
             //unlisten for selection changes in our children
-            WorkSpace.CompoundsUpdated -= new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked -= new EventHandler(WorkSpace_ValidationChecked);
 
             CompoundTable.ConstantClicked -= new EventHandler(CompoundTable_ConstantClicked);

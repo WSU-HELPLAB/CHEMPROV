@@ -7,43 +7,32 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
-using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using ChemProV.Core;
-using ChemProV.PFD.ProcessUnits;
 
 namespace ChemProV.PFD.Undos
 {
     /// <summary>
-    /// Represents an undo/redo action that will set the label on a labeled process unit
+    /// Represents an undo/redo action that will set the label on an AbstractProcessUnit
     /// </summary>
     public class SetProcessUnitLabel : IUndoRedoAction
     {
         private string m_label;
         
-        private LabeledProcessUnit m_lpu;
+        private AbstractProcessUnit m_lpu;
 
-        public SetProcessUnitLabel(LabeledProcessUnit lpu, string labelToSetOnExecution)
+        public SetProcessUnitLabel(AbstractProcessUnit unit, string labelToSetOnExecution)
         {
-            m_lpu = lpu;
+            m_lpu = unit;
             m_label = labelToSetOnExecution;
         }
         
         public IUndoRedoAction Execute(Workspace sender)
         {
             // Create the opposite action to set the label back to what it is right now
-            IUndoRedoAction opposite = new SetProcessUnitLabel(m_lpu, m_lpu.ProcessUnitLabel);
+            IUndoRedoAction opposite = new SetProcessUnitLabel(m_lpu, m_lpu.Label);
 
             // Set the label
-            m_lpu.ProcessUnitLabel = m_label;
+            m_lpu.Label = m_label;
 
             return opposite;
         }

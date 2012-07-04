@@ -24,20 +24,22 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
     /// </summary>
     public class GenericProcessUnitRule : IRule
     {
+        // Code is stale because of extensive refactoring
+        
         /// <summary>
-        /// This is a reference to the IProcessUnit being checked
+        /// This is a reference to the GenericProcessUnit being checked
         /// </summary>
-        protected IProcessUnit target;
+        protected Core.AbstractProcessUnit target;
 
         /// <summary>
-        /// List of compounds coming into the target IProcessUnit.  Declared as
+        /// List of compounds coming into the target GenericProcessUnit.  Declared as
         /// a instance var in order to reduce the number of times that the
         /// dictionary will have to be built.
         /// </summary>
         protected Dictionary<string, StreamComponent> incomingCompounds;
 
         /// <summary>
-        /// List of compounds coming into the target IProcessUnit.  Declared as
+        /// List of compounds coming into the target GenericProcessUnit.  Declared as
         /// a instance var in order to reduce the number of times that the
         /// dictionary will have to be built.
         /// </summary>
@@ -128,12 +130,13 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
                 //this should hit both incoming and outgoing streams, so we need to create a new
                 //list that merges the two streams
-                List<IStream> mergedList = new List<IStream>(target.IncomingStreams.Count + target.OutgoingStreams.Count);
-                foreach (IStream stream in target.IncomingStreams)
+                List<Core.AbstractStream> mergedList = new List<Core.AbstractStream>(
+                    target.IncomingStreamCount + target.OutgoingStreamCount);
+                foreach (Core.AbstractStream stream in target.IncomingStreams)
                 {
                     mergedList.Add(stream);
                 }
-                foreach (IStream stream in target.OutgoingStreams)
+                foreach (Core.AbstractStream stream in target.OutgoingStreams)
                 {
                     mergedList.Add(stream);
                 }
@@ -212,16 +215,21 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// <returns></returns>
         protected ValidationResult CheckOverallUnits()
         {
+            // Extensive refactoring has broken this code
+            throw new NotImplementedException();
+
+            /*
+            
             //loop through all incoming & outgoing streams.  If one of the overall units doesn't match,
             //then we have a problem
 
             //prime the loop
             string comparisonUnit = "";
             bool mismatchFound = false;
-            if (target.IncomingStreams.Count > 0)
+            if (target.IncomingStreamCount > 0)
             {
                 int i = 0;
-                while (i < target.OutgoingStreams.Count)
+                while (i < target.OutgoingStreamCount)
                 {
                     ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(target.IncomingStreams[0].Table);
                     if (tableAdapter.GetTableType() == TableType.Chemcial)
@@ -232,10 +240,10 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
                     i++;
                 }
             }
-            else if (target.OutgoingStreams.Count > 0)
+            else if (target.OutgoingStreamCount > 0)
             {
                 int i = 0;
-                while (i < target.OutgoingStreams.Count)
+                while (i < target.OutgoingStreamCount)
                 {
                     ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(target.OutgoingStreams[0].Table);
                     if (tableAdapter.GetTableType() == TableType.Chemcial)
@@ -255,10 +263,10 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
             //if we found a mismatch, we need to target all streams, so create a master
             //stream list
-            List<IStream> masterList = new List<IStream>();
+            List<Core.AbstractStream> masterList = new List<Core.AbstractStream>();
 
             //loop through incoming & outgoing streams
-            foreach (IStream stream in target.IncomingStreams)
+            foreach (Core.AbstractStream stream in target.IncomingStreams)
             {
                 ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
 
@@ -274,7 +282,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
                     }
                 }
             }
-            foreach (IStream stream in target.OutgoingStreams)
+            foreach (Core.AbstractStream stream in target.OutgoingStreams)
             {
                 ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
 
@@ -299,6 +307,8 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             }
 
             return ValidationResult.Empty;
+            
+            */
         }
 
         /// <summary>
@@ -328,14 +338,16 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// </summary>
         /// <param name="streams"></param>
         /// <returns></returns>
-        protected virtual Dictionary<string, StreamComponent> TallyCompounds(IList<IStream> streams)
+        protected virtual Dictionary<string, StreamComponent> TallyCompounds(IEnumerable<Core.AbstractStream> streams)
         {
             Dictionary<string, StreamComponent> compounds = new Dictionary<string, StreamComponent>(5);
 
             //tally up flow rates for each compound
-            foreach (IStream stream in streams)
+            foreach (Core.AbstractStream stream in streams)
             {
-                ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
+                // TODO: Get the commented-out part working again
+                throw new NotImplementedException();
+                ITableAdapter tableAdapter = null;// TableAdapterFactory.CreateTableAdapter(stream.Table);
 
                 //start at index value = 1 as we're assuming that 1 is the header row, which we don't
                 //check in this particular rule (see CheckOverallFlowRate())
@@ -364,14 +376,16 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// </summary>
         /// <param name="streams">This is a list of streams whos Overall will be add together</param>
         /// <returns>Returns a StreamComponent which contains the results</returns>
-        private StreamComponent TallyOverallFlowRate(IList<IStream> streams)
+        private StreamComponent TallyOverallFlowRate(IEnumerable<Core.AbstractStream> streams)
         {
             StreamComponent component = new StreamComponent();
 
             //tally up flow rates coming into this compound
-            foreach (IStream stream in streams)
+            foreach (Core.AbstractStream stream in streams)
             {
-                ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
+                // TODO: Get the commented-out part working again
+                throw new NotImplementedException();
+                ITableAdapter tableAdapter = null;// TableAdapterFactory.CreateTableAdapter(stream.Table);
                 if (tableAdapter.GetTableType() == TableType.Chemcial)
                 {
                     component.AddValue(tableAdapter.GetQuantityAtRow(0));
@@ -416,7 +430,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
         /// <summary>
         /// Gets or set's the rule's target.  Note that in this implementation, the target is assumed
-        /// to be an IProcessUnit
+        /// to be an GenericProcessUnit
         /// </summary>
         public object Target
         {
@@ -426,7 +440,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             }
             set
             {
-                target = value as IProcessUnit;
+                target = value as Core.AbstractProcessUnit;
 
                 if (target != null)
                 {

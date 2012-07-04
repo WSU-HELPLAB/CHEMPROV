@@ -8,11 +8,13 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
+using ChemProV.Logic.Undos;
 
 namespace ChemProV.UI.DrawingCanvas.States
 {
@@ -30,7 +32,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         private MathCore.Vector m_originalLocation;
 
-        private GenericProcessUnit m_puThatGotBorderChange = null;
+        private ProcessUnitControl m_puThatGotBorderChange = null;
 
         private Workspace m_workspace;
         
@@ -59,7 +61,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             MovingState ms = new MovingState(canvas, workspace);
             ICanvasElement ce = elementToMove as ICanvasElement;
-            ms.m_originalLocation = new MathCore.Vector(ce.Location);
+            ms.m_originalLocation = new MathCore.Vector(ce.Location.X, ce.Location.Y);
             return ms;
         }
 
@@ -80,8 +82,9 @@ namespace ChemProV.UI.DrawingCanvas.States
             
             Point pt = e.GetPosition(m_canvas);
 
-            MathCore.Vector diff = (new MathCore.Vector(pt)) - m_mouseDownPt;
-            pt = (m_originalLocation + diff).ToPoint();
+            MathCore.Vector diff = (new MathCore.Vector(pt.X, pt.Y)) - m_mouseDownPt;
+            diff = (m_originalLocation + diff);
+            pt = new Point(diff.X, diff.Y);
 
             // If we changed a border color, change it back and null the reference
             if (null != m_puThatGotBorderChange)
@@ -91,21 +94,23 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
 
             // Various objects have slightly different moving rules so we need to check the type
-            if (m_canvas.SelectedElement is PFD.ProcessUnits.GenericProcessUnit)
+            ProcessUnitControl lpu = m_canvas.SelectedElement as ProcessUnitControl;
+            if (null != lpu)
             {
                 // First off, move the process unit
-                (m_canvas.SelectedElement as GenericProcessUnit).Location = pt;
+                lpu.ProcessUnit.Location = new MathCore.Vector(pt.X, pt.Y);
                 
                 // See if we're dragging it over anything else
                 object hoveringOver = m_canvas.GetChildAt(pt, m_canvas.SelectedElement);
 
                 // See if it's a stream connection endpoint
-                DraggableStreamEndpoint dse = hoveringOver as DraggableStreamEndpoint;
-                if (null != dse)
+                DraggableStreamEndpoint endpoint = hoveringOver as DraggableStreamEndpoint;
+                if (null != endpoint)
                 {
-                    m_puThatGotBorderChange = m_canvas.SelectedElement as GenericProcessUnit;
+                    m_puThatGotBorderChange = lpu;
+
                     // Set the process unit's border color
-                    m_puThatGotBorderChange.SetBorderColor(dse.CanConnectTo(m_puThatGotBorderChange) ?
+                    m_puThatGotBorderChange.SetBorderColor(endpoint.CanConnectTo(lpu) ?
                         ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
                 }
             }
@@ -115,7 +120,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 (m_canvas.SelectedElement as Core.ICanvasElement).Location = pt;
             }
 
-            // NOTE: Stream-oriented moving stuff is handled elsewhere. See the DraggableStreamEndpoint class
+            // NOTE: Stream-oriented moving stuff is handled elsewhere. See the MovingStreamEndpoint class
         }
 
         public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -130,9 +135,9 @@ namespace ChemProV.UI.DrawingCanvas.States
             m_mouseDown = false;
 
             Point location = e.GetPosition(m_canvas);
-            if (m_canvas.SelectedElement is IProcessUnit)
+            if (m_canvas.SelectedElement is ProcessUnitControl)
             {
-                DropProcessUnit(m_canvas.SelectedElement as IProcessUnit, location);
+                DropProcessUnit(m_canvas.SelectedElement as ProcessUnitControl, location);
             }
             // Note that stream endpoint stuff is handled in a different state object
             else if (m_canvas.SelectedElement is ICanvasElement)
@@ -140,8 +145,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 // All we have to do here is create an undo and then fall through to 
                 // below and go back to the null state
                 m_workspace.AddUndo(new UndoRedoCollection("Undo move",
-                    new PFD.Undos.RestoreLocation((ICanvasElement)m_canvas.SelectedElement, 
-                        m_originalLocation.ToPoint())));
+                    new PFD.Undos.RestoreLocation((ICanvasElement)m_canvas.SelectedElement, m_originalLocation)));
             }
 
             // Letting up the left mouse button signifies the end of the moving state. Therefore 
@@ -152,7 +156,8 @@ namespace ChemProV.UI.DrawingCanvas.States
         public void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             m_mouseDown = true;
-            m_mouseDownPt = new MathCore.Vector(e.GetPosition(m_canvas));
+            Point p = e.GetPosition(m_canvas);
+            m_mouseDownPt = new MathCore.Vector(p.X, p.Y);
         }
 
         #region Unused Mouse Events
@@ -182,7 +187,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
         #endregion IState Members
 
-        private void DropProcessUnit(IProcessUnit pu, Point location)
+        private void DropProcessUnit(ProcessUnitControl pu, Point location)
         {
             // We want to see if the process unit is being dragged and dropped onto a stream 
             // source or destination
@@ -192,11 +197,11 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // If there is no child at that point or there is a child but it's not a stream endpoint 
             // then this ends up just being a move of the process unit
-            if (null == dropTarget || !(dropTarget is DraggableStreamEndpoint))
+            if (null == dropTarget || !(m_canvas.IsStreamEndpoint(dropTarget as UIElement)))
             {
                 // Add an undo that will move the process unit back to where it was
                 m_workspace.AddUndo(new UndoRedoCollection("Undo moving process unit",
-                    new PFD.Undos.RestoreLocation(pu, m_originalLocation.ToPoint())));
+                    new PFD.Undos.RestoreLocation(pu, m_originalLocation)));
 
                 // The control is already in the right position from the mouse-move event, so we're done
                 return;
@@ -207,22 +212,24 @@ namespace ChemProV.UI.DrawingCanvas.States
             DraggableStreamEndpoint streamEndpoint = dropTarget as DraggableStreamEndpoint;
             if (streamEndpoint.CanConnectTo(pu))
             {
+                Core.AbstractStream stream = streamEndpoint.ParentStream.Stream;
                 switch (streamEndpoint.Type)
                 {
-                    case DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected:
+                    case DraggableStreamEndpoint.EndpointType.StreamDestination:
                         m_workspace.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
-                            new PFD.Undos.DetachIncomingStream(pu, streamEndpoint.ParentStream),
-                            new PFD.Undos.SetStreamDestination(streamEndpoint.ParentStream, m_originalLocation.ToPoint(), pu)));
-                        pu.AttachIncomingStream(streamEndpoint.ParentStream);
-                        streamEndpoint.ParentStream.Destination = pu;
+                            new Logic.Undos.DetachIncomingStream(pu.ProcessUnit, streamEndpoint.ParentStream.Stream),
+                            new Logic.Undos.SetStreamDestination(stream, null, pu.ProcessUnit, m_originalLocation)));
+                        pu.ProcessUnit.AttachIncomingStream(streamEndpoint.ParentStream.Stream);
+                        stream.Destination = pu.ProcessUnit;
                         break;
 
-                    case DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected:
+                    case DraggableStreamEndpoint.EndpointType.StreamSource:
                         m_workspace.AddUndo(new UndoRedoCollection("Undo moving and connecting process unit",
-                            new DetachOutgoingStream(pu, streamEndpoint.ParentStream),
-                            new SetStreamSource(streamEndpoint.ParentStream, null, pu, streamEndpoint.Location)));
-                        pu.AttachOutgoingStream(streamEndpoint.ParentStream);
-                        streamEndpoint.ParentStream.Source = pu;
+                            new DetachOutgoingStream(pu.ProcessUnit, streamEndpoint.ParentStream.Stream),
+                            new SetStreamSource(stream, null, pu.ProcessUnit,
+                                new MathCore.Vector(streamEndpoint.Location.X, streamEndpoint.Location.Y))));
+                        pu.ProcessUnit.AttachOutgoingStream(stream);
+                        stream.Source = pu.ProcessUnit;
                         break;
 
                     default:
@@ -235,7 +242,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 // In this case we simply snap it back to where it was when the move started. 
                 // Ideally we should have some sort of animation that makes it slide back to its original 
                 // location, but that can come much later if we want it.
-                pu.Location = m_originalLocation.ToPoint();
+                pu.Location = new Point(m_originalLocation.X, m_originalLocation.Y);
                 
                 // Note that in either case we've essentially canceled the action and no net-change has 
                 // been made. Thus we don't need to create an undo.

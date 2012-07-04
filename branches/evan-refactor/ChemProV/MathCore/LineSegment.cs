@@ -101,7 +101,7 @@ namespace ChemProV.MathCore
         /// </summary>
         public double GetDistance(Point point)
         {
-            Vector pt = new Vector(point);
+            Vector pt = new Vector(point.X, point.Y);
             Vector v = pt - m_a;
             double adj = v.ScalarProjectOnto(Direction);
             if (adj < 0.0 || adj > Length)

@@ -18,7 +18,7 @@ namespace ChemProV.UI
 {
     public partial class SubprocessChooserWindow : ChildWindow
     {
-        private LabeledProcessUnit m_lpu;
+        private ProcessUnitControl m_lpu;
         
         private Core.NamedColor m_nc = new Core.NamedColor(null, Colors.Transparent);
 
@@ -27,7 +27,7 @@ namespace ChemProV.UI
         public SubprocessChooserWindow()
             : this(null, null) { }
         
-        public SubprocessChooserWindow(LabeledProcessUnit lpu, Workspace workspace)
+        public SubprocessChooserWindow(ProcessUnitControl lpu, Workspace workspace)
         {
             InitializeComponent();
 
@@ -88,10 +88,10 @@ namespace ChemProV.UI
         {
             // Add the undo item before setting the new subgroup
             m_workspace.AddUndo(
-                new UndoRedoCollection("Undo subprocess change", new SetSubprocess(m_lpu)));
+                new UndoRedoCollection("Undo subprocess change", new Logic.Undos.SetSubprocess(m_lpu.ProcessUnit)));
 
             // Set the new subprocess
-            m_lpu.Subprocess = m_nc.Color;
+            m_lpu.ProcessUnit.Subprocess = m_nc.Color.ToString();
             
             this.DialogResult = true;
         }

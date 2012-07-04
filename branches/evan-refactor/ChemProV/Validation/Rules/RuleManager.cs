@@ -57,28 +57,25 @@ namespace ChemProV.Validation.Rules
         /// a a new EveryoneDict can be made with the new data.
         /// </summary>
         /// <param name="iProcessUnits">This is a list of all the iProcessUnits to be checked typicall all ProcessUnits</param>
-        private void CheckProcessUnits(IEnumerable<IProcessUnit> iProcessUnits)
+        private void CheckProcessUnits(IEnumerable<ProcessUnitControl> iProcessUnits)
         {
             IRule rule;
 
-            foreach (IProcessUnit ipu in iProcessUnits)
+            foreach (ProcessUnitControl ipu in iProcessUnits)
             {
-                if (!(ipu is TemporaryProcessUnit))
+                rule = ProcessUnitRuleFactory.GetProcessUnitRule(ipu);
+                rule.Target = ipu;
+                rule.CheckRule();
+                foreach (ValidationResult vr in rule.ValidationResults)
                 {
-                    rule = ProcessUnitRuleFactory.GetProcessUnitRule(ipu);
-                    rule.Target = ipu;
-                    rule.CheckRule();
-                    foreach (ValidationResult vr in rule.ValidationResults)
+                    if (!EveryoneDict.ContainsKey(vr.Target))
                     {
-                        if (!EveryoneDict.ContainsKey(vr.Target))
-                        {
-                            EveryoneDict.Add(vr.Target, new List<string>());
-                        }
-                        if (!EveryoneDict[vr.Target].Contains(vr.Message))
-                        {
-                            EveryoneDict[vr.Target].Add("[" + ruleNumber + "]\n-" + vr.Message + "\n");
-                            ruleNumber++;
-                        }
+                        EveryoneDict.Add(vr.Target, new List<string>());
+                    }
+                    if (!EveryoneDict[vr.Target].Contains(vr.Message))
+                    {
+                        EveryoneDict[vr.Target].Add("[" + ruleNumber + "]\n-" + vr.Message + "\n");
+                        ruleNumber++;
                     }
                 }
             }
@@ -101,7 +98,10 @@ namespace ChemProV.Validation.Rules
                 rule.Target = table;
                 rule.CheckRule();
 
-                ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(table);
+                // TODO: fix (eventually)
+                throw new NotImplementedException("Rule manager is broken");
+                ITableAdapter tableAdapter = null;
+                //ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(table);
                 int i = 0;
                 int items = tableAdapter.GetRowCount();
                 TableType tableType;
@@ -162,73 +162,6 @@ namespace ChemProV.Validation.Rules
             }
         }
 
-        private ObservableCollection<EquationData> replaceUserDefinedVariables(ObservableCollection<EquationData> equations)
-        {
-            //This needs to be written to pull the userDefinedEquations out then to insert them into the other equations when used
-            /*
-            foreach (EquationData eqData in equations)
-            {
-                int i = 0;
-                while (i < tuple.Item2.Count)
-                {
-                    IEquationToken token = tuple.Item2[i];
-                    if (token is VariableToken)
-                    {
-                        foreach (Tuple<string, Equation> userDefinedVariable in userDefinedVariables)
-                        {
-                            if (token.Value == userDefinedVariable.Item1)
-                            {
-                                int index = tuple.Item2.IndexOf(token);
-
-                                tuple.Item2.RemoveAt(index);
-
-                                //decrement i because we just made the list smaller
-                                i--;
-
-                                foreach (IEquationToken item in userDefinedVariable.Item2.EquationTokens)
-                                {
-                                    //we need to do a deep copy because we will manipulate the contents of the tokens
-                                    //and they shouldnt change what the equation has.  i.e. subsitution
-                                    if (item is OperatorToken)
-                                    {
-                                        tuple.Item2.Insert(index, new OperatorToken(item.Value));
-                                    }
-                                    else if (item is VariableToken)
-                                    {
-                                        tuple.Item2.Insert(index, new VariableToken(item.Value));
-                                    }
-                                    else
-                                    {
-                                        throw new Exception("Unknown Token");
-                                    }
-
-                                    index++;
-
-                                    //increment i because we just made the list bigger
-                                    i++;
-                                }
-                            }
-                        }
-                    }
-                    i++;
-                }
-            }
-
-            return null;
-            */
-
-            //this is temp until func is redone
-            return null;
-        }
-
-        /// <summary>
-        /// AC TODO: Reimplement equation checking rules.
-        /// </summary>
-        private void CheckEquationSemantics(ObservableCollection<EquationData> equations, IList<Tuple<string, EquationControl>> userDefinedVariables, List<IProcessUnit> processUnits)
-        {
-            
-        }
-
         private void Equations_Solvable(object sender, EventArgs e)
         {
             Solvable(this, e);
@@ -239,7 +172,7 @@ namespace ChemProV.Validation.Rules
         /// </summary>
         /// <param name="pfdElements">list of all pfdElements that need to be checked</param>
         /// <param name="equations">list of all equations that need to be checked</param>
-        public void Validate(IEnumerable<IPfdElement> pfdElements, ObservableCollection<EquationData> equations, IList<Tuple<string, EquationControl>> userDefinedVariables)
+        public void Validate(IEnumerable<IPfdElement> pfdElements, IList<Tuple<string, EquationControl>> userDefinedVariables)
         {
             //clear out the dictionary before we begin adding new stuff
             EveryoneDict.Clear();
@@ -249,8 +182,8 @@ namespace ChemProV.Validation.Rules
             {
                 //pull out process units from the list of pfd elements
                 var processUnits = from c in pfdElements
-                                   where c is IProcessUnit
-                                   select c as IProcessUnit;
+                                   where c is ProcessUnitControl
+                                   select c as ProcessUnitControl;
 
                 //and properties tables
                 var tables = from c in pfdElements

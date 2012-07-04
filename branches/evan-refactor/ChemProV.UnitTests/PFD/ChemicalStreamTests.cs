@@ -20,13 +20,16 @@ namespace ChemProV.UnitTests.PFD
         [TestMethod]
         public void TestMoleUnitChange()
         {
-            //create test window, make sure that we started in Mass units
-            ChemicalStreamPropertiesWindow window = new ChemicalStreamPropertiesWindow();
-            Assert.AreEqual(window.TableName, "M1");
+            // TODO: rewrite this at some point
+            throw new NotImplementedException();
+            
+            ////create test window, make sure that we started in Mass units
+            //ChemicalStreamPropertiesWindow window = new ChemicalStreamPropertiesWindow();
+            //Assert.AreEqual(window.TableName, "M1");
 
-            //switch to moles, make sure that things got changed over
-            window.ItemSource[0].SelectedUnit = ChemicalUnits.Moles - 1;
-            Assert.AreEqual(window.TableName, "N1");
+            ////switch to moles, make sure that things got changed over
+            //window.ItemSource[0].SelectedUnit = ChemicalUnits.Moles - 1;
+            //Assert.AreEqual(window.TableName, "N1");
         }
     }
 }
