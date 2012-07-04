@@ -7,8 +7,10 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 
 // If I had it my way, I'd rename the sticky note Silverlight user control to StickyNoteControl and 
@@ -25,7 +27,7 @@ namespace ChemProV.PFD.StickyNote
     /// This class can load/save/store all relevant data for a sticky note without any Silverlight-
     /// specific dependencies.
     /// </summary>
-    public class StickyNote_UIIndependent
+    public class StickyNote_UIIndependent : INotifyPropertyChanged
     {
         private double m_locX = 0.0;
 
@@ -99,6 +101,20 @@ namespace ChemProV.PFD.StickyNote
             {
                 return m_sizeH;
             }
+            set
+            {
+                if (m_sizeH == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_sizeH = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Height"));
+                }
+            }
         }
 
         public double LocationX
@@ -107,6 +123,20 @@ namespace ChemProV.PFD.StickyNote
             {
                 return m_locX;
             }
+            set
+            {
+                if (m_locX == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_locX = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("LocationX"));
+                }
+            }
         }
 
         public double LocationY
@@ -114,6 +144,20 @@ namespace ChemProV.PFD.StickyNote
             get
             {
                 return m_locY;
+            }
+            set
+            {
+                if (m_locY == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_locY = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("LocationY"));
+                }
             }
         }
 
@@ -130,6 +174,20 @@ namespace ChemProV.PFD.StickyNote
             get
             {
                 return m_text;
+            }
+            set
+            {
+                if (m_text == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_text = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Text"));
+                }
             }
         }
 
@@ -170,7 +228,17 @@ namespace ChemProV.PFD.StickyNote
             }
             set
             {
+                if (m_userName == value)
+                {
+                    // No change
+                    return;
+                }
+                
                 m_userName = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("UserName"));
+                }
             }
         }
 
@@ -179,6 +247,20 @@ namespace ChemProV.PFD.StickyNote
             get
             {
                 return m_sizeW;
+            }
+            set
+            {
+                if (m_sizeW == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_sizeW = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Width"));
+                }
             }
         }
 
@@ -202,5 +284,31 @@ namespace ChemProV.PFD.StickyNote
 
             parent.Add(tree);
         }
+
+
+        public void WriteXml(XmlWriter writer)
+        {
+            // Location
+            writer.WriteStartElement("Location");
+            writer.WriteElementString("X", m_locX.ToString());
+            writer.WriteElementString("Y", m_locY.ToString());
+            writer.WriteEndElement();
+
+            // Write the content
+            writer.WriteStartElement("Content");
+            writer.WriteString(m_text);
+            writer.WriteEndElement();
+
+            // Write the size as well
+            writer.WriteElementString("Size", string.Format("{0},{1}", Width, Height));
+
+            // Write the user name if we have one
+            if (!string.IsNullOrEmpty(m_userName))
+            {
+                writer.WriteElementString("UserName", m_userName);
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged = null;
     }
 }

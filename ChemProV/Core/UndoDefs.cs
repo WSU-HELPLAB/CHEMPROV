@@ -112,6 +112,9 @@ namespace ChemProV.Core
             {
                 opposites.Add(undoRedo.Execute(sender));
             }
+            
+            // The opposites should be executed in the reverse order
+            opposites.Reverse();
 
             // Determine the new title by changing "Undo" to "Redo" or "Redo" to "Undo"
             string newTitle = m_title.StartsWith("Undo") ? m_title.Replace("Undo", "Redo") :

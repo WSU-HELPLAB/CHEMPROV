@@ -21,7 +21,7 @@ namespace ChemProV.Grammars
 
         #region properties
         public EquationModel Model { get; set; }
-        public IStreamData Data { get; set; }
+        public Core.IStreamData Data { get; set; }
         public string Name { get; set; }
         public VariableSigns Sign { get; set; }
         public bool IsPercent { get; set; }

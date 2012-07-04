@@ -47,11 +47,30 @@
         <!-- Spacer before process streams -->
         <Border BorderThickness="2" Height="2" BorderBrush="Gray" Margin="4,4,4,4"></Border>
 
-        <!-- This panel will have buttons for available streams -->
-        <!-- It will be populated and adjusted based on difficulty at runtime -->
-        <StackPanel Name="StreamsPanel">
-            <TextBlock Name="ReplaceMeWithStreams" TextWrapping="Wrap">Auto-populates at runtime:
-            Streams</TextBlock>
+        <!-- Panel for stream buttons. Unlike the process unit buttons these are not 
+             created at runtime
+        -->
+        <StackPanel Name="StreamsPanel" Orientation="Horizontal">
+            
+            <!-- Chemical stream button. Available on all difficulties so always visible. -->
+            <Border CornerRadius="3" BorderThickness="1" Background="White" BorderBrush="Gray"
+                Margin="2,2,2,2" Padding="2,2,2,2" Name="ChemicalStreamButton"
+                MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown">
+                <Image Source="/UI/Icons/pu_stream.png" Stretch="None">
+                    <ToolTipService.ToolTip>Chemical Stream</ToolTipService.ToolTip>
+                </Image>
+            </Border>
+
+            <!-- Heat stream button. Shows/hides based on difficulty level. -->
+            <Border CornerRadius="3" BorderThickness="1" Background="White" BorderBrush="Gray"
+                Margin="2,2,2,2" Padding="2,2,2,2" Name="HeatStreamButton"
+                MouseLeftButtonDown="PaletteButton_MouseLeftButtonDown"
+                Visibility="Collapsed">
+                <Image Source="/UI/Icons/pu_heat_stream.png" Stretch="None">
+                    <ToolTipService.ToolTip>Chemical Stream</ToolTipService.ToolTip>
+                </Image>
+            </Border>
+            
         </StackPanel>
 
     </StackPanel>

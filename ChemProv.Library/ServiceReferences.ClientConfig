@@ -4,21 +4,21 @@
             <basicHttpBinding>
                 <binding name="BasicHttpBinding_AuthenticationService" maxBufferSize="2147483647"
                     maxReceivedMessageSize="2147483647">
-                    <security mode="None" />
+                    <security mode="Transport" />
                 </binding>
                 <binding name="BasicHttpBinding_OsbleService" maxBufferSize="2147483647"
                     maxReceivedMessageSize="2147483647">
-                    <security mode="None" />
+                    <security mode="Transport" />
                 </binding>
             </basicHttpBinding>
         </bindings>
         <client>
-            <endpoint address="http://peppermint.arvixe.com/services/OsbleService.svc"
-                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService"
-                contract="OsbleRemoteServices.OsbleService" name="BasicHttpBinding_OsbleService" />
-            <endpoint address="http://peppermint.arvixe.com/services/AuthenticationService.svc"
+            <endpoint address="https://osble.org/services/AuthenticationService.svc/Services/AuthenticationService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService"
                 contract="OsbleAuthServices.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
+            <endpoint address="https://osble.org/services/OsbleService.svc/Services/OsbleService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService"
+                contract="OsbleRemoteServices.OsbleService" name="BasicHttpBinding_OsbleService" />
         </client>
     </system.serviceModel>
 </configuration>

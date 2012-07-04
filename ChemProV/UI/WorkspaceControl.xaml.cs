@@ -31,8 +31,7 @@ namespace ChemProV.UI
     {
         #region Delegates
 
-        public event EventHandler ToolPlaced = delegate { };
-        public event EventHandler CompoundsUpdated = delegate { };
+        //public event EventHandler ToolPlaced = delegate { };
         public event EventHandler ValidationChecked = delegate { };
 
         #endregion Delegates
@@ -44,8 +43,6 @@ namespace ChemProV.UI
         private RuleManager ruleManager = RuleManager.GetInstance();
 
         private bool checkRules = true;
-
-        private OptionDifficultySetting currentDifficultySetting;
 
         private ObservableCollection<string> compounds = new ObservableCollection<string>();
 
@@ -68,7 +65,6 @@ namespace ChemProV.UI
             InitializeComponent();
 
             DrawingCanvas.PfdChanging += new EventHandler(DrawingCanvas_PfdChanging);
-            DrawingCanvas.ToolPlaced += new EventHandler(DrawingCanvas_ToolPlaced);
             DrawingCanvas.PfdUpdated += new PfdUpdatedEventHandler(CheckRulesForPFD);
             EquationEditor.EquationTokensChanged += new EventHandler(CheckRulesForPFD);
 
@@ -95,19 +91,6 @@ namespace ChemProV.UI
         #endregion Constructor
 
         #region Properties
-
-        public OptionDifficultySetting CurrentDifficultySetting
-        {
-            get { return currentDifficultySetting; }
-            set
-            {
-                if (value != currentDifficultySetting)
-                {
-                    DifficultySettingChanged(currentDifficultySetting, value);
-                    currentDifficultySetting = value;
-                }
-            }
-        }
 
         public ObservableCollection<string> Compounds
         {
@@ -217,14 +200,9 @@ namespace ChemProV.UI
             UpdateCommentsPaneVisibility();
         }
 
-        public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)
-        {
-            DrawingCanvas.CurrentDifficultySetting = newValue;
-            EquationEditor.CurrentDifficultySetting = newValue;
-        }
-
         /// <summary>
         /// This fires when an equation is changed
+        /// TODO: This is old code. See if it's even needed anymore
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
@@ -239,8 +217,6 @@ namespace ChemProV.UI
                 var iPropertiesWindows = from c in DrawingCanvas.ChildIPfdElements
                                          where c is IPropertiesWindow
                                          select c as IPropertiesWindow;
-
-                UpdateCompounds(iPropertiesWindows);
 
                 var pfdElements = DrawingCanvas.ChildIPfdElements;
 
@@ -260,37 +236,31 @@ namespace ChemProV.UI
             EquationEditor.EquationTokensChanged += new EventHandler(CheckRulesForPFD);
         }
 
-        public void LoadXmlElements(XDocument doc)
-        {
-            isLoadingFile = true;
-            //clear out previous data
-            DrawingCanvas.ClearDrawingCanvas();
-            m_snUserColors.Clear();
+        //public void LoadXmlElements(XDocument doc)
+        //{
+        //    isLoadingFile = true;
+        //    //clear out previous data
+        //    DrawingCanvas.ClearDrawingCanvas();
+        //    m_snUserColors.Clear();
 
-            //tell the drawing drawing_canvas to load its new children
-            DrawingCanvas.LoadXmlElements(doc.Descendants("DrawingCanvas").ElementAt(0));
+        //    //some items don't have feedback so there might not be a feedbackwindow element.
+        //    if (doc.Descendants("FeedbackWindow").Count() > 0)
+        //    {
+        //        FeedbackWindow.LoadXmlElements(doc.Descendants("FeedbackWindow").ElementAt(0));
+        //    }
 
-            //some items don't have feedback so there might not be a feedbackwindow element.
-            if (doc.Descendants("FeedbackWindow").Count() > 0)
-            {
-                FeedbackWindow.LoadXmlElements(doc.Descendants("FeedbackWindow").ElementAt(0));
-            }
+        //    //done loading the file so set isLoadingFile to false and call the CheckRulesForPFD to check the rules
+        //    isLoadingFile = false;
 
-            //done loading the file so set isLoadingFile to false and call the CheckRulesForPFD to check the rules
-            isLoadingFile = false;
+        //    //AC: The function will update the equation editor's list of scope and type options.  This needs to be up to date
+        //    //before we can load the equation editor.
+        //    CheckRulesForPFD(this, EventArgs.Empty);
 
-            //AC: The function will update the equation editor's list of scope and type options.  This needs to be up to date
-            //before we can load the equation editor.
-            CheckRulesForPFD(this, EventArgs.Empty);
+        //    // Update the equations
+        //    EquationEditor.UpdateCompounds();
 
-            //Now, update the list of PFD elements
-            EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
-
-            // Update the equations
-            EquationEditor.UpdateCompounds();
-
-            UpdateCommentsPaneVisibility();
-        }
+        //    UpdateCommentsPaneVisibility();
+        //}
 
         public object GetobjectFromId(string id)
         {
@@ -301,35 +271,37 @@ namespace ChemProV.UI
 
         #region Private Helper
 
-        private void UpdateCompounds(IEnumerable<IPropertiesWindow> iPropertiesWindows)
-        {
-            ITableAdapter tableAdapter;
+        //private void UpdateCompounds(IEnumerable<IPropertiesWindow> iPropertiesWindows)
+        //{
+        //    ITableAdapter tableAdapter;
 
-            compounds.Clear();
+        //    compounds.Clear();
 
-            foreach (IPfdElement ipfd in iPropertiesWindows)
-            {
-                if (ipfd is IPropertiesWindow)
-                {
-                    tableAdapter = TableAdapterFactory.CreateTableAdapter(ipfd as IPropertiesWindow);
-                    int i = 0;
-                    while (i < tableAdapter.GetRowCount())
-                    {
-                        string compound = tableAdapter.GetCompoundAtRow(i);
-                        if (compound != "Select" && compound != "Overall" && compound.Length > 0)
-                        {
-                            if (!compounds.Contains(compound))
-                            {
-                                compounds.Add(compound);
-                            }
-                        }
-                        i++;
-                    }
-                }
-            }
-            EquationEditor.Compounds = compounds;
-            CompoundsUpdated(this, EventArgs.Empty);
-        }
+        //    foreach (IPfdElement ipfd in iPropertiesWindows)
+        //    {
+        //        if (ipfd is IPropertiesWindow)
+        //        {
+        //            tableAdapter = TableAdapterFactory.CreateTableAdapter(ipfd as IPropertiesWindow);
+        //            int i = 0;
+        //            while (i < tableAdapter.GetRowCount())
+        //            {
+        //                string compound = tableAdapter.GetCompoundAtRow(i);
+        //                if (compound != "Select" && compound != "Overall" && compound.Length > 0)
+        //                {
+        //                    if (!compounds.Contains(compound))
+        //                    {
+        //                        compounds.Add(compound);
+        //                    }
+        //                }
+        //                i++;
+        //            }
+        //        }
+        //    }
+            
+        //    // Don't need this anymore because the equation editor handles it
+        //    //EquationEditor.Compounds = compounds;
+        //    CompoundsUpdated(this, EventArgs.Empty);
+        //}
 
         private void DrawingCanvas_PfdChanging(object sender, EventArgs e)
         {
@@ -339,13 +311,6 @@ namespace ChemProV.UI
         private void WorkSpace_SizeChanged(object sender, SizeChangedEventArgs e)
         {
             //FixSizeOfComponents();
-        }
-
-        private void DrawingCanvas_ToolPlaced(object sender, EventArgs e)
-        {
-            //update equation scope options
-            EquationEditor.PfdElements = DrawingCanvas.ChildIPfdElements;
-            ToolPlaced(this, EventArgs.Empty);
         }
 
         #endregion Private Helper

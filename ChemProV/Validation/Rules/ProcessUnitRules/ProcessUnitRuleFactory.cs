@@ -21,21 +21,21 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         }
 
         /// <summary>
-        /// This returns the rule that needs to be checked for the IProcessUnit
+        /// This returns the rule that needs to be checked for the GenericProcessUnit
         /// Currently it returns the ReactorProcessUnitRule if pu is a reactor otherwise
         /// it returns the GenericProcessUnitRule
         /// </summary>
         /// <param name="pu">The process unit that will be checked with the rule returned</param>
         /// <returns>GenericProcessUnitRule which could be a ReactorProcessUnitRule since it inherients from GenericProcessUnitRule</returns>
-        public static GenericProcessUnitRule GetProcessUnitRule(IProcessUnit pu)
+        public static GenericProcessUnitRule GetProcessUnitRule(ProcessUnitControl pu)
         {
             GenericProcessUnitRule puRule;
 
-            if (pu.Description == ProcessUnitDescriptions.Reactor)
+            if (pu.ProcessUnit is Core.Reactor)
             {
                 puRule = new ReactorProcessUnitRule();
             }
-            else if (pu.Description == ProcessUnitDescriptions.HeatExchangerNoUtility)
+            else if (pu.ProcessUnit is Core.HeatExchangerNoUtility)
             {
                 puRule = new HeatExchangerWithoutUtilityProcessUnitRule();
             }

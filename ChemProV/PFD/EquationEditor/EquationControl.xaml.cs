@@ -12,7 +12,6 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using ChemProV.PFD.EquationEditor.Models;
-using ChemProV.PFD.EquationEditor.Tokens;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -96,16 +95,6 @@ namespace ChemProV.PFD.EquationEditor
         public EquationType SelectedItem
         {
             get { return TypeComboBox.SelectedItem as EquationType; }
-        }
-
-        /// <summary>
-        /// Compatibility item
-        /// (read comment on SelectedItem above... same deal here)
-        /// </summary>
-        public ObservableCollection<IEquationToken> EquationTokens
-        {
-            get;
-            set;
         }
 
         public void HighlightFeedback(bool highlight)

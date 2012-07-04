@@ -8,6 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -18,6 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Core;
+using ChemProV.PFD.StickyNote;
 
 namespace ChemProV.PFD.Undos
 {
@@ -25,9 +27,9 @@ namespace ChemProV.PFD.Undos
     {
         private int m_index;
         
-        private ICommentCollection m_owner;
+        private IList<StickyNote_UIIndependent> m_owner;
 
-        public RemoveComment(ICommentCollection owner, int index)
+        public RemoveComment(IList<StickyNote_UIIndependent> owner, int index)
         {
             m_owner = owner;
             m_index = index;
@@ -35,8 +37,8 @@ namespace ChemProV.PFD.Undos
 
         public IUndoRedoAction Execute(Workspace sender)
         {
-            IComment current = m_owner.GetCommentAt(m_index);
-            m_owner.RemoveCommentAt(m_index);
+            StickyNote_UIIndependent current = m_owner[m_index];
+            m_owner.RemoveAt(m_index);
             return new InsertComment(m_owner, current, m_index);
         }
     }

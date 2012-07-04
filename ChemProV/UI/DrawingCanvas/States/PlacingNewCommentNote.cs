@@ -38,8 +38,8 @@ namespace ChemProV.UI.DrawingCanvas.States
         private ControlPalette m_creator;
 
         /// <summary>
-        /// This will be a reference to a stream or a process unit if either has been "highlighted" 
-        /// by a mouse-over.
+        /// This will be a reference to a stream control or a process unit control if either has 
+        /// been "highlighted" by a mouse-over.
         /// </summary>
         private object m_highlightedHover = null;
 
@@ -86,8 +86,9 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // See if we're hovering over a process unit (will be null if we're not)
             m_highlightedHover = m_canvas.GetChildAtIncludeStreams(p, m_placementIcon);
-            GenericProcessUnit pu = m_highlightedHover as GenericProcessUnit;
-            AbstractStream stream = m_highlightedHover as AbstractStream;
+            ProcessUnitControl pu = m_highlightedHover as ProcessUnitControl;
+            ChemProV.PFD.Streams.AbstractStream stream =
+                m_highlightedHover as ChemProV.PFD.Streams.AbstractStream;
 
             // Set the border if we are hovering over a process unit to indicate that we can attach 
             // an anchored comment to it
@@ -117,27 +118,43 @@ namespace ChemProV.UI.DrawingCanvas.States
             UnhighlightHover();
 
             Point mousePt = e.GetPosition(m_canvas);
+
+            // Get a reference to the workspace
+            Workspace ws = m_canvas.GetWorkspace();
             
             // There are two possibilities for a mouse-down. The first is that the mouse isn't over 
             // any object that can have comments created for it, in which case we create a free-
             // floating comment. The second is that there is and we need to create an anchored comment.
             UIElement uie = m_canvas.GetChildAtIncludeStreams(mousePt);
-            Core.ICommentCollection collection = uie as Core.ICommentCollection;
-            if (null == collection)
-            {
-                // Create the sticky note and add it to the canvas
-                StickyNoteControl note = new StickyNoteControl(m_canvas);
-                m_canvas.AddNewChild(note);
-                note.Width = note.Height = 100.0;
-                note.Location = mousePt;
-                note.SetValue(Canvas.ZIndexProperty, (int)4);
+            if (uie is ProcessUnitControl || uie is PFD.Streams.AbstractStream)
+            {                
+                // All we need to do is add a comment to the appropriate collection in the workspace, 
+                // but we need to compute a smart location for it. There's a static method in the 
+                // sticky note control that does this for is.
+                MathCore.Vector pos = StickyNoteControl.ComputeNewCommentNoteLocation(
+                    m_canvas, uie, 100.0, 100.0);
+
+                // Create the new sticky note and add it to the workspace. Event handlers will update 
+                // the UI appropriately.
+                StickyNote_UIIndependent sn = new StickyNote_UIIndependent()
+                {
+                    Width = 100.0,
+                    Height = 100.0,
+                    LocationX = pos.X,
+                    LocationY = pos.Y
+                };
+                if (uie is ProcessUnitControl)
+                {
+                    (uie as ProcessUnitControl).ProcessUnit.Comments.Add(sn);
+                }
+                else
+                {
+                    (uie as PFD.Streams.AbstractStream).Stream.Comments.Add(sn);
+                }
 
                 // Create an undo
                 m_canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
-                    "Undo creation of free-floating comment", new RemoveFromCanvas(note, m_canvas)));
-
-                // Select the note on the canvas
-                m_canvas.SelectedElement = note;
+                    "Undo creation of anchored comment", new Logic.Undos.RemoveStickyNote(sn)));
 
                 // Tell the control palette to switch back to select mode. It will also set the drawing 
                 // canvas's state to null
@@ -145,21 +162,24 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
             else
             {
-                StickyNoteControl newNote;
-                List<IUndoRedoAction> undos = StickyNoteControl.CreateCommentNote(
-                    m_canvas, collection, null, out newNote);
+                // This means we need to create a free-floating sticky note.
+                StickyNote_UIIndependent note = new StickyNote_UIIndependent();
+                note.Height = note.Width = 100.0;
+                note.LocationX = mousePt.X;
+                note.LocationY = mousePt.Y;
 
-                // Create an undo
-                m_canvas.GetWorkspace().AddUndo(
-                    new UndoRedoCollection("Undo creation of anchored comment", undos.ToArray()));
+                // Add it to the workspace. Event subscribers will update the UI automatically.
+                m_canvas.GetWorkspace().StickyNotes.Add(note);
 
-                // Select the note on the canvas
-                m_canvas.SelectedElement = newNote;
+                // Add an undo that will remove the sticky note
+                m_canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
+                    "Undo creation of free-floating comment",
+                    new Logic.Undos.RemoveStickyNote(note)));
 
                 // Tell the control palette to switch back to select mode. It will also set the drawing 
                 // canvas's state to null
                 m_creator.SwitchToSelect();
-            }
+            }            
         }
 
         public void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
@@ -198,14 +218,14 @@ namespace ChemProV.UI.DrawingCanvas.States
                 return;
             }
 
-            GenericProcessUnit gpu = m_highlightedHover as GenericProcessUnit;
+            ProcessUnitControl gpu = m_highlightedHover as ProcessUnitControl;
             if (null != gpu)
             {
                 gpu.SetBorderColor(PFD.ProcessUnits.ProcessUnitBorderColor.NoBorder);
             }
             else
             {
-                AbstractStream s = m_highlightedHover as AbstractStream;
+                PFD.Streams.AbstractStream s = m_highlightedHover as PFD.Streams.AbstractStream;
                 if (null != s)
                 {
                     s.Selected = true;

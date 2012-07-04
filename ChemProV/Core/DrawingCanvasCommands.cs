@@ -13,22 +13,11 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 // the process I'm getting rid of the ICommand and CommandFactory stuff, I'm 
 // creating this static class to replace some of that functionality.
 
-using System;
 using System.Collections.Generic;
-using System.Net;
 using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
-using ChemProV.PFD;
+using ChemProV.Logic.Undos;
 using ChemProV.PFD.ProcessUnits;
-using ChemProV.PFD.Streams;
 using ChemProV.UI.DrawingCanvas;
-using ChemProV.PFD.Undos;
 
 namespace ChemProV.Core
 {
@@ -61,43 +50,33 @@ namespace ChemProV.Core
                 // Case 1: deleting a sticky note
                 (element as PFD.StickyNote.StickyNoteControl).DeleteWithUndo(canvas);
             }
-            else if (element is AbstractStream)
+            else if (element is ChemProV.PFD.Streams.AbstractStream)
             {
                 // Case 2: deleting a stream
 
-                DeleteStreamWithUndo((AbstractStream)element, canvas);
-            }
-            else if (element is DraggableStreamEndpoint)
-            {
-                // Case 3: Selected element is a stream drag handle, in which case we are also 
-                // deleting a stream
-
-                DraggableStreamEndpoint dse = element as DraggableStreamEndpoint;
-                DeleteStreamWithUndo((AbstractStream)dse.ParentStream, canvas);
-                return;
+                DeleteStreamWithUndo(element as ChemProV.PFD.Streams.AbstractStream, canvas);
             }
             else if (element is PFD.Streams.PropertiesWindow.IPropertiesWindow)
             {
-                // Case 4: Selected element is a stream properties window, in which case we are 
-                // also deleting a stream
-                PFD.Streams.PropertiesWindow.IPropertiesWindow win = element as
-                    PFD.Streams.PropertiesWindow.IPropertiesWindow;
-
-                DeleteStreamWithUndo(win.ParentStream as AbstractStream, canvas);
+                // Intentionally do nothing in this case. If the user has focus on a properties window 
+                // then they would probably hit the delete key to delete text in one of the text boxes. 
+                // We do NOT want this to delete the stream.
             }
-            else if (element is HeatExchanger)
+            else if (element is ProcessUnitControl)
             {
-                DeleteHEWU(element as HeatExchanger, canvas);
-            }
-            else if (element is GenericProcessUnit)
-            {
-                DeleteProcessUnitWithUndo(element as GenericProcessUnit, canvas);
+                if ((element as ProcessUnitControl).ProcessUnit is ChemProV.Core.HeatExchangerWithUtility)
+                {
+                    DeleteHEWU(element as ProcessUnitControl, canvas);
+                }
+                else
+                {
+                    DeleteProcessUnitWithUndo(element as ProcessUnitControl, canvas);
+                }
             }
             else
             {
-                // Generic case - just remove whatever's selected with an undo to re-add it
-                ws.AddUndo(new UndoRedoCollection("Undo", new AddToCanvas(element, canvas)));
-                canvas.Children.Remove(element);
+                // We don't recognize the object so don't do anything
+                return;
             }
 
             // If we just deleted the item that was just selected, we should set the selected 
@@ -108,7 +87,8 @@ namespace ChemProV.Core
             }
         }
 
-        private static void DeleteHEWU(HeatExchanger he, DrawingCanvas canvas)
+        // Refactoring on this method is done (logic-wise, could use some cleanup otherwise)
+        private static void DeleteHEWU(ProcessUnitControl he, DrawingCanvas canvas)
         {
             int i;
             Workspace ws = canvas.GetWorkspace();
@@ -118,7 +98,7 @@ namespace ChemProV.Core
             // this does not always hold true when loading from files so it's just safer to search 
             // for it
             HeatStream heatStream = null;
-            foreach (IStream incomingStream in he.IncomingStreams)
+            foreach (Core.AbstractStream incomingStream in he.ProcessUnit.IncomingStreams)
             {
                 if (incomingStream is HeatStream)
                 {
@@ -126,131 +106,77 @@ namespace ChemProV.Core
                     break;
                 }
             }
+            PFD.Streams.AbstractStream heatStreamControl =
+                canvas.GetStreamControl(heatStream) as PFD.Streams.AbstractStream;
 
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
-            undos.Add(new AddToCanvas(he, canvas));
-            undos.Add(new AddToCanvas(heatStream, canvas));
-            undos.Add(new AddToCanvas(heatStream.SourceDragIcon, canvas));
-            undos.Add(new AddToCanvas(heatStream.DestinationDragIcon, canvas));
-            undos.Add(new AddToCanvas(heatStream.Table as UIElement, canvas));
+            undos.Add(new Logic.Undos.AddToWorkspace(heatStream));
+            undos.Add(new Logic.Undos.AddToWorkspace(he.ProcessUnit));
 
             // We need to check if the attached stream has a source
             if (null != heatStream.Source)
             {
                 // Detach with undo
-                undos.Add(new AttachOutgoingStream(heatStream.Source, heatStream));
-                heatStream.Source.DettachOutgoingStream(heatStream);
-            }
-
-            // Delete all comment sticky notes for the process unit
-            for (i = 0; i < he.CommentCount; i++)
-            {
-                PFD.StickyNote.StickyNoteControl sn = he.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
-
-                // We will not remove the comment from the collection, but we must remove it
-                // from the canvas. Comment sticky notes have both a sticky note control and 
-                // a connecting line that have to be removed.
-                undos.Add(new AddToCanvas(sn, canvas));
-                undos.Add(new AddToCanvas(sn.LineToParent, canvas));
-
-                canvas.RemoveChild(sn);
-                canvas.RemoveChild(sn.LineToParent);
-            }
-
-            // Delete all comment sticky notes for the stream
-            ICommentCollection cc = heatStream as ICommentCollection;
-            if (null != cc)
-            {
-                for (i = 0; i < cc.CommentCount; i++)
-                {
-                    PFD.StickyNote.StickyNoteControl sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
-
-                    // We will not remove the comment from the collection, but we must remove it
-                    // from the canvas. Comment sticky notes have both a sticky note control and 
-                    // a connecting line that have to be removed.
-                    undos.Add(new AddToCanvas(sn, canvas));
-                    undos.Add(new AddToCanvas(sn.LineToParent, canvas));
-
-                    canvas.RemoveChild(sn);
-                    canvas.RemoveChild(sn.LineToParent);
-                }
+                undos.Add(new Logic.Undos.AttachOutgoingStream(heatStream.Source, heatStream));
+                heatStream.Source.DetachOutgoingStream(heatStream);
             }
 
             // Detach all outgoing streams and make undos
-            for (i = 0; i < he.OutgoingStreams.Count; i++)
+            foreach (Core.AbstractStream s in he.ProcessUnit.OutgoingStreams)
             {
-                IStream s = he.OutgoingStreams[i];
-                undos.Add(new SetStreamSource(s, he, null, (s as AbstractStream).SourceDragIcon.Location));
+                undos.Add(new Logic.Undos.SetStreamSource(s, he.ProcessUnit, null,
+                    s.SourceLocation));
+                    //(s as AbstractStream).SourceDragIcon.Location));
                 s.Source = null;
             }
 
             // Detach all incoming streams and make undos
-            for (i = 0; i < he.IncomingStreams.Count; i++)
+            foreach (Core.AbstractStream s in he.ProcessUnit.IncomingStreams)
             {
-                IStream s = he.IncomingStreams[i];
-                undos.Add(new SetStreamDestination(s, he, null));
+                undos.Add(new Logic.Undos.SetStreamDestination(s, he.ProcessUnit, null,
+                    s.DestinationLocation));
                 s.Destination = null;
             }
 
             ws.AddUndo(new UndoRedoCollection(
                 "Undo deletion of heat exchanger with utility", undos.ToArray()));
 
-            // Remove the pieces from the canvas
-            canvas.RemoveChild(he);
-            canvas.RemoveChild(heatStream);
-            canvas.RemoveChild(heatStream.SourceDragIcon);
-            canvas.RemoveChild(heatStream.DestinationDragIcon);
-            canvas.RemoveChild(heatStream.Table as UIElement);
+            // Tell the process unit and heat stream to remove themselves from the canvas
+            he.RemoveSelfFromCanvas(canvas);
+            heatStreamControl.RemoveSelfFromCanvas(canvas);
         }
 
-        private static void DeleteProcessUnitWithUndo(GenericProcessUnit pu, DrawingCanvas canvas)
+        // Refactoring on this method is done
+        private static void DeleteProcessUnitWithUndo(ProcessUnitControl pu, DrawingCanvas canvas)
         {
+            Workspace ws = canvas.GetWorkspace();
+
+            // Initialize the list of undos
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
-            undos.Add(new AddToCanvas(pu, canvas));
+            undos.Add(new ChemProV.Logic.Undos.AddToWorkspace(pu.ProcessUnit));
 
             // Detach all incoming streams and make undos
-            int i;
-            for (i = 0; i < pu.IncomingStreams.Count; i++)
+            foreach (Core.AbstractStream s in pu.ProcessUnit.IncomingStreams)
             {
-                IStream s = pu.IncomingStreams[i];
-                undos.Add(new SetStreamDestination(s, pu, null));
+                undos.Add(new SetStreamDestination(s, pu.ProcessUnit, null, s.DestinationLocation));
                 s.Destination = null;
             }
 
             // Detach all outgoing streams and make undos
-            for (i = 0; i < pu.OutgoingStreams.Count; i++)
+            foreach (Core.AbstractStream s in pu.ProcessUnit.OutgoingStreams)
             {
-                IStream s = pu.OutgoingStreams[i];
-                undos.Add(new SetStreamSource(s, pu, null, (s as AbstractStream).SourceDragIcon.Location));
+                undos.Add(new SetStreamSource(s, pu.ProcessUnit, null, s.SourceLocation));
                 s.Source = null;
             }
 
-            // Delete all comment sticky notes
-            ICommentCollection cc = pu as ICommentCollection;
-            if (null != cc)
-            {
-                for (i = 0; i < cc.CommentCount; i++)
-                {
-                    PFD.StickyNote.StickyNoteControl sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
-                    
-                    // We will not remove the comment from the collection, but we must remove it
-                    // from the canvas. Comment sticky notes have both a sticky note control and 
-                    // a connecting line that have to be removed.
-                    undos.Add(new AddToCanvas(sn, canvas));
-                    undos.Add(new AddToCanvas(sn.LineToParent, canvas));
+            // Remove the process unit from the workspace. Event handlers will update UI.
+            ws.RemoveProcessUnit(pu.ProcessUnit);
 
-                    canvas.RemoveChild(sn);
-                    canvas.RemoveChild(sn.LineToParent);
-                }
-            }
-
-            canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
-                "Undo deletion of process unit", undos.ToArray()));
-
-            // Remove the process unit
-            canvas.RemoveChild(pu);
+            // Finalize the undo
+            ws.AddUndo(new UndoRedoCollection("Undo deletion of process unit", undos.ToArray()));
         }
-        
+
+        // Refactoring on this method is done (none needed)
         public static void DeleteSelectedElement(DrawingCanvas canvas)
         {
             // If there's nothing selected then we just go to null state and return
@@ -263,72 +189,48 @@ namespace ChemProV.Core
             DeleteElement(canvas, (UIElement)canvas.SelectedElement);
         }
 
-        private static void DeleteStreamWithUndo(AbstractStream stream, DrawingCanvas canvas)
+        // Refactoring on this method is done
+        private static void DeleteStreamWithUndo(ChemProV.PFD.Streams.AbstractStream stream,
+            DrawingCanvas canvas)
         {
+            Core.AbstractStream s = stream.Stream;
+            
             // Special case: the old version (before I rewrote a bunch of logic) didn't let 
             // you delete heat streams whose destination was a heat exchanger with utility.
             // I will keep this functionality.
-            if (stream is HeatStream && stream.Destination is HeatExchanger)
+            if (s is HeatStream && s.Destination is HeatExchangerWithUtility)
             {
                 return;
             }
 
             // We need to build a list of undos. Some actions are shared by all cases.
             List<IUndoRedoAction> actions = new List<IUndoRedoAction>();
-            // In all cases we will need to add back the components of the stream
-            actions.AddRange(new IUndoRedoAction[]{
-                new PFD.Undos.AddToCanvas(stream, canvas),
-                new PFD.Undos.AddToCanvas(stream.SourceDragIcon, canvas),
-                new PFD.Undos.AddToCanvas(stream.DestinationDragIcon, canvas),
-                new PFD.Undos.AddToCanvas(stream.Table as UIElement, canvas)});
+            // In all cases we will need to add the stream back to the workspace
+            actions.Add(new Logic.Undos.AddToWorkspace(stream.Stream));
 
-            if (null != stream.Source)
+            if (null != s.Source)
             {
                 // If the stream has a non-null source then we need to detach it and 
                 // make sure the undo would reattach it
-                actions.Add(new PFD.Undos.AttachOutgoingStream(stream.Source, stream));
+                actions.Add(new Logic.Undos.AttachOutgoingStream(s.Source, s));
 
                 // Do the detachment so that the process unit (which is staying around) won't 
                 // have an outgoing stream that's been deleted
-                stream.Source.DettachOutgoingStream(stream);
+                s.Source.DetachOutgoingStream(s);
             }
-            if (null != stream.Destination)
+            if (null != s.Destination)
             {
                 // If the stream has a non-null destination then we need to detach it and 
                 // make sure the undo would reattach it
-                actions.Add(new PFD.Undos.AttachIncomingStream(stream.Destination, stream));
+                actions.Add(new Logic.Undos.AttachIncomingStream(s.Destination, s));
 
                 // Do the detachment so that the process unit (which is staying around) won't 
                 // have an incoming stream that's been deleted
-                stream.Destination.DettachIncomingStream(stream);
+                s.Destination.DetachIncomingStream(s);
             }
 
-            // Delete all comment sticky notes
-            int i;
-            ICommentCollection cc = stream as ICommentCollection;
-            if (null != cc)
-            {
-                for (i = 0; i < cc.CommentCount; i++)
-                {
-                    PFD.StickyNote.StickyNoteControl sn = cc.GetCommentAt(i) as PFD.StickyNote.StickyNoteControl;
-
-                    // We will not remove the comment from the collection, but we must remove it
-                    // from the canvas. Comment sticky notes have both a sticky note control and 
-                    // a connecting line that have to be removed.
-                    actions.Add(new AddToCanvas(sn, canvas));
-                    actions.Add(new AddToCanvas(sn.LineToParent, canvas));
-
-                    canvas.RemoveChild(sn);
-                    canvas.RemoveChild(sn.LineToParent);
-                }
-            }
-
-            // Now we actually remove the stream. Note that this stream object will hold onto 
-            // any source or destination stream references that it has
-            canvas.RemoveChild(stream);
-            canvas.RemoveChild(stream.SourceDragIcon);
-            canvas.RemoveChild(stream.DestinationDragIcon);
-            canvas.RemoveChild(stream.Table as UIElement);
+            // Delete the stream from the workspace. Event handlers will take care of updating the UI.
+            canvas.GetWorkspace().RemoveStream(stream.Stream);
 
             // Add the undo that we built
             canvas.GetWorkspace().AddUndo(

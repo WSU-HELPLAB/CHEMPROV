@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Windows;
 using System.Windows.Controls;
@@ -9,29 +10,30 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Core;
+using ChemProV.PFD.StickyNote;
 
 namespace ChemProV.PFD.Undos
 {
     public class InsertComment : IUndoRedoAction
     {
-        private Core.ICommentCollection m_cc;
+        private IList<StickyNote_UIIndependent> m_collection;
 
-        private Core.IComment m_comment;
+        private StickyNote_UIIndependent m_comment;
 
         private int m_index;
 
-        public InsertComment(Core.ICommentCollection collection, Core.IComment comment, int insertionIndex)
+        public InsertComment(IList<StickyNote_UIIndependent> collection, StickyNote_UIIndependent comment, int insertionIndex)
         {
-            m_cc = collection;
+            m_collection = collection;
             m_comment = comment;
             m_index = insertionIndex;
         }
 
         public IUndoRedoAction Execute(Workspace sender)
         {
-            m_cc.InsertCommentAt(m_comment, m_index);
+            m_collection.Insert(m_index, m_comment);
 
-            return new RemoveComment(m_cc, m_index);
+            return new RemoveComment(m_collection, m_index);
         }
     }
 }

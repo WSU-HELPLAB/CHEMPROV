@@ -9,6 +9,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Windows;
 using System.Windows.Controls;
@@ -26,7 +27,7 @@ using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 using ChemProV.UI.DrawingCanvas.States;
-using ChemProV.PFD.Undos;
+using System.ComponentModel;
 
 namespace ChemProV.UI.DrawingCanvas
 {
@@ -36,7 +37,7 @@ namespace ChemProV.UI.DrawingCanvas
     /// This is our drawing drawing_canvas, the thing that ProcessUnits and Streams are dragged onto.
     /// It controls everything that goes on with itself.
     /// </summary>
-    public class DrawingCanvas : Canvas, IXmlSerializable
+    public class DrawingCanvas : Canvas
     {
         public event PfdUpdatedEventHandler PfdUpdated = delegate { };
         public event EventHandler PfdChanging = delegate { };
@@ -107,8 +108,6 @@ namespace ChemProV.UI.DrawingCanvas
                     m_endingAState = true;
                     m_currentState.StateEnding();
                     m_endingAState = false;
-
-                    Core.App.Workspace.EquationEditorReference.PfdElements = ChildIPfdElements;
                 }
 
                 m_currentState = value;
@@ -128,22 +127,6 @@ namespace ChemProV.UI.DrawingCanvas
             set { isReadOnly = value; }
         }
 
-        private OptionDifficultySetting currentDifficultySetting;
-
-        /// <summary>
-        /// get / set the currentlyDifficult.  Set will throw an exception if it cannot handle the request and
-        /// it will keep its old value
-        /// </summary>
-        public OptionDifficultySetting CurrentDifficultySetting
-        {
-            get { return currentDifficultySetting; }
-            set
-            {
-                DifficultySettingChanged(currentDifficultySetting, value);
-                currentDifficultySetting = value;
-            }
-        }
-
         /// <summary>
         /// This is used to decided if main page should route key down to drawing drawing_canvas
         /// </summary>
@@ -156,17 +139,17 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// This stores the currently selected element, the one with the yellow boarder
+        /// This stores the currently selected element
         /// </summary>
-        private IPfdElement selectedElement;
+        private ICanvasElement selectedElement;
 
-        public IPfdElement SelectedElement
+        public ICanvasElement SelectedElement
         {
             get { return selectedElement; }
             set
             {
                 //This checks to see if we had an element selected if so tell it it is no longer selected
-                IPfdElement oldvalue = selectedElement;
+                IPfdElement oldvalue = selectedElement as IPfdElement;
                 if (oldvalue != null)
                 {
                     oldvalue.Selected = false;
@@ -176,7 +159,10 @@ namespace ChemProV.UI.DrawingCanvas
                 //is changed and draw the boarder around themselves appropriately.
                 if (value != null)
                 {
-                    value.Selected = true;
+                    if (value is IPfdElement)
+                    {
+                        (value as IPfdElement).Selected = true;
+                    }
                     if (value is UserControl)
                     {
                         (value as UserControl).Focus();
@@ -244,15 +230,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         /// <summary>
-        /// This is called whenever we have placed a new tool and it fires an event in pallet so it sets the
-        /// selection back to the arrow
-        /// </summary>
-        public void placedNewTool()
-        {
-            this.ToolPlaced(this, new EventArgs());
-        }
-
-        /// <summary>
         /// This method gets the first child control that contains the specified point. If no 
         /// children contain the point then null is returned.
         /// </summary>
@@ -267,7 +244,8 @@ namespace ChemProV.UI.DrawingCanvas
         {
             foreach (UIElement uie in Children)
             {
-                if (object.ReferenceEquals(excludeMe, uie))
+                if (object.ReferenceEquals(excludeMe, uie) ||
+                    System.Windows.Visibility.Collapsed == uie.Visibility)
                 {
                     continue;
                 }
@@ -306,6 +284,12 @@ namespace ChemProV.UI.DrawingCanvas
                     {
                         continue;
                     }
+                }
+
+                // If it's collapsed then ignore it
+                if (System.Windows.Visibility.Collapsed == uie.Visibility)
+                {
+                    continue;
                 }
                 
                 double w = (double)uie.GetValue(Canvas.ActualWidthProperty);
@@ -347,8 +331,8 @@ namespace ChemProV.UI.DrawingCanvas
                             continue;
                         }
                     }
-                    
-                    AbstractStream stream = uie as AbstractStream;
+
+                    PFD.Streams.AbstractStream stream = uie as PFD.Streams.AbstractStream;
                     if (null == stream)
                     {
                         continue;
@@ -367,38 +351,19 @@ namespace ChemProV.UI.DrawingCanvas
             return element;
         }
 
-        public LabeledProcessUnit GetProcessUnitById(string id)
+        public ProcessUnitControl GetProcessUnitControl(Core.AbstractProcessUnit unit)
         {
             foreach (UIElement uie in Children)
             {
-                if (!(uie is LabeledProcessUnit))
+                if (!(uie is ProcessUnitControl))
                 {
                     continue;
                 }
 
-                LabeledProcessUnit pu = uie as LabeledProcessUnit;
-                if (pu.Id.Equals(id))
+                ProcessUnitControl pu = uie as ProcessUnitControl;
+                if (object.ReferenceEquals(pu.ProcessUnit, unit))
                 {
                     return pu;
-                }
-            }
-
-            return null;
-        }
-
-        public AbstractStream GetStreamById(string id)
-        {
-            foreach (UIElement uie in Children)
-            {
-                if (!(uie is AbstractStream))
-                {
-                    continue;
-                }
-
-                AbstractStream stream = uie as AbstractStream;
-                if (stream.Id.Equals(id))
-                {
-                    return stream;
                 }
             }
 
@@ -440,7 +405,7 @@ namespace ChemProV.UI.DrawingCanvas
 
             // Go ahead and select the item under the mouse
             object child = GetChildAtIncludeStreams(e.GetPosition(this));
-            SelectedElement = child as IPfdElement;
+            SelectedElement = child as ICanvasElement;
             if (child is DraggableStreamEndpoint)
             {
                 SelectedElement = (child as DraggableStreamEndpoint).ParentStream;
@@ -449,6 +414,23 @@ namespace ChemProV.UI.DrawingCanvas
             // A right mouse button down implies that we need to flip to the menu state
             CurrentState = new UI.DrawingCanvas.States.MenuState(this, m_workspace);
             (m_currentState as MenuState).Show(e);
+        }
+
+        public bool IsStreamEndpoint(UIElement element)
+        {
+            foreach (UIElement uie in Children)
+            {
+                PFD.Streams.AbstractStream s = uie as PFD.Streams.AbstractStream;
+                if (s != null)
+                {
+                    if (element == s.SourceDragIcon || element == s.DestinationDragIcon)
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         public void MouseLeftButtonUpHandler(object sender, MouseButtonEventArgs e)
@@ -482,7 +464,7 @@ namespace ChemProV.UI.DrawingCanvas
             // If our current state is null, then we want to create an appropriate one.
             // But first we need to check to see if we've selected an element
             object childAtPos = GetChildAtIncludeStreams(e.GetPosition(this));
-            SelectedElement = childAtPos as IPfdElement;
+            SelectedElement = childAtPos as ICanvasElement;
 
             // If there is nothing where the mouse pointer is, then we leave the state 
             // null and return.
@@ -545,33 +527,6 @@ namespace ChemProV.UI.DrawingCanvas
 
         #region IPfdMouseEvents
 
-        public void TempProcessUnitMouseRightButtonDownHandler(object sender, MouseEventArgs e)
-        {
-            TemporaryProcessUnit tpu = sender as TemporaryProcessUnit;
-            if (tpu.OutgoingStreams.Count > 0)
-            {
-                SelectedElement = tpu.OutgoingStreams[0];
-            }
-            else if (tpu.IncomingStreams.Count > 0)
-            {
-                SelectedElement = tpu.IncomingStreams[0];
-            }
-        }
-
-        /// <summary>
-        /// This is called when we move the mouse on top off a ProcessUnit in which case it sets hoveringOver to be itself.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void IProcessUnit_MouseEnter(object sender, MouseEventArgs e)
-        {
-        }
-
-        public void ProcessUnitStreamsChanged(object sender, EventArgs e)
-        {
-            PFDModified();
-        }
-
         /// <summary>
         /// Called whenever a user updates table data
         /// </summary>
@@ -588,47 +543,6 @@ namespace ChemProV.UI.DrawingCanvas
         }
 
         #endregion IPfdMouseEvents
-
-        public void DifficultySettingChanged(OptionDifficultySetting oldValue, OptionDifficultySetting newValue)
-        {
-            // Go through all the child elements looking for streams and process units. Upon finding either, ask it 
-            // if it's available at the difficulty level that we want to switch to and if it's not, throw an exception.
-            foreach (UIElement uie in Children)
-            {
-                if (uie is IStream)
-                {
-                    System.Reflection.MethodInfo mi = uie.GetType().GetMethod("IsAvailableWithDifficulty");
-                    bool available = (bool)mi.Invoke(null, new object[] { newValue });
-                    if (!available)
-                    {
-                        // This exception is caught at a higher level and an appropriate error message is shown
-                        throw new Exception();
-                    }
-                }
-                else if (uie is IProcessUnit)
-                {
-                    if (!(uie as IProcessUnit).IsAvailableWithDifficulty(newValue))
-                    {
-                        // This exception is caught at a higher level and an appropriate error message is shown
-                        throw new Exception();
-                    }
-                }
-            }
-
-            // If we come here it means that we didn't find any problems with switching to the difficulty, so 
-            // we should update all chemical stream tables
-            foreach (UIElement uie in Children)
-            {
-                ChemicalStreamPropertiesWindow table = uie as ChemicalStreamPropertiesWindow;
-                if (null == table)
-                {
-                    continue;
-                }
-
-                // Whether or not the temperature row is shown is dependent on the difficulty level
-                table.ShowTemperatureRow = (newValue == OptionDifficultySetting.MaterialAndEnergyBalance);
-            }
-        }
 
         /// <summary>
         /// Calling this function will cause the drawing_canvas to recalculate its height and width.
@@ -706,284 +620,227 @@ namespace ChemProV.UI.DrawingCanvas
 
         #region Load/Save
 
-        /// <summary>
-        /// Loads an XML-generated list of elements.
-        /// </summary>
-        /// <param name="doc"></param>
-        public void LoadXmlElements(XElement doc)
-        {            
-            // Process units first
-            XElement processUnits = doc.Descendants("ProcessUnits").ElementAt(0);
-            foreach (XElement unit in processUnits.Elements())
-            {
-                // Create the process unit and add it to the canvas
-                IProcessUnit pu = ProcessUnitFactory.ProcessUnitFromXml(unit);
-                AddNewChild((UIElement)pu);
+        // Keeping commented out for reference purposes, but I think I have all this in the workspace class now
 
-                // E.O.
-                // Load any comments that are present
-                XElement cmtElement = unit.Element("Comments");
-                if (null != cmtElement)
-                {
-                    foreach (XElement child in cmtElement.Elements())
-                    {                        
-                        StickyNoteControl sn;
-                        StickyNoteControl.CreateCommentNote(
-                            this, pu as Core.ICommentCollection, child, out sn);
-                    }
-                }
-            }
+        ///// <summary>
+        ///// Loads an XML-generated list of elements.
+        ///// </summary>
+        ///// <param name="doc"></param>
+        //public void LoadXmlElements(XElement doc)
+        //{            
+        //    // Process units first
+        //    XElement processUnits = doc.Descendants("ProcessUnits").ElementAt(0);
+        //    foreach (XElement unit in processUnits.Elements())
+        //    {
+        //        // Create the process unit and add it to the canvas
+        //        GenericProcessUnit pu = ChemProV.PFD.ProcessUnits.ProcessUnitFactory.ProcessUnitFromXml(unit);
+        //        AddNewChild((UIElement)pu);
 
-            //then streams
-            List<IStream> streamObjects = new List<IStream>();
-            XElement streamList = doc.Descendants("Streams").ElementAt(0);
-            foreach (XElement stream in streamList.Elements())
-            {
-                // Create the stream. The factory will connect it to the process units and create 
-                // sticky notes for comments if present
-                IStream s = StreamFactory.StreamFromXml(stream, this, true);
+        //        // E.O.
+        //        // Load any comments that are present
+        //        XElement cmtElement = unit.Element("Comments");
+        //        if (null != cmtElement)
+        //        {
+        //            foreach (XElement child in cmtElement.Elements())
+        //            {                        
+        //                StickyNoteControl sn;
+        //                StickyNoteControl.CreateCommentNote(
+        //                    this, pu as Core.ICommentCollection, child, out sn);
+        //            }
+        //        }
+        //    }
 
-                // The stream control itself is really just lines and these lines need a low Z-index
-                (s as AbstractStream).SetValue(Canvas.ZIndexProperty, -3);
+        //    //then streams
+        //    List<ChemProV.PFD.Streams.AbstractStream> streamObjects = new List<ChemProV.PFD.Streams.AbstractStream>();
+        //    XElement streamList = doc.Descendants("Streams").ElementAt(0);
+        //    foreach (XElement stream in streamList.Elements())
+        //    {
+        //        // Create the stream. The factory will connect it to the process units and create 
+        //        // sticky notes for comments if present
+        //        ChemProV.PFD.Streams.AbstractStream s = StreamFactory.StreamFromXml(stream, this, true);
 
-                s.UpdateStreamLocation();
+        //        // The stream control itself is really just lines and these lines need a low Z-index
+        //        (s as AbstractStream).SetValue(Canvas.ZIndexProperty, -3);
 
-                //we can't add the streams until we have also built the properties table
-                //so just add to local list variable
-                streamObjects.Add(s);
-            }
+        //        s.UpdateStreamLocation();
 
-            //and finally, properties tables
-            XElement tablesList = doc.Descendants("PropertiesWindows").ElementAt(0);
-            foreach (XElement table in tablesList.Elements())
-            {
-                //store the table's target
-                string parentName = (string)table.Element("ParentStream");
+        //        //we can't add the streams until we have also built the properties table
+        //        //so just add to local list variable
+        //        streamObjects.Add(s);
+        //    }
 
-                //create the table
-                IPropertiesWindow pTable = PropertiesWindowFactory.TableFromXml(table, currentDifficultySetting, isReadOnly);
+        //    //and finally, properties tables
+        //    XElement tablesList = doc.Descendants("PropertiesWindows").ElementAt(0);
+        //    foreach (XElement table in tablesList.Elements())
+        //    {
+        //        //store the table's target
+        //        string parentName = (string)table.Element("ParentStream");
 
-                //find the parent on the drawing_canvas
-                var parent = from c in streamObjects
-                             where c.Id.CompareTo(parentName) == 0
-                             select c;
-                pTable.ParentStream = parent.ElementAt(0);
-                parent.ElementAt(0).Table = pTable;
+        //        //create the table
+        //        IPropertiesWindow pTable = PropertiesWindowFactory.TableFromXml(table, currentDifficultySetting, isReadOnly);
 
-                // Add the stream. Streams take care of adding/removing their tables to/from
-                // the drawing canvas
-                AddNewChild((UIElement)parent.ElementAt(0));
+        //        //find the parent on the drawing_canvas
+        //        var parent = from c in streamObjects
+        //                     where c.Id.CompareTo(parentName) == 0
+        //                     select c;
+        //        pTable.ParentStream = parent.ElementAt(0);
+        //        parent.ElementAt(0).Table = pTable;
 
-                pTable.TableDataChanged += new TableDataEventHandler(TableDataChanged);
-                pTable.TableDataChanging += new EventHandler(TableDataChanging);
+        //        // Add the stream. Streams take care of adding/removing their tables to/from
+        //        // the drawing canvas
+        //        AddNewChild((UIElement)parent.ElementAt(0));
 
-                //tell the stream to redraw in order to fix any graphical glitches
-                parent.ElementAt(0).UpdateStreamLocation();
-            }
+        //        pTable.TableDataChanged += new TableDataEventHandler(TableDataChanged);
+        //        pTable.TableDataChanging += new EventHandler(TableDataChanging);
 
-            //don't forget about the sticky notes!
-            XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
-            foreach (XElement note in stickyNoteList.Elements())
-            {
-                StickyNoteControl sn = new StickyNoteControl(note, this);
-                AddNewChild(sn);
-            }
+        //        //tell the stream to redraw in order to fix any graphical glitches
+        //        parent.ElementAt(0).UpdateStreamLocation();
+        //    }
 
-            // Tell all stream endpoints to update their locations
-            foreach (UIElement uie in Children)
-            {
-                if (!(uie is DraggableStreamEndpoint))
-                {
-                    continue;
-                }
+        //    //don't forget about the sticky notes!
+        //    XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
+        //    foreach (XElement note in stickyNoteList.Elements())
+        //    {
+        //        StickyNoteControl sn = new StickyNoteControl(note, this);
+        //        AddNewChild(sn);
+        //    }
 
-                DraggableStreamEndpoint dse = uie as DraggableStreamEndpoint;
-                dse.EndpointConnectionChanged(dse.Type, null, null);
-            }
+        //    // Tell all stream endpoints to update their locations
+        //    foreach (UIElement uie in Children)
+        //    {
+        //        if (!(uie is DraggableStreamEndpoint))
+        //        {
+        //            continue;
+        //        }
 
-            // Go through all sticky notes on the canvas and assign colors
-            Dictionary<string, StickyNoteColors> clrs = new Dictionary<string, StickyNoteColors>();
-            foreach (UIElement uie in Children)
-            {
-                StickyNoteControl sn = uie as StickyNoteControl;
-                if (null == sn)
-                {
-                    continue;
-                }
+        //        DraggableStreamEndpoint dse = uie as DraggableStreamEndpoint;
+        //        dse.EndpointConnectionChanged(dse.Type, null, null);
+        //    }
 
-                // Assign a color based on the user name
-                if (!string.IsNullOrEmpty(sn.CommentUserName))
-                {
-                    if (!clrs.ContainsKey(sn.CommentUserName))
-                    {
-                        StickyNoteColors clr = StickyNoteControl.GetNextUserStickyColor();
-                        clrs[sn.CommentUserName] = clr;
-                        sn.ColorChange(clr);
-                    }
-                    else
-                    {
-                        sn.ColorChange(clrs[sn.CommentUserName]);
-                    }
-                }
-            }
+        //    // Go through all sticky notes on the canvas and assign colors
+        //    Dictionary<string, StickyNoteColors> clrs = new Dictionary<string, StickyNoteColors>();
+        //    foreach (UIElement uie in Children)
+        //    {
+        //        StickyNoteControl sn = uie as StickyNoteControl;
+        //        if (null == sn)
+        //        {
+        //            continue;
+        //        }
 
-            PFDModified();
-        }
+        //        // Assign a color based on the user name
+        //        if (!string.IsNullOrEmpty(sn.CommentUserName))
+        //        {
+        //            if (!clrs.ContainsKey(sn.CommentUserName))
+        //            {
+        //                StickyNoteColors clr = StickyNoteControl.GetNextUserStickyColor();
+        //                clrs[sn.CommentUserName] = clr;
+        //                sn.ColorChange(clr);
+        //            }
+        //            else
+        //            {
+        //                sn.ColorChange(clrs[sn.CommentUserName]);
+        //            }
+        //        }
+        //    }
+
+        //    PFDModified();
+        //}
 
         private StickyNoteColors GetStickyNoteColor(StickyNoteControl forThis)
         {
-            if (!Core.App.Workspace.UserStickyNoteColors.ContainsKey(forThis.CommentUserName))
+            if (!Core.App.Workspace.UserStickyNoteColors.ContainsKey(forThis.StickyNote.UserName))
             {
                 // New user = new color. We need to get a new color and then add this user to
                 // the dictionary
                 StickyNoteColors clr = StickyNoteControl.GetNextUserStickyColor();
-                Core.App.Workspace.UserStickyNoteColors.Add(forThis.CommentUserName, clr);
+                Core.App.Workspace.UserStickyNoteColors.Add(forThis.StickyNote.UserName, clr);
                 return clr;
             }
             else
             {
-                return Core.App.Workspace.UserStickyNoteColors[forThis.CommentUserName];
+                return Core.App.Workspace.UserStickyNoteColors[forThis.StickyNote.UserName];
             }
         }
 
-        #region IXmlSerializable Members
+        ///// <summary>
+        ///// Turns the drawing drawing_canvas into an XML object
+        ///// </summary>
+        ///// <param name="writer"></param>
+        //public void WriteXml(XmlWriter writer)
+        //{
+        //    //before writing, separate the elements based on type
+        //    List<GenericProcessUnit> processUnits = new List<GenericProcessUnit>();
+        //    List<ChemProV.PFD.Streams.AbstractStream> streams = new List<ChemProV.PFD.Streams.AbstractStream>();
+        //    List<IPropertiesWindow> PropertiesWindows = new List<IPropertiesWindow>();
+        //    List<StickyNoteControl> stickyNotes = new List<StickyNoteControl>();
+        //    List<IPfdElement> other = new List<IPfdElement>();
 
-        /// <summary>
-        /// According to the MSDN documentation, this should return NULL
-        /// </summary>
-        /// <returns></returns>
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            return null;
-        }
+        //    //create the lists by looping through all children
+        //    foreach (UIElement element in this.Children)
+        //    {
+        //        if (element is IPfdElement)
+        //        {
+        //            if (element is GenericProcessUnit)
+        //            {
+        //                processUnits.Add(element as GenericProcessUnit);
+        //            }
+        //            else if (element is ChemProV.PFD.Streams.AbstractStream)
+        //            {
+        //                streams.Add(element as ChemProV.PFD.Streams.AbstractStream);
+        //            }
+        //            else if (element is IPropertiesWindow)
+        //            {
+        //                PropertiesWindows.Add(element as IPropertiesWindow);
+        //            }
+        //            else if (element is StickyNoteControl)
+        //            {
+        //                stickyNotes.Add(element as StickyNoteControl);
+        //            }
+        //            else
+        //            {
+        //                other.Add(element as IPfdElement);
+        //            }
+        //        }
+        //    }
 
-        /// <summary>
-        /// not used
-        /// </summary>
-        /// <param name="reader"></param>
-        public void ReadXml(XmlReader reader)
-        {
-        }
+        //    //process units first
+        //    writer.WriteStartElement("ProcessUnits");
+        //    foreach (IPfdElement element in processUnits)
+        //    {
+        //        objectFromIPfdElement(element).Serialize(writer, element);
+        //    }
+        //    writer.WriteEndElement();
 
-        /// <summary>
-        /// Turns the drawing drawing_canvas into an XML object
-        /// </summary>
-        /// <param name="writer"></param>
-        public void WriteXml(XmlWriter writer)
-        {
-            //before writing, separate the elements based on type
-            List<IProcessUnit> processUnits = new List<IProcessUnit>();
-            List<IStream> streams = new List<IStream>();
-            List<IPropertiesWindow> PropertiesWindows = new List<IPropertiesWindow>();
-            List<StickyNoteControl> stickyNotes = new List<StickyNoteControl>();
-            List<IPfdElement> other = new List<IPfdElement>();
+        //    //then streams
+        //    writer.WriteStartElement("Streams");
+        //    foreach (IPfdElement element in streams)
+        //    {
+        //        objectFromIPfdElement(element).Serialize(writer, element);
+        //    }
+        //    writer.WriteEndElement();
 
-            //create the lists by looping through all children
-            foreach (UIElement element in this.Children)
-            {
-                if (element is IPfdElement)
-                {
-                    if (element is IProcessUnit)
-                    {
-                        processUnits.Add(element as IProcessUnit);
-                    }
-                    else if (element is IStream)
-                    {
-                        streams.Add(element as IStream);
-                    }
-                    else if (element is IPropertiesWindow)
-                    {
-                        PropertiesWindows.Add(element as IPropertiesWindow);
-                    }
-                    else if (element is StickyNoteControl)
-                    {
-                        stickyNotes.Add(element as StickyNoteControl);
-                    }
-                    else
-                    {
-                        other.Add(element as IPfdElement);
-                    }
-                }
-            }
+        //    //next, properties tables
+        //    writer.WriteStartElement("PropertiesWindows");
+        //    foreach (IPfdElement element in PropertiesWindows)
+        //    {
+        //        objectFromIPfdElement(element).Serialize(writer, element);
+        //    }
+        //    writer.WriteEndElement();
 
-            //process units first
-            writer.WriteStartElement("ProcessUnits");
-            foreach (IPfdElement element in processUnits)
-            {
-                objectFromIPfdElement(element).Serialize(writer, element);
-            }
-            writer.WriteEndElement();
-
-            //then streams
-            writer.WriteStartElement("Streams");
-            foreach (IPfdElement element in streams)
-            {
-                objectFromIPfdElement(element).Serialize(writer, element);
-            }
-            writer.WriteEndElement();
-
-            //next, properties tables
-            writer.WriteStartElement("PropertiesWindows");
-            foreach (IPfdElement element in PropertiesWindows)
-            {
-                objectFromIPfdElement(element).Serialize(writer, element);
-            }
-            writer.WriteEndElement();
-
-            // Write "free-floating" sticky notes. These are ones that have don't have a 
-            // comment collection parent
-            writer.WriteStartElement("StickyNotes");
-            foreach (IPfdElement element in stickyNotes)
-            {
-                if (!((StickyNoteControl)element).HasCommentCollectionParent)
-                {
-                    writer.WriteStartElement("StickyNote");
-                    (element as StickyNoteControl).WriteXml(writer);
-                    writer.WriteEndElement();
-                }
-            }
-            writer.WriteEndElement();
-
-            //finally, whatever is left over
-            writer.WriteStartElement("Other");
-            foreach (IPfdElement element in other)
-            {
-                objectFromIPfdElement(element).Serialize(writer, element);
-            }
-            writer.WriteEndElement();
-        }
-
-        /// <summary>
-        /// Helper function used to get the right type of XML Serialize
-        /// </summary>
-        /// <param name="element"></param>
-        /// <returns></returns>
-        private XmlSerializer objectFromIPfdElement(IPfdElement element)
-        {
-            if (element is GenericProcessUnit)
-            {
-                return new XmlSerializer(typeof(GenericProcessUnit));
-            }
-            else if (element is AbstractStream)
-            {
-                return new XmlSerializer(typeof(AbstractStream));
-            }
-            else if (element is ChemicalStreamPropertiesWindow)
-            {
-                return new XmlSerializer(typeof(ChemicalStreamPropertiesWindow));
-            }
-            else if (element is HeatStreamPropertiesWindow)
-            {
-                return new XmlSerializer(typeof(HeatStreamPropertiesWindow));
-            }
-            else if (element is StickyNoteControl)
-            {
-                return new XmlSerializer(typeof(StickyNoteControl));
-            }
-            return new XmlSerializer(typeof(NullSerializer));
-        }
-
-        #endregion IXmlSerializable Members
+        //    // Write "free-floating" sticky notes. These are ones that have don't have a 
+        //    // comment collection parent
+        //    writer.WriteStartElement("StickyNotes");
+        //    foreach (IPfdElement element in stickyNotes)
+        //    {
+        //        if (!((StickyNoteControl)element).HasCommentCollectionParent)
+        //        {
+        //            writer.WriteStartElement("StickyNote");
+        //            (element as StickyNoteControl).WriteXml(writer);
+        //            writer.WriteEndElement();
+        //        }
+        //    }
+        //    writer.WriteEndElement();
+        //}
 
         /// <summary>
         /// Null class used in XML output.  Does nothing.
@@ -1016,8 +873,6 @@ namespace ChemProV.UI.DrawingCanvas
         public void ClearDrawingCanvas()
         {
             this.Children.Clear();
-            ChemicalStreamPropertiesWindow.ResetTableCounter();
-            HeatStreamPropertiesWindow.ResetTableCounter();
         }
 
         /// <summary>
@@ -1066,11 +921,164 @@ namespace ChemProV.UI.DrawingCanvas
 
             // Store a reference to the workspace
             m_workspace = workspace;
+
+            // We must monitor changes to the list of process units, streams, sticky notes, and 
+            // comments for streams or process units. (Or should the controls monitor their own 
+            // comment collections?)
+            m_workspace.ProcessUnitsCollectionChanged += this.ProcessUnits_CollectionChanged;
+            m_workspace.StreamsCollectionChanged += new EventHandler(Streams_CollectionChanged);
+            m_workspace.StickyNotes.CollectionChanged += this.StickyNotes_CollectionChanged;
+            // TODO: The rest
         }
 
         public Workspace GetWorkspace()
         {
             return m_workspace;
+        }
+
+        #region Event handlers for UI updating
+
+        /// <summary>
+        /// Callback for when the collection of process units in the workspace changes. We must update 
+        /// the UI to match the workspace.
+        /// </summary>
+        private void ProcessUnits_CollectionChanged(object sender, EventArgs e)
+        {
+            // First go through all process unit controls on the canvas and remove ones that are 
+            // no longer in the workspace.
+            List<ChemProV.Core.AbstractProcessUnit> unitsThatHaveControls = 
+                new List<ChemProV.Core.AbstractProcessUnit>();
+            for (int i=0; i<Children.Count; i++)
+            {
+                ProcessUnitControl lpu = Children[i] as ProcessUnitControl;
+                if (null == lpu)
+                {
+                    continue;
+                }
+
+                // Add it to a list that we'll use later
+                unitsThatHaveControls.Add(lpu.ProcessUnit);
+
+                if (!m_workspace.ProcessUnits.Contains(lpu.ProcessUnit))
+                {
+                    // Tell the process unit to remove itself. It will also remove any 
+                    // controls used to represent comments.
+                    lpu.RemoveSelfFromCanvas(this);
+                    
+                    // Reset the index since a bunch of child controls could have potentially just 
+                    // been removed
+                    i = -1;
+                }
+            }
+
+            // Now go through and add any process units that are missing
+            foreach (ChemProV.Core.AbstractProcessUnit apu in m_workspace.ProcessUnits)
+            {
+                if (!unitsThatHaveControls.Contains(apu))
+                {
+                    // Create the process unit. The static method will create it, put it on 
+                    // the canvas, and take care of all comment sticky notes as well.
+                    ProcessUnitControl lpuNew = ProcessUnitControl.CreateOnCanvas(this, apu);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Event handler to update free-floating sticky notes
+        /// </summary>
+        private void StickyNotes_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            // First go through all sticky note controls on the canvas and remove ones that are 
+            // no longer in the workspace.
+            List<ChemProV.PFD.StickyNote.StickyNote_UIIndependent> notesThatHaveControls =
+                new List<ChemProV.PFD.StickyNote.StickyNote_UIIndependent>();
+            for (int i = 0; i < Children.Count; i++)
+            {
+                PFD.StickyNote.StickyNoteControl snc = Children[i] as PFD.StickyNote.StickyNoteControl;
+                if (null == snc)
+                {
+                    continue;
+                }
+
+                // Add it to a list that we'll use later
+                notesThatHaveControls.Add(snc.StickyNote);
+
+                if (!m_workspace.StickyNotes.Contains(snc.StickyNote))
+                {
+                    // Remove the sticky note control from the canvas
+                    Children.RemoveAt(i);
+
+                    // Decrement the index since we just removed a control
+                    i = -1;
+                }
+            }
+
+            // Now go through and add any sticky notes that are missing
+            foreach (ChemProV.PFD.StickyNote.StickyNote_UIIndependent sn in m_workspace.StickyNotes)
+            {
+                if (!notesThatHaveControls.Contains(sn))
+                {
+                    PFD.StickyNote.StickyNoteControl.CreateOnCanvas(this, sn, null);
+                }
+            }
+        }
+
+        private void Streams_CollectionChanged(object sender, EventArgs e)
+        {
+            // First go through all stream controls on the canvas and remove ones that are 
+            // no longer in the workspace.
+            List<ChemProV.Core.AbstractStream> streamsThatHaveControls =
+                new List<ChemProV.Core.AbstractStream>();
+            for (int i = 0; i < Children.Count; i++)
+            {
+                PFD.Streams.AbstractStream stream = Children[i] as PFD.Streams.AbstractStream;
+                if (null == stream)
+                {
+                    continue;
+                }
+
+                // Add it to a list that we'll use later
+                streamsThatHaveControls.Add(stream.Stream);
+
+                if (!m_workspace.Streams.Contains(stream.Stream))
+                {
+                    // Tell the stream control to remove itself and all it's children (stream lines, 
+                    // comment sticky note controls, etc.)
+                    stream.RemoveSelfFromCanvas(this);
+
+                    // Reset the index since a bunch of child controls could have potentially just 
+                    // been removed
+                    i = -1;
+                }
+            }
+
+            // Now go through and add stream controls that are missing
+            foreach (ChemProV.Core.AbstractStream stream in m_workspace.Streams)
+            {
+                if (!streamsThatHaveControls.Contains(stream))
+                {
+                    PFD.Streams.AbstractStream.CreateOnCanvas(this, stream);
+                }
+            }
+        }
+
+        #endregion
+
+        public PFD.Streams.AbstractStream GetStreamControl(Core.AbstractStream stream)
+        {
+            foreach (UIElement uie in Children)
+            {
+                PFD.Streams.AbstractStream s = uie as PFD.Streams.AbstractStream;
+                if (null != s)
+                {
+                    if (Object.ReferenceEquals(s.Stream, stream))
+                    {
+                        return s;
+                    }
+                }
+            }
+
+            return null;
         }
     }
 }

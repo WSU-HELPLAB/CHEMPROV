@@ -67,7 +67,15 @@ namespace ChemProV.UI
                     m_workspace.EquationEditorFontSize = d;
                 }
             }
+
             this.DialogResult = true;
+
+            // Try to change the difficulty setting
+            if (!m_workspace.TrySetDifficulty(OptionSelection))
+            {
+                MessageBox.Show("Use of advance process units or streams detected. " +
+                    "Please remove them before changing the setting.");
+            }
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)

@@ -29,7 +29,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
         /// <summary>
         /// Gets or sets the parent stream that the table is attached to
         /// </summary>
-        IStream ParentStream
+        ChemProV.PFD.Streams.AbstractStream ParentStream
         {
             get;
             set;

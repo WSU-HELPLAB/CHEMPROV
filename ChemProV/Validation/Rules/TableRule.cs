@@ -35,14 +35,15 @@ namespace ChemProV.Validation.Rules
             //Clear the list from last time
             ValidationResults.Clear();
 
-            //Make sure target is not null and it is an IPropertiesWindow
-            if (target != null && target is ChemicalStreamPropertiesWindow)
+            // Make sure the target is not null and it is an StreamPropertiesTable
+            if (target != null && target is Core.StreamPropertiesTable)
             {
-                ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(target as IPropertiesWindow);
+                ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(
+                    target as Core.StreamPropertiesTable);
 
                 ValidationResult vr;
 
-                if (target is ChemicalStreamPropertiesWindow)
+                if (StreamType.Chemical == (target as Core.StreamPropertiesTable).StreamType)
                 {
                     vr = unitsAreConsistant(tableAdapter);
 

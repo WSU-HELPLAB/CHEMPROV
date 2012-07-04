@@ -22,6 +22,7 @@ using ChemProV.PFD.EquationEditor.Models;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Undos;
+using System.ComponentModel;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -35,11 +36,14 @@ namespace ChemProV.PFD.EquationEditor
 
         #region instance variables
 
-        private IList<string> compounds = new List<string>();
         private List<string> elements = new List<string>();
         private ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
 
-        private List<IPfdElement> pfdElements = new List<IPfdElement>();
+        /// <summary>
+        /// List of stream property tables that we've attached row-change listeners to. Gets updated 
+        /// when the collection of streams in the workspace changes.
+        /// </summary>
+        private List<Core.StreamPropertiesTable> m_monitoredTables = new List<Core.StreamPropertiesTable>();
 
         private ChemProV.Core.Workspace m_workspace = null;
 
@@ -51,61 +55,12 @@ namespace ChemProV.PFD.EquationEditor
 
         private static Brush s_lightGrayBrush = new SolidColorBrush(Colors.LightGray);
 
-        public List<IPfdElement> PfdElements
-        {
-            get
-            {
-                return pfdElements;
-            }
-            set
-            {
-                //attach event listeners to each LabeledProcessUnit so that we can update our
-                //scopes as necessary
-                foreach (IPfdElement element in value)
-                {
-                    if (element is LabeledProcessUnit)
-                    {
-                        (element as LabeledProcessUnit).PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(LabeledProcessUnitPropertyChanged);
-                    }
-                }
-
-                //and detach event listeners from the old list of elements
-                foreach (IPfdElement element in pfdElements)
-                {
-                    if (element is LabeledProcessUnit)
-                    {
-                        (element as LabeledProcessUnit).PropertyChanged -= new System.ComponentModel.PropertyChangedEventHandler(LabeledProcessUnitPropertyChanged);
-                    }
-                }
-
-                //finally, replace the old with the new
-                pfdElements = value;
-                updateScopes();
-            }
-        }
-
         public ObservableCollection<EquationType> EquationTypes
         {
             get { return equationTypes; }
         }
 
         public ObservableCollection<EquationScope> EquationScopes { get; private set; }
-
-        public OptionDifficultySetting CurrentDifficultySetting
-        {
-            get;
-            set;
-        }
-
-        public IList<string> Compounds
-        {
-            get { return compounds; }
-            set
-            {
-                compounds = value;
-                UpdateCompounds();
-            }
-        }
 
         #endregion Properties
 
@@ -114,8 +69,6 @@ namespace ChemProV.PFD.EquationEditor
         public EquationEditor()
         {
             InitializeComponent();
-
-            PfdElements = new List<IPfdElement>();
 
             UpdateCompounds();
             updateScopes();
@@ -297,58 +250,6 @@ namespace ChemProV.PFD.EquationEditor
         }
 
         /// <summary>
-        /// Updates the list of scopes that an equation can reference
-        /// </summary>
-        private void updateScopes()
-        {
-            EquationScopes = new ObservableCollection<EquationScope>();
-
-            //add "overall" scope
-            EquationScopes.Add(new EquationScope(EquationScopeClassification.Overall, Name = "Overall"));
-
-            //add "unspecified" scope
-            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unknown, Name = "Unknown"));
-
-            //add any process units to the list of possible scopes
-            foreach (IPfdElement element in PfdElements)
-            {
-                LabeledProcessUnit unit = element as LabeledProcessUnit;
-                if (unit != null)
-                {
-                    EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = unit.ProcessUnitLabel));
-
-                    // If there's a scope for this process unit, then add it
-                    if (!unit.Subprocess.Equals(System.Windows.Media.Colors.White))
-                    {
-                        // Find the name of this color
-                        string name = null;
-                        foreach (Core.NamedColor nc in Core.NamedColors.All)
-                        {
-                            if (nc.Color.Equals(unit.Subprocess))
-                            {
-                                name = nc.Name + " subprocess";
-                                break;
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(name))
-                        {
-                            EquationScopes.Add(new EquationScope(EquationScopeClassification.SubProcess, name));
-                        }
-                    }
-                }
-            }
-
-            // Update all of the equation controls
-            for (int i = 0; i < EquationRowCount; i++)
-            {
-                EquationControl ec = GetRow(i);
-                ec.SetScopeOptions(EquationScopes);
-                UpdateEquationModelElements(ec.Model);
-            }
-        }
-
-        /// <summary>
         /// Gets the equation control at the specified row index.
         /// </summary>
         /// <param name="index">Zero-based index of the row.</param>
@@ -368,6 +269,13 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         public void UpdateCompounds()
         {
+            if (null == m_workspace)
+            {
+                return;
+            }
+            
+            IList<string> compounds = Core.WorkspaceUtility.GetUniqueSelectedCompounds(m_workspace);
+            
             equationTypes = new ObservableCollection<EquationType>();
             elements.Clear();
             foreach (string compoundstr in compounds)
@@ -379,7 +287,6 @@ namespace ChemProV.PFD.EquationEditor
                     if (!elements.Contains(element.Key.Name))
                     {
                         elements.Add(element.Key.Name);
-
                     }
                 }
             }
@@ -389,10 +296,13 @@ namespace ChemProV.PFD.EquationEditor
 
             foreach (string compound in compounds)
             {
-                equationTypes.Add(new EquationType(EquationTypeClassification.Compound, compound));
+                if (compound != "Overall")
+                {
+                    equationTypes.Add(new EquationType(EquationTypeClassification.Compound, compound));
+                }
             }
 
-            if (CurrentDifficultySetting != OptionDifficultySetting.MaterialBalance)
+            if (m_workspace.Difficulty != OptionDifficultySetting.MaterialBalance)
             {
                 foreach (string element in elements)
                 {
@@ -407,17 +317,17 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        private List<IPfdElement> GetElementAndStreams(IProcessUnit unit)
+        private List<object> GetElementAndStreams(Core.AbstractProcessUnit unit)
         {
-            List<IPfdElement> elements = new List<IPfdElement>();
+            List<object> elements = new List<object>();
             
-            //add the process unit as well as its incoming and outgoing streams
+            // Add the process unit as well as its incoming and outgoing streams
             elements.Add(unit);
-            foreach (IPfdElement element in unit.IncomingStreams)
+            foreach (Core.AbstractStream element in unit.IncomingStreams)
             {
                 elements.Add(element);
             }
-            foreach (IPfdElement element in unit.OutgoingStreams)
+            foreach (Core.AbstractStream element in unit.OutgoingStreams)
             {
                 elements.Add(element);
             }
@@ -426,18 +336,16 @@ namespace ChemProV.PFD.EquationEditor
 
         private void UpdateEquationModelElements(EquationModel equation)
         {
-            List<IPfdElement> relevantUnits = new List<IPfdElement>();
+            List<object> relevantUnits = new List<object>();
 
             //supply different PFD elements to the model depending on its scope
             switch (equation.Scope.Classification)
             {
                 //With a single unit, all we care about is that unit and its related streams
                 case EquationScopeClassification.SingleUnit:
-                    LabeledProcessUnit selectedUnit = (from element in PfdElements
-                                                      where element is LabeledProcessUnit
-                                                      &&
-                                                      (element as LabeledProcessUnit).ProcessUnitLabel == equation.Scope.Name
-                                                      select element).FirstOrDefault() as LabeledProcessUnit;
+                    Core.AbstractProcessUnit selectedUnit = (from element in m_workspace.ProcessUnits
+                                                      where (element as Core.AbstractProcessUnit).Label == equation.Scope.Name
+                                                      select element).FirstOrDefault() as Core.AbstractProcessUnit;
                     if (selectedUnit != null)
                     {
                         relevantUnits = GetElementAndStreams(selectedUnit);
@@ -456,19 +364,21 @@ namespace ChemProV.PFD.EquationEditor
                 //Pull all source and sink units as well as their streams
                 case EquationScopeClassification.Overall:
                 default:
-                    List<IProcessUnit> units = (from element in PfdElements
-                                                where element is IProcessUnit
-                                                &&
-                                                (
-                                                 (element as IProcessUnit).Description == ProcessUnitDescriptions.Sink
-                                                 ||
-                                                 (element as IProcessUnit).Description == ProcessUnitDescriptions.Source
-                                                )
-                                                select element as IProcessUnit).ToList();
-                    foreach (IProcessUnit unit in units)
-                    {
-                        relevantUnits = relevantUnits.Union(GetElementAndStreams(unit)).ToList();
-                    }
+                    // TODO: Fix or remove
+
+                    //List<GenericProcessUnit> units = (from element in PfdElements
+                    //                            where element is GenericProcessUnit
+                    //                            &&
+                    //                            (
+                    //                             (element as GenericProcessUnit).Description == ProcessUnitDescriptions.Sink
+                    //                             ||
+                    //                             (element as GenericProcessUnit).Description == ProcessUnitDescriptions.Source
+                    //                            )
+                    //                            select element as GenericProcessUnit).ToList();
+                    //foreach (GenericProcessUnit unit in units)
+                    //{
+                    //    relevantUnits = relevantUnits.Union(GetElementAndStreams(unit)).ToList();
+                    //}
                     break;
             }
 
@@ -485,7 +395,7 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
-        private void LabeledProcessUnitPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void GenericProcessUnitPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             updateScopes();
         }
@@ -618,11 +528,19 @@ namespace ChemProV.PFD.EquationEditor
             // Store a reference to the workspace
             m_workspace = workspace;
 
+            UpdateCompounds();
+            updateScopes();
+
             UpdateFromWorkspace();
 
             // Attach listeners
             m_workspace.Equations.CollectionChanged += new NotifyCollectionChangedEventHandler(Equations_CollectionChanged);
             m_workspace.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(WorkspacePropertyChanged);
+            m_workspace.ProcessUnitsCollectionChanged += delegate(object sender, EventArgs e)
+            {
+                updateScopes();
+            };
+            m_workspace.StreamsCollectionChanged += new EventHandler(WorkspaceStreamsCollectionChanged);
         }
 
         private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -635,7 +553,8 @@ namespace ChemProV.PFD.EquationEditor
             // Set the deletion callback function
             control.SetDeleteRequestDelegate(this.DeleteEquationRow);
 
-            control.Model.RelatedElements = PfdElements;
+            // TODO: Perhaps fix at a later date (the commented-out line)
+            //control.Model.RelatedElements = PfdElements;
             control.Model.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(EquationModelPropertyChanged);
 
             // Link up events for move up/move down buttons
@@ -655,6 +574,19 @@ namespace ChemProV.PFD.EquationEditor
                 // Tell the workspace to update visibility for the comment pane
                 Core.App.Workspace.UpdateCommentsPaneVisibility();
             };
+        }
+
+        /// <summary>
+        /// Fired when a row in a chemical stream properties table changes. The reason we're interested 
+        /// in this is because the "Type" options in the equations editor come from the collection of 
+        /// selected compounds in the stream property tables.
+        /// </summary>
+        private void TableRowPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("SelectedCompound"))
+            {
+                UpdateCompounds();
+            }
         }
 
         /// <summary>
@@ -703,6 +635,60 @@ namespace ChemProV.PFD.EquationEditor
             UpdateRowProperties();
         }
 
+        /// <summary>
+        /// Updates the list of scopes that an equation can reference
+        /// </summary>
+        private void updateScopes()
+        {
+            // Can't do anything without a workspace
+            if (null == m_workspace)
+            {
+                return;
+            }
+            
+            EquationScopes = new ObservableCollection<EquationScope>();
+
+            //add "overall" scope
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Overall, Name = "Overall"));
+
+            //add "Unknown" scope
+            EquationScopes.Add(new EquationScope(EquationScopeClassification.Unknown, Name = "Unknown"));
+
+            // Add any process units and subprocesses to the list of possible scopes
+            foreach (Core.AbstractProcessUnit apu in m_workspace.ProcessUnits)
+            {
+                EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = apu.Label));
+
+                // If there's a non-default subprocess for this process unit, then add it
+                if (!apu.Subprocess.ToLower().Equals("#ffffffff"))
+                {
+                    // Find the name of this color
+                    string name = null;
+                    foreach (Core.NamedColor nc in Core.NamedColors.All)
+                    {
+                        if (nc.Color.Equals(apu.Subprocess))
+                        {
+                            name = nc.Name + " subprocess";
+                            break;
+                        }
+                    }
+
+                    if (!string.IsNullOrEmpty(name))
+                    {
+                        EquationScopes.Add(new EquationScope(EquationScopeClassification.SubProcess, name));
+                    }
+                }
+            }
+
+            // Update all of the equation controls
+            for (int i = 0; i < EquationRowCount; i++)
+            {
+                EquationControl ec = GetRow(i);
+                ec.SetScopeOptions(EquationScopes);
+                UpdateEquationModelElements(ec.Model);
+            }
+        }
+
         private void WorkspacePropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("EquationEditorFontSize"))
@@ -710,6 +696,38 @@ namespace ChemProV.PFD.EquationEditor
                 // Update the font size for all rows
                 UpdateRowProperties();
             }
+        }
+
+        private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
+        {
+            // Start by unsubscribing from the old list
+            foreach (Core.StreamPropertiesTable table in m_monitoredTables)
+            {
+                table.RowPropertyChanged -= this.TableRowPropertyChanged;
+            }
+
+            // Rebuild the list and subsribe to changes in chemical stream property tables
+            m_monitoredTables.Clear();
+            foreach (Core.AbstractStream stream in m_workspace.Streams)
+            {
+                Core.ChemicalStream cs = stream as Core.ChemicalStream;
+                if (null == cs)
+                {
+                    // Ignore it if it's not a chemical stream
+                    continue;
+                }
+
+                Core.StreamPropertiesTable table = cs.PropertiesTable;
+                if (null == table)
+                {
+                    throw new InvalidOperationException(
+                        "Stream in workspace has a null table");
+                }
+                m_monitoredTables.Add(table);
+                table.RowPropertyChanged += this.TableRowPropertyChanged;
+            }
+
+            UpdateCompounds();
         }
     }
 }

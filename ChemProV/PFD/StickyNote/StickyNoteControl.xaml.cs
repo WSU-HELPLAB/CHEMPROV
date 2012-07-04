@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -14,14 +14,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using System.Xml;
-using System.Xml.Linq;
-using System.Xml.Serialization;
 using ChemProV.Core;
 using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 using ChemProV.UI.DrawingCanvas;
+using System.ComponentModel;
 
 namespace ChemProV.PFD.StickyNote
 {
@@ -34,7 +32,7 @@ namespace ChemProV.PFD.StickyNote
         Yellow
     }
 
-    public partial class StickyNoteControl : UserControl, IPfdElement, IXmlSerializable, Core.ICanvasElement, Core.IComment
+    public partial class StickyNoteControl : UserControl, IPfdElement, Core.ICanvasElement
     {
         private DrawingCanvas m_canvas = null;
 
@@ -49,7 +47,9 @@ namespace ChemProV.PFD.StickyNote
         /// <summary>
         /// Reference to the parent comment collection if this is a comment-sticky-note, null otherwise.
         /// </summary>
-        private Core.ICommentCollection m_commentParent = null;
+        private object m_commentParent = null;
+
+        private StickyNote_UIIndependent m_note;
         
         private StickyNoteColors color;
 
@@ -59,52 +59,152 @@ namespace ChemProV.PFD.StickyNote
         /// Default constructor that exists only to make design view work. Must stay private.
         /// </summary>
         private StickyNoteControl()
-            : this(null)
+            : this(null, null)
         {
         }
-        
-        public StickyNoteControl(DrawingCanvas canvas)
+
+        private StickyNoteControl(DrawingCanvas canvas, StickyNote_UIIndependent memNote)
         {
             InitializeComponent();
             m_canvas = canvas;
+            m_note = memNote;
 
             // Ensure that we always default to yellow
             ColorChange(StickyNoteColors.Yellow);
-        }
-
-        public StickyNoteControl(XElement xmlNote, DrawingCanvas canvas)
-            : this(canvas)
-        {
-            // Use UI-independent logic to load the note's properties. Ideally ChemProV 
-            // should be architected so that you could deal with ChemProV documents without 
-            // dependency on Silverlight (but it's not even close at this point). The UI-
-            // independent sticky note was a step in this direction.
-            StickyNote_UIIndependent memNote = new StickyNote_UIIndependent(xmlNote, null);
 
             // Set properties
-            this.Height = memNote.Height;
-            this.CommentText = memNote.Text;
-            this.CommentUserName = memNote.UserName;
-            this.Width = memNote.Width;
-            this.SetValue(Canvas.LeftProperty, memNote.LocationX);
-            this.SetValue(Canvas.TopProperty, memNote.LocationY);
+            if (null != memNote)
+            {
+                this.Height = memNote.Height;
+                Note.Text = memNote.Text;
+                Header.Text = (null == m_note.UserName) ? string.Empty : m_note.UserName;
+                this.Width = memNote.Width;
+                this.SetValue(Canvas.LeftProperty, memNote.LocationX);
+                this.SetValue(Canvas.TopProperty, memNote.LocationY);
+
+                // Monitor changes in the memNote object
+                memNote.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(MemNote_PropertyChanged);
+            }
+        }
+
+        /// <summary>
+        /// Callback for changes in the data structure that this control wraps around. We have to update UI 
+        /// elements appropriately based on changes to the data.
+        /// </summary>
+        private void MemNote_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                // TODO: Height
+                
+                case "LocationX":
+                    SetValue(Canvas.LeftProperty, m_note.LocationX);
+                    break;
+
+                case "LocationY":
+                    SetValue(Canvas.TopProperty, m_note.LocationY);
+                    break;
+                
+                case "Text":
+                    Note.Text = m_note.Text;
+                    break;
+                
+                case "UserName":
+                    Header.Text = (null == m_note.UserName) ? string.Empty : m_note.UserName;
+                    break;
+
+                // TODO: Width
+            }
+        }
+
+        public static StickyNoteControl CreateOnCanvas(DrawingCanvas canvas,
+            StickyNote_UIIndependent memNote, object commentParentControl)
+        {
+            // I'm using a static constructor because this way I can at least choose 
+            // wording that implies that this control will be created AND added to 
+            // the drawing canvas.
+
+            // Quick parameter check
+            if (null == canvas || null == memNote)
+            {
+                throw new ArgumentNullException();
+            }
+
+            StickyNoteControl snc = new StickyNoteControl(canvas, memNote);
+            snc.m_commentParent = commentParentControl;
+            canvas.AddNewChild(snc);
+
+            // Give it a high z-index since we want comments above everything else
+            snc.SetValue(Canvas.ZIndexProperty, (int)4);
+
+            // Setup extra stuff if we have a parent control
+            if (null != commentParentControl)
+            {
+                if (!(commentParentControl is ChemProV.PFD.Streams.AbstractStream) && 
+                    !(commentParentControl is ProcessUnitControl))
+                {
+                    throw new InvalidOperationException(
+                        "The parent element for a comment-sticky-note must be a stream or process unit");
+                }
+
+                // Create the line and add it to the drawing canvas
+                snc.m_lineToParent = new Line();
+                canvas.AddNewChild(snc.m_lineToParent);
+                snc.m_lineToParent.SetValue(Canvas.ZIndexProperty, -3);
+                snc.m_lineToParent.Stroke = new SolidColorBrush(Color.FromArgb(255, 245, 222, 179));
+                snc.m_lineToParent.StrokeThickness = 1.0;
+
+                // Make sure that when the parent moves we update the line
+                if (commentParentControl is ProcessUnitControl)
+                {
+                    (commentParentControl as ProcessUnitControl).ProcessUnit.PropertyChanged +=
+                        snc.ProcessUnitParentPropertyChanged;
+                }
+                else
+                {
+                    (commentParentControl as PFD.Streams.AbstractStream).Stream.PropertyChanged +=
+                        snc.StreamParentPropertyChanged;
+                }
+
+                // Position the line to the parent
+                snc.UpdateLineToParent();
+            }
+
+            return snc;
+        }
+
+        private void ProcessUnitParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Location"))
+            {
+                UpdateLineToParent();
+            }
+        }
+
+        private void StreamParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("SourceLocation") || 
+                e.PropertyName.Equals("DestinationLocation"))
+            {
+                UpdateLineToParent();
+            }
+        }
+
+        /// <summary>
+        /// Only here because IPFDElement requires it
+        /// </summary>
+        public String Id
+        {
+            get;
+            set;
         }
 
         /// <summary>
         /// This is not currently used but must have it since IPfdElement has it
+        /// TODO: Get rid of it. All location monitoring should happen through the 
+        /// workspace objects.
         /// </summary>
         public event EventHandler LocationChanged;
-
-        public string Id
-        {
-            get
-            {
-                return null;
-            }
-            set
-            {
-            }
-        }
 
         public void HighlightFeedback(bool highlight)
         {
@@ -269,44 +369,16 @@ namespace ChemProV.PFD.StickyNote
             }
         }
 
-        #region IXmlSerializable Members
-
-        public System.Xml.Schema.XmlSchema GetSchema()
-        {
-            return null;
-        }
-
         /// <summary>
-        /// (not used, see the FromXml method instead)
+        /// Gets a reference to the StickyNote object that this control represents
         /// </summary>
-        public void ReadXml(XmlReader reader)
+        public StickyNote_UIIndependent StickyNote
         {
-        }
-
-        public void WriteXml(XmlWriter writer)
-        {
-            //the process units location
-            writer.WriteStartElement("Location");
-            writer.WriteElementString("X", GetValue(Canvas.LeftProperty).ToString());
-            writer.WriteElementString("Y", GetValue(Canvas.TopProperty).ToString());
-            writer.WriteEndElement();
-
-            //and the stickey note's content
-            writer.WriteStartElement("Content");
-            writer.WriteString(Note.Text);
-            writer.WriteEndElement();
-
-            // Write the size as well
-            writer.WriteElementString("Size", string.Format("{0},{1}", Width, Height));
-
-            // Write the user name if we have one
-            if (!string.IsNullOrEmpty(CommentUserName))
+            get
             {
-                writer.WriteElementString("UserName", CommentUserName);
+                return m_note;
             }
         }
-
-        #endregion IXmlSerializable Members
 
         #region ICanvasElement Members
 
@@ -331,8 +403,18 @@ namespace ChemProV.PFD.StickyNote
                     return;
                 }
 
-                SetValue(Canvas.LeftProperty, value.X - Width / 2.0);
-                SetValue(Canvas.TopProperty, value.Y - 10.0);
+                // Stop listening while we change the data
+                m_note.PropertyChanged -= this.MemNote_PropertyChanged;
+                
+                double left = value.X - Width / 2.0;
+                double top = value.Y - 10.0;
+                SetValue(Canvas.LeftProperty, left);
+                SetValue(Canvas.TopProperty, top);
+                m_note.LocationX = left;
+                m_note.LocationY = top;
+
+                // Start listening again
+                m_note.PropertyChanged += this.MemNote_PropertyChanged;
 
                 UpdateLineToParent();
             }
@@ -348,10 +430,11 @@ namespace ChemProV.PFD.StickyNote
             }
 
             Point location;
-            AbstractStream stream = m_commentParent as AbstractStream;
+            ChemProV.PFD.Streams.AbstractStream stream = 
+                m_commentParent as ChemProV.PFD.Streams.AbstractStream;
             if (null == stream)
             {
-                location = (m_commentParent as IProcessUnit).MidPoint;
+                location = (m_commentParent as ProcessUnitControl).Location;
             }
             else
             {
@@ -386,214 +469,272 @@ namespace ChemProV.PFD.StickyNote
             }
         }
 
-        public Core.ICommentCollection CommentCollectionParent
+        public static MathCore.Vector ComputeNewCommentNoteLocation(DrawingCanvas canvas, object parentControl,
+            double controlWidth = 100.0, double controlHeight = 100.0)
         {
-            get
+            // First resolve the "center point" of the parent object. Also get a reference to the collection 
+            // of comments.
+            Point location;
+            IList<StickyNote_UIIndependent> comments;
+            ProcessUnitControl lpu = parentControl as ProcessUnitControl;
+            PFD.Streams.AbstractStream stream = parentControl as PFD.Streams.AbstractStream;
+            if (null != lpu)
             {
-                return m_commentParent;
+                location = lpu.Location;
+                comments = lpu.ProcessUnit.Comments;
             }
-        }
-
-        /// <summary>
-        /// Creates a new sticky note to be used as a comment attached to a specific PFD element. The comment is added
-        /// to the specified comment-collection-parent and appropriate controls are added to the drawing canvas.
-        /// Undo items are created and returned in a list but are not actually added to the drawing canvas via its 
-        /// "AddUndo" method. Rather, a list is returned so that if the caller is doing multiple things at once it can 
-        /// pack more undo items into a single collection as it sees fit.
-        /// </summary>
-        public static List<IUndoRedoAction> CreateCommentNote(DrawingCanvas canvas, Core.ICommentCollection parent,
-            XElement optionalToLoadFromXML, out StickyNoteControl createdNote)
-        {
-            if (!(parent is AbstractStream) && !(parent is IProcessUnit))
+            else if (null != stream)
             {
-                throw new InvalidOperationException(
-                    "The parent element for a comment-sticky-note must be a stream or process unit");
-            }
-            
-            StickyNoteControl sn;
-            if (null == optionalToLoadFromXML)
-            {
-                sn = new StickyNoteControl(canvas);
-                sn.Width = 100.0;
-                sn.Height = 100.0;
+                location = stream.StreamLineMidpoint;
+                comments = stream.Stream.Comments;
             }
             else
             {
-                sn = new StickyNoteControl(optionalToLoadFromXML, canvas);
+                throw new ArgumentException(
+                    "Parent control for a comment sticky note must be a stream or process unit " +
+                    "control.\n Method: ComputeNewCommentNoteLocation");
             }
-            sn.m_commentParent = parent;
-            canvas.AddNewChild(sn);
 
-            // Give it a high z-index since we want comments above everything else
-            sn.SetValue(Canvas.ZIndexProperty, (int)4);
+            // Get a reference to the workspace. We will look at other sticky notes in this workspace to 
+            // try to avoid direct overlap.
+            Workspace ws = canvas.GetWorkspace();
 
-            // Create the line and add it to the drawing canvas
-            sn.m_lineToParent = new Line();
-            canvas.AddNewChild(sn.m_lineToParent);
-            sn.m_lineToParent.SetValue(Canvas.ZIndexProperty, -3);
-            sn.m_lineToParent.Stroke = new SolidColorBrush(Color.FromArgb(255, 245, 222, 179));
-            sn.m_lineToParent.StrokeThickness = 1.0;
-
-            // Compute a location if we don't have XML data
-            if (null == optionalToLoadFromXML)
+            MathCore.Vector loc;
+            int attempts = 0;
+            while (true)
             {
-                int attempts = 0;
-                while (true)
+                // Compute a location
+                double radius = 150.0;
+                double angle = (double)(comments.Count % 6) * 60.0 / 180.0 * Math.PI;
+                loc = new MathCore.Vector(
+                    location.X + radius * Math.Cos(angle),
+                    location.Y + radius * Math.Sin(angle));
+
+                // Make sure this location wouldn't make the control go off the canvas
+                if (loc.X - (controlWidth / 2.0) < 0.0 ||
+                    loc.Y - (controlHeight / 2.0) < 0.0)
                 {
-                    Point location;
-                    AbstractStream stream = parent as AbstractStream;
-                    if (null == stream)
-                    {
-                        location = (parent as IProcessUnit).MidPoint;
-                    }
-                    else
-                    {
-                        location = stream.StreamLineMidpoint;
-                    }
+                    attempts++;
+                }
+                else if ((null != stream && stream.Stream.ContainsCommentWithLocation(loc.X, loc.Y)) ||
+                    (null != lpu && lpu.ProcessUnit.ContainsCommentWithLocation(loc.X, loc.Y)))
+                {
+                    attempts++;
+                }
+                else
+                {
+                    // This means the location is ok and we can return it
+                    return loc;
+                }
 
-                    // Compute a location
-                    double radius = 150.0;
-                    int count = (parent as Core.ICommentCollection).CommentCount;
-                    double angle = (double)(count % 6) * 60.0 / 180.0 * Math.PI;
-                    sn.Location = new Point(
-                        location.X + radius * Math.Cos(angle),
-                        location.Y + radius * Math.Sin(angle));
+                // Try cascading if radial position failed
+                if (attempts > 6)
+                {
+                    // Reset attempts because we're about to try another method of positioning
+                    attempts = 0;
 
-                    if (sn.IsOffCanvas(sn) || StickyNoteControl.ContainsCommentSNAt(sn.Location, parent))
+                    double offset = 10.0;
+                    while (true)
                     {
-                        attempts++;
-                    }
-                    else
-                    {
-                        break;
-                    }
+                        loc.X = location.X + radius + offset;
+                        loc.Y = location.Y + offset;
 
-                    // Try cascading if radial position failed
-                    if (attempts > 6)
-                    {
-                        // Reset attempts because we're about to try another method of positioning
-                        attempts = 0;
-                        
-                        double offset = 10.0;
-                        while (true)
+                        // Make sure this location wouldn't make the control go off the canvas
+                        if (loc.X - (controlWidth / 2.0) < 0.0 ||
+                            loc.Y - (controlHeight / 2.0) < 0.0)
                         {
-                            sn.Location = new Point(
-                                location.X + radius + offset, location.Y + offset);
-
-                            if (!sn.IsOffCanvas(sn) && 
-                                !StickyNoteControl.ContainsCommentSNAt(sn.Location, parent))
-                            {
-                                // This position works
-                                break;
-                            }
-
                             attempts++;
-                            if (attempts > 50)
-                            {
-                                // Just give up and choose an arbitrary position
-                                sn.Location = new Point(location.X + radius, location.Y);
-                                break;
-                            }
-
-                            // Increase the offset for the next attempt
-                            offset += 10.0;
                         }
-                        break;
+                        else if ((null != stream && stream.Stream.ContainsCommentWithLocation(loc.X, loc.Y)) ||
+                            (null != lpu && lpu.ProcessUnit.ContainsCommentWithLocation(loc.X, loc.Y)))
+                        {
+                            attempts++;
+                        }
+                        else
+                        {
+                            // This means the location is ok and we can return it
+                            return loc;
+                        }
+
+                        attempts++;
+                        if (attempts > 50)
+                        {
+                            // Just give up and choose an arbitrary position
+                            return new MathCore.Vector(location.X + radius, location.Y);
+                        }
+
+                        // Increase the offset for the next attempt
+                        offset += 10.0;
                     }
                 }
             }
-
-            // Make sure that when the parent moves we update the line
-            (parent as IPfdElement).LocationChanged +=
-                delegate(object sender, EventArgs e)
-                {
-                    sn.UpdateLineToParent();
-                };
-
-            sn.UpdateLineToParent();
-
-            // Set the output value
-            createdNote = sn;
-
-            // Add the comment to the collection
-            parent.AddComment(sn);
-
-            // Build and return a list of undos that will remove the elements that we added to the 
-            // drawing canvas and will remove the comment from the collection
-            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
-            undos.Add(new RemoveFromCanvas(sn, canvas));
-            undos.Add(new RemoveFromCanvas(sn.LineToParent, canvas));
-            undos.Add(new RemoveComment(parent, parent.CommentCount - 1));
-
-            return undos;
         }
 
-        /// <summary>
-        /// Deletes this sticky note from the drawing canvas and adds an undo to bring it back. If this 
-        /// is a comment sticky note, it will be removed from its parent's comment collection (and the 
-        /// undo will be created to handle that too).
-        /// </summary>
-        public void DeleteWithUndo(DrawingCanvas canvas)
-        {
-            if (null == m_commentParent)
-            {
-                // The case is simple when we're not anchored
-                canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
-                    "Undo deleting comment", new AddToCanvas(this, canvas)));
-                canvas.RemoveChild(this);
-                return;
-            }
+        ///// <summary>
+        ///// Creates a new sticky note to be used as a comment attached to a specific PFD element. The comment is added
+        ///// to the specified comment-collection-parent and appropriate controls are added to the drawing canvas.
+        ///// Undo items are created and returned in a list but are not actually added to the drawing canvas via its 
+        ///// "AddUndo" method. Rather, a list is returned so that if the caller is doing multiple things at once it can 
+        ///// pack more undo items into a single collection as it sees fit.
+        ///// </summary>
+        //[Obsolete("Removing this, do not use. Keeping for positioning algorithm reference.")]
+        //public static List<IUndoRedoAction> CreateCommentNote(DrawingCanvas canvas, object parent,
+        //    XElement optionalToLoadFromXML, out StickyNoteControl createdNote)
+        //{
+        //    if (!(parent is AbstractStream) && !(parent is GenericProcessUnit))
+        //    {
+        //        throw new InvalidOperationException(
+        //            "The parent element for a comment-sticky-note must be a stream or process unit");
+        //    }
+            
+        //    StickyNoteControl sn;
+        //    if (null == optionalToLoadFromXML)
+        //    {
+        //        sn = new StickyNoteControl(canvas);
+        //        sn.Width = 100.0;
+        //        sn.Height = 100.0;
+        //    }
+        //    else
+        //    {
+        //        sn = new StickyNoteControl(optionalToLoadFromXML, canvas);
+        //    }
+        //    sn.m_commentParent = parent;
+        //    canvas.AddNewChild(sn);
 
-            // Find the index of this comment in the parent collection
-            Core.ICommentCollection cc = m_commentParent as Core.ICommentCollection;
-            int commentIndex = -1;
-            for (int i=0; i<cc.CommentCount; i++)
-            {
-                if (object.ReferenceEquals(this, cc.GetCommentAt(i)))
-                {
-                    commentIndex = i;
-                }
-            }
+        //    // Give it a high z-index since we want comments above everything else
+        //    sn.SetValue(Canvas.ZIndexProperty, (int)4);
 
-            // Otherwise we have to do the following:
-            // 1. Remove sticky note (and add undo item for this)
-            // 2. Removing the line that connects it to the parent (undo item too)
-            // 3. Remove it from parent collection (undo item too)
-            canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
-                "Undo deleting comment",
-                new AddToCanvas(this, canvas),
-                new AddToCanvas(m_lineToParent, canvas),
-                new InsertComment(cc, this, commentIndex)));
+        //    // Create the line and add it to the drawing canvas
+        //    sn.m_lineToParent = new Line();
+        //    canvas.AddNewChild(sn.m_lineToParent);
+        //    sn.m_lineToParent.SetValue(Canvas.ZIndexProperty, -3);
+        //    sn.m_lineToParent.Stroke = new SolidColorBrush(Color.FromArgb(255, 245, 222, 179));
+        //    sn.m_lineToParent.StrokeThickness = 1.0;
 
-            canvas.RemoveChild(this);
-            canvas.RemoveChild(m_lineToParent);
-            cc.RemoveCommentAt(commentIndex);
-        }
+        //    // Compute a location if we don't have XML data
+        //    if (null == optionalToLoadFromXML)
+        //    {
+                
+        //    }
+
+        //    // Make sure that when the parent moves we update the line
+        //    (parent as IPfdElement).LocationChanged +=
+        //        delegate(object sender, EventArgs e)
+        //        {
+        //            sn.UpdateLineToParent();
+        //        };
+
+        //    sn.UpdateLineToParent();
+
+        //    // Set the output value
+        //    createdNote = sn;
+
+        //    // Add the comment to the collection
+        //    parent.AddComment(sn);
+
+        //    // Build and return a list of undos that will remove the elements that we added to the 
+        //    // drawing canvas and will remove the comment from the collection
+        //    List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
+        //    undos.Add(new RemoveFromCanvas(sn, canvas));
+        //    undos.Add(new RemoveFromCanvas(sn.LineToParent, canvas));
+        //    undos.Add(new RemoveComment(parent, parent.CommentCount - 1));
+
+        //    return undos;
+        //}
 
         #region IComment Members
 
-        public string CommentText
-        {
-            get { return Note.Text; }
-            set
-            {
-                Note.Text = value;
-            }
-        }
+        // Use the StickyNote data structure instead
+        //   |
+        //   |
+        //   v
+        
+        //public string CommentText
+        //{
+        //    get { return Note.Text; }
+        //    set
+        //    {
+        //        Note.Text = value;
+        //    }
+        //}
+
+        ///// <summary>
+        ///// User name for the creator of this comment
+        ///// </summary>
+        //public string CommentUserName
+        //{
+        //    get
+        //    {
+        //        return Header.Text;
+        //    }
+        //    set
+        //    {
+        //        Header.Text = (null == value) ? string.Empty : value;
+        //    }
+        //}
 
         /// <summary>
-        /// User name for the creator of this comment
+        /// Deletes this sticky note from the workspace and adds an undo to bring it back.
         /// </summary>
-        public string CommentUserName
+        public void DeleteWithUndo(DrawingCanvas canvas)
         {
-            get
+            // Get a reference to the workspace
+            Workspace ws = canvas.GetWorkspace();
+
+            // Start by unsubscribing from events
+            if (m_commentParent is ProcessUnitControl)
             {
-                return Header.Text;
+                (m_commentParent as ProcessUnitControl).ProcessUnit.PropertyChanged -=
+                    ProcessUnitParentPropertyChanged;
             }
-            set
+            else
             {
-                Header.Text = (null == value) ? string.Empty : value;
+                (m_commentParent as PFD.Streams.AbstractStream).Stream.PropertyChanged -=
+                    StreamParentPropertyChanged;
             }
+            
+            // Get a reference to the relevant comment collection
+            IList<StickyNote_UIIndependent> comments;
+            if (null == m_commentParent)
+            {
+                comments = ws.StickyNotes;
+            }
+            else if (m_commentParent is ProcessUnitControl)
+            {
+                comments = (m_commentParent as ProcessUnitControl).ProcessUnit.Comments;
+            }
+            else
+            {
+                comments = (m_commentParent as ChemProV.PFD.Streams.AbstractStream).Stream.Comments;
+            }
+
+            // Find the index of this comment in the parent collection
+            int commentIndex = -1;
+            for (int i = 0; i < comments.Count; i++)
+            {
+                if (object.ReferenceEquals(m_note, comments[i]))
+                {
+                    commentIndex = i;
+                    break;
+                }
+            }
+
+            // This really should never occur, but if we didn't find the comment in the collection 
+            // then this implies that this control shouldn't be on the canvas anyway, so remove it.
+            if (-1 == commentIndex)
+            {
+                canvas.RemoveChild(this);
+                canvas.RemoveChild(m_lineToParent);
+                return;
+            }
+
+            // Add the undo first
+            ws.AddUndo(new UndoRedoCollection(
+                    "Undo deleting comment", new InsertComment(ws.StickyNotes, m_note, commentIndex)));
+
+            // Remove the comment from the workspace. Event handlers will update the UI and remove 
+            // this control (and the line to the parent control) from the drawing canvas.
+            ws.StickyNotes.RemoveAt(commentIndex);
         }
 
         #endregion
@@ -647,20 +788,27 @@ namespace ChemProV.PFD.StickyNote
             }
         }
 
-        private bool IsOffCanvas(StickyNoteControl sn)
+        private bool IsOffCanvas
         {
-            double left = (double)sn.GetValue(Canvas.LeftProperty);
-            double top = (double)sn.GetValue(Canvas.TopProperty);
-            return (left < 0.0 || top < 0.0);
+            get
+            {
+                double left = (double)GetValue(Canvas.LeftProperty);
+                double top = (double)GetValue(Canvas.TopProperty);
+                return (left < 0.0 || top < 0.0);
 
-            // TODO: Checks on the right and bottom edges with respect to the drawing canvas
+                // TODO: Checks on the right and bottom edges with respect to the drawing canvas
+            }
         }
 
-        private static bool ContainsCommentSNAt(Point location, Core.ICommentCollection parent)
+        /// <summary>
+        /// Goes through all controls on the drawing canvas and returns true if any one is 
+        /// a sticky note control with the exact specified location.
+        /// </summary>
+        private static bool ContainsCommentSNAt(DrawingCanvas canvas, Point location)
         {
-            for (int i = 0; i < parent.CommentCount; i++)
+            for (int i = 0; i < canvas.Children.Count; i++)
             {
-                StickyNoteControl sn = parent.GetCommentAt(i) as StickyNoteControl;
+                StickyNoteControl sn = canvas.Children[i] as StickyNoteControl;
                 if (null != sn)
                 {
                     if (sn.Location.Equals(location))

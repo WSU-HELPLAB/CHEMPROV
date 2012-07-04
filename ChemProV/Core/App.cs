@@ -81,14 +81,6 @@ namespace ChemProV.Core
             return img;
         }
 
-        public static OptionDifficultySetting DifficultySetting
-        {
-            get
-            {
-                return s_workspace.CurrentDifficultySetting;
-            }
-        }
-
         /// <summary>
         /// This must be called upon application initialization
         /// </summary>

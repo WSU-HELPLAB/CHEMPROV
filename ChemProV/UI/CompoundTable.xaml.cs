@@ -14,11 +14,14 @@ using System.Windows;
 using System.Windows.Controls;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
+using System.ComponentModel;
 
 namespace ChemProV.UI
 {
     public partial class CompoundTable : UserControl, ChemProV.Core.IWorkspaceChangeListener
     {
+        private Core.Workspace m_ws = null;
+        
         public CompoundTable()
         {
             InitializeComponent();
@@ -127,33 +130,74 @@ namespace ChemProV.UI
 
         #region IWorkspaceChangeListener Members
 
-        public void WorkspaceChanged(WorkspaceControl workspace, Core.WorkspaceChangeDetails details)
+        public void SetWorkspace(ChemProV.Core.Workspace workspace)
         {
+            // If we have a previous workspace, then unsubscribe from events
+            if (null != m_ws)
+            {
+                // Currently the application never does this. We get a workspace reference once 
+                // as the application initializes and that's it.
+                throw new NotImplementedException();
+            }
+            
+            m_ws = workspace;
+
+            // We need to watch changes in the stream collection and every time a new 
+            // one is added we need to attach listeners.
+            m_ws.StreamsCollectionChanged += new EventHandler(WorkspaceStreamsCollectionChanged);
+        }
+
+        #endregion
+
+        private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
+        {
+            foreach (Core.AbstractStream stream in m_ws.Streams)
+            {
+                // Unsubscribe first for safety. A += WILL cause the event handler to fire twice if 
+                // we were already subscribing and we want to avoid this. However, a -= when we're 
+                // not subscribed does not cause an error.
+                stream.PropertiesTable.RowPropertyChanged -= this.PropertiesTable_RowPropertyChanged;
+                
+                stream.PropertiesTable.RowPropertyChanged += this.PropertiesTable_RowPropertyChanged;
+            }
+        }
+
+        private void PropertiesTable_RowPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // We only care about the selected compounds
+            if (!e.PropertyName.Equals("SelectedCompound"))
+            {
+                return;
+            }
+
             // Backup the currently selected item
             string currentSelection = Compound_ComboBox.SelectedItem as string;
-            
+
             // Clear the combo box items
             Compound_ComboBox.Items.Clear();
 
-            // Go through the PFD items and look for chemical stream properties windows
-            foreach (UIElement uie in workspace.DrawingCanvas.Children)
+            // Go through all stream properties tables
+            foreach (Core.AbstractStream stream in m_ws.Streams)
             {
-                ChemicalStreamPropertiesWindow cspw = uie as ChemicalStreamPropertiesWindow;
-                if (null == cspw)
+                Core.StreamPropertiesTable table = stream.PropertiesTable;
+                if (null == table)
+                {
+                    continue;
+                }
+                if (StreamType.Chemical != table.StreamType)
                 {
                     continue;
                 }
 
-                // Go through the rows and look for compounds
-                foreach (ChemicalStreamData csd in cspw.ItemSource)
+                // Go through the rows and look for at the selected compound. Add items to the 
+                // combo box as needed.
+                foreach (Core.IStreamData data in table.Rows)
                 {
-                    if (Enum.IsDefined(typeof(ChemicalCompounds), (byte)csd.SelectedCompoundId))
+                    string s = (data as Core.ChemicalStreamData).SelectedCompound;
+                    if (!string.IsNullOrEmpty(s) && !s.Equals("Overall") && 
+                        !Compound_ComboBox.Items.Contains(s))
                     {
-                        string s = csd.SelectedCompound.ToPrettyString();
-                        if (!Compound_ComboBox.Items.Contains(s))
-                        {
-                            Compound_ComboBox.Items.Add(s);
-                        }
+                        Compound_ComboBox.Items.Add(s);
                     }
                 }
             }
@@ -164,11 +208,9 @@ namespace ChemProV.UI
             {
                 Compound_ComboBox.SelectedItem = currentSelection;
             }
-            
+
             // Invoke the selection-changed event to ensure that everything works
             Compound_ComboBox_SelectionChanged(this, EventArgs.Empty as SelectionChangedEventArgs);
         }
-
-        #endregion
     }
 }

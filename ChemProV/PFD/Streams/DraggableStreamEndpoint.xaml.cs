@@ -25,34 +25,20 @@ namespace ChemProV.PFD.Streams
     /// Represents a stream endpoint that shows up as a draggable icon in the workspace. Implements 
     /// it's own mouse input logic (IState) and knows whether to accept or reject drag-drop actions 
     /// from the user.
+    /// TODO: renaming to StreamEndpointIcon and make sure the comments are changed to reflect the 
+    /// fact that this control is little more than an image icon and does not process any input.
     /// </summary>
-    public partial class DraggableStreamEndpoint : UserControl, Core.ICanvasElement, IState
+    public partial class DraggableStreamEndpoint : UserControl
     {
         public enum EndpointType
         {
-            StreamSourceNotConnected,
-            StreamDestinationNotConnected,
-            StreamSourceConnected,
-            StreamDestinationConnected
+            StreamSource,
+            StreamDestination
         }
 
         #region Private member variables
         
         private DrawingCanvas m_canvas;
-
-        /// <summary>
-        /// Keeps track of whether or not this endpoint was connected to a steam when the mouse was 
-        /// pressed down. A draggable stream endpoint can be one of four types
-        /// 1. Unconnected source
-        /// 2. Unconnected destination
-        /// 3. Connected source
-        /// 4. Connected destination
-        /// If it's one of the first two when we the mouse is pressed down, this value will be 
-        /// non-null and will contain a reference to the process unit that we were connected to. 
-        /// Otherwise it will be null. If we drag around this endpoint and break a connection to a 
-        /// process unit then this will be relevant for creating undos.
-        /// </summary>
-        private GenericProcessUnit m_connectedToOnMouseDown = null;
 
         private int m_id;
 
@@ -80,7 +66,7 @@ namespace ChemProV.PFD.Streams
         /// indicate acceptance or rejection of hover-over action. When the mouse is moved off of 
         /// this item, its border color needs to be restored to normal.
         /// </summary>
-        private GenericProcessUnit m_weChangedThisUnitsBorder = null;
+        private ProcessUnitControl m_weChangedThisUnitsBorder = null;
         
         #endregion
 
@@ -91,7 +77,7 @@ namespace ChemProV.PFD.Streams
         /// it needs a default constructor to show up correctly in the editor.
         /// </summary>
         private DraggableStreamEndpoint()
-            : this(EndpointType.StreamSourceNotConnected, null, null)
+            : this(EndpointType.StreamSource, null, null)
         {
         }
         
@@ -111,21 +97,21 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// Determines whether or not this endpoint can connect to the specified process unit.
+        /// Determines whether or not this endpoint can connect to the specified process unit
         /// </summary>
-        public bool CanConnectTo(IProcessUnit processUnit)
+        public bool CanConnectTo(Core.AbstractProcessUnit processUnit)
         {
             // The logic to determine this is already implemented in the process unit. We just 
             // have to identify whether we're incoming or outgoing.
-            if (EndpointType.StreamDestinationNotConnected == m_type)
+            if (EndpointType.StreamDestination == m_type)
             {
-                return processUnit.IsAcceptingIncomingStreams(m_owner) &&
-                    !object.ReferenceEquals(processUnit, m_owner.Source);
+                return processUnit.CanAcceptIncomingStream(m_owner.Stream) &&
+                    !object.ReferenceEquals(processUnit, m_owner.Stream.Source);
             }
-            else if (EndpointType.StreamSourceNotConnected == m_type)
+            else if (EndpointType.StreamSource == m_type)
             {
-                return processUnit.IsAcceptingOutgoingStreams(m_owner) &&
-                    !object.ReferenceEquals(processUnit, m_owner.Destination);
+                return processUnit.CanAcceptOutgoingStream(m_owner.Stream) &&
+                    !object.ReferenceEquals(processUnit, m_owner.Stream.Destination);
             }
 
             // If we're already connected then we cannot connect to anything else. Endpoints attach 
@@ -133,39 +119,23 @@ namespace ChemProV.PFD.Streams
             return false;
         }
 
-        public bool IsConnected
+        /// <summary>
+        /// Determines whether or not this endpoint can connect to the specified process unit control
+        /// </summary>
+        public bool CanConnectTo(ProcessUnitControl processUnit)
         {
-            get
-            {
-                switch (m_type)
-                {
-                    case EndpointType.StreamSourceConnected:
-                    case EndpointType.StreamDestinationConnected:
-                        return true;
-
-                    default:
-                        return false;
-                }
-            }
+            return CanConnectTo(processUnit.ProcessUnit);
         }
 
         public bool IsSource
         {
             get
             {
-                switch (m_type)
-                {
-                    case EndpointType.StreamSourceConnected:
-                    case EndpointType.StreamSourceNotConnected:
-                        return true;
-
-                    default:
-                        return false;
-                }
+                return (EndpointType.StreamSource == m_type);
             }
         }
 
-        public IStream ParentStream
+        public AbstractStream ParentStream
         {
             get
             {
@@ -175,72 +145,73 @@ namespace ChemProV.PFD.Streams
 
         private void RebuildIcon()
         {
-            // If we have are a connected destination endpoint then we have to procedurally build 
-            // an arrow-head polygon
-            if (EndpointType.StreamDestinationConnected == m_type)
-            {
-                AbstractStream a = m_owner as AbstractStream;
+            //// If we have are a connected destination endpoint then we have to procedurally build 
+            //// an arrow-head polygon
+            //if (EndpointType.StreamDestinationConnected == m_type)
+            //{
+            //    AbstractStream a = m_owner as AbstractStream;
 
-                // Get the points array for the arrow's vertices
-                Point[] pts = a.GetArrowVertices();
+            //    // Get the points array for the arrow's vertices
+            //    Point[] pts = a.GetArrowVertices();
 
-                double minX, minY, maxX, maxY;
-                minX = minY = double.MaxValue;
-                maxX = maxY = double.MinValue;
-                foreach (Point pt in pts)
-                {
-                    minX = Math.Min(minX, pt.X);
-                    minY = Math.Min(minY, pt.Y);
-                    maxX = Math.Max(maxX, pt.X);
-                    maxY = Math.Max(maxY, pt.Y);
-                }
+            //    double minX, minY, maxX, maxY;
+            //    minX = minY = double.MaxValue;
+            //    maxX = maxY = double.MinValue;
+            //    foreach (Point pt in pts)
+            //    {
+            //        minX = Math.Min(minX, pt.X);
+            //        minY = Math.Min(minY, pt.Y);
+            //        maxX = Math.Max(maxX, pt.X);
+            //        maxY = Math.Max(maxY, pt.Y);
+            //    }
 
-                // Set the width and height
-                Width = maxX - minX;
-                Height = maxY - minY;
+            //    // Set the width and height
+            //    Width = maxX - minX;
+            //    Height = maxY - minY;
 
-                // Adjust points to make them relative to this control's coordinate system
-                for (int i = 0; i < 3; i++)
-                {
-                    ArrowIcon.Points[i] = new Point(pts[i].X - minX, pts[i].Y - minY);
-                }
+            //    // Adjust points to make them relative to this control's coordinate system
+            //    for (int i = 0; i < 3; i++)
+            //    {
+            //        ArrowIcon.Points[i] = new Point(pts[i].X - minX, pts[i].Y - minY);
+            //    }
 
-                // Want position such that: 
-                //   Left.X + (pts[0].X - minX) = pts[0].X
-                //   Left.X = minX
-                // Similar thing for Y
+            //    // Want position such that: 
+            //    //   Left.X + (pts[0].X - minX) = pts[0].X
+            //    //   Left.X = minX
+            //    // Similar thing for Y
 
-                SetValue(Canvas.LeftProperty, minX);
-                SetValue(Canvas.TopProperty, minY);
+            //    SetValue(Canvas.LeftProperty, minX);
+            //    SetValue(Canvas.TopProperty, minY);
 
-                // Use the same fill as the stem
-                ArrowIcon.Fill = m_owner.Stem.Fill;
+            //    // Use the same fill as the stem
+            //    ArrowIcon.Fill = m_owner.Stem.Fill;
 
-                // Make sure it's visible and the icon is hidden
-                ArrowIcon.Visibility = System.Windows.Visibility.Visible;
-                IconImage.Visibility = System.Windows.Visibility.Collapsed;
+            //    // Make sure it's visible and the icon is hidden
+            //    ArrowIcon.Visibility = System.Windows.Visibility.Visible;
+            //    IconImage.Visibility = System.Windows.Visibility.Collapsed;
 
-                // Tell the other endpoint to update since we have potentially just repositioned this one
-                OtherEndpoint.PU_LocationChanged(null, null);
-            }
-            else
+            //    // Tell the other endpoint to update since we have potentially just repositioned this one
+            //    OtherEndpoint.PU_LocationChanged(null, null);
+            //}
+            //else
+            if (true)
             {
                 BitmapImage bmp = new BitmapImage();
                 
                 // We have an icon for each of these 3 types
                 switch (m_type)
                 {
-                    case EndpointType.StreamDestinationNotConnected:
+                    case EndpointType.StreamDestination:
                         bmp.UriSource = new Uri("/UI/Icons/pu_sink.png", UriKind.Relative);
                         Width = Height = 20;
                         break;
 
-                    case EndpointType.StreamSourceConnected:
-                        bmp.UriSource = new Uri("/UI/Icons/StreamSourceConnection.png", UriKind.Relative);
-                        Width = Height = 12;
-                        break;
+                    //case EndpointType.StreamSourceConnected:
+                    //    bmp.UriSource = new Uri("/UI/Icons/StreamSourceConnection.png", UriKind.Relative);
+                    //    Width = Height = 12;
+                    //    break;
 
-                    case EndpointType.StreamSourceNotConnected:
+                    case EndpointType.StreamSource:
                         bmp.UriSource = new Uri("/UI/Icons/pu_source.png", UriKind.Relative);
                         Width = Height = 20;
                         break;
@@ -268,14 +239,10 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        #region ICanvasElement Members
+        //#region ICanvasElement Members
 
         /// <summary>
         /// The draggable endpoint implements the location as the midpoint of the control.
-        /// 
-        /// As a reminder, this assumes that the parent control to this object inherits 
-        /// from System.Windows.Controls.Canvas. There is code all around the place that 
-        /// assumes this, but I just thought I'd mention it again.
         /// </summary>
         public Point Location
         {
@@ -287,396 +254,376 @@ namespace ChemProV.PFD.Streams
             }
             set
             {
-                // IMPORTANT
-                // Never try to create undos in here. The location property can be changed by a variety of 
-                // code paths for a variety of different reasons. Thus, undo actions to restore location 
-                // (if needed) are created at a higher level and not within this setter.
-
                 // Avoid recursive calls
                 if (m_settingLocation)
                 {
                     return;
                 }
                 m_settingLocation = true;
-                
-                Point current = new Point(
-                    (double)GetValue(Canvas.LeftProperty) + this.Width / 2.0,
-                    (double)GetValue(Canvas.TopProperty) + this.Height / 2.0);
-                
-                // This means the position is changing
+
                 SetValue(Canvas.LeftProperty, value.X - this.Width / 2.0);
                 SetValue(Canvas.TopProperty, value.Y - this.Height / 2.0);
-
-                // Enpoints for a stream let each other when their locations change
-                OtherEndpoint.PU_LocationChanged(null, null);
-
-                // Update the parent stream's location, provided we are not connected
-                if (EndpointType.StreamDestinationNotConnected == m_type ||
-                    EndpointType.StreamSourceNotConnected == m_type)
-                {
-                    m_owner.UpdateStreamLocation();
-                }
 
                 m_settingLocation = false;
             }
         }
 
-        #endregion
+        //#endregion
 
-        #region IState Members
+        //#region IState Members
 
-        public new void MouseEnter(object sender, MouseEventArgs e)
-        {
-        }
+        //public new void MouseEnter(object sender, MouseEventArgs e)
+        //{
+        //}
 
-        public new void MouseLeave(object sender, MouseEventArgs e)
-        {
-        }
+        //public new void MouseLeave(object sender, MouseEventArgs e)
+        //{
+        //}
 
-        public new void MouseMove(object sender, MouseEventArgs e)
-        {            
-            // Ignore mouse moves when the mouse button is not down. In theory this should never 
-            // happen, so perhaps I should throw an exception (?)
-            if (!m_isMouseDown)
-            {
-                return;
-            }
+        //public new void MouseMove(object sender, MouseEventArgs e)
+        //{            
+        //    // Ignore mouse moves when the mouse button is not down. In theory this should never 
+        //    // happen, so perhaps I should throw an exception (?)
+        //    if (!m_isMouseDown)
+        //    {
+        //        return;
+        //    }
 
-            // Restore border color if we need to
-            if (null != m_weChangedThisUnitsBorder)
-            {
-                m_weChangedThisUnitsBorder.SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                m_weChangedThisUnitsBorder = null;
-            }
+        //    // Restore border color if we need to
+        //    if (null != m_weChangedThisUnitsBorder)
+        //    {
+        //        m_weChangedThisUnitsBorder.SetBorderColor(ProcessUnitBorderColor.NoBorder);
+        //        m_weChangedThisUnitsBorder = null;
+        //    }
             
-            Point pt = e.GetPosition(m_canvas);
+        //    Point pt = e.GetPosition(m_canvas);
 
-            // If we are moving the endpoint to break a connection, then we need to do that
-            if (EndpointType.StreamSourceConnected == m_type && 
-                null != m_connectedToOnMouseDown)
-            {
-                // Break the connection on the process unit
-                m_connectedToOnMouseDown.DettachOutgoingStream(m_owner);
+        //    // If we are moving the endpoint to break a connection, then we need to do that
+        //    if (EndpointType.StreamSourceConnected == m_type && 
+        //        null != m_connectedToOnMouseDown)
+        //    {
+        //        // Break the connection on the process unit
+        //        m_connectedToOnMouseDown.DettachOutgoingStream(m_owner);
 
-                // Set the source to null on the stream. Note that this will invoke our type change event
-                m_owner.Source = null;
-            }
-            else if (EndpointType.StreamDestinationConnected == m_type &&
-                null != m_connectedToOnMouseDown)
-            {
-                // Break the connection on the process unit
-                m_connectedToOnMouseDown.DettachIncomingStream(m_owner);
+        //        // Set the source to null on the stream. Note that this will invoke our type change event
+        //        m_owner.Source = null;
+        //    }
+        //    else if (EndpointType.StreamDestinationConnected == m_type &&
+        //        null != m_connectedToOnMouseDown)
+        //    {
+        //        // Break the connection on the process unit
+        //        m_connectedToOnMouseDown.DettachIncomingStream(m_owner);
 
-                // Set the destination to null on the stream. Note that this will invoke our type change event
-                m_owner.Destination = null;
-            }
+        //        // Set the destination to null on the stream. Note that this will invoke our type change event
+        //        m_owner.Destination = null;
+        //    }
             
-            // First position this control on the drawing canvas. This will update the stream's location
-            this.Location = pt;
+        //    // First position this control on the drawing canvas. This will update the stream's location
+        //    this.Location = pt;
 
-            // If we are hovering over an element then we want to see if it's a process unit. We 
-            // connect stream endpoints to process units by dragging and dropping over them, so 
-            // this is a crucial piece of code.
-            IProcessUnit pu = m_canvas.GetChildAt(pt, this) as IProcessUnit;
+        //    // If we are hovering over an element then we want to see if it's a process unit. We 
+        //    // connect stream endpoints to process units by dragging and dropping over them, so 
+        //    // this is a crucial piece of code.
+        //    GenericProcessUnit pu = m_canvas.GetChildAt(pt, this) as GenericProcessUnit;
 
-            // If it's not a process unit then we can return
-            if (null == pu)
-            {
-                return;
-            }
+        //    // If it's not a process unit then we can return
+        //    if (null == pu)
+        //    {
+        //        return;
+        //    }
 
-            // Now we need to ask the question of: if we were to drop the endpoint here, could we make 
-            // a valid connection? We need to answer this question and give some sort of signal to 
-            // the user to let them know if they can connect this way or not.
+        //    // Now we need to ask the question of: if we were to drop the endpoint here, could we make 
+        //    // a valid connection? We need to answer this question and give some sort of signal to 
+        //    // the user to let them know if they can connect this way or not.
             
-            // We are about to change the border color for this process unit
-            m_weChangedThisUnitsBorder = (GenericProcessUnit)pu;
+        //    // We are about to change the border color for this process unit
+        //    m_weChangedThisUnitsBorder = (GenericProcessUnit)pu;
 
-            // Set a border color based on whether or not the action is doable
-            m_weChangedThisUnitsBorder.SetBorderColor(CanConnectTo(pu) ? 
-                ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
-        }
+        //    // Set a border color based on whether or not the action is doable
+        //    m_weChangedThisUnitsBorder.SetBorderColor(CanConnectTo(pu) ? 
+        //        ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
+        //}
 
-        public new void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // There's a special case scenario if we're the destination and connected to 
-            // a heat exchanger with utility. These cannot be detached.
-            if (EndpointType.StreamDestinationConnected == m_type &&
-                m_owner.Destination is HeatExchanger)
-            {
-                m_canvas.CurrentState = null;
-                return;
-            }
+        //public new void MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        //{
+        //    // There's a special case scenario if we're the destination and connected to 
+        //    // a heat exchanger with utility. These cannot be detached.
+        //    if (EndpointType.StreamDestinationConnected == m_type &&
+        //        m_owner.Destination is HeatExchanger)
+        //    {
+        //        m_canvas.CurrentState = null;
+        //        return;
+        //    }
             
-            m_locationOnLMBDown = this.Location;
-            m_isMouseDown = true;
-            e.Handled = true;
+        //    m_locationOnLMBDown = this.Location;
+        //    m_isMouseDown = true;
+        //    e.Handled = true;
 
-            // Starting a drag selects the parent stream
-            m_canvas.SelectedElement = m_owner;
+        //    // Starting a drag selects the parent stream
+        //    m_canvas.SelectedElement = m_owner;
 
-            switch (m_type)
-            {
-                case EndpointType.StreamDestinationConnected:
-                    m_connectedToOnMouseDown = m_owner.Destination as GenericProcessUnit;
-                    break;
+        //    switch (m_type)
+        //    {
+        //        case EndpointType.StreamDestinationConnected:
+        //            m_connectedToOnMouseDown = m_owner.Destination as GenericProcessUnit;
+        //            break;
 
-                case EndpointType.StreamSourceConnected:
-                    m_connectedToOnMouseDown = m_owner.Source as GenericProcessUnit;
-                    break;
+        //        case EndpointType.StreamSourceConnected:
+        //            m_connectedToOnMouseDown = m_owner.Source as GenericProcessUnit;
+        //            break;
 
-                default:
-                    m_connectedToOnMouseDown = null;
-                    break;
-            }
-        }
+        //        default:
+        //            m_connectedToOnMouseDown = null;
+        //            break;
+        //    }
+        //}
 
-        public new void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
-        {
-            e.Handled = true;
+        //public new void MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        //{
+        //    e.Handled = true;
             
-            // Only process if we're coming up from a mouse down
-            if (!m_isMouseDown)
-            {
-                return;
-            }
+        //    // Only process if we're coming up from a mouse down
+        //    if (!m_isMouseDown)
+        //    {
+        //        return;
+        //    }
 
-            // Get a reference to the workspace
-            Workspace ws = m_canvas.GetWorkspace();
+        //    // Get a reference to the workspace
+        //    Workspace ws = m_canvas.GetWorkspace();
 
-            // The mouse button is no longer down
-            m_isMouseDown = false;
+        //    // The mouse button is no longer down
+        //    m_isMouseDown = false;
 
-            // We can start by restoring process unit border color if it was changed
-            if (null != m_weChangedThisUnitsBorder)
-            {
-                m_weChangedThisUnitsBorder.SetBorderColor(ProcessUnitBorderColor.NoBorder);
-                m_weChangedThisUnitsBorder = null;
-            }
+        //    // We can start by restoring process unit border color if it was changed
+        //    if (null != m_weChangedThisUnitsBorder)
+        //    {
+        //        m_weChangedThisUnitsBorder.SetBorderColor(ProcessUnitBorderColor.NoBorder);
+        //        m_weChangedThisUnitsBorder = null;
+        //    }
 
-            // Now we need to finalize the move. The logic here is a lot like the mouse move logic, in 
-            // that we need to see if we're over a process unit that we can connect to.
-            Point pt = e.GetPosition(m_canvas);
+        //    // Now we need to finalize the move. The logic here is a lot like the mouse move logic, in 
+        //    // that we need to see if we're over a process unit that we can connect to.
+        //    Point pt = e.GetPosition(m_canvas);
 
-            // First position this control on the drawing canvas
-            this.Location = pt;
+        //    // First position this control on the drawing canvas
+        //    this.Location = pt;
 
-            // Next, find out if we are hovering over another element
-            UIElement uie = m_canvas.GetChildAt(pt, this);
+        //    // Next, find out if we are hovering over another element
+        //    UIElement uie = m_canvas.GetChildAt(pt, this);
 
-            // "Cast" as process unit. Will be null if it's not
-            IProcessUnit pu = uie as IProcessUnit;
+        //    // "Cast" as process unit. Will be null if it's not
+        //    GenericProcessUnit pu = uie as GenericProcessUnit;
 
-            // If we aren't hovering over anything or we're hovering over something other than a process 
-            // unit, then we have two possibilities:
-            // 1. m_connectedToOnMouseDown is null, implying that this is just a simple drag to reposition. 
-            //    In this case we just need to create an undo action to restore position
-            // 2. It WAS connected originally and we have broken the connection and dropped the endpoint at 
-            //    a location where there is no process unit. We need our undo to create re-attaching logic 
-            //    in this case.
-            if (null == uie || null == pu)
-            {
-                if (null == m_connectedToOnMouseDown)
-                {
-                    ws.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
-                        new Undos.RestoreLocation(this, m_locationOnLMBDown)));
-                    m_canvas.CurrentState = null;
-                    return;
-                }
+        //    // If we aren't hovering over anything or we're hovering over something other than a process 
+        //    // unit, then we have two possibilities:
+        //    // 1. m_connectedToOnMouseDown is null, implying that this is just a simple drag to reposition. 
+        //    //    In this case we just need to create an undo action to restore position
+        //    // 2. It WAS connected originally and we have broken the connection and dropped the endpoint at 
+        //    //    a location where there is no process unit. We need our undo to create re-attaching logic 
+        //    //    in this case.
+        //    if (null == uie || null == pu)
+        //    {
+        //        if (null == m_connectedToOnMouseDown)
+        //        {
+        //            ws.AddUndo(new UndoRedoCollection("Undo moving stream endpoint",
+        //                new Undos.RestoreLocation(this, m_locationOnLMBDown)));
+        //            m_canvas.CurrentState = null;
+        //            return;
+        //        }
 
-                if (m_type == EndpointType.StreamDestinationNotConnected)
-                {
-                    ws.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
-                        //new Undos.RestoreLocation(this, m_locationOnLMBDown),
-                        new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, null)));
-                }
-                else
-                {
-                    ws.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
-                        new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, null, this.Location)));
-                }
+        //        if (m_type == EndpointType.StreamDestinationNotConnected)
+        //        {
+        //            ws.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
+        //                //new Undos.RestoreLocation(this, m_locationOnLMBDown),
+        //                new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
+        //                new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, null)));
+        //        }
+        //        else
+        //        {
+        //            ws.AddUndo(new UndoRedoCollection("Undo detaching stream endpoint",
+        //                new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
+        //                new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, null, this.Location)));
+        //        }
 
-                Core.App.ControlPalette.SwitchToSelect();
-                return;
-            }
+        //        Core.App.ControlPalette.SwitchToSelect();
+        //        return;
+        //    }
 
-            // Now we know we're dropping on a process unit and we need to see if it's a valid connection 
-            // or not.
-            if (!CanConnectTo(pu))
-            {
-                // This implies that it is an invalid drag-drop
-                FinishBadDrag(pu as GenericProcessUnit);
-                return;
-            }
+        //    // Now we know we're dropping on a process unit and we need to see if it's a valid connection 
+        //    // or not.
+        //    if (!CanConnectTo(pu))
+        //    {
+        //        // This implies that it is an invalid drag-drop
+        //        FinishBadDrag(pu as GenericProcessUnit);
+        //        return;
+        //    }
 
-            // For connecting, we need to handle the different endpoint types separately.
-            if (EndpointType.StreamSourceNotConnected == m_type)
-            {
-                if (null != m_connectedToOnMouseDown)
-                {
-                    // We were connected to something and broke that connection. Unless it's the exact 
-                    // same process unit that we're dropping on, create an undo to detach from the one 
-                    // we're about to attach to and then reattah to the old one.
-                    if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
-                    {
-                        // No net-change was made. Reattach and return
-                        if (IsSource)
-                        {
-                            m_connectedToOnMouseDown.AttachOutgoingStream(m_owner);
-                            m_owner.Source = m_connectedToOnMouseDown;
-                        }
-                        else
-                        {
-                            m_connectedToOnMouseDown.AttachIncomingStream(m_owner);
-                            m_owner.Destination = m_connectedToOnMouseDown;
-                        }
-                        Core.App.ControlPalette.SwitchToSelect();
-                        return;
-                    }
+        //    // For connecting, we need to handle the different endpoint types separately.
+        //    if (EndpointType.StreamSourceNotConnected == m_type)
+        //    {
+        //        if (null != m_connectedToOnMouseDown)
+        //        {
+        //            // We were connected to something and broke that connection. Unless it's the exact 
+        //            // same process unit that we're dropping on, create an undo to detach from the one 
+        //            // we're about to attach to and then reattah to the old one.
+        //            if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
+        //            {
+        //                // No net-change was made. Reattach and return
+        //                if (IsSource)
+        //                {
+        //                    m_connectedToOnMouseDown.AttachOutgoingStream(m_owner);
+        //                    m_owner.Source = m_connectedToOnMouseDown;
+        //                }
+        //                else
+        //                {
+        //                    m_connectedToOnMouseDown.AttachIncomingStream(m_owner);
+        //                    m_owner.Destination = m_connectedToOnMouseDown;
+        //                }
+        //                Core.App.ControlPalette.SwitchToSelect();
+        //                return;
+        //            }
 
-                    // Create an undo that will detach and reattach
-                    ws.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
-                        new Undos.DetachOutgoingStream(pu, m_owner),
-                        new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, pu, new Point())));
-                }
-                else
-                {
-                    // Create an undo that will:
-                    // 1. Detach the stream from the process unit that we're about to connect it to
-                    // 2. Set the stream source back to null (this sets the draggable icon back to 
-                    //    where it was when the drag first started)
-                    ws.AddUndo(new UndoRedoCollection(
-                        "Undo linking stream source to process unit",
-                        new Undos.DetachOutgoingStream(pu, m_owner),
-                        new Undos.SetStreamSource(m_owner, null, pu, m_locationOnLMBDown)));
-                }
+        //            // Create an undo that will detach and reattach
+        //            ws.AddUndo(new UndoRedoCollection("Undo linking stream source to different process unit",
+        //                new Undos.DetachOutgoingStream(pu, m_owner),
+        //                new Undos.AttachOutgoingStream(m_connectedToOnMouseDown, m_owner),
+        //                new Undos.SetStreamSource(m_owner, m_connectedToOnMouseDown, pu, new Point())));
+        //        }
+        //        else
+        //        {
+        //            // Create an undo that will:
+        //            // 1. Detach the stream from the process unit that we're about to connect it to
+        //            // 2. Set the stream source back to null (this sets the draggable icon back to 
+        //            //    where it was when the drag first started)
+        //            ws.AddUndo(new UndoRedoCollection(
+        //                "Undo linking stream source to process unit",
+        //                new Undos.DetachOutgoingStream(pu, m_owner),
+        //                new Undos.SetStreamSource(m_owner, null, pu, m_locationOnLMBDown)));
+        //        }
 
-                // Now do the actual attaching
-                pu.AttachOutgoingStream(m_owner);
-                m_owner.Source = pu;
-            }
-            else if (EndpointType.StreamDestinationNotConnected == m_type)
-            {
-                if (null != m_connectedToOnMouseDown)
-                {
-                    // We were connected to something and broke that connection. Unless it's the exact 
-                    // same process unit that we're dropping on, create an undo to detach from the one 
-                    // we're about to attach to and then reattah to the old one.
-                    if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
-                    {
-                        // No change was made - switch back to the selecting state
-                        Core.App.ControlPalette.SwitchToSelect();
-                        return;
-                    }
+        //        // Now do the actual attaching
+        //        pu.AttachOutgoingStream(m_owner);
+        //        m_owner.Source = pu;
+        //    }
+        //    else if (EndpointType.StreamDestinationNotConnected == m_type)
+        //    {
+        //        if (null != m_connectedToOnMouseDown)
+        //        {
+        //            // We were connected to something and broke that connection. Unless it's the exact 
+        //            // same process unit that we're dropping on, create an undo to detach from the one 
+        //            // we're about to attach to and then reattah to the old one.
+        //            if (object.ReferenceEquals(m_connectedToOnMouseDown, pu))
+        //            {
+        //                // No change was made - switch back to the selecting state
+        //                Core.App.ControlPalette.SwitchToSelect();
+        //                return;
+        //            }
 
-                    // Create an undo that will detach and reattach
-                    ws.AddUndo(new UndoRedoCollection(
-                        "Undo linking stream source to different process unit",
-                        new Undos.DetachIncomingStream(pu, m_owner),
-                        new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
-                        new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, pu)));
-                }
-                else
-                {
-                    // Create an undo that will:
-                    // 1. Detach the stream from the process unit that we're about to connect it to
-                    // 2. Set the stream destination back to null and move the draggable icon back to it 
-                    //    was when the drag first started
-                    //m_canvas.AddUndo(new UndoRedoCollection(
-                    //    "Undo linking stream source to process unit",
-                    //    new Undos.RestoreLocation(this, m_locationOnLMBDown),
-                    //    new Undos.DetachIncomingStream(pu, m_owner),
-                    //    new Undos.SetStreamDestination(m_owner, null)));
-                    ws.AddUndo(new UndoRedoCollection(
-                        "Undo linking stream source to process unit",
-                        new Undos.DetachIncomingStream(pu, m_owner),
-                        new Undos.SetStreamDestination(m_owner, m_locationOnLMBDown, pu)));
-                }
+        //            // Create an undo that will detach and reattach
+        //            ws.AddUndo(new UndoRedoCollection(
+        //                "Undo linking stream source to different process unit",
+        //                new Undos.DetachIncomingStream(pu, m_owner),
+        //                new Undos.AttachIncomingStream(m_connectedToOnMouseDown, m_owner),
+        //                new Undos.SetStreamDestination(m_owner, m_connectedToOnMouseDown, pu)));
+        //        }
+        //        else
+        //        {
+        //            // Create an undo that will:
+        //            // 1. Detach the stream from the process unit that we're about to connect it to
+        //            // 2. Set the stream destination back to null and move the draggable icon back to it 
+        //            //    was when the drag first started
+        //            //m_canvas.AddUndo(new UndoRedoCollection(
+        //            //    "Undo linking stream source to process unit",
+        //            //    new Undos.RestoreLocation(this, m_locationOnLMBDown),
+        //            //    new Undos.DetachIncomingStream(pu, m_owner),
+        //            //    new Undos.SetStreamDestination(m_owner, null)));
+        //            ws.AddUndo(new UndoRedoCollection(
+        //                "Undo linking stream source to process unit",
+        //                new Undos.DetachIncomingStream(pu, m_owner),
+        //                new Undos.SetStreamDestination(m_owner, m_locationOnLMBDown, pu)));
+        //        }
 
-                // Now do the actual attaching
-                pu.AttachIncomingStream(m_owner);
-                m_owner.Destination = pu;
-            }
-            else
-            {
-                // At this time those are the only two possibilities, so we'll never hit this code 
-                // block, but to provide some resilience against breaking changes, we'll throw 
-                // an exception if we get here.
-                throw new InvalidOperationException(
-                    "Stream endpoint was expected to be either a source or destination but was neither");
-            }
+        //        // Now do the actual attaching
+        //        pu.AttachIncomingStream(m_owner);
+        //        m_owner.Destination = pu;
+        //    }
+        //    else
+        //    {
+        //        // At this time those are the only two possibilities, so we'll never hit this code 
+        //        // block, but to provide some resilience against breaking changes, we'll throw 
+        //        // an exception if we get here.
+        //        throw new InvalidOperationException(
+        //            "Stream endpoint was expected to be either a source or destination but was neither");
+        //    }
 
-            // Flip back to the selecting state
-            Core.App.ControlPalette.SwitchToSelect();
+        //    // Flip back to the selecting state
+        //    Core.App.ControlPalette.SwitchToSelect();
 
-            ((AbstractStream)m_owner).UpdateStreamLocation();
-        }
+        //    ((AbstractStream)m_owner).UpdateStreamLocation();
+        //}
 
-        public new void MouseWheel(object sender, MouseEventArgs e)
-        {
-        }
+        //public new void MouseWheel(object sender, MouseEventArgs e)
+        //{
+        //}
 
-        public new void LostMouseCapture(object sender, MouseEventArgs e)
-        {
-        }
+        //public new void LostMouseCapture(object sender, MouseEventArgs e)
+        //{
+        //}
 
-        public void StateEnding()
-        {
-        }
+        //public void StateEnding()
+        //{
+        //}
 
-        #endregion
+        //#endregion
 
-        public void EndpointConnectionChanged(EndpointType newType, GenericProcessUnit oldPU,
-            GenericProcessUnit newPU)
-        {
-            // Whenever the source or destination process units change, BOTH stream endpoints need to 
-            // attach location change listeners
+        //public void EndpointConnectionChanged(EndpointType newType, GenericProcessUnit oldPU,
+        //    GenericProcessUnit newPU)
+        //{
+        //    // Whenever the source or destination process units change, BOTH stream endpoints need to 
+        //    // attach location change listeners
             
-            if (null != oldPU)
-            {
-                // Detach listeners
-                oldPU.LocationChanged -= PU_LocationChanged;
-                oldPU.LocationChanged -= OtherEndpoint.PU_LocationChanged;
-            }
+        //    if (null != oldPU)
+        //    {
+        //        // Detach listeners
+        //        oldPU.LocationChanged -= PU_LocationChanged;
+        //        oldPU.LocationChanged -= OtherEndpoint.PU_LocationChanged;
+        //    }
 
-            if (null != newPU)
-            {
-                // Attach new listeners
-                newPU.LocationChanged += PU_LocationChanged;
-                newPU.LocationChanged += OtherEndpoint.PU_LocationChanged;
-            }
+        //    if (null != newPU)
+        //    {
+        //        // Attach new listeners
+        //        newPU.LocationChanged += PU_LocationChanged;
+        //        newPU.LocationChanged += OtherEndpoint.PU_LocationChanged;
+        //    }
             
-            // Store the new type
-            m_type = newType;
+        //    // Store the new type
+        //    m_type = newType;
 
-            RebuildIcon();
+        //    RebuildIcon();
 
-            if (IsConnected)
-            {
-                // Invoke the location change event to update positions (if needed)
-                PU_LocationChanged(null, null);
-            }
-            else
-            {
-                m_owner.UpdateStreamLocation();
-            }
-        }
+        //    if (IsConnected)
+        //    {
+        //        // Invoke the location change event to update positions (if needed)
+        //        PU_LocationChanged(null, null);
+        //    }
+        //    else
+        //    {
+        //        m_owner.UpdateStreamLocation();
+        //    }
+        //}
 
-        private void PU_LocationChanged(object sender, EventArgs e)
-        {
-            if (EndpointType.StreamDestinationConnected == m_type)
-            {
-                RebuildIcon();
-            }
-            else if (EndpointType.StreamSourceConnected == m_type)
-            {
-                MathCore.Vector pos = MathCore.Vector.Normalize(m_owner.StreamVector) * 30.0;
-                this.Location = ((new MathCore.Vector(m_owner.Source.Location)) + pos).ToPoint();
-            }
-        }
+        //private void PU_LocationChanged(object sender, EventArgs e)
+        //{
+        //    if (EndpointType.StreamDestinationConnected == m_type)
+        //    {
+        //        RebuildIcon();
+        //    }
+        //    else if (EndpointType.StreamSourceConnected == m_type)
+        //    {
+        //        MathCore.Vector pos = MathCore.Vector.Normalize(m_owner.StreamVector) * 30.0;
+        //        this.Location = ((new MathCore.Vector(m_owner.Source.Location)) + pos).ToPoint();
+        //    }
+        //}
 
         private DraggableStreamEndpoint OtherEndpoint
         {
@@ -687,40 +634,40 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        /// <summary>
-        /// Called from the mouse-up event when we've determined that the drag that's being completed is 
-        /// invalid. In this case we have to restore things back to the way they were before the drag 
-        /// started. This may potentially involve reattching to a process unit.
-        /// Calling this function implies that we are denying the user's drag-drop action and restoring 
-        /// to a state that leaves a net-change of zero. Therefore there are no undos created because 
-        /// they are not needed (we didn't change anything, so nothing to undo).
-        /// </summary>
-        private void FinishBadDrag(GenericProcessUnit unit)
-        {
-            // Restore the location of this process unit to where it was on mouse-down
-            Location = m_locationOnLMBDown;
+        ///// <summary>
+        ///// Called from the mouse-up event when we've determined that the drag that's being completed is 
+        ///// invalid. In this case we have to restore things back to the way they were before the drag 
+        ///// started. This may potentially involve reattching to a process unit.
+        ///// Calling this function implies that we are denying the user's drag-drop action and restoring 
+        ///// to a state that leaves a net-change of zero. Therefore there are no undos created because 
+        ///// they are not needed (we didn't change anything, so nothing to undo).
+        ///// </summary>
+        //private void FinishBadDrag(GenericProcessUnit unit)
+        //{
+        //    // Restore the location of this process unit to where it was on mouse-down
+        //    Location = m_locationOnLMBDown;
 
-            if (null != m_connectedToOnMouseDown)
-            {
-                // This means that we were connected to a process unit on mouse-down and we need to 
-                // reattach
-                if (EndpointType.StreamSourceNotConnected == m_type)
-                {
-                    unit.AttachOutgoingStream(m_owner);
-                    m_owner.Source = m_connectedToOnMouseDown;
-                }
-                else
-                {
-                    unit.AttachIncomingStream(m_owner);
-                    m_owner.Destination = m_connectedToOnMouseDown;
-                }
-            }
+        //    if (null != m_connectedToOnMouseDown)
+        //    {
+        //        // This means that we were connected to a process unit on mouse-down and we need to 
+        //        // reattach
+        //        if (EndpointType.StreamSourceNotConnected == m_type)
+        //        {
+        //            unit.AttachOutgoingStream(m_owner);
+        //            m_owner.Source = m_connectedToOnMouseDown;
+        //        }
+        //        else
+        //        {
+        //            unit.AttachIncomingStream(m_owner);
+        //            m_owner.Destination = m_connectedToOnMouseDown;
+        //        }
+        //    }
 
-            // Update the stream's visual stuff
-            m_owner.UpdateStreamLocation();
+        //    // Update the stream's visual stuff
+        //    m_owner.UpdateStreamLocation();
             
-            // Flip back to the default state
-            Core.App.ControlPalette.SwitchToSelect();
-        }
+        //    // Flip back to the default state
+        //    Core.App.ControlPalette.SwitchToSelect();
+        //}
     }
 }

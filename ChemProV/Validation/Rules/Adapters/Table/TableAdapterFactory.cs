@@ -23,15 +23,15 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public static ITableAdapter CreateTableAdapter(IPropertiesWindow table)
+        public static ITableAdapter CreateTableAdapter(Core.StreamPropertiesTable table)
         {
-            if (table is ChemicalStreamPropertiesWindow)
+            if (StreamType.Chemical == table.StreamType)
             {
-                return new ChemicalTableAdapter(table as ChemicalStreamPropertiesWindow);
+                return new ChemicalTableAdapter(table);
             }
-            else if (table is HeatStreamPropertiesWindow)
+            else if (StreamType.Heat == table.StreamType)
             {
-                return new HeatTableAdapter(table as HeatStreamPropertiesWindow);
+                return new HeatTableAdapter(table);
             }
             return new NullTableAdapter();
         }

@@ -125,8 +125,15 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Core\IRemoveSelfFromCanvas.cs" />
+    <Compile Include="Core\HeatExchangerNoUtility.cs" />
+    <Compile Include="Core\HeatExchangerWithUtility.cs" />
+    <Compile Include="Core\Mixer.cs" />
+    <Compile Include="Core\ProcessUnitFactory.cs" />
+    <Compile Include="Core\Reactor.cs" />
+    <Compile Include="Core\Separator.cs" />
+    <Compile Include="Core\AbstractStream.cs" />
     <Compile Include="Core\App.cs" />
-    <Compile Include="Core\CommentLogic.cs" />
     <Compile Include="Core\CommentMerger.cs" />
     <Compile Include="Core\DegreesOfFreedomAnalysis.cs" />
     <Compile Include="Core\DrawingCanvasCommands.cs" />
@@ -136,52 +143,45 @@
     <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Core\NamedColors.cs" />
     <Compile Include="Core\IWorkspaceChangeListener.cs" />
+    <Compile Include="Core\StreamPropertiesTable.cs" />
     <Compile Include="Core\Workspace.cs" />
+    <Compile Include="Core\WorkspaceUtility.cs" />
     <Compile Include="Grammars\ChemProVLexer.cs" />
     <Compile Include="Grammars\ChemProVParser.cs" />
     <Compile Include="Grammars\ChemProVTree.cs" />
     <Compile Include="Grammars\Equation.cs" />
     <Compile Include="Grammars\Variable.cs" />
+    <Compile Include="Core\ChemicalStream.cs" />
+    <Compile Include="Core\HeatStream.cs" />
+    <Compile Include="Logic\Undos\AddToWorkspace.cs" />
+    <Compile Include="Logic\Undos\RemoveProcessUnit.cs" />
+    <Compile Include="Logic\Undos\RemoveStickyNote.cs" />
+    <Compile Include="Logic\Undos\RemoveStream.cs" />
+    <Compile Include="Logic\Undos\SetStreamDestinationLocation.cs" />
+    <Compile Include="Logic\Undos\SetStreamSourceLocation.cs" />
+    <Compile Include="Logic\Undos\SetSubprocess.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MathCore\LineSegment.cs" />
     <Compile Include="MathCore\Rectangle.cs" />
     <Compile Include="MathCore\Vector.cs" />
+    <Compile Include="OptionDifficultySetting.cs" />
     <Compile Include="PFD\EquationEditor\EquationControl.xaml.cs">
       <DependentUpon>EquationControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\EquationEditor\EquationData.cs" />
     <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
       <DependentUpon>EquationEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\Models\EquationModel.cs" />
-    <Compile Include="PFD\EquationEditor\Models\EquationTypeClassification.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationScope.cs" />
     <Compile Include="PFD\EquationEditor\Models\EquationType.cs" />
     <Compile Include="PFD\EquationEditor\Models\IEquationModifier.cs" />
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
-    <Compile Include="PFD\EquationEditor\Tokens\IEquationToken.cs" />
-    <Compile Include="PFD\EquationEditor\Tokens\OperatorToken.cs" />
-    <Compile Include="PFD\EquationEditor\Tokens\TokenList.xaml.cs">
-      <DependentUpon>TokenList.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PFD\EquationEditor\Tokens\VariableToken.cs" />
     <Compile Include="PFD\IPfdElement.cs" />
-    <Compile Include="PFD\ProcessUnits\GenericProcessUnit.xaml.cs">
-      <DependentUpon>GenericProcessUnit.xaml</DependentUpon>
+    <Compile Include="PFD\ProcessUnits\ProcessUnitControl.xaml.cs">
+      <DependentUpon>ProcessUnitControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\ProcessUnits\HeatExchanger.cs" />
-    <Compile Include="PFD\ProcessUnits\HeatExchangerNoUtility.cs" />
-    <Compile Include="PFD\ProcessUnits\IProcessUnit.cs" />
-    <Compile Include="PFD\ProcessUnits\LabeledProcessUnit.xaml.cs">
-      <DependentUpon>LabeledProcessUnit.xaml</DependentUpon>
-    </Compile>
-    <Compile Include="PFD\ProcessUnits\Mixer.cs" />
-    <Compile Include="PFD\ProcessUnits\ProcessUnitDescriptions.cs" />
-    <Compile Include="PFD\ProcessUnits\Reactor.cs" />
-    <Compile Include="PFD\ProcessUnits\Separator.cs" />
-    <Compile Include="PFD\ProcessUnits\TemporaryProcessUnit.cs" />
     <Compile Include="PFD\StickyNote\StickyNoteControl.xaml.cs">
       <DependentUpon>StickyNoteControl.xaml</DependentUpon>
     </Compile>
@@ -189,23 +189,15 @@
     <Compile Include="PFD\Streams\AbstractStream.xaml.cs">
       <DependentUpon>AbstractStream.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\Streams\ChemicalStream.cs" />
     <Compile Include="PFD\Streams\DraggableStreamEndpoint.xaml.cs">
       <DependentUpon>DraggableStreamEndpoint.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\Streams\HeatStream.cs" />
-    <Compile Include="PFD\Streams\IStream.cs" />
-    <Compile Include="PFD\ProcessUnits\ProcessUnitFactory.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamData.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesTableFactory.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindow.xaml.cs">
-      <DependentUpon>ChemicalStreamPropertiesWindow.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Core\ChemicalStreamData.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\CompoundFormatter.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\Compounds.cs" />
+    <Compile Include="Core\ChemicalCompounds.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\DataUpdatedEventArgs.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Chemical\Units.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\IStreamData.cs" />
+    <Compile Include="Core\ChemicalUnits.cs" />
+    <Compile Include="Core\IStreamData.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowGrid.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\TempUnitsFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\UnitsFormatter.cs" />
@@ -214,35 +206,29 @@
     <Compile Include="PFD\Streams\PropertiesWindow\Element.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\GenericTableData.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Heat\CompoundFormatter.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Heat\HeatStreamData.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\Heat\HeatStreamPropertiesWindow.xaml.cs">
-      <DependentUpon>HeatStreamPropertiesWindow.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Core\HeatStreamData.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Heat\UnitsFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\IPropertiesWindow.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowFactory.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\View.cs" />
-    <Compile Include="PFD\Streams\StreamFactory.cs" />
-    <Compile Include="PFD\Undos\AddToCanvas.cs" />
-    <Compile Include="PFD\Undos\AttachOutgoingStream.cs" />
-    <Compile Include="PFD\Undos\DetachOutgoingStream.cs" />
+    <Compile Include="Logic\Undos\AttachOutgoingStream.cs" />
+    <Compile Include="Logic\Undos\DetachOutgoingStream.cs" />
     <Compile Include="PFD\Undos\InsertComment.cs" />
     <Compile Include="PFD\Undos\InsertEquation.cs" />
     <Compile Include="PFD\Undos\RemoveComment.cs" />
     <Compile Include="PFD\Undos\RemoveEquation.cs" />
     <Compile Include="PFD\Undos\RestoreStickyNoteColor.cs" />
-    <Compile Include="PFD\Undos\SetProcessSubgroup.cs" />
-    <Compile Include="PFD\Undos\DetachIncomingStream.cs" />
-    <Compile Include="PFD\Undos\AttachIncomingStream.cs" />
-    <Compile Include="PFD\Undos\RemoveFromCanvas.cs" />
+    <Compile Include="Logic\Undos\DetachIncomingStream.cs" />
+    <Compile Include="Logic\Undos\AttachIncomingStream.cs" />
     <Compile Include="PFD\Undos\ResizeControl.cs" />
     <Compile Include="PFD\Undos\RestoreLocation.cs" />
     <Compile Include="PFD\Undos\SetProcessUnitLabel.cs" />
-    <Compile Include="PFD\Undos\SetStreamDestination.cs" />
-    <Compile Include="PFD\Undos\SetStreamSource.cs" />
+    <Compile Include="Logic\Undos\SetStreamDestination.cs" />
+    <Compile Include="Logic\Undos\SetStreamSource.cs" />
     <Compile Include="Core\UndoDefs.cs" />
+    <Compile Include="Core\AbstractProcessUnit.cs" />
     <Compile Include="RequestOpenFileArgs.cs" />
+    <Compile Include="StreamType.cs" />
     <Compile Include="UI\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
@@ -264,6 +250,7 @@
     <Compile Include="UI\DrawingCanvas\States\IState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MenuState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
+    <Compile Include="UI\DrawingCanvas\States\MovingStreamEndpoint.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingNewStream.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingNewProcessUnit.cs" />
     <Compile Include="UI\DrawingCanvas\States\PlacingNewCommentNote.cs" />
@@ -271,10 +258,17 @@
     <Compile Include="UI\EqCommentControl.xaml.cs">
       <DependentUpon>EqCommentControl.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\ICommentControlManager.cs" />
+    <Compile Include="UI\MiniStreamTable.xaml.cs">
+      <DependentUpon>MiniStreamTable.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\OptionWindow.xaml.cs">
       <DependentUpon>OptionWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\StreamTableControl.xaml.cs">
+      <DependentUpon>StreamTableControl.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\SubprocessChooserWindow.xaml.cs">
       <DependentUpon>SubprocessChooserWindow.xaml</DependentUpon>
     </Compile>
@@ -324,19 +318,11 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PFD\EquationEditor\Tokens\TokenList.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PFD\ProcessUnits\GenericProcessUnit.xaml">
+    <Page Include="PFD\ProcessUnits\ProcessUnitControl.xaml">
       <Generator>MSBuild:MarkupCompilePass1</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PFD\ProcessUnits\LabeledProcessUnit.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="PFD\StickyNote\StickyNoteControl.xaml">
       <SubType>Designer</SubType>
@@ -349,14 +335,6 @@
     <Page Include="PFD\Streams\DraggableStreamEndpoint.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
-    </Page>
-    <Page Include="PFD\Streams\PropertiesWindow\Chemical\ChemicalStreamPropertiesWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
-    </Page>
-    <Page Include="PFD\Streams\PropertiesWindow\Heat\HeatStreamPropertiesWindow.xaml">
-      <Generator>MSBuild:Compile</Generator>
-      <SubType>Designer</SubType>
     </Page>
     <Page Include="UI\AboutWindow.xaml">
       <SubType>Designer</SubType>
@@ -378,7 +356,15 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\MiniStreamTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\OptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\StreamTableControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

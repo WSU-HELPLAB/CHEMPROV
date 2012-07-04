@@ -13,7 +13,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProV", "Portabl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProV_Tests", "PortableChemProV_Tests\PortableChemProV_Tests.csproj", "{2C323049-4BEA-4AA4-A933-3EA9B5CEE5AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProvNet4", "PortableChemProvNet4\PortableChemProvNet4.csproj", "{2C2F929D-A984-4ED5-BCF3-1A885260BF3A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProVNet4", "PortableChemProvNet4\PortableChemProVNet4.csproj", "{2C2F929D-A984-4ED5-BCF3-1A885260BF3A}"
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution

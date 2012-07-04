@@ -126,22 +126,29 @@ namespace ChemProV.UI
                     canvas, this);
                 return;
             }
-
-            // Get the type of object we are about to create
-            Type newObjType = ((Border)sender).Tag as Type;
-
-            // If it's a process unit, assign the state to create it
-            if (newObjType.IsSubclassOf(typeof(GenericProcessUnit)))
+            else if (object.ReferenceEquals(sender, ChemicalStreamButton))
             {
-                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewProcessUnit(
-                    this, canvas, newObjType);
+                // Set a state to create a chemical stream
+                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
+                    this, canvas, StreamType.Chemical);
+            }
+            else if (object.ReferenceEquals(sender, HeatStreamButton))
+            {
+                // Set a state to create a heat stream
+                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
+                    this, canvas, StreamType.Heat);
             }
             else
             {
-                // Set the canvas state to setting a new object of the appropriate type
-                // This state handles the placing of streams
-                Core.App.Workspace.DrawingCanvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
-                    this, Core.App.Workspace.DrawingCanvas, newObjType);
+                // Get the type of object we are about to create
+                Type newObjType = ((Border)sender).Tag as Type;
+
+                // If it's a process unit, assign the state to create it
+                if (newObjType.IsSubclassOf(typeof(Core.AbstractProcessUnit)))
+                {
+                    canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewProcessUnit(
+                        this, canvas, newObjType);
+                }
             }
         }
 
@@ -151,17 +158,26 @@ namespace ChemProV.UI
         /// </summary>
         public void RefreshPalette(OptionDifficultySetting setting)
         {
-            // First clear the content in the stack panels
+            // Show or hide the heat stream button based on the setting
+            if ((new Core.HeatStream(-1)).IsAvailableWithDifficulty(setting))
+            {
+                HeatStreamButton.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                HeatStreamButton.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
+            // Now we use reflection to create the process unit buttons
+            
+            // First clear the content in the process unit stack panel
             ProcessUnitsPanel.Children.Clear();
-            StreamsPanel.Children.Clear();
 
             // We will create potentially multiple stack panels for rows of buttons
             StackPanel spPUs = null;
-            StackPanel spStreams = null;
 
             // Keep track of how many buttons we create
             int puBtns = 0;
-            int streamBtnCount = 0;
 
             // Use reflection to find appropriate process units and streams for the palette
             Assembly a = Assembly.GetExecutingAssembly();
@@ -173,15 +189,13 @@ namespace ChemProV.UI
                     continue;
                 }
 
-                // We only are interested in types that inherit from LabeledProcessUnit and 
-                // AbstractStream
-                if (t.IsSubclassOf(typeof(PFD.ProcessUnits.LabeledProcessUnit)) &&
-                    typeof(PFD.ProcessUnits.LabeledProcessUnit) != t)
+                // We only are interested in types that inherit from AbstractProcessUnit
+                if (t.IsSubclassOf(typeof(Core.AbstractProcessUnit)) && !t.IsAbstract)
                 {
                     // We've found a potential process unit, but we need to make sure that 
                     // it can be created under the specified difficulty setting
-                    PFD.ProcessUnits.LabeledProcessUnit unit = (PFD.ProcessUnits.LabeledProcessUnit)
-                        Activator.CreateInstance(t);
+                    Core.AbstractProcessUnit unit = 
+                        Activator.CreateInstance(t, (int)-1) as Core.AbstractProcessUnit;
                     if (unit.IsAvailableWithDifficulty(setting))
                     {
                         if (0 == (puBtns % m_buttonsPerRow))
@@ -191,64 +205,18 @@ namespace ChemProV.UI
                             spPUs.Orientation = Orientation.Horizontal;
 
                             // Add the first button to it
-                            spPUs.Children.Add(CreateButton(unit.IconSource, unit.Description, t));
+                            spPUs.Children.Add(CreateButton(
+                                ProcessUnitControl.GetIconSource(t), unit.Description, t));
 
                             ProcessUnitsPanel.Children.Add(spPUs);
                         }
                         else
                         {
-                            spPUs.Children.Add(CreateButton(unit.IconSource, unit.Description, t));
+                            spPUs.Children.Add(CreateButton(
+                                ProcessUnitControl.GetIconSource(t), unit.Description, t));
                         }
 
                         puBtns++;
-                    }
-                }
-                else if (t.IsSubclassOf(typeof(PFD.Streams.AbstractStream)))
-                {
-                    // We've found a potential stream, but we need to make sure that it can be created under the 
-                    // specified difficulty setting. The stream must have a static method for this and we'll use 
-                    // reflection to find it.
-                    MethodInfo mi = t.GetMethod("IsAvailableWithDifficulty",
-                        new Type[]{typeof(OptionDifficultySetting)});
-
-                    // Tell the developer that they need to add this in
-                    if (null == mi)
-                    {
-                        throw new Exception("Note to developer: You have a class named " + t.Name +
-                            " that inherits from AbstractStream but does not have the required static method " +
-                            "\"IsAvailableWithDifficulty(OptionDifficultySetting)\". Please implement this " +
-                            "method so that the control palette knows how to deal with the stream type.");
-                    }
-
-                    // There also needs to be a static string property for the title
-                    PropertyInfo pi = t.GetProperty("Title", typeof(string));
-                    if (null == pi)
-                    {
-                        throw new Exception("Note to developer: You have a class named " + t.Name +
-                            " that inherits from AbstractStream but does not have the required static property " +
-                            "\"string Title { get; }\". Please implement this property so that the control " + 
-                            "palette knows how to label the stream creation option.");
-                    }
-                    string streamTitle = pi.GetGetMethod().Invoke(null, null) as string;
-
-                    // Execute it
-                    bool available = (bool)mi.Invoke(null, new object[] { setting });
-                    if (available)
-                    {
-                        if (0 == (streamBtnCount % m_buttonsPerRow))
-                        {
-                            // Create a new row
-                            spStreams = new StackPanel();
-                            spStreams.Orientation = Orientation.Horizontal;
-
-                            // Add the row into the control
-                            StreamsPanel.Children.Add(spStreams);
-                        }
-
-                        spStreams.Children.Add(CreateButton(t.Equals(typeof(PFD.Streams.HeatStream)) ?
-                            "/UI/Icons/pu_heat_stream.png" : "/UI/Icons/pu_stream.png", streamTitle, t));
-
-                        streamBtnCount++;
                     }
                 }
             }
@@ -284,7 +252,6 @@ namespace ChemProV.UI
         private void UserControl_Loaded(object sender, RoutedEventArgs e)
         {
             ReplaceMeWithProcessUnits.Text = "Loading...";
-            ReplaceMeWithStreams.Text = "Loading...";
 
             StickyNoteButton.Tag = typeof(PFD.StickyNote.StickyNoteControl);
         }

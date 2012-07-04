@@ -9,8 +9,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 // Original file author: Evan Olds
 
+// Keep this class UI-independent. Don't use things like System.Windows.Point or anything 
+// else that requires Silverlight, WPF, etc.
 using System;
-using System.Windows;
 
 namespace ChemProV.MathCore
 {
@@ -22,12 +23,6 @@ namespace ChemProV.MathCore
         public double X;
 
         public double Y;
-
-        public Vector(Point point)
-        {
-            X = point.X;
-            Y = point.Y;
-        }
 
         public Vector(double x, double y)
         {
@@ -48,6 +43,11 @@ namespace ChemProV.MathCore
                 return (other.X == this.X && other.Y == this.Y);
             }
             return false;
+        }
+
+        public bool Equals(Vector other)
+        {
+            return (other.X == this.X && other.Y == this.Y);
         }
 
         public override int GetHashCode()
@@ -115,9 +115,9 @@ namespace ChemProV.MathCore
             return (X * ontome.X + Y * ontome.Y) / ontome.Length;
         }
 
-        public Point ToPoint()
+        public override string ToString()
         {
-            return new Point(X, Y);
+            return X.ToString() + "," + Y.ToString();
         }
     }
 }

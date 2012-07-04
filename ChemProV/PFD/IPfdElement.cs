@@ -14,12 +14,7 @@ namespace ChemProV.PFD
     public interface IPfdElement
     {
         /// <summary>
-        /// Fired when the PFD element's location is changed
-        /// </summary>
-        event EventHandler LocationChanged;
-
-        /// <summary>
-        /// Gets or sets the IProcessUnit's unique ID number
+        /// Gets or sets the GenericProcessUnit's unique ID number
         /// </summary>
         String Id
         {
