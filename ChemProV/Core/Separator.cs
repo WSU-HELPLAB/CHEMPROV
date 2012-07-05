@@ -9,7 +9,7 @@ namespace ChemProV.Core
             : this(AbstractProcessUnit.GetNextUID()) { }
 
         public Separator(int id)
-            : base(id, "Exc" + id.ToString()) { }
+            : base(id, "Sep" + id.ToString()) { }
         
         public Separator(XElement loadFromMe)
             : base(loadFromMe)

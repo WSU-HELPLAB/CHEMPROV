@@ -18,7 +18,7 @@ namespace ChemProV.Core
             : this(AbstractProcessUnit.GetNextUID()) { }
 
         public Mixer(int id)
-            : base(id, "Exc" + id.ToString()) { }
+            : base(id, "Mix" + id.ToString()) { }
         
         public Mixer(XElement loadFromMe)
             : base(loadFromMe)
