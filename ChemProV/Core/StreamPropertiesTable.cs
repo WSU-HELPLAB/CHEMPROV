@@ -147,7 +147,7 @@ namespace ChemProV.Core
                 newRow = new ChemicalStreamData();
             }
 
-            // Add the new row to the list
+            // Add the new row to the list (will invoke PropertyChanged for us)
             AddRow(newRow);
 
             // Return the new row
@@ -179,6 +179,23 @@ namespace ChemProV.Core
         private void AnyRow_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             RowPropertyChanged(sender, e);
+        }
+
+        public int IndexOfRow(IStreamData row)
+        {
+            return m_rows.IndexOf(row);
+        }
+
+        public bool InsertRow(int index, IStreamData row)
+        {
+            if (index < 0 || index > m_rows.Count)
+            {
+                return false;
+            }
+
+            m_rows.Insert(index, row);
+            RowsChanged(this, EventArgs.Empty);
+            return true;
         }
 
         public bool CanAddRemoveRows

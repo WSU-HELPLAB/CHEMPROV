@@ -108,6 +108,12 @@ namespace ChemProV.Core
                     m_selectedUnits = ((ChemicalUnits)unitEnumInt).ToPrettyString();
                 }
             }
+
+            XElement uhr = loadFromMe.Element("UserHasRenamed");
+            if (null != uhr)
+            {
+                m_userHasRenamed = bool.Parse(uhr.Value);
+            }
         }
 
         public object GetColumnUIObject(int columnIndex, out string propertyName)
@@ -377,6 +383,8 @@ namespace ChemProV.Core
             writer.WriteStartElement("ToolTipMessage");
             writer.WriteString(ToolTipMessage);
             writer.WriteEndElement();
+
+            writer.WriteElementString("UserHasRenamed", m_userHasRenamed.ToString());
 
             // End "ChemicalStreamData"
             writer.WriteEndElement();
