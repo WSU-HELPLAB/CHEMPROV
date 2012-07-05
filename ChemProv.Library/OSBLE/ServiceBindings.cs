@@ -45,7 +45,7 @@ namespace ChemProV.Library.OSBLE
                     MaxBufferSize = 2147483647,
                     MaxReceivedMessageSize = 2147483647,
                     SendTimeout = new TimeSpan(0, 0, 15, 0, 0),
-                    ReceiveTimeout = new TimeSpan(0, 0, 15, 0, 0),
+                    ReceiveTimeout = new TimeSpan(0, 0, 15, 0, 0),                    
                 };
 
 #if false
@@ -53,6 +53,7 @@ namespace ChemProV.Library.OSBLE
 #else
                 binding.Security.Mode = BasicHttpSecurityMode.Transport;
 #endif
+
                 return binding;
             }
         }

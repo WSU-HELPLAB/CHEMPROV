@@ -194,18 +194,19 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                     <sdk:Label Height="Auto" x:Name="X_Label" Width="18" Content="X" HorizontalAlignment="Center" MouseLeftButtonDown="X_Label_MouseLeftButtonDown" Background="#FFD4CC75" />
                 </StackPanel>
                 <TextBox
-            Height="3"
-            HorizontalAlignment="Left"
-            Margin="0,0,0,0"
-            x:Name="Note"
-            VerticalAlignment="Top"
-            Width="3"
-            Background="Transparent"
-            TextWrapping="Wrap"
-            AcceptsReturn="True"
-            Style="{StaticResource TextBoxWithOutBorder}"
-            VerticalScrollBarVisibility="Auto"
-            />
+                    Height="3"
+                    HorizontalAlignment="Left"
+                    Margin="0,0,0,0"
+                    x:Name="Note"
+                    VerticalAlignment="Top"
+                    Width="3"
+                    Background="Transparent"
+                    TextWrapping="Wrap"
+                    AcceptsReturn="True"
+                    Style="{StaticResource TextBoxWithOutBorder}"
+                    VerticalScrollBarVisibility="Auto"
+                    TextChanged="Note_TextChanged"
+                    />
             </StackPanel>
             <Polygon
                 x:Name="Bottem_Left_Corner"

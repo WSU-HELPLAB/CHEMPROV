@@ -6,7 +6,7 @@ This file is part of ChemProV (http://helplab.org/chemprov).
 ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 -->
-<UserControl x:Class="ChemProV.PFD.Streams.AbstractStream"
+<UserControl x:Class="ChemProV.PFD.Streams.StreamControl"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
@@ -18,10 +18,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     IsTabStop="True"
     >
     <Canvas x:Name="LayoutRoot">
-        <!-- This control is not much more than a few connecting lines in terms of what's actually in the 
-        control. The control's logic, however, creates several more components at runtime and adds them 
-        to the DrawingCanvas that it exists upon. -->
-        <Line X1="15" X2="15" Y1="0" Y2="15" Stroke="Black" Fill="Black" x:Name="Stem" StrokeThickness="1" Canvas.ZIndex="-2" />
+        <!-- Most of the controls we need to represent the stream are generated programatically. -->
         <Line X1="15" X2="15" Y1="15" Y2="50" Stroke="White" x:Name="TableLine"  />
     </Canvas>
 </UserControl>

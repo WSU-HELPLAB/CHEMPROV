@@ -30,7 +30,7 @@ namespace ChemProV.UnitTests.PFD
             w.AddStream(cs1);
 
             // The DrawingCanvas control should have added a stream control
-            ChemProV.PFD.Streams.AbstractStream streamControl =
+            ChemProV.PFD.Streams.StreamControl streamControl =
                 mp1.WorkspaceReference.DrawingCanvasReference.GetStreamControl(cs1);
             Assert.IsNotNull(streamControl, "DrawingCanvas control did not correctly create a " +
                 "stream control for a stream that was added to the workspace.");

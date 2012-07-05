@@ -186,8 +186,8 @@
       <DependentUpon>StickyNoteControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\StickyNote\StickyNote_UIIndependent.cs" />
-    <Compile Include="PFD\Streams\AbstractStream.xaml.cs">
-      <DependentUpon>AbstractStream.xaml</DependentUpon>
+    <Compile Include="PFD\Streams\StreamControl.xaml.cs">
+      <DependentUpon>StreamControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\Streams\DraggableStreamEndpoint.xaml.cs">
       <DependentUpon>DraggableStreamEndpoint.xaml</DependentUpon>
@@ -328,7 +328,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PFD\Streams\AbstractStream.xaml">
+    <Page Include="PFD\Streams\StreamControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

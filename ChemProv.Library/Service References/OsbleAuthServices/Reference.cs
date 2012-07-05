@@ -20,257 +20,227 @@ namespace ChemProV.Library.OsbleAuthServices {
     [System.Runtime.Serialization.DataContractAttribute(Name="UserProfile", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Users")]
     public partial class UserProfile : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private string AspNetUserNamek__BackingFieldField;
+        private string AuthenticationHashField;
         
-        private string AuthenticationHashk__BackingFieldField;
+        private bool CanCreateCoursesField;
         
-        private bool CanCreateCoursesk__BackingFieldField;
+        private int DefaultCourseField;
         
-        private int DefaultCoursek__BackingFieldField;
+        private bool EmailAllActivityPostsField;
         
-        private bool EmailAllActivityPostsk__BackingFieldField;
+        private bool EmailAllNotificationsField;
         
-        private bool EmailAllNotificationsk__BackingFieldField;
+        private string FirstNameField;
         
-        private string FirstNamek__BackingFieldField;
+        private int IDField;
         
-        private int IDk__BackingFieldField;
+        private string IdentificationField;
         
-        private string Identificationk__BackingFieldField;
+        private bool IsAdminField;
         
-        private bool IsAdmink__BackingFieldField;
+        private bool IsApprovedField;
         
-        private bool IsApprovedk__BackingFieldField;
+        private string LastNameField;
         
-        private string LastNamek__BackingFieldField;
+        private ChemProV.Library.OsbleAuthServices.School SchoolField;
         
-        private string Passwordk__BackingFieldField;
+        private int SchoolIDField;
         
-        private int SchoolIDk__BackingFieldField;
+        private int SortByField;
         
-        private ChemProV.Library.OsbleAuthServices.School Schoolk__BackingFieldField;
+        private string UserNameField;
         
-        private int SortByk__BackingFieldField;
-        
-        private string UserNamek__BackingFieldField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<AspNetUserName>k__BackingField", IsRequired=true)]
-        public string AspNetUserNamek__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string AuthenticationHash {
             get {
-                return this.AspNetUserNamek__BackingFieldField;
+                return this.AuthenticationHashField;
             }
             set {
-                if ((object.ReferenceEquals(this.AspNetUserNamek__BackingFieldField, value) != true)) {
-                    this.AspNetUserNamek__BackingFieldField = value;
-                    this.RaisePropertyChanged("AspNetUserNamek__BackingField");
+                if ((object.ReferenceEquals(this.AuthenticationHashField, value) != true)) {
+                    this.AuthenticationHashField = value;
+                    this.RaisePropertyChanged("AuthenticationHash");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<AuthenticationHash>k__BackingField", IsRequired=true)]
-        public string AuthenticationHashk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool CanCreateCourses {
             get {
-                return this.AuthenticationHashk__BackingFieldField;
+                return this.CanCreateCoursesField;
             }
             set {
-                if ((object.ReferenceEquals(this.AuthenticationHashk__BackingFieldField, value) != true)) {
-                    this.AuthenticationHashk__BackingFieldField = value;
-                    this.RaisePropertyChanged("AuthenticationHashk__BackingField");
+                if ((this.CanCreateCoursesField.Equals(value) != true)) {
+                    this.CanCreateCoursesField = value;
+                    this.RaisePropertyChanged("CanCreateCourses");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<CanCreateCourses>k__BackingField", IsRequired=true)]
-        public bool CanCreateCoursesk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int DefaultCourse {
             get {
-                return this.CanCreateCoursesk__BackingFieldField;
+                return this.DefaultCourseField;
             }
             set {
-                if ((this.CanCreateCoursesk__BackingFieldField.Equals(value) != true)) {
-                    this.CanCreateCoursesk__BackingFieldField = value;
-                    this.RaisePropertyChanged("CanCreateCoursesk__BackingField");
+                if ((this.DefaultCourseField.Equals(value) != true)) {
+                    this.DefaultCourseField = value;
+                    this.RaisePropertyChanged("DefaultCourse");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<DefaultCourse>k__BackingField", IsRequired=true)]
-        public int DefaultCoursek__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool EmailAllActivityPosts {
             get {
-                return this.DefaultCoursek__BackingFieldField;
+                return this.EmailAllActivityPostsField;
             }
             set {
-                if ((this.DefaultCoursek__BackingFieldField.Equals(value) != true)) {
-                    this.DefaultCoursek__BackingFieldField = value;
-                    this.RaisePropertyChanged("DefaultCoursek__BackingField");
+                if ((this.EmailAllActivityPostsField.Equals(value) != true)) {
+                    this.EmailAllActivityPostsField = value;
+                    this.RaisePropertyChanged("EmailAllActivityPosts");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<EmailAllActivityPosts>k__BackingField", IsRequired=true)]
-        public bool EmailAllActivityPostsk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool EmailAllNotifications {
             get {
-                return this.EmailAllActivityPostsk__BackingFieldField;
+                return this.EmailAllNotificationsField;
             }
             set {
-                if ((this.EmailAllActivityPostsk__BackingFieldField.Equals(value) != true)) {
-                    this.EmailAllActivityPostsk__BackingFieldField = value;
-                    this.RaisePropertyChanged("EmailAllActivityPostsk__BackingField");
+                if ((this.EmailAllNotificationsField.Equals(value) != true)) {
+                    this.EmailAllNotificationsField = value;
+                    this.RaisePropertyChanged("EmailAllNotifications");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<EmailAllNotifications>k__BackingField", IsRequired=true)]
-        public bool EmailAllNotificationsk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string FirstName {
             get {
-                return this.EmailAllNotificationsk__BackingFieldField;
+                return this.FirstNameField;
             }
             set {
-                if ((this.EmailAllNotificationsk__BackingFieldField.Equals(value) != true)) {
-                    this.EmailAllNotificationsk__BackingFieldField = value;
-                    this.RaisePropertyChanged("EmailAllNotificationsk__BackingField");
+                if ((object.ReferenceEquals(this.FirstNameField, value) != true)) {
+                    this.FirstNameField = value;
+                    this.RaisePropertyChanged("FirstName");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<FirstName>k__BackingField", IsRequired=true)]
-        public string FirstNamek__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int ID {
             get {
-                return this.FirstNamek__BackingFieldField;
+                return this.IDField;
             }
             set {
-                if ((object.ReferenceEquals(this.FirstNamek__BackingFieldField, value) != true)) {
-                    this.FirstNamek__BackingFieldField = value;
-                    this.RaisePropertyChanged("FirstNamek__BackingField");
+                if ((this.IDField.Equals(value) != true)) {
+                    this.IDField = value;
+                    this.RaisePropertyChanged("ID");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<ID>k__BackingField", IsRequired=true)]
-        public int IDk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string Identification {
             get {
-                return this.IDk__BackingFieldField;
+                return this.IdentificationField;
             }
             set {
-                if ((this.IDk__BackingFieldField.Equals(value) != true)) {
-                    this.IDk__BackingFieldField = value;
-                    this.RaisePropertyChanged("IDk__BackingField");
+                if ((object.ReferenceEquals(this.IdentificationField, value) != true)) {
+                    this.IdentificationField = value;
+                    this.RaisePropertyChanged("Identification");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<Identification>k__BackingField", IsRequired=true)]
-        public string Identificationk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsAdmin {
             get {
-                return this.Identificationk__BackingFieldField;
+                return this.IsAdminField;
             }
             set {
-                if ((object.ReferenceEquals(this.Identificationk__BackingFieldField, value) != true)) {
-                    this.Identificationk__BackingFieldField = value;
-                    this.RaisePropertyChanged("Identificationk__BackingField");
+                if ((this.IsAdminField.Equals(value) != true)) {
+                    this.IsAdminField = value;
+                    this.RaisePropertyChanged("IsAdmin");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<IsAdmin>k__BackingField", IsRequired=true)]
-        public bool IsAdmink__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsApproved {
             get {
-                return this.IsAdmink__BackingFieldField;
+                return this.IsApprovedField;
             }
             set {
-                if ((this.IsAdmink__BackingFieldField.Equals(value) != true)) {
-                    this.IsAdmink__BackingFieldField = value;
-                    this.RaisePropertyChanged("IsAdmink__BackingField");
+                if ((this.IsApprovedField.Equals(value) != true)) {
+                    this.IsApprovedField = value;
+                    this.RaisePropertyChanged("IsApproved");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<IsApproved>k__BackingField", IsRequired=true)]
-        public bool IsApprovedk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string LastName {
             get {
-                return this.IsApprovedk__BackingFieldField;
+                return this.LastNameField;
             }
             set {
-                if ((this.IsApprovedk__BackingFieldField.Equals(value) != true)) {
-                    this.IsApprovedk__BackingFieldField = value;
-                    this.RaisePropertyChanged("IsApprovedk__BackingField");
+                if ((object.ReferenceEquals(this.LastNameField, value) != true)) {
+                    this.LastNameField = value;
+                    this.RaisePropertyChanged("LastName");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<LastName>k__BackingField", IsRequired=true)]
-        public string LastNamek__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public ChemProV.Library.OsbleAuthServices.School School {
             get {
-                return this.LastNamek__BackingFieldField;
+                return this.SchoolField;
             }
             set {
-                if ((object.ReferenceEquals(this.LastNamek__BackingFieldField, value) != true)) {
-                    this.LastNamek__BackingFieldField = value;
-                    this.RaisePropertyChanged("LastNamek__BackingField");
+                if ((object.ReferenceEquals(this.SchoolField, value) != true)) {
+                    this.SchoolField = value;
+                    this.RaisePropertyChanged("School");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<Password>k__BackingField", IsRequired=true)]
-        public string Passwordk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int SchoolID {
             get {
-                return this.Passwordk__BackingFieldField;
+                return this.SchoolIDField;
             }
             set {
-                if ((object.ReferenceEquals(this.Passwordk__BackingFieldField, value) != true)) {
-                    this.Passwordk__BackingFieldField = value;
-                    this.RaisePropertyChanged("Passwordk__BackingField");
+                if ((this.SchoolIDField.Equals(value) != true)) {
+                    this.SchoolIDField = value;
+                    this.RaisePropertyChanged("SchoolID");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<SchoolID>k__BackingField", IsRequired=true)]
-        public int SchoolIDk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int SortBy {
             get {
-                return this.SchoolIDk__BackingFieldField;
+                return this.SortByField;
             }
             set {
-                if ((this.SchoolIDk__BackingFieldField.Equals(value) != true)) {
-                    this.SchoolIDk__BackingFieldField = value;
-                    this.RaisePropertyChanged("SchoolIDk__BackingField");
+                if ((this.SortByField.Equals(value) != true)) {
+                    this.SortByField = value;
+                    this.RaisePropertyChanged("SortBy");
                 }
             }
         }
         
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<School>k__BackingField", IsRequired=true)]
-        public ChemProV.Library.OsbleAuthServices.School Schoolk__BackingField {
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public string UserName {
             get {
-                return this.Schoolk__BackingFieldField;
+                return this.UserNameField;
             }
             set {
-                if ((object.ReferenceEquals(this.Schoolk__BackingFieldField, value) != true)) {
-                    this.Schoolk__BackingFieldField = value;
-                    this.RaisePropertyChanged("Schoolk__BackingField");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<SortBy>k__BackingField", IsRequired=true)]
-        public int SortByk__BackingField {
-            get {
-                return this.SortByk__BackingFieldField;
-            }
-            set {
-                if ((this.SortByk__BackingFieldField.Equals(value) != true)) {
-                    this.SortByk__BackingFieldField = value;
-                    this.RaisePropertyChanged("SortByk__BackingField");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute(Name="<UserName>k__BackingField", IsRequired=true)]
-        public string UserNamek__BackingField {
-            get {
-                return this.UserNamek__BackingFieldField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.UserNamek__BackingFieldField, value) != true)) {
-                    this.UserNamek__BackingFieldField = value;
-                    this.RaisePropertyChanged("UserNamek__BackingField");
+                if ((object.ReferenceEquals(this.UserNameField, value) != true)) {
+                    this.UserNameField = value;
+                    this.RaisePropertyChanged("UserName");
                 }
             }
         }

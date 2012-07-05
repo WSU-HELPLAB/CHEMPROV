@@ -50,11 +50,11 @@ namespace ChemProV.Core
                 // Case 1: deleting a sticky note
                 (element as PFD.StickyNote.StickyNoteControl).DeleteWithUndo(canvas);
             }
-            else if (element is ChemProV.PFD.Streams.AbstractStream)
+            else if (element is ChemProV.PFD.Streams.StreamControl)
             {
                 // Case 2: deleting a stream
 
-                DeleteStreamWithUndo(element as ChemProV.PFD.Streams.AbstractStream, canvas);
+                DeleteStreamWithUndo(element as ChemProV.PFD.Streams.StreamControl, canvas);
             }
             else if (element is PFD.Streams.PropertiesWindow.IPropertiesWindow)
             {
@@ -106,8 +106,8 @@ namespace ChemProV.Core
                     break;
                 }
             }
-            PFD.Streams.AbstractStream heatStreamControl =
-                canvas.GetStreamControl(heatStream) as PFD.Streams.AbstractStream;
+            PFD.Streams.StreamControl heatStreamControl =
+                canvas.GetStreamControl(heatStream) as PFD.Streams.StreamControl;
 
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
             undos.Add(new Logic.Undos.AddToWorkspace(heatStream));
@@ -190,7 +190,7 @@ namespace ChemProV.Core
         }
 
         // Refactoring on this method is done
-        private static void DeleteStreamWithUndo(ChemProV.PFD.Streams.AbstractStream stream,
+        private static void DeleteStreamWithUndo(ChemProV.PFD.Streams.StreamControl stream,
             DrawingCanvas canvas)
         {
             Core.AbstractStream s = stream.Stream;
@@ -203,31 +203,36 @@ namespace ChemProV.Core
                 return;
             }
 
-            // We need to build a list of undos. Some actions are shared by all cases.
+            // We need to build a list of undos
             List<IUndoRedoAction> actions = new List<IUndoRedoAction>();
-            // In all cases we will need to add the stream back to the workspace
-            actions.Add(new Logic.Undos.AddToWorkspace(stream.Stream));
 
             if (null != s.Source)
             {
                 // If the stream has a non-null source then we need to detach it and 
                 // make sure the undo would reattach it
                 actions.Add(new Logic.Undos.AttachOutgoingStream(s.Source, s));
+                actions.Add(new Logic.Undos.SetStreamSource(s, s.Source, null, s.SourceLocation));
 
                 // Do the detachment so that the process unit (which is staying around) won't 
                 // have an outgoing stream that's been deleted
                 s.Source.DetachOutgoingStream(s);
+                s.Source = null;
             }
             if (null != s.Destination)
             {
                 // If the stream has a non-null destination then we need to detach it and 
                 // make sure the undo would reattach it
                 actions.Add(new Logic.Undos.AttachIncomingStream(s.Destination, s));
+                actions.Add(new Logic.Undos.SetStreamDestination(s, s.Destination, null, s.DestinationLocation));
 
                 // Do the detachment so that the process unit (which is staying around) won't 
                 // have an incoming stream that's been deleted
                 s.Destination.DetachIncomingStream(s);
+                s.Destination = null;
             }
+
+            // In all cases we will need to add the stream back to the workspace
+            actions.Add(new Logic.Undos.AddToWorkspace(stream.Stream));
 
             // Delete the stream from the workspace. Event handlers will take care of updating the UI.
             canvas.GetWorkspace().RemoveStream(stream.Stream);

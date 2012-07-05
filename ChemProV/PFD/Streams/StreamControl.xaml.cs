@@ -25,14 +25,14 @@ using ChemProV.PFD.Streams.PropertiesWindow;
 namespace ChemProV.PFD.Streams
 {
     /// <summary>
-    /// TODO: Rename to StreamControl. This class is not abstract and is the only stream control.
+    /// Control that serves as a UI element for and AbstractStream. Manages its own collection of child 
+    /// controls on the DrawingCanvas including comment sticky notes.
     /// </summary>
-    public partial class AbstractStream : UserControl, IPfdElement, UI.ICommentControlManager, ICanvasElement
+    public partial class StreamControl : UserControl, IPfdElement, UI.ICommentControlManager, ICanvasElement
     {
         #region instance vars
 
         public event EventHandler SelectionChanged = null;
-        public bool m_isSelected = false;
 
         private Polygon m_arrow;
 
@@ -56,6 +56,21 @@ namespace ChemProV.PFD.Streams
         /// when the stream has a non-null destination.
         /// </summary>
         private DraggableStreamEndpoint m_dstDragIcon = null;
+
+        public bool m_isSelected = false;
+
+        /// <summary>
+        /// Stores the mid-point value that was computed in the most recent call to 
+        /// ComputeLineSegments
+        /// </summary>
+        private MathCore.Vector m_lastMidPoint = new MathCore.Vector(
+            double.NegativeInfinity, double.NegativeInfinity);
+
+        /// <summary>
+        /// The collection of lines used to draw the stream. This control takes care of these lines 
+        /// on the DrawingCanvas and must add/remove as this collection is altered.
+        /// </summary>
+        public List<Line> m_lines = new List<Line>();
 
         /// <summary>
         /// A reference to the control to use as the table when it is minimized. This stays null 
@@ -103,16 +118,9 @@ namespace ChemProV.PFD.Streams
 
         private bool m_updatingLocation = false;
 
-        /// <summary>
-        /// Keeps track of the process unit's unique ID number.  Needed when parsing
-        /// to/from XML for saving and loading
-        /// TODO: Remove
-        /// </summary>
-        private string streamId;
-
         #endregion instance vars
 
-        #region ChemProV.PFD.Streams.AbstractStream Members
+        private static readonly Brush s_streamLineSelected = new SolidColorBrush(Colors.Yellow);
 
         /// <summary>
         /// Gets or sets the stream's unique ID number
@@ -120,14 +128,11 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         public String Id
         {
-            get
+            get 
             {
-                return streamId;
+                return null;
             }
-            set
-            {
-                streamId = value;
-            }
+            set { }
         }
 
         public MathCore.Vector StreamVector
@@ -250,14 +255,6 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        public UI.StreamTableControl Table
-        {
-            get
-            {
-                return m_table;
-            }
-        }
-
         /// <summary>
         /// Gets the point on the border of the destination process unit where the stream line 
         /// connects to. This is only relevant if the stream has a non-null destination process 
@@ -309,26 +306,130 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        public MathCore.Vector[] GetArrowVertices()
+        /// <summary>
+        /// Computes line segments for the stream lines that should be rendered. The first point (A) 
+        /// in the first segment will be the source location and the last point (B) in the last 
+        /// segment will be the destination location. The number of lines in the array can be any 
+        /// value greater than 1.
+        /// </summary>
+        private MathCore.LineSegment[] ComputeLineSegments(out MathCore.Vector midpoint, 
+            out MathCore.Vector sourceIconLocation)
         {
-            MathCore.Vector[] pts = new MathCore.Vector[3];
+            MathCore.Vector s = (null == m_stream.Source) ? 
+                m_stream.SourceLocation : m_stream.Source.Location;
+            MathCore.Vector d = (null == m_stream.Destination) ?
+                m_stream.DestinationLocation : m_stream.Destination.Location;
 
-            // Start by getting the normalized connection line vector
-            MathCore.Vector v = MathCore.Vector.Normalize(StreamVector);
+            // Set the default source icon location. Will get changed below if need be
+            sourceIconLocation = s;
+            
+            // Start with the simplest case of 1 straight line
+            MathCore.LineSegment simplest = new MathCore.LineSegment(
+                m_stream.SourceLocation, m_stream.DestinationLocation);
 
-            // Also get the connection point
-            MathCore.Vector tip = DestinationConnectionPoint;
+            // If it doesn't intersect any other process units then we'll use it
+            if (!m_canvas.IntersectsAnyPU(simplest, m_stream.Source, m_stream.Destination))
+            {
+                midpoint = (s + d) / 2.0;
+                m_lastMidPoint = midpoint;
+                if (null != m_stream.Source)
+                {
+                    sourceIconLocation = s + (MathCore.Vector.Normalize(d - s) * 30.0);
+                }
+                return new MathCore.LineSegment[] { simplest };
+            }
 
-            // Build perpendicular MathCore.Vectors
-            MathCore.Vector perp1 = MathCore.Vector.GetPerpendicular1(v) * 15.0;
-            MathCore.Vector perp2 = MathCore.Vector.GetPerpendicular2(v) * 15.0;
+            // If that doesn't work, try two lines that make a 90 degree angle
+            MathCore.Vector corner = new MathCore.Vector(s.X, d.Y);
+            MathCore.LineSegment a = new MathCore.LineSegment(s, corner);
+            MathCore.LineSegment b = new MathCore.LineSegment(corner, d);
+            if (!m_canvas.IntersectsAnyPU(a, m_stream.Source, m_stream.Destination) &&
+                !m_canvas.IntersectsAnyPU(b, m_stream.Source, m_stream.Destination))
+            {
+                // These lines will work
+                midpoint = corner;
+                m_lastMidPoint = midpoint;
+                if (null != m_stream.Source)
+                {
+                    sourceIconLocation = s + (MathCore.Vector.Normalize(a.Direction) * 30.0);
+                }
+                return new MathCore.LineSegment[] { a, b };
+            }
+            // Try the other variant
+            corner = new MathCore.Vector(d.X, s.Y);
+            a = new MathCore.LineSegment(s, corner);
+            b = new MathCore.LineSegment(corner, d);
+            if (!m_canvas.IntersectsAnyPU(a, m_stream.Source, m_stream.Destination) &&
+                !m_canvas.IntersectsAnyPU(b, m_stream.Source, m_stream.Destination))
+            {
+                // These lines will work
+                midpoint = corner;
+                m_lastMidPoint = midpoint;
+                if (null != m_stream.Source)
+                {
+                    sourceIconLocation = s + (MathCore.Vector.Normalize(a.Direction) * 30.0);
+                }
+                return new MathCore.LineSegment[] { a, b };
+            }
 
-            // Build the arrow
-            pts[0] = tip;
-            pts[1] = ((tip - (v * 15.0)) + perp1);
-            pts[2] = ((tip - (v * 15.0)) + perp2);
+            // If we still don't have it then try a 3-line box
+            double dx = Math.Abs(s.X - d.X);
+            double dy = Math.Abs(s.Y - d.Y);
+            if (dy > dx)
+            {
+                double xPos = Math.Min(s.X, d.X - 35.0);
+                corner = new MathCore.Vector(xPos, s.Y);
+                MathCore.Vector corner2 = new MathCore.Vector(xPos, d.Y);
+                a = new MathCore.LineSegment(s, corner);
+                b = new MathCore.LineSegment(corner, corner2);
+                MathCore.LineSegment c = new MathCore.LineSegment(corner2, d);
 
-            return pts;
+                if (!m_canvas.IntersectsAnyPU(a, m_stream.Source, m_stream.Destination) &&
+                    !m_canvas.IntersectsAnyPU(b, m_stream.Source, m_stream.Destination) &&
+                    !m_canvas.IntersectsAnyPU(c, m_stream.Source, m_stream.Destination))
+                {
+                    // These lines will work
+                    midpoint = (corner + corner2) / 2.0;
+                    m_lastMidPoint = midpoint;
+                    if (null != m_stream.Source)
+                    {
+                        sourceIconLocation = s + (MathCore.Vector.Normalize(a.Direction) * 30.0);
+                    }
+                    return new MathCore.LineSegment[] { a, b, c };
+                }
+            }
+            else
+            {
+                double yPos = Math.Min(s.Y, d.Y) - 35.0;
+                corner = new MathCore.Vector(s.X, yPos);
+                MathCore.Vector corner2 = new MathCore.Vector(d.X, yPos);
+                a = new MathCore.LineSegment(s, corner);
+                b = new MathCore.LineSegment(corner, corner2);
+                MathCore.LineSegment c = new MathCore.LineSegment(corner2, d);
+
+                if (!m_canvas.IntersectsAnyPU(a, m_stream.Source, m_stream.Destination) &&
+                    !m_canvas.IntersectsAnyPU(b, m_stream.Source, m_stream.Destination) &&
+                    !m_canvas.IntersectsAnyPU(c, m_stream.Source, m_stream.Destination))
+                {
+                    // These lines will work
+                    midpoint = (corner + corner2) / 2.0;
+                    m_lastMidPoint = midpoint;
+                    if (null != m_stream.Source)
+                    {
+                        sourceIconLocation = s + (MathCore.Vector.Normalize(a.Direction) * 30.0);
+                    }
+                    return new MathCore.LineSegment[] { a, b, c };
+                }
+            }
+
+            // Out of options if we come here, so use the straight line
+            midpoint = (s + d) / 2.0;
+            m_lastMidPoint = midpoint;
+            if (null != m_stream.Source)
+            {
+                sourceIconLocation = s + (MathCore.Vector.Normalize(d - s) * 30.0);
+            }
+            return new MathCore.LineSegment[] { simplest };
         }
 
         /// <summary>
@@ -350,9 +451,12 @@ namespace ChemProV.PFD.Streams
 
                 m_isSelected = value;
 
-                // Set the stem color based on selection state
-                this.Stem.Stroke = m_isSelected ?
-                    new SolidColorBrush(Colors.Yellow) : m_streamLineNotSelected;
+                // Set the color of the lines based on selection state
+                foreach (Line line in m_lines)
+                {
+                    line.Stroke = m_isSelected ?
+                        s_streamLineSelected : m_streamLineNotSelected;
+                }
 
                 if (null != SelectionChanged)
                 {
@@ -387,96 +491,12 @@ namespace ChemProV.PFD.Streams
                 (unit as ChemProV.PFD.ProcessUnits.ProcessUnitControl).ProcessUnit);
         }
 
-        #endregion ChemProV.PFD.Streams.AbstractStream Members
-
-        /// <summary>
-        /// Can be called to manually update the stream's location
-        /// </summary>
-        public virtual void UpdateStreamLocation()
+        private static void SetLineLocation(Line line, MathCore.Vector a, MathCore.Vector b)
         {
-            if (m_updatingLocation)
-            {
-                return;
-            }
-            m_updatingLocation = true;
-
-            MathCore.Vector sPt = m_stream.SourceLocation;
-            MathCore.Vector dPt = m_stream.DestinationLocation;
-            MathCore.Vector lineMidpoint = (sPt + dPt) / 2.0;
-            
-            // Start by positioning the stem line that connects source and destination
-            // TODO: Rework this for boxed lines
-            Stem.X1 = sPt.X;
-            Stem.Y1 = sPt.Y;
-            Stem.X2 = dPt.X;
-            Stem.Y2 = dPt.Y;
-
-            // Take care of the source drag icon
-            MathCore.Vector sIconPt = MathCore.Vector.Normalize(dPt - sPt) * 32.0;
-            m_sourceDragIcon.Location = new Point(sPt.X, sPt.Y);
-            if (null != m_stream.Source)
-            {
-                m_sourceDragIcon.Visibility = System.Windows.Visibility.Collapsed;
-                // We need to show the square drag handle and position it
-                if (null == m_square)
-                {
-                    m_square = new System.Windows.Shapes.Rectangle()
-                    {
-                        Fill = m_streamLineNotSelected,
-                        Width = 10.0,
-                        Height = 10.0
-                    };
-                    m_canvas.AddNewChild(m_square);
-                    m_square.MouseLeftButtonDown += new MouseButtonEventHandler(SourceSquare_MouseLeftButtonDown);
-                }
-                m_square.Visibility = System.Windows.Visibility.Visible;
-                MathCore.Vector location = sPt + (MathCore.Vector.Normalize(dPt - sPt) * 30.0);
-                m_square.SetValue(Canvas.LeftProperty, location.X - 5.0);
-                m_square.SetValue(Canvas.TopProperty, location.Y - 5.0);
-            }
-            else
-            {
-                m_sourceDragIcon.Visibility = System.Windows.Visibility.Visible;
-                if (null != m_square)
-                {
-                    m_square.Visibility = System.Windows.Visibility.Collapsed;
-                }
-            }
-
-            // Take care of the destination drag icon as well
-            if (null == m_stream.Destination)
-            {
-                m_dstDragIcon.Location = new Point(dPt.X, dPt.Y);
-                m_dstDragIcon.Visibility = System.Windows.Visibility.Visible;
-            }
-            else
-            {
-                m_dstDragIcon.Visibility = System.Windows.Visibility.Collapsed;
-            }
-
-            // Now do the table line
-            if (null != m_table && !m_tableMinimized)
-            {
-                TableLine.X1 = lineMidpoint.X;
-                TableLine.Y1 = lineMidpoint.Y;
-                TableLine.X2 = m_table.Location.X;
-                TableLine.Y2 = m_table.Location.Y;
-            }
-
-            // If we're minimized then we need to position the mini table in the middle of the 
-            // stream line
-            if (m_tableMinimized)
-            {
-                m_miniTable.SetValue(Canvas.LeftProperty, lineMidpoint.X);
-                m_miniTable.SetValue(Canvas.TopProperty, lineMidpoint.Y);
-            }
-
-            if (null != m_stream.Destination)
-            {
-                UpdateAndShowArrow();
-            }
-
-            m_updatingLocation = false;
+            line.X1 = a.X;
+            line.Y1 = a.Y;
+            line.X2 = b.X;
+            line.Y2 = b.Y;
         }
 
         private void SourceSquare_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
@@ -492,43 +512,17 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        private void UpdateAndShowArrow()
-        {
-            // Get the points array for the arrow's vertices
-            MathCore.Vector[] pts = GetArrowVertices();
-
-            if (3 != m_arrow.Points.Count)
-            {
-                // We need to add.
-                foreach (MathCore.Vector pt in pts)
-                {
-                    m_arrow.Points.Add(new Point(pt.X, pt.Y));
-                }
-            }
-            else
-            {
-                // We need to set. I assume that setting is more efficient than clearing and re-adding, 
-                // but it may not be that big of a deal.
-                for (int i = 0; i < 3; i++)
-                {
-                    m_arrow.Points[i] = new Point(pts[i].X, pts[i].Y);
-                }
-            }
-
-            m_arrow.Visibility = System.Windows.Visibility.Visible;
-        }
-
         /// <summary>
         /// Private constructor. This is used only to get designed view to work. IT MUST NOT BE 
         /// MADE PUBLIC. For correct initialization the stream needs a DrawingCanvas reference.
         /// </summary>
-        private AbstractStream()
+        private StreamControl()
             : this(null, null)
         {
 
         }
 
-        private AbstractStream(DrawingCanvas canvas, ChemProV.Core.AbstractStream stream)
+        private StreamControl(DrawingCanvas canvas, ChemProV.Core.AbstractStream stream)
         {
             m_canvas = canvas;
             m_stream = stream;
@@ -546,7 +540,6 @@ namespace ChemProV.PFD.Streams
                 {
                     m_streamLineNotSelected = new SolidColorBrush(Colors.Black);
                 }
-                this.Stem.Stroke = m_streamLineNotSelected;
                 
                 // Create the drag handle for the source
                 m_sourceDragIcon = new DraggableStreamEndpoint(
@@ -577,14 +570,16 @@ namespace ChemProV.PFD.Streams
 
                 // Create the arrow polygon control
                 m_arrow = new Polygon();
-                // Use the same fill as the stem
-                m_arrow.Fill = Stem.Fill;
+                // Set the fill
+                m_arrow.Fill = m_streamLineNotSelected;
                 // Add it to the canvas
                 m_canvas.AddNewChild(m_arrow);
                 // Set the Z-index
                 m_arrow.SetValue(Canvas.ZIndexProperty, 2);
-                // Update the vertices
-                UpdateAndShowArrow();
+                // Add 3 points/vertices
+                m_arrow.Points.Add(new Point());
+                m_arrow.Points.Add(new Point());
+                m_arrow.Points.Add(new Point());
                 // Hide it if there's no destination
                 if (null == m_stream.Destination)
                 {
@@ -595,9 +590,6 @@ namespace ChemProV.PFD.Streams
                 {
                     m_arrow.MouseLeftButtonDown += new MouseButtonEventHandler(DestinationArrow_MouseLeftButtonDown);
                 }
-
-                // Make sure the stem line has a low z-index
-                Stem.SetValue(Canvas.ZIndexProperty, -1);
 
                 UpdateStreamLocation();
 
@@ -629,7 +621,6 @@ namespace ChemProV.PFD.Streams
                 //  2. Changes to the source process units properties (position)
                 //  3. Changes to the destination process units properties (position)
                 //  4. Changes to the source or destination references
-                //  5. Changes to source or destination location changes (if source or destination are non-null)
 
                 // 1.
                 // Setup the event listener for the comment collection. It is the responsibility of this 
@@ -654,23 +645,13 @@ namespace ChemProV.PFD.Streams
 
                 // 4.
                 stream.PropertyChanged += new PropertyChangedEventHandler(Stream_PropertyChanged);
-
-                // 5.
-                if (null != m_stream.Source)
-                {
-                    m_stream.Source.PropertyChanged += this.SourceOrDest_PropertyChanged;
-                }
-                if (null != m_stream.Destination)
-                {
-                    m_stream.Destination.PropertyChanged += this.SourceOrDest_PropertyChanged;
-                }
             }
         }
 
-        public static AbstractStream CreateOnCanvas(DrawingCanvas canvas,
+        public static StreamControl CreateOnCanvas(DrawingCanvas canvas,
             ChemProV.Core.AbstractStream stream)
         {
-            AbstractStream streamControl = new AbstractStream(canvas, stream);
+            StreamControl streamControl = new StreamControl(canvas, stream);
             canvas.AddNewChild(streamControl);
             return streamControl;
         }
@@ -812,7 +793,7 @@ namespace ChemProV.PFD.Streams
         }
 
         /// <summary>
-        /// Invoked when the comment collection in m_pu changes. This method updates the set of 
+        /// Invoked when the comment collection in m_stream changes. This method updates the set of 
         /// sticky note controls on the drawing canvas that are used to represent comments for 
         /// the process unit.
         /// </summary>
@@ -831,7 +812,8 @@ namespace ChemProV.PFD.Streams
                     m_canvas.RemoveChild(m_stickyNotes[i].LineToParent);
                     m_canvas.RemoveChild(m_stickyNotes[i]);
 
-                    // Decrement the index because we've deleted an item
+                    // Remove it from our collection as well and then back up the index
+                    m_stickyNotes.RemoveAt(i);
                     i--;
                 }
                 else
@@ -845,7 +827,8 @@ namespace ChemProV.PFD.Streams
             {
                 if (!existing.Contains(m_stream.Comments[i]))
                 {
-                    StickyNote.StickyNoteControl.CreateOnCanvas(m_canvas, m_stream.Comments[i], this);
+                    m_stickyNotes.Add(StickyNote.StickyNoteControl.CreateOnCanvas(
+                        m_canvas, m_stream.Comments[i], this));
                 }
             }
         }
@@ -879,19 +862,15 @@ namespace ChemProV.PFD.Streams
                 m_canvas.Children.Add(m_miniTable);
             }
 
-            // Hide the table and the line
+            // Hide the full size table and the line
             m_table.Visibility = System.Windows.Visibility.Collapsed;
             TableLine.Visibility = System.Windows.Visibility.Collapsed;
 
             // Make sure the mini-table is visible
             m_miniTable.Visibility = System.Windows.Visibility.Visible;
 
-            // Position the mini table
-            MathCore.Vector lineMidpoint = (m_stream.SourceLocation + m_stream.DestinationLocation) / 2.0;
-            m_miniTable.SetValue(Canvas.LeftProperty, lineMidpoint.X);
-            m_miniTable.SetValue(Canvas.TopProperty, lineMidpoint.Y);
-
             m_tableMinimized = true;
+            UpdateStreamLocation();            
         }
 
         /// <summary>
@@ -911,6 +890,34 @@ namespace ChemProV.PFD.Streams
 
             m_tableMinimized = false;
             UpdateStreamLocation();
+        }
+
+        public double GetShortestDistanceFromLines(MathCore.Vector location)
+        {
+            if (0 == m_lines.Count)
+            {
+                // If there are no lines we'll say it's very far away
+                return double.MaxValue;
+            }
+
+            double d = double.MaxValue;
+            foreach (Line line in m_lines)
+            {
+                MathCore.LineSegment ls = new MathCore.LineSegment(
+                    line.X1, line.Y1, line.X2, line.Y2);
+                double tempD = ls.GetDistance(location);
+                if (tempD < d)
+                {
+                    d = tempD;
+                }
+            }
+
+            return d;
+        }
+        
+        public double GetShortestDistanceFromLines(Point location)
+        {
+            return GetShortestDistanceFromLines(new MathCore.Vector(location.X, location.Y));
         }
 
         [Obsolete("Will be removed or re-written in the near future")]
@@ -940,6 +947,15 @@ namespace ChemProV.PFD.Streams
             //}
         }
 
+        public void SetLineBrush(Brush brush)
+        {
+            foreach (Line line in m_lines)
+            {
+                line.Stroke = brush;
+                line.Fill = brush;
+            }
+        }
+
         public ChemProV.Core.AbstractStream Stream
         {
             get
@@ -952,7 +968,14 @@ namespace ChemProV.PFD.Streams
         {
             get
             {
-                return new Point((Stem.X1 + Stem.X2) / 2.0, (Stem.Y1 + Stem.Y2) / 2.0);
+                if (double.NegativeInfinity.Equals(m_lastMidPoint.X) ||
+                    double.NegativeInfinity.Equals(m_lastMidPoint.Y))
+                {
+                    return new Point(
+                        (m_stream.SourceLocation.X + m_stream.DestinationLocation.X) / 2.0,
+                        (m_stream.SourceLocation.Y + m_stream.DestinationLocation.Y) / 2.0);
+                }
+                return new Point(m_lastMidPoint.X, m_lastMidPoint.Y);
             }
         }
 
@@ -1013,9 +1036,24 @@ namespace ChemProV.PFD.Streams
         /// <summary>
         /// Removes this control from the canvas. This includes removal of controls that are 
         /// "attached" to this control, such as the comment sticky note controls.
+        /// This is considered disposal of the control and it should not be used anymore 
+        /// after calling this method.
         /// </summary>
         public void RemoveSelfFromCanvas(UI.DrawingCanvas.DrawingCanvas canvas)
         {
+            // Unsubscribe from events (important)
+            m_stream.PropertyChanged -= this.Stream_PropertyChanged;
+            if (null != m_sourceEventItem)
+            {
+                m_sourceEventItem.PropertyChanged -= this.SourceOrDest_PropertyChanged;
+                m_sourceEventItem = null;
+            }
+            if (null != m_destEventItem)
+            {
+                m_destEventItem.PropertyChanged -= this.SourceOrDest_PropertyChanged;
+                m_destEventItem = null;
+            }
+            
             canvas.RemoveChild(this);
             canvas.RemoveChild(m_sourceDragIcon);
             canvas.RemoveChild(m_dstDragIcon);
@@ -1033,11 +1071,19 @@ namespace ChemProV.PFD.Streams
                 canvas.RemoveChild(m_arrow);
             }
 
+            // Remove all the lines
+            foreach (Line line in m_lines)
+            {
+                canvas.RemoveChild(line);
+            }
+            m_lines.Clear();
+
             foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
             {
                 canvas.RemoveChild(snc.LineToParent);
                 canvas.RemoveChild(snc);
             }
+            m_stickyNotes.Clear();
         }
 
         public Point Location
@@ -1049,6 +1095,174 @@ namespace ChemProV.PFD.Streams
             set
             {
             }
+        }
+
+        public UI.StreamTableControl Table
+        {
+            get
+            {
+                return m_table;
+            }
+        }
+
+        /// <summary>
+        /// Recomputes location of all relevant controls within the stream (endpoint icons, 
+        /// stream lines, etc.)
+        /// </summary>
+        public virtual void UpdateStreamLocation()
+        {
+            if (m_updatingLocation)
+            {
+                return;
+            }
+            m_updatingLocation = true;
+
+            MathCore.Vector sPt = m_stream.SourceLocation;
+            MathCore.Vector dPt = m_stream.DestinationLocation;
+            MathCore.Vector lineMidpoint = (sPt + dPt) / 2.0;
+
+            // Compute the line segments for our stream lines
+            MathCore.Vector mid, sIconPt;
+            MathCore.LineSegment[] lines = ComputeLineSegments(out mid, out sIconPt);
+            // Get the list of UI lines to the right size
+            while (m_lines.Count > lines.Length)
+            {
+                int index = m_lines.Count - 1;
+                m_canvas.RemoveChild(m_lines[index]);
+                m_lines.RemoveAt(index);
+            }
+            while (m_lines.Count < lines.Length)
+            {
+                Line line = new Line();
+                m_lines.Add(line);
+                m_canvas.AddNewChild(line);
+
+                // Make sure the line has a low z-index
+                line.SetValue(Canvas.ZIndexProperty, -1);
+
+                // Remember to set the line color
+                Brush b = m_isSelected ? s_streamLineSelected : m_streamLineNotSelected;
+                line.Fill = b;
+                line.Stroke = b;
+            }
+            // Set the positions
+            for (int i = 0; i < lines.Length; i++)
+            {
+                SetLineLocation(m_lines[i], lines[i].A, lines[i].B);
+            }
+
+            // Now do the table line if necessary
+            if (null != m_table && !m_tableMinimized)
+            {
+                TableLine.X1 = mid.X;
+                TableLine.Y1 = mid.Y;
+                TableLine.X2 = m_table.Location.X;
+                TableLine.Y2 = m_table.Location.Y;
+            }
+            
+            // Check if we're minimized then we need to position the mini table
+            if (m_tableMinimized)
+            {
+                m_miniTable.SetValue(Canvas.LeftProperty, mid.X);
+                m_miniTable.SetValue(Canvas.TopProperty, mid.Y);
+            }
+
+            // Take care of the source drag icon
+            if (null != m_stream.Source)
+            {
+                m_sourceDragIcon.Visibility = System.Windows.Visibility.Collapsed;
+                // We need to show the square drag handle and position it
+                if (null == m_square)
+                {
+                    m_square = new System.Windows.Shapes.Rectangle()
+                    {
+                        Fill = m_streamLineNotSelected,
+                        Width = 10.0,
+                        Height = 10.0
+                    };
+                    m_canvas.AddNewChild(m_square);
+                    m_square.MouseLeftButtonDown += new MouseButtonEventHandler(SourceSquare_MouseLeftButtonDown);
+                }
+                m_square.Visibility = System.Windows.Visibility.Visible;
+                m_square.SetValue(Canvas.LeftProperty, sIconPt.X - 5.0);
+                m_square.SetValue(Canvas.TopProperty, sIconPt.Y - 5.0);
+            }
+            else
+            {
+                m_sourceDragIcon.Location = new Point(
+                    m_stream.SourceLocation.X, m_stream.SourceLocation.Y);
+                m_sourceDragIcon.Visibility = System.Windows.Visibility.Visible;
+                if (null != m_square)
+                {
+                    m_square.Visibility = System.Windows.Visibility.Collapsed;
+                }
+            }
+
+            // Take care of the destination drag icon as well
+            if (null == m_stream.Destination)
+            {
+                m_dstDragIcon.Location = new Point(dPt.X, dPt.Y);
+                m_dstDragIcon.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                m_dstDragIcon.Visibility = System.Windows.Visibility.Collapsed;
+            }
+
+            // If we have a non-null destination, update the arrow
+            if (null != m_stream.Destination)
+            {
+                // Where the last line segment intersects the destination process unit is where 
+                // the tip of the arrow is
+                Point pt = new Point(
+                    m_stream.Destination.Location.X - 20.0,
+                    m_stream.Destination.Location.Y - 20.0);
+                MathCore.Rectangle destRect = MathCore.Rectangle.CreateFromCanvasRect(pt, 40.0, 40.0);
+                MathCore.Vector[] isects = destRect.GetIntersections(lines[lines.Length - 1]);
+                MathCore.LineSegment lastLine = lines[lines.Length - 1];
+
+                if (0 == isects.Length)
+                {
+                    // No clue what to do here
+                }
+
+                double minDist = double.MaxValue;
+                foreach (MathCore.Vector isectPt in isects)
+                {
+                    double tempDist = (isectPt - lastLine.A).Length;
+                    if (tempDist < minDist)
+                    {
+                        minDist = tempDist;
+                    }
+                }
+
+                MathCore.Vector dirNorm = MathCore.Vector.Normalize(lastLine.Direction);
+                MathCore.Vector tip = lastLine.A + dirNorm * minDist;
+                MathCore.Vector perp1 = MathCore.Vector.Normalize(
+                    MathCore.Vector.GetPerpendicular1(lastLine.Direction));
+                MathCore.Vector perp2 = MathCore.Vector.Normalize(
+                    MathCore.Vector.GetPerpendicular2(lastLine.Direction));
+                MathCore.Vector[] pts = new MathCore.Vector[]{
+                    tip,
+                    tip - (dirNorm * 10.0) + (perp1 * 10.0),
+                    tip - (dirNorm*10.0) + (perp2 * 10.0) };
+
+                // Set the vertices
+                for (int i = 0; i < 3; i++)
+                {
+                    m_arrow.Points[i] = new Point(pts[i].X, pts[i].Y);
+                }
+
+                m_arrow.Visibility = System.Windows.Visibility.Visible;
+            }
+
+            // Lastly, tell the comment sticky notes to update
+            foreach (StickyNote.StickyNoteControl sn in m_stickyNotes)
+            {
+                sn.UpdateLineToParent();
+            }
+
+            m_updatingLocation = false;
         }
     }
 }

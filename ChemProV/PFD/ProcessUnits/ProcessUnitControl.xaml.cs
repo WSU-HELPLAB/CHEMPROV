@@ -210,7 +210,8 @@ namespace ChemProV.PFD.ProcessUnits
                     m_canvas.RemoveChild(m_stickyNotes[i].LineToParent);
                     m_canvas.RemoveChild(m_stickyNotes[i]);
 
-                    // Decrement the index because we've deleted an item
+                    // Remove it from our collection as well and then back up the index
+                    m_stickyNotes.RemoveAt(i);
                     i--;
                 }
                 else
@@ -224,7 +225,10 @@ namespace ChemProV.PFD.ProcessUnits
             {
                 if (!existing.Contains(m_pu.Comments[i]))
                 {
-                    StickyNote.StickyNoteControl.CreateOnCanvas(m_canvas, m_pu.Comments[i], this);
+                    StickyNote.StickyNoteControl snc = StickyNote.StickyNoteControl.CreateOnCanvas(
+                        m_canvas, m_pu.Comments[i], this);
+                    m_stickyNotes.Add(snc);
+                    snc.UpdateLineToParent();
                 }
             }
         }

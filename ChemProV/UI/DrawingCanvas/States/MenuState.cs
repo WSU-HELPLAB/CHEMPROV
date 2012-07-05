@@ -102,7 +102,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // ----- Now we start into stuff that's dependent on the selected item -----
 
             // Show comment options if the item can have comments
-            if (m_canvas.SelectedElement is PFD.Streams.AbstractStream ||
+            if (m_canvas.SelectedElement is PFD.Streams.StreamControl ||
                 m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
             {
                 AddCommentCollectionMenuOptions(m_contextMenu);
@@ -222,7 +222,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             menuItem.Click += delegate(object sender, RoutedEventArgs e)
             {
                 MenuItem tempMI = sender as MenuItem;
-                PFD.Streams.AbstractStream stream = tempMI.Tag as PFD.Streams.AbstractStream;
+                PFD.Streams.StreamControl stream = tempMI.Tag as PFD.Streams.StreamControl;
                 PFD.ProcessUnits.ProcessUnitControl unit = tempMI.Tag as PFD.ProcessUnits.ProcessUnitControl;
 
                 // Get a reference to the comment collection
@@ -268,7 +268,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 objName = (m_canvas.SelectedElement as PFD.ProcessUnits.ProcessUnitControl).ProcessUnit.Label;
             }
-            else if (m_canvas.SelectedElement is ChemProV.PFD.Streams.AbstractStream)
+            else if (m_canvas.SelectedElement is ChemProV.PFD.Streams.StreamControl)
             {
                 objName = "selected stream";
             }

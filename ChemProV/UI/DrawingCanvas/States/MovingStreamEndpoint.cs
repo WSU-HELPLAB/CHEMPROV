@@ -110,22 +110,21 @@ namespace ChemProV.UI.DrawingCanvas.States
                 m_changedBorderColor = lpu;
                 if (m_dragIcon.IsSource)
                 {
-                    if (lpu.ProcessUnit.CanAcceptOutgoingStream(m_stream))
+                    if (object.ReferenceEquals(m_stream.Source, lpu.ProcessUnit))
                     {
-                        // This means that we can make the connection. The source may already be correctly set, in 
-                        // which case we don't need to disconnect and reconnect.
-                        if (!object.ReferenceEquals(m_stream.Source, lpu.ProcessUnit))
+                        // This means that the process unit we're dragging the source icon over is 
+                        // already set as the source, so we don't have to do anything.
+                    }
+                    else if (lpu.ProcessUnit.CanAcceptOutgoingStream(m_stream))
+                    {
+                        // If we had a non-null source then disconnect
+                        if (null != m_stream.Source)
                         {
-                            // If we had a non-null source then disconnect
-                            if (null != m_stream.Source)
-                            {
-                                m_stream.Source.DetachOutgoingStream(m_stream);
-                            }
-                            
-                            m_stream.Source = lpu.ProcessUnit;
-                            lpu.ProcessUnit.AttachOutgoingStream(m_stream);
-                            m_stream.SourceLocation = new Vector(lpu.Location.X, lpu.Location.Y);
+                            m_stream.Source.DetachOutgoingStream(m_stream);
                         }
+
+                        m_stream.Source = lpu.ProcessUnit;
+                        lpu.ProcessUnit.AttachOutgoingStream(m_stream);
 
                         // Set the border color to indicate that we can make this connection
                         lpu.SetBorderColor(ProcessUnitBorderColor.AcceptingStreams);
@@ -136,8 +135,9 @@ namespace ChemProV.UI.DrawingCanvas.States
                         if (null != m_stream.Source)
                         {
                             m_stream.Source.DetachOutgoingStream(m_stream);
+                            m_stream.Source = null;
                         }
-                        
+
                         // This means that the connection cannot be made
                         lpu.SetBorderColor(ProcessUnitBorderColor.NotAcceptingStreams);
                         m_stream.SourceLocation = new Vector(p.X, p.Y);
@@ -145,22 +145,21 @@ namespace ChemProV.UI.DrawingCanvas.States
                 }
                 else
                 {
-                    if (lpu.ProcessUnit.CanAcceptIncomingStream(m_stream))
+                    if (object.ReferenceEquals(m_stream.Destination, lpu.ProcessUnit))
                     {
-                        // This means that we can make the connection. The destination may already be correctly 
-                        // set, in which case we don't need to disconnect and reconnect.
-                        if (!object.ReferenceEquals(m_stream.Destination, lpu.ProcessUnit))
+                        // This means that the process unit we're dragging the destination icon over 
+                        // is already set as the destination, so we don't have to do anything.
+                    }
+                    else if (lpu.ProcessUnit.CanAcceptIncomingStream(m_stream))
+                    {
+                        // If we had a non-null destination then disconnect
+                        if (null != m_stream.Destination)
                         {
-                            // If we had a non-null destination then disconnect
-                            if (null != m_stream.Destination)
-                            {
-                                m_stream.Destination.DetachIncomingStream(m_stream);
-                            }
-
-                            m_stream.Destination = lpu.ProcessUnit;
-                            lpu.ProcessUnit.AttachIncomingStream(m_stream);
-                            m_stream.DestinationLocation = new Vector(lpu.Location.X, lpu.Location.Y);
+                            m_stream.Destination.DetachIncomingStream(m_stream);
                         }
+
+                        m_stream.Destination = lpu.ProcessUnit;
+                        lpu.ProcessUnit.AttachIncomingStream(m_stream);
 
                         // Set the border color to indicate that we can make this connection
                         lpu.SetBorderColor(ProcessUnitBorderColor.AcceptingStreams);
@@ -171,6 +170,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                         if (null != m_stream.Destination)
                         {
                             m_stream.Destination.DetachIncomingStream(m_stream);
+                            m_stream.Destination = null;
                         }
 
                         // This means that the connection cannot be made
@@ -222,7 +222,12 @@ namespace ChemProV.UI.DrawingCanvas.States
             ProcessUnitControl puc = m_canvas.GetChildAt(p, m_dragIcon) as ProcessUnitControl;
             if (null != puc)
             {
-                if (!m_dragIcon.CanConnectTo(puc))
+                if ((m_dragIcon.IsSource && object.ReferenceEquals(puc.ProcessUnit, m_stream.Source)) ||
+                    (!m_dragIcon.IsSource && object.ReferenceEquals(puc.ProcessUnit, m_stream.Destination)))
+                {
+                    // This means we've already connected and we're good to go
+                }
+                else if (!m_dragIcon.CanConnectTo(puc))
                 {
                     // Set the state back to what it was when we started
                     if (m_dragIcon.IsSource)
