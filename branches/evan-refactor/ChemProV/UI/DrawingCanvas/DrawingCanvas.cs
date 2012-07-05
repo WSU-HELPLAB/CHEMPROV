@@ -173,15 +173,6 @@ namespace ChemProV.UI.DrawingCanvas
             }
         }
 
-        public List<StickyNoteControl> ChildStickyNotes
-        {
-            get
-            {
-                var snElements = from c in this.Children where c is StickyNoteControl select c as StickyNoteControl;
-                return new List<StickyNoteControl>(snElements);
-            }
-        }
-
         public List<IPfdElement> ChildIPfdElements
         {
             get
@@ -193,10 +184,6 @@ namespace ChemProV.UI.DrawingCanvas
 
         #endregion Properties
 
-        /// <summary>
-        /// Raised whenever the drawing_canvas places a drawing tool
-        /// </summary>
-        public event EventHandler ToolPlaced = delegate { };
         public event EventHandler feedbackLabelEvent = delegate { };
 
         /// <summary>
@@ -332,16 +319,13 @@ namespace ChemProV.UI.DrawingCanvas
                         }
                     }
 
-                    PFD.Streams.AbstractStream stream = uie as PFD.Streams.AbstractStream;
+                    PFD.Streams.StreamControl stream = uie as PFD.Streams.StreamControl;
                     if (null == stream)
                     {
                         continue;
                     }
 
-                    MathCore.LineSegment ls = new MathCore.LineSegment(
-                        new Point(stream.Stem.X1, stream.Stem.Y1),
-                        new Point(stream.Stem.X2, stream.Stem.Y2));
-                    if (ls.GetDistance(location) <= dist)
+                    if (stream.GetShortestDistanceFromLines(location) <= dist)
                     {
                         return stream;
                     }
@@ -420,7 +404,7 @@ namespace ChemProV.UI.DrawingCanvas
         {
             foreach (UIElement uie in Children)
             {
-                PFD.Streams.AbstractStream s = uie as PFD.Streams.AbstractStream;
+                PFD.Streams.StreamControl s = uie as PFD.Streams.StreamControl;
                 if (s != null)
                 {
                     if (element == s.SourceDragIcon || element == s.DestinationDragIcon)
@@ -903,6 +887,28 @@ namespace ChemProV.UI.DrawingCanvas
             return true;
         }
 
+        public void UpdateAllStreamLocations()
+        {
+            // Get a list of all stream controls. We can't actually update the stream locations 
+            // within this foreach loop because the update may alter the child collection and 
+            // cause an exception to be thrown.
+            List<StreamControl> streams = new List<StreamControl>();            
+            foreach (UIElement uie in Children)
+            {
+                StreamControl sc = uie as StreamControl;
+                if (null != sc)
+                {
+                    streams.Add(sc);
+                }
+            }
+
+            // Now we can actually do the updates
+            foreach (StreamControl sc in streams)
+            {
+                sc.UpdateStreamLocation();
+            }
+        }
+
         public void SetWorkspace(ChemProV.Core.Workspace workspace)
         {
             if (object.ReferenceEquals(m_workspace, workspace))
@@ -928,7 +934,6 @@ namespace ChemProV.UI.DrawingCanvas
             m_workspace.ProcessUnitsCollectionChanged += this.ProcessUnits_CollectionChanged;
             m_workspace.StreamsCollectionChanged += new EventHandler(Streams_CollectionChanged);
             m_workspace.StickyNotes.CollectionChanged += this.StickyNotes_CollectionChanged;
-            // TODO: The rest
         }
 
         public Workspace GetWorkspace()
@@ -1000,6 +1005,12 @@ namespace ChemProV.UI.DrawingCanvas
                     continue;
                 }
 
+                // If it has a parent then it is managed by that control
+                if (snc.HasCommentCollectionParent)
+                {
+                    continue;
+                }
+
                 // Add it to a list that we'll use later
                 notesThatHaveControls.Add(snc.StickyNote);
 
@@ -1031,7 +1042,7 @@ namespace ChemProV.UI.DrawingCanvas
                 new List<ChemProV.Core.AbstractStream>();
             for (int i = 0; i < Children.Count; i++)
             {
-                PFD.Streams.AbstractStream stream = Children[i] as PFD.Streams.AbstractStream;
+                PFD.Streams.StreamControl stream = Children[i] as PFD.Streams.StreamControl;
                 if (null == stream)
                 {
                     continue;
@@ -1057,18 +1068,18 @@ namespace ChemProV.UI.DrawingCanvas
             {
                 if (!streamsThatHaveControls.Contains(stream))
                 {
-                    PFD.Streams.AbstractStream.CreateOnCanvas(this, stream);
+                    PFD.Streams.StreamControl.CreateOnCanvas(this, stream);
                 }
             }
         }
 
         #endregion
 
-        public PFD.Streams.AbstractStream GetStreamControl(Core.AbstractStream stream)
+        public PFD.Streams.StreamControl GetStreamControl(Core.AbstractStream stream)
         {
             foreach (UIElement uie in Children)
             {
-                PFD.Streams.AbstractStream s = uie as PFD.Streams.AbstractStream;
+                PFD.Streams.StreamControl s = uie as PFD.Streams.StreamControl;
                 if (null != s)
                 {
                     if (Object.ReferenceEquals(s.Stream, stream))
@@ -1079,6 +1090,62 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             return null;
+        }
+
+        public bool IntersectsAnyPU(MathCore.LineSegment segment, params Core.AbstractProcessUnit[] exclusionList)
+        {
+            foreach (UIElement uie in Children)
+            {
+                ProcessUnitControl puc = uie as ProcessUnitControl;
+                if (null == puc)
+                {
+                    // Not a process unit control
+                    continue;
+                }
+
+                if (null != exclusionList)
+                {
+                    bool goNext = false;
+                    foreach (Core.AbstractProcessUnit excludeMe in exclusionList)
+                    {
+                        // See if we want to exclude this one
+                        if (object.ReferenceEquals(puc.ProcessUnit, excludeMe))
+                        {
+                            goNext = true;
+                            break;
+                        }
+                    }
+
+                    if (goNext)
+                    {
+                        continue;
+                    }
+                }
+
+                // Build a rectangle for the control
+                Point pt = new Point(
+                    (double)puc.GetValue(Canvas.LeftProperty),
+                    (double)puc.GetValue(Canvas.TopProperty));
+                MathCore.Rectangle r;
+                if (double.IsNaN(puc.Width) || double.IsNaN(puc.Height) ||
+                    0.0 == puc.Width || 0.0 == puc.Height)
+                {
+                    // Silverlight UI stuff can be funky so we have a condition to use 
+                    // hard coded dimensions as opposed to getting them from the control
+                    r = MathCore.Rectangle.CreateFromCanvasRect(pt, 40.0, 40.0);
+                }
+                else
+                {
+                    r = MathCore.Rectangle.CreateFromCanvasRect(pt, puc.Width, puc.Height);
+                }
+
+                if (r.GetIntersections(segment).Length > 0)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
     }
 }

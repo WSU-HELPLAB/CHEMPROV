@@ -30,6 +30,12 @@ namespace ChemProV.MathCore
     {
         private Vector m_a, m_b;
 
+        public LineSegment(double x1, double y1, double x2, double y2)
+        {
+            m_a = new Vector(x1, y1);
+            m_b = new Vector(x2, y2);
+        }
+        
         public LineSegment(Point a, Point b)
         {
             m_a = new Vector(a.X, a.Y);
@@ -96,12 +102,16 @@ namespace ChemProV.MathCore
             return Vector.Project(ptMinusA, Direction);
         }
 
+        public double GetDistance(Point point)
+        {
+            return GetDistance(new Vector(point.X, point.Y));
+        }
+
         /// <summary>
         /// Gets the unsigned distance between the specified point and this line
         /// </summary>
-        public double GetDistance(Point point)
+        public double GetDistance(MathCore.Vector pt)
         {
-            Vector pt = new Vector(point.X, point.Y);
             Vector v = pt - m_a;
             double adj = v.ScalarProjectOnto(Direction);
             if (adj < 0.0 || adj > Length)

@@ -129,7 +129,7 @@ namespace ChemProV.Core
             {
                 foreach (XElement child in cmtElement.Elements())
                 {
-                    m_comments.Add(new StickyNote_UIIndependent(cmtElement, UIDString));
+                    m_comments.Add(new StickyNote_UIIndependent(child, UIDString));
                 }
             }
         }

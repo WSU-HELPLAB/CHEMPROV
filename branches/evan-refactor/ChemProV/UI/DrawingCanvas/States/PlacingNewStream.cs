@@ -247,7 +247,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
 
             // Get the stream control that the DrawingCanvas should have added
-            PFD.Streams.AbstractStream streamControl = m_canvas.GetStreamControl(m_stream);
+            PFD.Streams.StreamControl streamControl = m_canvas.GetStreamControl(m_stream);
 
             // Tell it to hide the table
             streamControl.HideTable();

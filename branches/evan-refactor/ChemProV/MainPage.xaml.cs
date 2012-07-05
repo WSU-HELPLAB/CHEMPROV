@@ -601,12 +601,14 @@ namespace ChemProV
                 }
                 
                 // This means we succeeded in opening the file for reading and writing
-                // Start by loading the actual PFD data
                 LoadChemProVFile(fs);
 
                 // We've loaded, so we're done with the stream
                 fs.Dispose();
                 fs = null;
+
+                // Tell the drawing canvas to update stream positions now that everything is loaded
+                WorkSpace.DrawingCanvas.UpdateAllStreamLocations();
             }
         }
 
@@ -769,16 +771,16 @@ namespace ChemProV
         {
             // TODO: Deal with this. I've commented it out now because the live version of the OSBLE service 
             // has some property naming related problems.
-            
-            //if (!model.IsLoggedIn)
-            //{
-            //    // If we're not logged in then don't do anything
-            //    return;
-            //}
 
-            //// For testing purposes:
-            //// Get and display some info
-            //MessageBox.Show("User Info\nSchool.Name = " + model.Profile.School.Name);
+            if (!model.IsLoggedIn)
+            {
+                // If we're not logged in then don't do anything
+                return;
+            }
+
+            // For testing purposes:
+            // Get and display some info
+            MessageBox.Show("User Info\nSchool.Name = " + model.Profile.School.Namek__BackingField);
         }
 
         private void DFAnalysisTab_GotFocus(object sender, RoutedEventArgs e)

@@ -89,18 +89,18 @@
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Service References\OsbleAuthServices\AuthenticationService.wsdl" />
-    <None Include="Service References\OsbleAuthServices\AuthenticationService.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService2.wsdl" />
+    <None Include="Service References\OsbleAuthServices\AuthenticationService21.wsdl" />
+    <None Include="Service References\OsbleAuthServices\AuthenticationService4.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleAuthServices\AuthenticationService1.wsdl" />
-    <None Include="Service References\OsbleAuthServices\AuthenticationService1.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService41.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleAuthServices\AuthenticationService2.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService42.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OsbleAuthServices\AuthenticationService3.xsd">
+    <None Include="Service References\OsbleAuthServices\AuthenticationService43.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OsbleAuthServices\ChemProV.Library.OsbleAuthServices.UserProfile.datasource">
@@ -112,7 +112,6 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Service References\OsbleAuthServices\AuthenticationService.disco" />
     <None Include="Service References\OsbleRemoteServices\ChemProV.Library.OsbleRemoteServices.Assignment.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -158,6 +157,7 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Service References\OsbleRemoteServices\OsbleService.disco" />
+    <None Include="Service References\OsbleAuthServices\AuthenticationService1.disco" />
     <Content Include="ServiceReferences.ClientConfig" />
   </ItemGroup>
   <ItemGroup>

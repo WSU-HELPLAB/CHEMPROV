@@ -76,7 +76,7 @@ namespace ChemProV.PFD.StickyNote
             if (null != memNote)
             {
                 this.Height = memNote.Height;
-                Note.Text = memNote.Text;
+                Note.Text = (null == memNote.Text) ? string.Empty : memNote.Text;
                 Header.Text = (null == m_note.UserName) ? string.Empty : m_note.UserName;
                 this.Width = memNote.Width;
                 this.SetValue(Canvas.LeftProperty, memNote.LocationX);
@@ -140,7 +140,7 @@ namespace ChemProV.PFD.StickyNote
             // Setup extra stuff if we have a parent control
             if (null != commentParentControl)
             {
-                if (!(commentParentControl is ChemProV.PFD.Streams.AbstractStream) && 
+                if (!(commentParentControl is ChemProV.PFD.Streams.StreamControl) && 
                     !(commentParentControl is ProcessUnitControl))
                 {
                     throw new InvalidOperationException(
@@ -162,7 +162,7 @@ namespace ChemProV.PFD.StickyNote
                 }
                 else
                 {
-                    (commentParentControl as PFD.Streams.AbstractStream).Stream.PropertyChanged +=
+                    (commentParentControl as PFD.Streams.StreamControl).Stream.PropertyChanged +=
                         snc.StreamParentPropertyChanged;
                 }
 
@@ -183,7 +183,9 @@ namespace ChemProV.PFD.StickyNote
 
         private void StreamParentPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName.Equals("SourceLocation") || 
+            if (e.PropertyName.Equals("Source") ||
+                e.PropertyName.Equals("Destination") ||
+                e.PropertyName.Equals("SourceLocation") || 
                 e.PropertyName.Equals("DestinationLocation"))
             {
                 UpdateLineToParent();
@@ -422,16 +424,15 @@ namespace ChemProV.PFD.StickyNote
 
         #endregion
 
-        private void UpdateLineToParent()
+        public void UpdateLineToParent()
         {
-            if (null == m_lineToParent)
+            if (null == m_lineToParent || null == m_commentParent)
             {
                 return;
             }
 
             Point location;
-            ChemProV.PFD.Streams.AbstractStream stream = 
-                m_commentParent as ChemProV.PFD.Streams.AbstractStream;
+            StreamControl stream = m_commentParent as StreamControl;
             if (null == stream)
             {
                 location = (m_commentParent as ProcessUnitControl).Location;
@@ -477,7 +478,7 @@ namespace ChemProV.PFD.StickyNote
             Point location;
             IList<StickyNote_UIIndependent> comments;
             ProcessUnitControl lpu = parentControl as ProcessUnitControl;
-            PFD.Streams.AbstractStream stream = parentControl as PFD.Streams.AbstractStream;
+            PFD.Streams.StreamControl stream = parentControl as PFD.Streams.StreamControl;
             if (null != lpu)
             {
                 location = lpu.Location;
@@ -691,7 +692,7 @@ namespace ChemProV.PFD.StickyNote
                 }
                 else
                 {
-                    (m_commentParent as PFD.Streams.AbstractStream).Stream.PropertyChanged -=
+                    (m_commentParent as PFD.Streams.StreamControl).Stream.PropertyChanged -=
                         StreamParentPropertyChanged;
                 }
             }
@@ -708,7 +709,7 @@ namespace ChemProV.PFD.StickyNote
             }
             else
             {
-                comments = (m_commentParent as ChemProV.PFD.Streams.AbstractStream).Stream.Comments;
+                comments = (m_commentParent as ChemProV.PFD.Streams.StreamControl).Stream.Comments;
             }
 
             // Find the index of this comment in the parent collection
@@ -733,11 +734,11 @@ namespace ChemProV.PFD.StickyNote
 
             // Add the undo first
             ws.AddUndo(new UndoRedoCollection(
-                    "Undo deleting comment", new InsertComment(ws.StickyNotes, m_note, commentIndex)));
+                    "Undo deleting comment", new InsertComment(comments, m_note, commentIndex)));
 
-            // Remove the comment from the workspace. Event handlers will update the UI and remove 
+            // Remove the comment from the collection. Event handlers will update the UI and remove 
             // this control (and the line to the parent control) from the drawing canvas.
-            ws.StickyNotes.RemoveAt(commentIndex);
+            comments.RemoveAt(commentIndex);
         }
 
         #endregion
@@ -822,6 +823,11 @@ namespace ChemProV.PFD.StickyNote
             }
 
             return false;
+        }
+
+        private void Note_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            m_note.Text = Note.Text;
         }
     }
 }

@@ -55,7 +55,7 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         private Point m_locationOnLMBDown;
         
-        private AbstractStream m_owner;
+        private StreamControl m_owner;
 
         private bool m_settingLocation = false;
         
@@ -81,7 +81,7 @@ namespace ChemProV.PFD.Streams
         {
         }
         
-        public DraggableStreamEndpoint(EndpointType endpointType, AbstractStream owner, DrawingCanvas canvas)
+        public DraggableStreamEndpoint(EndpointType endpointType, StreamControl owner, DrawingCanvas canvas)
         {
             InitializeComponent();
 
@@ -135,7 +135,7 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        public AbstractStream ParentStream
+        public StreamControl ParentStream
         {
             get
             {

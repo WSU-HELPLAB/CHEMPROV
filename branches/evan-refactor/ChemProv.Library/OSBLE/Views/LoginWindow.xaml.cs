@@ -196,14 +196,33 @@ namespace ChemProV.Library.OSBLE.Views
                 }
             }
 
+            this.DialogResult = true;
+
+            //ViewModel.LoginCommand.Execute(null);
+
+            OsbleAuthServices.AuthenticationServiceClient c = new OsbleAuthServices.AuthenticationServiceClient(
+                ServiceBindings.AuthenticationServiceBinding,
+                new System.ServiceModel.EndpointAddress("https://osble.org/Services/AuthenticationService.svc"));
+                //ServiceBindings.RemoteAuthenticationEndpoint);
+            c.ValidateUserCompleted += new EventHandler<OsbleAuthServices.ValidateUserCompletedEventArgs>(c_ValidateUserCompleted);
+            c.ValidateUserAsync(UserNameTextBox.Text, PasswordBox.Password);
+
             #region DEBUG
 
-            WebClient wc = new WebClient();
-            wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
+            //WebClient wc = new WebClient();
+            //wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
             //wc.DownloadStringAsync(new Uri("https://osble.org/Services/AuthenticationService.svc"));
-            wc.DownloadStringAsync(new Uri("http://www.evanolds.com/"));
+            //wc.DownloadStringAsync(new Uri("http://www.evanolds.com/"));
+            //wc.DownloadStringAsync(new Uri("https://thefinder.tax.ohio.gov/StreamlineSalesTaxWeb/WebService/About.aspx"));
+            //wc.DownloadStringAsync(new Uri("http://sciencesoft.at/services/latex?wsdl"));
 
             #endregion
+        }
+
+        void c_ValidateUserCompleted(object sender, OsbleAuthServices.ValidateUserCompletedEventArgs e)
+        {
+            string result = e.Result;
+            bool breakhere = true;
         }
 
         private void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)

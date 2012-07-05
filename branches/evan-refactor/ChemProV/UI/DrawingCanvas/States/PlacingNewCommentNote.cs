@@ -87,8 +87,8 @@ namespace ChemProV.UI.DrawingCanvas.States
             // See if we're hovering over a process unit (will be null if we're not)
             m_highlightedHover = m_canvas.GetChildAtIncludeStreams(p, m_placementIcon);
             ProcessUnitControl pu = m_highlightedHover as ProcessUnitControl;
-            ChemProV.PFD.Streams.AbstractStream stream =
-                m_highlightedHover as ChemProV.PFD.Streams.AbstractStream;
+            ChemProV.PFD.Streams.StreamControl stream =
+                m_highlightedHover as ChemProV.PFD.Streams.StreamControl;
 
             // Set the border if we are hovering over a process unit to indicate that we can attach 
             // an anchored comment to it
@@ -98,7 +98,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
             else if (null != stream)
             {
-                stream.Stem.Stroke = new SolidColorBrush(Colors.Green);
+                stream.SetLineBrush(new SolidColorBrush(Colors.Green));
             }
         }
 
@@ -126,7 +126,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // any object that can have comments created for it, in which case we create a free-
             // floating comment. The second is that there is and we need to create an anchored comment.
             UIElement uie = m_canvas.GetChildAtIncludeStreams(mousePt);
-            if (uie is ProcessUnitControl || uie is PFD.Streams.AbstractStream)
+            if (uie is ProcessUnitControl || uie is PFD.Streams.StreamControl)
             {                
                 // All we need to do is add a comment to the appropriate collection in the workspace, 
                 // but we need to compute a smart location for it. There's a static method in the 
@@ -149,7 +149,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 }
                 else
                 {
-                    (uie as PFD.Streams.AbstractStream).Stream.Comments.Add(sn);
+                    (uie as PFD.Streams.StreamControl).Stream.Comments.Add(sn);
                 }
 
                 // Create an undo
@@ -225,7 +225,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             }
             else
             {
-                PFD.Streams.AbstractStream s = m_highlightedHover as PFD.Streams.AbstractStream;
+                PFD.Streams.StreamControl s = m_highlightedHover as PFD.Streams.StreamControl;
                 if (null != s)
                 {
                     s.Selected = true;

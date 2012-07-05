@@ -25,7 +25,7 @@
       </wsp:All>
     </wsp:ExactlyOne>
   </wsp:Policy>
-  <wsdl:import namespace="" location="https://osble.org/services/AuthenticationService.svc?wsdl=wsdl0" />
+  <wsdl:import namespace="" location="https://osble.org/Services/AuthenticationService.svc?wsdl=wsdl0" />
   <wsdl:types />
   <wsdl:binding name="BasicHttpBinding_AuthenticationService" type="AuthenticationService">
     <wsp:PolicyReference URI="#BasicHttpBinding_AuthenticationService_policy" />
@@ -51,7 +51,7 @@
   </wsdl:binding>
   <wsdl:service name="AuthenticationService">
     <wsdl:port name="BasicHttpBinding_AuthenticationService" binding="tns:BasicHttpBinding_AuthenticationService">
-      <soap:address location="https://osble.org/services/AuthenticationService.svc/Services/AuthenticationService.svc" />
+      <soap:address location="https://osble.org/Services/AuthenticationService.svc/Services/AuthenticationService.svc" />
     </wsdl:port>
   </wsdl:service>
 </wsdl:definitions>

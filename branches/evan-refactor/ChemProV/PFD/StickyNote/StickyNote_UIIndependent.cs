@@ -39,7 +39,7 @@ namespace ChemProV.PFD.StickyNote
 
         private double m_sizeW = 100.0;
 
-        private string m_text = null;
+        private string m_text = string.Empty;
 
         private string m_userName = null;
 
@@ -183,7 +183,7 @@ namespace ChemProV.PFD.StickyNote
                     return;
                 }
 
-                m_text = value;
+                m_text = string.IsNullOrEmpty(value) ? string.Empty : value;
                 if (null != PropertyChanged)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("Text"));
