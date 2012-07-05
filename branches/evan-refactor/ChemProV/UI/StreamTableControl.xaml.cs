@@ -54,28 +54,13 @@ namespace ChemProV.UI
             m_ws = workspace;
             m_canvas = canvas;
 
-            // We have a work item that says specifically NOT to do this
-            //   |    |
-            //   |    |
-            //   v    v
-            // Add the default row for chemical streams property tables if it's not already there
-            //if (0 == m_table.RowCount)
-            //{
-            //    if (StreamType.Chemical == table.StreamType)
-            //    {
-            //        ChemicalStreamData csd = m_table.AddNewRow() as ChemicalStreamData;
-            //        csd.SelectedCompound = "Overall";
-            //        csd.Label = "M" + table.Stream.Id.ToString();
-            //    }
-            //}
-
             // Do the initial UI setup
             HeaderTextBlock.Text = "Stream #" + m_table.Stream.Id.ToString();
             Location = new Point(table.Location.X, table.Location.Y);
             UpdateUI();
 
             // Ensure that the minimize button eats mouse events
-            MinimizeButton.MouseLeftButtonDown += new MouseButtonEventHandler(MinimizeButton_MouseButtonEvent);
+            MinimizeButton.MouseLeftButtonDown += this.MinimizeButton_MouseButtonEvent;
             MinimizeButton.MouseLeftButtonUp += this.MinimizeButton_MouseButtonEvent;
 
             // Monitor changes in the parent stream (all we care about is the Id)
@@ -94,24 +79,54 @@ namespace ChemProV.UI
             m_table.PropertyChanged += new PropertyChangedEventHandler(TablePropertyChanged);
         }
 
-        private string AutoLabel(string existing, string units)
+        private void AutoLabel(ChemicalStreamData row)
         {
-            if (units == ChemicalUnits.MassFraction.ToPrettyString() ||
-                units == ChemicalUnits.MoleFraction.ToPrettyString())
+            // Start by getting the character for the units
+            char startChar;
+            if (row.SelectedUnits == ChemicalUnits.MassFraction.ToPrettyString())
             {
-                // X,x for fractions
-                return existing.Replace('n', 'x').Replace('N', 'X').Replace('m', 'x').Replace('M', 'X');
+                // We use 'X' and 'x' for mass fraction
+                startChar = 'X';
             }
-            else if (ChemicalUnits.MassPercent.ToPrettyString() == units ||
-                ChemicalUnits.MolePercent.ToPrettyString() == units)
+            else if (ChemicalUnits.MoleFraction.ToPrettyString() == row.SelectedUnits)
             {
-                // N,n for percents
-                return existing.Replace('x', 'n').Replace('X', 'n').Replace('m', 'n').Replace('M', 'N');
+                // Y,y for mole fraction
+                startChar = 'Y';
+            }
+            else if (ChemicalUnits.MolePercent.ToPrettyString() == row.SelectedUnits ||
+                ChemicalUnits.Moles.ToPrettyString() == row.SelectedUnits ||
+                ChemicalUnits.MolesPerSecond.ToPrettyString() == row.SelectedUnits)
+            {
+                // N,n for anything remaining that has moles
+                startChar = 'N';
             }
             else
             {
                 // M,m for everything else
-                return existing.Replace('x', 'm').Replace('X', 'M').Replace('n', 'm').Replace('N', 'M');
+                startChar = 'M';
+            }
+
+            // Determine the row number
+            int rowNum = m_table.IndexOfRow(row);
+
+            // Now set the actual label
+            if ("Overall" == row.SelectedCompound)
+            {
+                // Label of the form: "[startChar.Upper][streamNum]"
+                row.Label = startChar.ToString() + m_table.Stream.Id.ToString();
+            }
+            else if (string.IsNullOrEmpty(row.SelectedCompound))
+            {
+                // Label of the form: "[startChar.Lower][streamNum][rowNum]"
+                row.Label = char.ToLower(startChar).ToString() + m_table.Stream.Id.ToString() + rowNum.ToString();
+            }
+            else
+            {
+                // Label of the form: "[startChar.Lower][streamNum][twoCharCompound]
+                PFD.Streams.PropertiesWindow.Compound compound =
+                    PFD.Streams.PropertiesWindow.CompoundFactory.GetElementsOfCompound(
+                        row.SelectedCompound.ToLower());
+                row.Label = char.ToLower(startChar).ToString() + m_table.Stream.Id.ToString() + compound.Abbr;
             }
         }
 
@@ -139,8 +154,8 @@ namespace ChemProV.UI
                 // If we just changed the "SelectedUnits" field, then check if we have to auto-
                 // rename the row
                 ChemicalStreamData csd = info.Item1 as ChemicalStreamData;
-                if (info.Item2.Equals("SelectedUnits") && !info.Item1.UserHasRenamed &&
-                    null != csd)
+                if ((info.Item2.Equals("SelectedUnits") || info.Item2.Equals("SelectedCompound")) && 
+                    !info.Item1.UserHasRenamed && null != csd)
                 {
                     m_programmaticallyChanging = true;
 
@@ -149,7 +164,7 @@ namespace ChemProV.UI
                     tbLabel.TextChanged -= this.TextField_TextChanged;
                     
                     // Change the label in the data structure
-                    csd.Label = AutoLabel(csd.Label, newValue);
+                    AutoLabel(csd);
 
                     // Re-subscribe to the label text box changes
                     tbLabel.TextChanged += this.TextField_TextChanged;
