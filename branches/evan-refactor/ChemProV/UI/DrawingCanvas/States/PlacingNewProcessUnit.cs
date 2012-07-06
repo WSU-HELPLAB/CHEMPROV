@@ -16,11 +16,10 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using ChemProV.Core;
-using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     public class PlacingNewProcessUnit : IState
     {

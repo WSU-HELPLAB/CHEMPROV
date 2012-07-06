@@ -179,13 +179,13 @@
     <Compile Include="PFD\EquationEditor\Models\IEquationModifier.cs" />
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\IPfdElement.cs" />
-    <Compile Include="PFD\ProcessUnits\ProcessUnitControl.xaml.cs">
+    <Compile Include="UI\ProcessUnitControl.xaml.cs">
       <DependentUpon>ProcessUnitControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\StickyNote\StickyNoteControl.xaml.cs">
+    <Compile Include="UI\StickyNoteControl.xaml.cs">
       <DependentUpon>StickyNoteControl.xaml</DependentUpon>
     </Compile>
-    <Compile Include="PFD\StickyNote\StickyNote_UIIndependent.cs" />
+    <Compile Include="Logic\StickyNote.cs" />
     <Compile Include="PFD\Streams\StreamControl.xaml.cs">
       <DependentUpon>StreamControl.xaml</DependentUpon>
     </Compile>
@@ -198,7 +198,6 @@
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\DataUpdatedEventArgs.cs" />
     <Compile Include="Core\ChemicalUnits.cs" />
     <Compile Include="Core\IStreamData.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\PropertiesWindowGrid.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\TempUnitsFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Chemical\UnitsFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\Compound.cs" />
@@ -217,7 +216,6 @@
     <Compile Include="PFD\Undos\InsertEquation.cs" />
     <Compile Include="PFD\Undos\RemoveComment.cs" />
     <Compile Include="PFD\Undos\RemoveEquation.cs" />
-    <Compile Include="PFD\Undos\RestoreStickyNoteColor.cs" />
     <Compile Include="Logic\Undos\DetachIncomingStream.cs" />
     <Compile Include="Logic\Undos\AttachIncomingStream.cs" />
     <Compile Include="PFD\Undos\ResizeControl.cs" />
@@ -232,8 +230,6 @@
     <Compile Include="UI\AboutWindow.xaml.cs">
       <DependentUpon>AboutWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\Behaviors\MovePopupHeader.cs" />
-    <Compile Include="UI\Behaviors\ResizePopupBorder.cs" />
     <Compile Include="UI\CommentPane.xaml.cs">
       <DependentUpon>CommentPane.xaml</DependentUpon>
     </Compile>
@@ -245,8 +241,7 @@
     <Compile Include="UI\ControlPalette.xaml.cs">
       <DependentUpon>ControlPalette.xaml</DependentUpon>
     </Compile>
-    <Compile Include="UI\DrawingCanvas\PfdUpdatedEventArgs.cs" />
-    <Compile Include="UI\DrawingCanvas\DrawingCanvas.cs" />
+    <Compile Include="UI\DrawingCanvas.cs" />
     <Compile Include="UI\DrawingCanvas\States\IState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MenuState.cs" />
     <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
@@ -318,13 +313,13 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="PFD\ProcessUnits\ProcessUnitControl.xaml">
+    <Page Include="UI\ProcessUnitControl.xaml">
       <Generator>MSBuild:MarkupCompilePass1</Generator>
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PFD\StickyNote\StickyNoteControl.xaml">
+    <Page Include="UI\StickyNoteControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -550,7 +545,10 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="PFD\ProcessUnits\" />
+    <Folder Include="PFD\StickyNote\" />
+  </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

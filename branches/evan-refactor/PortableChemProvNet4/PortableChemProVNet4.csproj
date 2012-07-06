@@ -50,6 +50,9 @@
     <Compile Include="..\ChemProV\Core\CommentMerger.cs">
       <Link>Core\CommentMerger.cs</Link>
     </Compile>
+    <Compile Include="..\ChemProV\Logic\StickyNote.cs">
+      <Link>Logic\StickyNote.cs</Link>
+    </Compile>
     <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationModel.cs">
       <Link>PFD\EquationEditor\Model\EquationModel.cs</Link>
     </Compile>
@@ -65,10 +68,11 @@
     <Compile Include="..\ChemProV\PFD\IPfdElement.cs">
       <Link>PFD\IPfdElement.cs</Link>
     </Compile>
-    <Compile Include="PFD\StickyNote\StickyNote_UIIndependent.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="PFD\StickyNote\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

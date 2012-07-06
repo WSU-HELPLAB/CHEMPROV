@@ -14,11 +14,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using ChemProV.Core;
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
+using ChemProV.UI;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     /// <summary>
     /// The menu state is set as the drawing canvas's current state whenever a right-click occurs. This 
@@ -103,16 +104,16 @@ namespace ChemProV.UI.DrawingCanvas.States
 
             // Show comment options if the item can have comments
             if (m_canvas.SelectedElement is PFD.Streams.StreamControl ||
-                m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
+                m_canvas.SelectedElement is ProcessUnitControl)
             {
                 AddCommentCollectionMenuOptions(m_contextMenu);
             }
 
             // If the user has right-clicked on a process unit then we want to add subprocess options
-            if (m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
+            if (m_canvas.SelectedElement is ProcessUnitControl)
             {
                 AddSubprocessMenuOptions(m_contextMenu,
-                    m_canvas.SelectedElement as PFD.ProcessUnits.ProcessUnitControl);
+                    m_canvas.SelectedElement as ProcessUnitControl);
             }
         }
 
@@ -223,10 +224,10 @@ namespace ChemProV.UI.DrawingCanvas.States
             {
                 MenuItem tempMI = sender as MenuItem;
                 PFD.Streams.StreamControl stream = tempMI.Tag as PFD.Streams.StreamControl;
-                PFD.ProcessUnits.ProcessUnitControl unit = tempMI.Tag as PFD.ProcessUnits.ProcessUnitControl;
+                ProcessUnitControl unit = tempMI.Tag as ProcessUnitControl;
 
                 // Get a reference to the comment collection
-                IList<StickyNote_UIIndependent> comments;
+                IList<StickyNote> comments;
                 if (null != stream)
                 {
                     comments = stream.Stream.Comments;
@@ -242,7 +243,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
                 // Create the new sticky note and add it to the workspace. Event handlers will update 
                 // the UI appropriately
-                StickyNote_UIIndependent sn = new StickyNote_UIIndependent()
+                StickyNote sn = new StickyNote()
                 {
                     Width = 100.0,
                     Height = 100.0,
@@ -264,9 +265,9 @@ namespace ChemProV.UI.DrawingCanvas.States
             };
 
             string objName = "selected object";
-            if (m_canvas.SelectedElement is PFD.ProcessUnits.ProcessUnitControl)
+            if (m_canvas.SelectedElement is ProcessUnitControl)
             {
-                objName = (m_canvas.SelectedElement as PFD.ProcessUnits.ProcessUnitControl).ProcessUnit.Label;
+                objName = (m_canvas.SelectedElement as ProcessUnitControl).ProcessUnit.Label;
             }
             else if (m_canvas.SelectedElement is ChemProV.PFD.Streams.StreamControl)
             {
@@ -313,7 +314,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// <summary>
         /// Adds menu options for the subprocess color changing
         /// </summary>
-        private void AddSubprocessMenuOptions(ContextMenu newContextMenu, PFD.ProcessUnits.ProcessUnitControl pu)
+        private void AddSubprocessMenuOptions(ContextMenu newContextMenu, ProcessUnitControl pu)
         {
             MenuItem parentMenuItem = new MenuItem();
             parentMenuItem.Header = "Subprocess";
@@ -334,7 +335,7 @@ namespace ChemProV.UI.DrawingCanvas.States
                 {
                     MenuItem menuItem = new MenuItem();
                     menuItem.Header = nc.Name;
-                    menuItem.Tag = System.Tuple.Create<PFD.ProcessUnits.ProcessUnitControl, Color>(
+                    menuItem.Tag = System.Tuple.Create<ProcessUnitControl, Color>(
                         pu, nc.Color);
 
                     // Show the menu item with a check next to it if it's the current color
@@ -351,8 +352,8 @@ namespace ChemProV.UI.DrawingCanvas.States
                     {
                         // Get the objects we need
                         MenuItem tempMI = sender as MenuItem;
-                        System.Tuple<PFD.ProcessUnits.ProcessUnitControl, Color> t = tempMI.Tag as
-                            System.Tuple<PFD.ProcessUnits.ProcessUnitControl, Color>;
+                        System.Tuple<ProcessUnitControl, Color> t = tempMI.Tag as
+                            System.Tuple<ProcessUnitControl, Color>;
 
                         // Create undo item before setting the new subgroup
                         m_workspace.AddUndo(new UndoRedoCollection("Undo subprocess change",
@@ -360,8 +361,6 @@ namespace ChemProV.UI.DrawingCanvas.States
 
                         // Set the subgroup
                         t.Item1.Subprocess = t.Item2;
-
-                        m_canvas.PFDModified();
 
                         // Make sure to remove the popup menu from the canvas
                         m_canvas.Children.Remove(m_contextMenu);
@@ -378,7 +377,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             mi.Click += delegate(object sender, RoutedEventArgs r)
             {
                 SubprocessChooserWindow win = new SubprocessChooserWindow(
-                    pu as PFD.ProcessUnits.ProcessUnitControl, m_workspace);
+                    pu as ProcessUnitControl, m_workspace);
                 win.Show();
 
                 // Make sure to remove the popup menu from the canvas

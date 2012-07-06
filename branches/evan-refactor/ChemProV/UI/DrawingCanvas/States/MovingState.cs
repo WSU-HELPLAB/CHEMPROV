@@ -11,12 +11,12 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.Core;
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 using ChemProV.Logic.Undos;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     /// <summary>
     /// This is the state for the drawing canvas when we are moving an object. This is NOT used to create 

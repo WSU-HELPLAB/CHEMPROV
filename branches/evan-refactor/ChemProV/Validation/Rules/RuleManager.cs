@@ -13,7 +13,7 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using ChemProV.PFD;
 using ChemProV.PFD.EquationEditor;
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.Validation.Rules.Adapters.Table;
 using ChemProV.Validation.Rules.ProcessUnitRules;

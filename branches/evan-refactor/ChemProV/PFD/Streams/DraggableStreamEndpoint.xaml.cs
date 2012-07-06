@@ -15,9 +15,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using ChemProV.Core;
-using ChemProV.PFD.ProcessUnits;
-using ChemProV.UI.DrawingCanvas;
-using ChemProV.UI.DrawingCanvas.States;
+using ChemProV.UI;
+using ChemProV.UI.DrawingCanvasStates;
 
 namespace ChemProV.PFD.Streams
 {

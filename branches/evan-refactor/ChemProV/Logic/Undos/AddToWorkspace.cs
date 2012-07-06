@@ -23,7 +23,7 @@ namespace ChemProV.Logic.Undos
         public AddToWorkspace(object objToAdd)
         {
             if (!(objToAdd is AbstractProcessUnit) && !(objToAdd is AbstractStream) &&
-                !(objToAdd is ChemProV.PFD.StickyNote.StickyNote_UIIndependent))
+                !(objToAdd is ChemProV.Logic.StickyNote))
             {
                 throw new InvalidOperationException(
                     "Object for an AddToWorkspace undo/redo action must be a process unit, " +
@@ -47,8 +47,8 @@ namespace ChemProV.Logic.Undos
             }
             else
             {
-                sender.StickyNotes.Add(m_toAdd as ChemProV.PFD.StickyNote.StickyNote_UIIndependent);
-                return new RemoveStickyNote(m_toAdd as ChemProV.PFD.StickyNote.StickyNote_UIIndependent);
+                sender.StickyNotes.Add(m_toAdd as ChemProV.Logic.StickyNote);
+                return new RemoveStickyNote(m_toAdd as ChemProV.Logic.StickyNote);
             }
         }
     }

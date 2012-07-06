@@ -20,7 +20,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Reflection;
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 using ChemProV.PFD.Streams;
 
 namespace ChemProV.UI
@@ -95,7 +95,7 @@ namespace ChemProV.UI
 
         private void PaletteButton_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
+            DrawingCanvas canvas = Core.App.Workspace.DrawingCanvasReference;
 
             // Make sure that if we have a popup menu that we close it at this point
             Core.App.ClosePopup();
@@ -122,20 +122,20 @@ namespace ChemProV.UI
             else if (object.ReferenceEquals(sender, StickyNoteButton))
             {
                 // We have a custom state for placing sticky notes
-                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewCommentNote(
+                canvas.CurrentState = new UI.DrawingCanvasStates.PlacingNewCommentNote(
                     canvas, this);
                 return;
             }
             else if (object.ReferenceEquals(sender, ChemicalStreamButton))
             {
                 // Set a state to create a chemical stream
-                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
+                canvas.CurrentState = new UI.DrawingCanvasStates.PlacingNewStream(
                     this, canvas, StreamType.Chemical);
             }
             else if (object.ReferenceEquals(sender, HeatStreamButton))
             {
                 // Set a state to create a heat stream
-                canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewStream(
+                canvas.CurrentState = new UI.DrawingCanvasStates.PlacingNewStream(
                     this, canvas, StreamType.Heat);
             }
             else
@@ -146,7 +146,7 @@ namespace ChemProV.UI
                 // If it's a process unit, assign the state to create it
                 if (newObjType.IsSubclassOf(typeof(Core.AbstractProcessUnit)))
                 {
-                    canvas.CurrentState = new UI.DrawingCanvas.States.PlacingNewProcessUnit(
+                    canvas.CurrentState = new UI.DrawingCanvasStates.PlacingNewProcessUnit(
                         this, canvas, newObjType);
                 }
             }
@@ -253,7 +253,7 @@ namespace ChemProV.UI
         {
             ReplaceMeWithProcessUnits.Text = "Loading...";
 
-            StickyNoteButton.Tag = typeof(PFD.StickyNote.StickyNoteControl);
+            StickyNoteButton.Tag = typeof(StickyNoteControl);
         }
     }
 }

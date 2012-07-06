@@ -10,8 +10,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-
-using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow;
 

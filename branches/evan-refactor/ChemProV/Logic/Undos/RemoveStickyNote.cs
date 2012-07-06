@@ -4,9 +4,9 @@ namespace ChemProV.Logic.Undos
 {
     public class RemoveStickyNote : IUndoRedoAction
     {
-        private ChemProV.PFD.StickyNote.StickyNote_UIIndependent m_note;
+        private ChemProV.Logic.StickyNote m_note;
         
-        public RemoveStickyNote(ChemProV.PFD.StickyNote.StickyNote_UIIndependent note)
+        public RemoveStickyNote(ChemProV.Logic.StickyNote note)
         {
             m_note = note;
         }

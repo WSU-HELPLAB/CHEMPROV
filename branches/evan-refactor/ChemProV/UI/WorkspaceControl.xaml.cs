@@ -20,7 +20,6 @@ using System.Xml.Linq;
 using ChemProV.PFD;
 using ChemProV.PFD.EquationEditor;
 using ChemProV.PFD.Streams.PropertiesWindow;
-using ChemProV.UI.DrawingCanvas;
 using ChemProV.Validation.Feedback;
 using ChemProV.Validation.Rules;
 using ChemProV.Validation.Rules.Adapters.Table;
@@ -51,8 +50,8 @@ namespace ChemProV.UI
         /// <summary>
         /// Dictionary used to map a user name to a sticky note color
         /// </summary>
-        private Dictionary<string, PFD.StickyNote.StickyNoteColors> m_snUserColors =
-            new Dictionary<string, PFD.StickyNote.StickyNoteColors>();
+        private Dictionary<string, StickyNoteColors> m_snUserColors =
+            new Dictionary<string, StickyNoteColors>();
 
         private Core.Workspace m_workspace = null;
 
@@ -65,7 +64,6 @@ namespace ChemProV.UI
             InitializeComponent();
 
             DrawingCanvas.PfdChanging += new EventHandler(DrawingCanvas_PfdChanging);
-            DrawingCanvas.PfdUpdated += new PfdUpdatedEventHandler(CheckRulesForPFD);
             EquationEditor.EquationTokensChanged += new EventHandler(CheckRulesForPFD);
 
             SizeChanged += new SizeChangedEventHandler(WorkSpace_SizeChanged);
@@ -113,7 +111,7 @@ namespace ChemProV.UI
         /// <summary>
         /// gets a reference to the DrawingCanvas used by WorkSpace
         /// </summary>
-        public DrawingCanvas.DrawingCanvas DrawingCanvasReference
+        public DrawingCanvas DrawingCanvasReference
         {
             get
             {
@@ -206,10 +204,10 @@ namespace ChemProV.UI
         /// </summary>
         /// <param name="sender"></param>
         /// <param name="e"></param>
+        [Obsolete("Significant changes have rendered this useless. Needs to be rewritten")]
         public void CheckRulesForPFD(object sender, EventArgs e)
         {
             //Stop listening for changed events since our ruleManager causes changes
-            DrawingCanvas.PfdUpdated -= new PfdUpdatedEventHandler(CheckRulesForPFD);
             EquationEditor.EquationTokensChanged -= new EventHandler(CheckRulesForPFD);
 
             if (!isLoadingFile)
@@ -232,7 +230,6 @@ namespace ChemProV.UI
             }
 
             //ok done changing stuff listen for changed events again
-            DrawingCanvas.PfdUpdated += new PfdUpdatedEventHandler(CheckRulesForPFD);
             EquationEditor.EquationTokensChanged += new EventHandler(CheckRulesForPFD);
         }
 
@@ -341,7 +338,7 @@ namespace ChemProV.UI
         /// <summary>
         /// Dictionary that maps a user name string to a sticky note color
         /// </summary>
-        public Dictionary<string, PFD.StickyNote.StickyNoteColors> UserStickyNoteColors
+        public Dictionary<string, StickyNoteColors> UserStickyNoteColors
         {
             get
             {

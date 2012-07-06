@@ -20,11 +20,11 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Xml;
-using ChemProV.UI.DrawingCanvas;
 using ChemProV.PFD.Streams;
 using System.Xml.Linq;
+using ChemProV.Logic;
 
-namespace ChemProV.PFD.ProcessUnits
+namespace ChemProV.UI
 {
     public enum ProcessUnitBorderColor
     {
@@ -39,7 +39,7 @@ namespace ChemProV.PFD.ProcessUnits
     /// units is completely beneath the UI layer in the logic layer. This control just wraps around an 
     /// AbstractProcessUnit object.
     /// </summary>
-    public partial class ProcessUnitControl : UserControl, IPfdElement, Core.ICanvasElement
+    public partial class ProcessUnitControl : UserControl, PFD.IPfdElement, Core.ICanvasElement
     {
         #region Instance Variables
 
@@ -75,7 +75,7 @@ namespace ChemProV.PFD.ProcessUnits
         /// We store this because the process unit is responsible for creating and removing its sticky 
         /// note controls on the drawing canvas.
         /// </summary>
-        private List<StickyNote.StickyNoteControl> m_stickyNotes = new List<StickyNote.StickyNoteControl>();
+        private List<StickyNoteControl> m_stickyNotes = new List<StickyNoteControl>();
 
         private static Brush s_selectedBorderBrush = new SolidColorBrush(Colors.Yellow);
         private Brush GreenBorderBrush = new SolidColorBrush(Colors.Green);
@@ -200,8 +200,8 @@ namespace ChemProV.PFD.ProcessUnits
             // Start by deleting any sticky note controls that represent comments that are no longer 
             // in the comment collection. While we do this, build a list of all comments that we 
             // have a sticky note control for (used in next step).
-            List<StickyNote.StickyNote_UIIndependent> existing =
-                new List<StickyNote.StickyNote_UIIndependent>();
+            List<Logic.StickyNote> existing =
+                new List<Logic.StickyNote>();
             for (int i = 0; i < m_stickyNotes.Count; i++)
             {
                 if (!m_pu.Comments.Contains(m_stickyNotes[i].StickyNote))
@@ -225,7 +225,7 @@ namespace ChemProV.PFD.ProcessUnits
             {
                 if (!existing.Contains(m_pu.Comments[i]))
                 {
-                    StickyNote.StickyNoteControl snc = StickyNote.StickyNoteControl.CreateOnCanvas(
+                    StickyNoteControl snc = StickyNoteControl.CreateOnCanvas(
                         m_canvas, m_pu.Comments[i], this);
                     m_stickyNotes.Add(snc);
                     snc.UpdateLineToParent();
@@ -280,7 +280,7 @@ namespace ChemProV.PFD.ProcessUnits
                     string undoText = "Undo renaming process unit from " + m_labelOnEditStart +
                         " to " + m_pu.Label;
                     m_canvas.GetWorkspace().AddUndo(new Core.UndoRedoCollection(undoText,
-                        new Undos.SetProcessUnitLabel(m_pu, m_labelOnEditStart)));
+                        new PFD.Undos.SetProcessUnitLabel(m_pu, m_labelOnEditStart)));
                 }
             }
 
@@ -734,7 +734,7 @@ namespace ChemProV.PFD.ProcessUnits
 
         public void HideAllComments()
         {
-            foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNoteControl snc in m_stickyNotes)
             {
                 snc.Hide();
             }
@@ -742,7 +742,7 @@ namespace ChemProV.PFD.ProcessUnits
 
         public void ShowAllComments()
         {
-            foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNoteControl snc in m_stickyNotes)
             {
                 snc.Show();
             }
@@ -752,10 +752,10 @@ namespace ChemProV.PFD.ProcessUnits
         /// Removes this control from the canvas. This includes removal of controls that are 
         /// "attached" to this control, such as the comment sticky note controls.
         /// </summary>
-        public void RemoveSelfFromCanvas(UI.DrawingCanvas.DrawingCanvas owner)
+        public void RemoveSelfFromCanvas(UI.DrawingCanvas owner)
         {
             owner.RemoveChild(this);
-            foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
+            foreach (ChemProV.UI.StickyNoteControl snc in m_stickyNotes)
             {
                 owner.RemoveChild(snc.LineToParent);
                 owner.RemoveChild(snc);

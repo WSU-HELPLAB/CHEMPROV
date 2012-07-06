@@ -9,7 +9,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System.Windows.Input;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     /// <summary>
     /// This is the base class that all states inherit from.

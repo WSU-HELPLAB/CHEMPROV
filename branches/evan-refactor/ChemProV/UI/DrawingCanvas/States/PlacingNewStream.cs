@@ -15,10 +15,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Undos;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     /// <summary>
     /// This is the state used to place a new stream on the drawing canvas. It only handles placement 
@@ -37,7 +36,7 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// process unit whose border color has been changed and must be changed back when we 
         /// complete the placing action or move the mouse out of its area.
         /// </summary>
-        private PFD.ProcessUnits.ProcessUnitControl m_puWithAlteredBorderColor = null;
+        private ProcessUnitControl m_puWithAlteredBorderColor = null;
 
         /// <summary>
         /// The source placement icon floats around under the mouse to begin with until the user 
@@ -148,7 +147,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Clear the border if we'd previously set one
             if (null != m_puWithAlteredBorderColor)
             {
-                m_puWithAlteredBorderColor.SetBorderColor(PFD.ProcessUnits.ProcessUnitBorderColor.NoBorder);
+                m_puWithAlteredBorderColor.SetBorderColor(ProcessUnitBorderColor.NoBorder);
                 m_puWithAlteredBorderColor = null;
             }
 
@@ -185,7 +184,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             // Clear the border if we'd previously set one
             if (null != m_puWithAlteredBorderColor)
             {
-                m_puWithAlteredBorderColor.SetBorderColor(PFD.ProcessUnits.ProcessUnitBorderColor.NoBorder);
+                m_puWithAlteredBorderColor.SetBorderColor(ProcessUnitBorderColor.NoBorder);
                 m_puWithAlteredBorderColor = null;
             }
 
