@@ -20,7 +20,7 @@ using System.Xml.Linq;
 using ChemProV.Core;
 
 // Temporary until further refactoring
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 
 namespace ChemProV.Core
 {
@@ -34,8 +34,8 @@ namespace ChemProV.Core
     {
         #region Member variables
 
-        private ObservableCollection<StickyNote_UIIndependent> m_comments = 
-            new ObservableCollection<StickyNote_UIIndependent>();
+        private ObservableCollection<StickyNote> m_comments = 
+            new ObservableCollection<StickyNote>();
 
         /// <summary>
         /// Unique identifier for the process unit
@@ -110,7 +110,7 @@ namespace ChemProV.Core
             {
                 foreach (XElement child in cmtElement.Elements())
                 {
-                    m_comments.Add(new StickyNote_UIIndependent(child, idString));
+                    m_comments.Add(new StickyNote(child, idString));
                 }
             }
         }
@@ -226,7 +226,7 @@ namespace ChemProV.Core
                 return maxTypes > numResults;
         }
 
-        public ObservableCollection<StickyNote_UIIndependent> Comments
+        public ObservableCollection<StickyNote> Comments
         {
             get
             {
@@ -239,7 +239,7 @@ namespace ChemProV.Core
         /// </summary>
         public bool ContainsCommentWithLocation(double x, double y)
         {
-            foreach (StickyNote_UIIndependent sn in m_comments)
+            foreach (StickyNote sn in m_comments)
             {
                 if (sn.LocationX == x && sn.LocationY == y)
                 {

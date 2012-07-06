@@ -22,13 +22,12 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using ChemProV.Core;
-using ChemProV.UI.DrawingCanvas;
 
 namespace ChemProV.UI
 {
     public partial class StreamTableControl : UserControl, Core.ICanvasElement
     {
-        private ChemProV.UI.DrawingCanvas.DrawingCanvas m_canvas;
+        private ChemProV.UI.DrawingCanvas m_canvas;
         
         private bool m_ignoreTablePropertyChanges = false;
         
@@ -46,7 +45,7 @@ namespace ChemProV.UI
         private Workspace m_ws = null;
         
         public StreamTableControl(Core.StreamPropertiesTable table, Workspace workspace,
-            DrawingCanvas.DrawingCanvas canvas)
+            DrawingCanvas canvas)
         {
             InitializeComponent();
 
@@ -216,9 +215,9 @@ namespace ChemProV.UI
 
         private void HeaderBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            DrawingCanvas.DrawingCanvas canvas = Core.App.Workspace.DrawingCanvas;
+            DrawingCanvas canvas = Core.App.Workspace.DrawingCanvas;
             canvas.SelectedElement = this;
-            canvas.CurrentState = UI.DrawingCanvas.States.MovingState.Create(
+            canvas.CurrentState = UI.DrawingCanvasStates.MovingState.Create(
                 canvas, m_ws);
         }
 
@@ -303,7 +302,7 @@ namespace ChemProV.UI
                     }
                     else
                     {
-                        ((ComboBox)sender).SelectedItem = val;
+                        (c as ComboBox).SelectedItem = val;
                     }
                 }
             }

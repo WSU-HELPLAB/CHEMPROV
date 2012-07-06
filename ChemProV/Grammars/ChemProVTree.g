@@ -12,7 +12,7 @@ options
 	using System;
 	using System.Collections.Generic;
 	using ChemProV.PFD;
-	using ChemProV.PFD.ProcessUnits;
+	using ChemProV.UI;
 	using ChemProV.PFD.Streams;
 	using ChemProV.PFD.Streams.PropertiesWindow;
 }

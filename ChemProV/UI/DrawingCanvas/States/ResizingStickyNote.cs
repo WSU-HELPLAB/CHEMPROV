@@ -14,8 +14,9 @@ using System.Windows;
 using System.Windows.Input;
 using ChemProV.Core;
 using ChemProV.PFD.Undos;
+using ChemProV.UI;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     /// <summary>
     /// State logic (mouse-input processing) for resizing a sticky note and creating appropriate 
@@ -37,11 +38,11 @@ namespace ChemProV.UI.DrawingCanvas.States
         /// <summary>
         /// Reference to the note that we're resizing
         /// </summary>
-        private ChemProV.PFD.StickyNote.StickyNoteControl m_note;
+        private StickyNoteControl m_note;
 
         private Size m_sizeOnMouseDown = new Size();
 
-        public ResizingStickyNote(DrawingCanvas canvas, ChemProV.PFD.StickyNote.StickyNoteControl note)
+        public ResizingStickyNote(DrawingCanvas canvas, StickyNoteControl note)
         {
             m_canvas = canvas;
             m_note = note;

@@ -12,7 +12,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:ChemProV_EquationEditor ="clr-namespace:ChemProV.PFD.EquationEditor"
-    xmlns:ChemProV_UI_DrawingCanvas="clr-namespace:ChemProV.UI.DrawingCanvas"
     xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
     xmlns:ChemProV_Validation_Feedback="clr-namespace:ChemProV.Validation.Feedback"
     xmlns:ChemProV_UI ="clr-namespace:ChemProV.UI"
@@ -37,12 +36,12 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 ScrollViewer.VerticalScrollBarVisibility="Visible"
                 Grid.Row="0" Grid.Column="0"
                 HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <ChemProV_UI_DrawingCanvas:DrawingCanvas
+                    <ChemProV_UI:DrawingCanvas
                         x:Name="DrawingCanvas"
                         Background="Gray"
                         Width="2000"
                         Height="2000" >
-                    </ChemProV_UI_DrawingCanvas:DrawingCanvas>
+                    </ChemProV_UI:DrawingCanvas>
             </ScrollViewer>
 
             <!--resizer widget -->

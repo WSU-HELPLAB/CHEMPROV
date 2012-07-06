@@ -20,26 +20,22 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using ChemProV.Core;
 using ChemProV.PFD;
-using ChemProV.PFD.ProcessUnits;
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
-using ChemProV.UI.DrawingCanvas.States;
+using ChemProV.UI.DrawingCanvasStates;
 using System.ComponentModel;
 
-namespace ChemProV.UI.DrawingCanvas
+namespace ChemProV.UI
 {
-    public delegate void PfdUpdatedEventHandler(object sender, PfdUpdatedEventArgs e);
-
     /// <summary>
     /// This is our drawing drawing_canvas, the thing that ProcessUnits and Streams are dragged onto.
     /// It controls everything that goes on with itself.
     /// </summary>
     public class DrawingCanvas : Canvas
     {
-        public event PfdUpdatedEventHandler PfdUpdated = delegate { };
         public event EventHandler PfdChanging = delegate { };
 
         /// <summary>
@@ -396,7 +392,7 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             // A right mouse button down implies that we need to flip to the menu state
-            CurrentState = new UI.DrawingCanvas.States.MenuState(this, m_workspace);
+            CurrentState = new UI.DrawingCanvasStates.MenuState(this, m_workspace);
             (m_currentState as MenuState).Show(e);
         }
 
@@ -509,25 +505,6 @@ namespace ChemProV.UI.DrawingCanvas
 
         #endregion DrawingCanvasMouseEvents
 
-        #region IPfdMouseEvents
-
-        /// <summary>
-        /// Called whenever a user updates table data
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        public void TableDataChanged(object sender, TableDataChangedEventArgs e)
-        {
-            PFDModified();
-        }
-
-        public void TableDataChanging(object sender, EventArgs e)
-        {
-            PFDChanging();
-        }
-
-        #endregion IPfdMouseEvents
-
         /// <summary>
         /// Calling this function will cause the drawing_canvas to recalculate its height and width.
         /// Adds a 100px buffer on each side to allow for scrolling.
@@ -580,26 +557,6 @@ namespace ChemProV.UI.DrawingCanvas
                 Core.DrawingCanvasCommands.DeleteSelectedElement(this);
                 e.Handled = true;
             }
-        }
-
-        /// <summary>
-        /// This should only be called whenever the PFD has been changed.  We don't care if the elements moved only if it changes the
-        /// PFD
-        /// </summary>
-        public void PFDModified()
-        {
-            //get all child PFD elements
-            var elements = from c in Children
-                           where c is IPfdElement
-                           select c as IPfdElement;
-
-            PfdUpdatedEventArgs args = new PfdUpdatedEventArgs(elements);
-            PfdUpdated(this, args);
-        }
-
-        public void PFDChanging()
-        {
-            PfdChanging(this, EventArgs.Empty);
         }
 
         #region Load/Save
@@ -871,7 +828,6 @@ namespace ChemProV.UI.DrawingCanvas
         public bool AddNewChild(UIElement childElement)
         {
             Children.Add(childElement);
-            PFDModified();
             return true;
         }
 
@@ -883,7 +839,6 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             Children.Remove(childElement);
-            PFDModified();
             return true;
         }
 
@@ -995,11 +950,11 @@ namespace ChemProV.UI.DrawingCanvas
         {
             // First go through all sticky note controls on the canvas and remove ones that are 
             // no longer in the workspace.
-            List<ChemProV.PFD.StickyNote.StickyNote_UIIndependent> notesThatHaveControls =
-                new List<ChemProV.PFD.StickyNote.StickyNote_UIIndependent>();
+            List<ChemProV.Logic.StickyNote> notesThatHaveControls =
+                new List<ChemProV.Logic.StickyNote>();
             for (int i = 0; i < Children.Count; i++)
             {
-                PFD.StickyNote.StickyNoteControl snc = Children[i] as PFD.StickyNote.StickyNoteControl;
+                UI.StickyNoteControl snc = Children[i] as UI.StickyNoteControl;
                 if (null == snc)
                 {
                     continue;
@@ -1025,11 +980,11 @@ namespace ChemProV.UI.DrawingCanvas
             }
 
             // Now go through and add any sticky notes that are missing
-            foreach (ChemProV.PFD.StickyNote.StickyNote_UIIndependent sn in m_workspace.StickyNotes)
+            foreach (ChemProV.Logic.StickyNote sn in m_workspace.StickyNotes)
             {
                 if (!notesThatHaveControls.Contains(sn))
                 {
-                    PFD.StickyNote.StickyNoteControl.CreateOnCanvas(this, sn, null);
+                    UI.StickyNoteControl.CreateOnCanvas(this, sn, null);
                 }
             }
         }

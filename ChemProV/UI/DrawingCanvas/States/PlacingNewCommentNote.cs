@@ -15,12 +15,11 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using ChemProV.Core;
-using ChemProV.PFD.ProcessUnits;
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     /// <summary>
     /// This is the state we're in when we're placing a new comment. The comment can be free-floating 
@@ -136,7 +135,7 @@ namespace ChemProV.UI.DrawingCanvas.States
 
                 // Create the new sticky note and add it to the workspace. Event handlers will update 
                 // the UI appropriately.
-                StickyNote_UIIndependent sn = new StickyNote_UIIndependent()
+                StickyNote sn = new StickyNote()
                 {
                     Width = 100.0,
                     Height = 100.0,
@@ -163,7 +162,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             else
             {
                 // This means we need to create a free-floating sticky note.
-                StickyNote_UIIndependent note = new StickyNote_UIIndependent();
+                StickyNote note = new StickyNote();
                 note.Height = note.Width = 100.0;
                 note.LocationX = mousePt.X;
                 note.LocationY = mousePt.Y;
@@ -221,7 +220,7 @@ namespace ChemProV.UI.DrawingCanvas.States
             ProcessUnitControl gpu = m_highlightedHover as ProcessUnitControl;
             if (null != gpu)
             {
-                gpu.SetBorderColor(PFD.ProcessUnits.ProcessUnitBorderColor.NoBorder);
+                gpu.SetBorderColor(ProcessUnitBorderColor.NoBorder);
             }
             else
             {

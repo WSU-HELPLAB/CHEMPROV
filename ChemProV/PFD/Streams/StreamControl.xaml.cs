@@ -18,9 +18,9 @@ using System.Windows.Media;
 using System.Windows.Shapes;
 using System.Windows.Media.Imaging;
 using ChemProV.Core;
-using ChemProV.UI.DrawingCanvas;
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.Streams
 {
@@ -102,7 +102,7 @@ namespace ChemProV.PFD.Streams
         /// We store this because the stream is responsible for creating and removing its sticky 
         /// note controls on the drawing canvas.
         /// </summary>
-        private List<StickyNote.StickyNoteControl> m_stickyNotes = new List<StickyNote.StickyNoteControl>();
+        private List<StickyNoteControl> m_stickyNotes = new List<StickyNoteControl>();
 
         private ChemProV.Core.AbstractStream m_stream;
 
@@ -474,8 +474,7 @@ namespace ChemProV.PFD.Streams
         /// <returns>True if the unit is a valid source, false otherwise.</returns>
         public bool IsValidSource(ProcessUnitControl unit)
         {
-            return m_stream.IsValidSource(
-                (unit as ChemProV.PFD.ProcessUnits.ProcessUnitControl).ProcessUnit);
+            return m_stream.IsValidSource((unit as ProcessUnitControl).ProcessUnit);
         }
 
         /// <summary>
@@ -487,8 +486,7 @@ namespace ChemProV.PFD.Streams
         /// <returns>True if the unit is a valid destination, false otherwise.</returns>
         public bool IsValidDestination(ProcessUnitControl unit)
         {
-            return m_stream.IsValidDestination(
-                (unit as ChemProV.PFD.ProcessUnits.ProcessUnitControl).ProcessUnit);
+            return m_stream.IsValidDestination((unit as ProcessUnitControl).ProcessUnit);
         }
 
         private static void SetLineLocation(Line line, MathCore.Vector a, MathCore.Vector b)
@@ -507,7 +505,7 @@ namespace ChemProV.PFD.Streams
                 m_canvas.SelectedElement = this;
 
                 // Set state to moving endpoint state
-                m_canvas.CurrentState = new UI.DrawingCanvas.States.MovingStreamEndpoint(
+                m_canvas.CurrentState = new UI.DrawingCanvasStates.MovingStreamEndpoint(
                     m_sourceDragIcon, m_canvas, false);
             }
         }
@@ -668,7 +666,7 @@ namespace ChemProV.PFD.Streams
                 m_canvas.SelectedElement = this;
 
                 // Set state to moving endpoint state
-                m_canvas.CurrentState = new UI.DrawingCanvas.States.MovingStreamEndpoint(
+                m_canvas.CurrentState = new UI.DrawingCanvasStates.MovingStreamEndpoint(
                     sender as DraggableStreamEndpoint, m_canvas, false);
             }
         }
@@ -683,7 +681,7 @@ namespace ChemProV.PFD.Streams
                 m_canvas.SelectedElement = this;
 
                 // Set state to moving endpoint state
-                m_canvas.CurrentState = new UI.DrawingCanvas.States.MovingStreamEndpoint(
+                m_canvas.CurrentState = new UI.DrawingCanvasStates.MovingStreamEndpoint(
                     m_dstDragIcon, m_canvas, false);
             }
         }
@@ -802,8 +800,7 @@ namespace ChemProV.PFD.Streams
             // Start by deleting any sticky note controls that represent comments that are no longer 
             // in the comment collection. While we do this, build a list of all comments that we 
             // have a sticky note control for (used in next step).
-            List<StickyNote.StickyNote_UIIndependent> existing =
-                new List<StickyNote.StickyNote_UIIndependent>();
+            List<StickyNote> existing = new List<StickyNote>();
             for (int i = 0; i < m_stickyNotes.Count; i++)
             {
                 if (!m_stream.Comments.Contains(m_stickyNotes[i].StickyNote))
@@ -827,7 +824,7 @@ namespace ChemProV.PFD.Streams
             {
                 if (!existing.Contains(m_stream.Comments[i]))
                 {
-                    m_stickyNotes.Add(StickyNote.StickyNoteControl.CreateOnCanvas(
+                    m_stickyNotes.Add(StickyNoteControl.CreateOnCanvas(
                         m_canvas, m_stream.Comments[i], this));
                 }
             }
@@ -1019,7 +1016,7 @@ namespace ChemProV.PFD.Streams
 
         public void HideAllComments()
         {
-            foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNoteControl snc in m_stickyNotes)
             {
                 snc.Hide();
             }
@@ -1027,7 +1024,7 @@ namespace ChemProV.PFD.Streams
 
         public void ShowAllComments()
         {
-            foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNoteControl snc in m_stickyNotes)
             {
                 snc.Show();
             }
@@ -1039,7 +1036,7 @@ namespace ChemProV.PFD.Streams
         /// This is considered disposal of the control and it should not be used anymore 
         /// after calling this method.
         /// </summary>
-        public void RemoveSelfFromCanvas(UI.DrawingCanvas.DrawingCanvas canvas)
+        public void RemoveSelfFromCanvas(UI.DrawingCanvas canvas)
         {
             // Unsubscribe from events (important)
             m_stream.PropertyChanged -= this.Stream_PropertyChanged;
@@ -1078,7 +1075,7 @@ namespace ChemProV.PFD.Streams
             }
             m_lines.Clear();
 
-            foreach (StickyNote.StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNoteControl snc in m_stickyNotes)
             {
                 canvas.RemoveChild(snc.LineToParent);
                 canvas.RemoveChild(snc);
@@ -1257,7 +1254,7 @@ namespace ChemProV.PFD.Streams
             }
 
             // Lastly, tell the comment sticky notes to update
-            foreach (StickyNote.StickyNoteControl sn in m_stickyNotes)
+            foreach (StickyNoteControl sn in m_stickyNotes)
             {
                 sn.UpdateLineToParent();
             }

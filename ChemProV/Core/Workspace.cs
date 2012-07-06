@@ -62,8 +62,8 @@ namespace ChemProV.Core
         /// <summary>
         /// Collection of sticky notes, a.k.a. free-floating comments, for the workspace.
         /// </summary>
-        protected ObservableCollection<ChemProV.PFD.StickyNote.StickyNote_UIIndependent> m_stickyNotes =
-            new ObservableCollection<ChemProV.PFD.StickyNote.StickyNote_UIIndependent>();
+        protected ObservableCollection<ChemProV.Logic.StickyNote> m_stickyNotes =
+            new ObservableCollection<ChemProV.Logic.StickyNote>();
 
         private List<AbstractStream> m_streams = new List<AbstractStream>();
 
@@ -301,7 +301,7 @@ namespace ChemProV.Core
             XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
             foreach (XElement note in stickyNoteList.Elements())
             {
-                m_stickyNotes.Add(new PFD.StickyNote.StickyNote_UIIndependent(note, null));
+                m_stickyNotes.Add(new Logic.StickyNote(note, null));
             }
 
             // Check for degrees of freedom analysis
@@ -529,7 +529,7 @@ namespace ChemProV.Core
 
                     // Write "free-floating" sticky notes
                     writer.WriteStartElement("StickyNotes");
-                    foreach (PFD.StickyNote.StickyNote_UIIndependent sn in m_stickyNotes)
+                    foreach (Logic.StickyNote sn in m_stickyNotes)
                     {
                         writer.WriteStartElement("StickyNote");
                         sn.WriteXml(writer);
@@ -576,7 +576,7 @@ namespace ChemProV.Core
             }
         }
 
-        public ObservableCollection<ChemProV.PFD.StickyNote.StickyNote_UIIndependent> StickyNotes
+        public ObservableCollection<ChemProV.Logic.StickyNote> StickyNotes
         {
             get
             {

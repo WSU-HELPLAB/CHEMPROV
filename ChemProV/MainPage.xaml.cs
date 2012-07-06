@@ -23,7 +23,6 @@ using System.Xml.Serialization;
 using ChemProV.Library.OSBLE.Views;
 using ChemProV.PFD.EquationEditor;
 using ChemProV.UI;
-using ChemProV.UI.DrawingCanvas;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;

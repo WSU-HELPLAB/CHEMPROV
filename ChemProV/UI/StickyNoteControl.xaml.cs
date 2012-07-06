@@ -15,13 +15,13 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
 using ChemProV.Core;
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
-using ChemProV.UI.DrawingCanvas;
 using System.ComponentModel;
+using ChemProV.Logic;
 
-namespace ChemProV.PFD.StickyNote
+namespace ChemProV.UI
 {
     public enum StickyNoteColors
     {
@@ -32,7 +32,7 @@ namespace ChemProV.PFD.StickyNote
         Yellow
     }
 
-    public partial class StickyNoteControl : UserControl, IPfdElement, Core.ICanvasElement
+    public partial class StickyNoteControl : UserControl, PFD.IPfdElement, Core.ICanvasElement
     {
         private DrawingCanvas m_canvas = null;
 
@@ -49,7 +49,7 @@ namespace ChemProV.PFD.StickyNote
         /// </summary>
         private object m_commentParent = null;
 
-        private StickyNote_UIIndependent m_note;
+        private StickyNote m_note;
         
         private StickyNoteColors color;
 
@@ -63,7 +63,7 @@ namespace ChemProV.PFD.StickyNote
         {
         }
 
-        private StickyNoteControl(DrawingCanvas canvas, StickyNote_UIIndependent memNote)
+        private StickyNoteControl(DrawingCanvas canvas, StickyNote memNote)
         {
             InitializeComponent();
             m_canvas = canvas;
@@ -118,7 +118,7 @@ namespace ChemProV.PFD.StickyNote
         }
 
         public static StickyNoteControl CreateOnCanvas(DrawingCanvas canvas,
-            StickyNote_UIIndependent memNote, object commentParentControl)
+            StickyNote memNote, object commentParentControl)
         {
             // I'm using a static constructor because this way I can at least choose 
             // wording that implies that this control will be created AND added to 
@@ -244,7 +244,7 @@ namespace ChemProV.PFD.StickyNote
             e.Handled = true;
 
             // Set the canvas state so that we'll enter resizing mode
-            m_canvas.CurrentState = new UI.DrawingCanvas.States.ResizingStickyNote(
+            m_canvas.CurrentState = new UI.DrawingCanvasStates.ResizingStickyNote(
                 m_canvas, this);
             // Kick it off by sending the mouse-down event
             m_canvas.CurrentState.MouseLeftButtonDown(sender, e);
@@ -374,7 +374,7 @@ namespace ChemProV.PFD.StickyNote
         /// <summary>
         /// Gets a reference to the StickyNote object that this control represents
         /// </summary>
-        public StickyNote_UIIndependent StickyNote
+        public StickyNote StickyNote
         {
             get
             {
@@ -476,7 +476,7 @@ namespace ChemProV.PFD.StickyNote
             // First resolve the "center point" of the parent object. Also get a reference to the collection 
             // of comments.
             Point location;
-            IList<StickyNote_UIIndependent> comments;
+            IList<StickyNote> comments;
             ProcessUnitControl lpu = parentControl as ProcessUnitControl;
             PFD.Streams.StreamControl stream = parentControl as PFD.Streams.StreamControl;
             if (null != lpu)
@@ -698,7 +698,7 @@ namespace ChemProV.PFD.StickyNote
             }
             
             // Get a reference to the relevant comment collection
-            IList<StickyNote_UIIndependent> comments;
+            IList<StickyNote> comments;
             if (null == m_commentParent)
             {
                 comments = ws.StickyNotes;

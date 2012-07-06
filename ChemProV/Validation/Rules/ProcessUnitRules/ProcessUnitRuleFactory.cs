@@ -7,7 +7,7 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 
 namespace ChemProV.Validation.Rules.ProcessUnitRules
 {

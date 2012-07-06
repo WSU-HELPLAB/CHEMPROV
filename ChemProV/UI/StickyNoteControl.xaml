@@ -11,7 +11,10 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" xmlns:System="clr-namespace:System;assembly=mscorlib" x:Class="ChemProV.PFD.StickyNote.StickyNoteControl"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
+    xmlns:ed="http://schemas.microsoft.com/expression/2010/drawing" 
+    xmlns:System="clr-namespace:System;assembly=mscorlib" 
+    x:Class="ChemProV.UI.StickyNoteControl"
     mc:Ignorable="d"
     d:DesignHeight="100" d:DesignWidth="100" SizeChanged="UserControl_SizeChanged">
 

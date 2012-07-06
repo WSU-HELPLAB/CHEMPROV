@@ -17,7 +17,7 @@ using ChemProV.Grammars;
 using Antlr.Runtime.Tree;
 using System.Linq;
 using ChemProV.PFD;
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow;

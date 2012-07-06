@@ -10,19 +10,19 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Core;
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.Undos
 {
     public class InsertComment : IUndoRedoAction
     {
-        private IList<StickyNote_UIIndependent> m_collection;
+        private IList<StickyNote> m_collection;
 
-        private StickyNote_UIIndependent m_comment;
+        private StickyNote m_comment;
 
         private int m_index;
 
-        public InsertComment(IList<StickyNote_UIIndependent> collection, StickyNote_UIIndependent comment, int insertionIndex)
+        public InsertComment(IList<StickyNote> collection, StickyNote comment, int insertionIndex)
         {
             m_collection = collection;
             m_comment = comment;

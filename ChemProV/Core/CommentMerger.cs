@@ -13,7 +13,7 @@ using System.Linq;
 using System.Xml.Linq;
 
 using ChemProV.PFD.EquationEditor.Models;
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 
 // Dependencies:
 //  1. StickyNote_UIIndependent.cs
@@ -39,9 +39,9 @@ namespace ChemProV.Core
         /// <summary>
         /// Loads comments from the document, adding the user name to the XML tree where necessary
         /// </summary>
-        private static StickyNote_UIIndependent[] LoadCommentsFrom(XDocument doc, string userNameIfNotInXml)
+        private static StickyNote[] LoadCommentsFrom(XDocument doc, string userNameIfNotInXml)
         {
-            List<StickyNote_UIIndependent> comments = new List<StickyNote_UIIndependent>();
+            List<StickyNote> comments = new List<StickyNote>();
             
             // Process units first...
             XElement processUnits = doc.Descendants("ProcessUnits").ElementAt(0);
@@ -55,7 +55,7 @@ namespace ChemProV.Core
                         // Ensure that it has a user name
                         SetUserNameIfAbsent(cmt, userNameIfNotInXml);
                         
-                        StickyNote_UIIndependent sn = new StickyNote_UIIndependent(
+                        StickyNote sn = new StickyNote(
                             cmt, unit.Attribute("Id").Value);
 
                         comments.Add(sn);
@@ -76,7 +76,7 @@ namespace ChemProV.Core
                         // Ensure that it has a user name
                         SetUserNameIfAbsent(cmt, userNameIfNotInXml);
                         
-                        StickyNote_UIIndependent sn = new StickyNote_UIIndependent(
+                        StickyNote sn = new StickyNote(
                             cmt, stream.Attribute("Id").Value);
 
                         comments.Add(sn);
@@ -91,7 +91,7 @@ namespace ChemProV.Core
                 // Ensure that it has a user name
                 SetUserNameIfAbsent(note, userNameIfNotInXml);
                 
-                comments.Add(new PFD.StickyNote.StickyNote_UIIndependent(note, null));
+                comments.Add(new Logic.StickyNote(note, null));
             }
 
             return comments.ToArray();
@@ -157,17 +157,17 @@ namespace ChemProV.Core
 
             // Start by loading all comments from the "child". Note that this doesn't include 
             // equation annotations
-            List<StickyNote_UIIndependent> childComments = new List<StickyNote_UIIndependent>();
+            List<StickyNote> childComments = new List<StickyNote>();
             childComments.AddRange(LoadCommentsFrom(docChild, childUserNameIfNotInXml));
 
             // Also load all comments from the parent
-            List<StickyNote_UIIndependent> parentComments = new List<StickyNote_UIIndependent>();
+            List<StickyNote> parentComments = new List<StickyNote>();
             parentComments.AddRange(LoadCommentsFrom(docParent, parentUserNameIfNotInXml));
 
             // Remove all child comments from the list that are duplicates (same text and parent ID)
             for (int i = 0; i < childComments.Count; i++)
             {
-                foreach (StickyNote_UIIndependent tempParent in parentComments)
+                foreach (StickyNote tempParent in parentComments)
                 {
                     if (tempParent.ParentId == childComments[i].ParentId &&
                         tempParent.Text == childComments[i].Text)
@@ -212,7 +212,7 @@ namespace ChemProV.Core
                 
                 // We've already removed duplicates from the child list, so if we have something in 
                 // that list with a matching ID then we add it
-                foreach (StickyNote_UIIndependent sn in childComments)
+                foreach (StickyNote sn in childComments)
                 {
                     if (sn.ParentId == unit.Attribute("Id").Value)
                     {
@@ -259,7 +259,7 @@ namespace ChemProV.Core
                 
                 // We've already removed duplicates from the child list, so if we have something in 
                 // that list with a matching ID then we add it
-                foreach (StickyNote_UIIndependent sn in childComments)
+                foreach (StickyNote sn in childComments)
                 {
                     if (sn.ParentId == stream.Attribute("Id").Value)
                     {
@@ -281,7 +281,7 @@ namespace ChemProV.Core
 
             // Add all free-floating sticky notes
             XElement stickyNoteXmlParent = docParent.Descendants("StickyNotes").ElementAt(0);
-            foreach (StickyNote_UIIndependent sn in childComments)
+            foreach (StickyNote sn in childComments)
             {
                 if (!string.IsNullOrEmpty(sn.ParentId))
                 {

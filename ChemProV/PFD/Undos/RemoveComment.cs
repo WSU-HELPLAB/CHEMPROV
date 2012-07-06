@@ -19,7 +19,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Core;
-using ChemProV.PFD.StickyNote;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.Undos
 {
@@ -27,9 +27,9 @@ namespace ChemProV.PFD.Undos
     {
         private int m_index;
         
-        private IList<StickyNote_UIIndependent> m_owner;
+        private IList<StickyNote> m_owner;
 
-        public RemoveComment(IList<StickyNote_UIIndependent> owner, int index)
+        public RemoveComment(IList<StickyNote> owner, int index)
         {
             m_owner = owner;
             m_index = index;
@@ -37,7 +37,7 @@ namespace ChemProV.PFD.Undos
 
         public IUndoRedoAction Execute(Workspace sender)
         {
-            StickyNote_UIIndependent current = m_owner[m_index];
+            StickyNote current = m_owner[m_index];
             m_owner.RemoveAt(m_index);
             return new InsertComment(m_owner, current, m_index);
         }

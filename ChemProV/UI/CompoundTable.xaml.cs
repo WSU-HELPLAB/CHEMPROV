@@ -160,6 +160,10 @@ namespace ChemProV.UI
                 
                 stream.PropertiesTable.RowPropertyChanged += this.PropertiesTable_RowPropertyChanged;
             }
+
+            // Invoke the property change event because the streams that were added most likely 
+            // have tables and those tables could have compounds selected.
+            PropertiesTable_RowPropertyChanged(null, new PropertyChangedEventArgs("SelectedCompound"));
         }
 
         private void PropertiesTable_RowPropertyChanged(object sender, PropertyChangedEventArgs e)

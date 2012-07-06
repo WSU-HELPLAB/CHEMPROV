@@ -8,6 +8,6 @@ namespace ChemProV.Core
         /// Tells the control to remove itself, and any relevant child controls it owns, from the 
         /// DrawingCanvas.
         /// </summary>
-        void RemoveSelfFromCanvas(ChemProV.UI.DrawingCanvas.DrawingCanvas owner);
+        void RemoveSelfFromCanvas(ChemProV.UI.DrawingCanvas owner);
     }
 }

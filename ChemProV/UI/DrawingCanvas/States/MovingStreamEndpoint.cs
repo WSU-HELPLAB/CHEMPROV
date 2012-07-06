@@ -3,10 +3,9 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.MathCore;
-using ChemProV.PFD.ProcessUnits;
 using ChemProV.PFD.Streams;
 
-namespace ChemProV.UI.DrawingCanvas.States
+namespace ChemProV.UI.DrawingCanvasStates
 {
     public class MovingStreamEndpoint : IState
     {

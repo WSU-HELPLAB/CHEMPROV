@@ -43,6 +43,7 @@ namespace ChemProV.UnitTests.PFD
             if (0 == cs1.PropertiesTable.RowCount)
             {
                 ChemicalStreamData csd = cs1.PropertiesTable.AddNewRow() as ChemicalStreamData;
+                csd.SelectedCompound = "Overall";
                 csd.Label = "M1";
                 csd.UserHasRenamed = false;
             }
@@ -58,8 +59,8 @@ namespace ChemProV.UnitTests.PFD
             ComboBox cbUnits = props.GetControl(cs1.PropertiesTable.Rows[0], "SelectedUnits") as ComboBox;
             Assert.IsNotNull(cbUnits, "Could not find combo box control for selected units");
             
-            // Select mass %, which should change the label from M1 to N1
-            cbUnits.SelectedItem = Core.ChemicalUnits.MassPercent.ToPrettyString();
+            // Select mole %, which should change the label from M1 to N1
+            cbUnits.SelectedItem = Core.ChemicalUnits.MolePercent.ToPrettyString();
 
             // Verify that the label changed to "N1"
             Assert.IsTrue(tbLabel.Text.Equals("N1"), "Test Failed: After unit change, the label " +

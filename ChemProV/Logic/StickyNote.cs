@@ -7,15 +7,13 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 using System;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
+using System.Xml;
 using System.Xml.Linq;
 
-// If I had it my way, I'd rename the sticky note Silverlight user control to StickyNoteControl and 
-// have this class just be named StickyNote, but such major changes are trying to be avoided at this 
-// point in time.
-
-namespace ChemProV.PFD.StickyNote
+namespace ChemProV.Logic
 {
     /// <summary>
     /// This class exists to provide a UI-independent sticky note entity. This is important because 
@@ -25,7 +23,7 @@ namespace ChemProV.PFD.StickyNote
     /// This class can load/save/store all relevant data for a sticky note without any Silverlight-
     /// specific dependencies.
     /// </summary>
-    public class StickyNote_UIIndependent
+    public class StickyNote : INotifyPropertyChanged
     {
         private double m_locX = 0.0;
 
@@ -37,17 +35,17 @@ namespace ChemProV.PFD.StickyNote
 
         private double m_sizeW = 100.0;
 
-        private string m_text = null;
+        private string m_text = string.Empty;
 
         private string m_userName = null;
 
-        public StickyNote_UIIndependent() { }
+        public StickyNote() { }
 
         /// <summary>
         /// Initializes from a &lt;StickyNote&gt; or &lt;Comment&gt; XElement with an optional ideintifier 
         /// for a parent object.
         /// </summary>
-        public StickyNote_UIIndependent(XElement stickyNoteElement, string optionalParentId)
+        public StickyNote(XElement stickyNoteElement, string optionalParentId)
         {
             // Make sure we have the correct type of XElement
             string elNameLwr = stickyNoteElement.Name.LocalName.ToLower();
@@ -99,6 +97,20 @@ namespace ChemProV.PFD.StickyNote
             {
                 return m_sizeH;
             }
+            set
+            {
+                if (m_sizeH == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_sizeH = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Height"));
+                }
+            }
         }
 
         public double LocationX
@@ -107,6 +119,20 @@ namespace ChemProV.PFD.StickyNote
             {
                 return m_locX;
             }
+            set
+            {
+                if (m_locX == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_locX = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("LocationX"));
+                }
+            }
         }
 
         public double LocationY
@@ -114,6 +140,20 @@ namespace ChemProV.PFD.StickyNote
             get
             {
                 return m_locY;
+            }
+            set
+            {
+                if (m_locY == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_locY = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("LocationY"));
+                }
             }
         }
 
@@ -130,6 +170,20 @@ namespace ChemProV.PFD.StickyNote
             get
             {
                 return m_text;
+            }
+            set
+            {
+                if (m_text == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_text = string.IsNullOrEmpty(value) ? string.Empty : value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Text"));
+                }
             }
         }
 
@@ -170,7 +224,17 @@ namespace ChemProV.PFD.StickyNote
             }
             set
             {
+                if (m_userName == value)
+                {
+                    // No change
+                    return;
+                }
+                
                 m_userName = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("UserName"));
+                }
             }
         }
 
@@ -179,6 +243,20 @@ namespace ChemProV.PFD.StickyNote
             get
             {
                 return m_sizeW;
+            }
+            set
+            {
+                if (m_sizeW == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_sizeW = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("Width"));
+                }
             }
         }
 
@@ -202,5 +280,31 @@ namespace ChemProV.PFD.StickyNote
 
             parent.Add(tree);
         }
+
+
+        public void WriteXml(XmlWriter writer)
+        {
+            // Location
+            writer.WriteStartElement("Location");
+            writer.WriteElementString("X", m_locX.ToString());
+            writer.WriteElementString("Y", m_locY.ToString());
+            writer.WriteEndElement();
+
+            // Write the content
+            writer.WriteStartElement("Content");
+            writer.WriteString(m_text);
+            writer.WriteEndElement();
+
+            // Write the size as well
+            writer.WriteElementString("Size", string.Format("{0},{1}", Width, Height));
+
+            // Write the user name if we have one
+            if (!string.IsNullOrEmpty(m_userName))
+            {
+                writer.WriteElementString("UserName", m_userName);
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged = null;
     }
 }

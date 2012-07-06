@@ -16,8 +16,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System.Collections.Generic;
 using System.Windows;
 using ChemProV.Logic.Undos;
-using ChemProV.PFD.ProcessUnits;
-using ChemProV.UI.DrawingCanvas;
+using ChemProV.UI;
 
 namespace ChemProV.Core
 {
@@ -45,10 +44,10 @@ namespace ChemProV.Core
             Workspace ws = canvas.GetWorkspace();
 
             // There are several different possibilities for what we're about to delete.
-            if (element is PFD.StickyNote.StickyNoteControl)
+            if (element is StickyNoteControl)
             {
                 // Case 1: deleting a sticky note
-                (element as PFD.StickyNote.StickyNoteControl).DeleteWithUndo(canvas);
+                (element as StickyNoteControl).DeleteWithUndo(canvas);
             }
             else if (element is ChemProV.PFD.Streams.StreamControl)
             {
