@@ -26,11 +26,10 @@ using ChemProV.Validation.Rules.Adapters.Table;
 
 namespace ChemProV.UI
 {
-    public partial class WorkspaceControl : UserControl
+    public partial class WorkspaceControl : UserControl, INotifyPropertyChanged
     {
         #region Delegates
 
-        //public event EventHandler ToolPlaced = delegate { };
         public event EventHandler ValidationChecked = delegate { };
 
         #endregion Delegates
@@ -43,9 +42,9 @@ namespace ChemProV.UI
 
         private bool checkRules = true;
 
-        private ObservableCollection<string> compounds = new ObservableCollection<string>();
-
         private ObservableCollection<string> elements = new ObservableCollection<string>();
+
+        private bool m_commentsPaneVisible = false;
 
         /// <summary>
         /// Dictionary used to map a user name to a sticky note color
@@ -73,28 +72,27 @@ namespace ChemProV.UI
 
         private void CloseCommentPaneButton_Click(object sender, RoutedEventArgs e)
         {
-            for (int i = 0; i < EquationEditor.EquationRowCount; i++)
-            {
-                EquationControl ec = EquationEditor.GetRowControl(i);
-                ec.Model.CommentsVisible = false;
-            }
-            EquationEditor.UpdateRowProperties();
+            // Commenting stuff out below until we discuss this in a meeting. I'm thinking that 
+            // your selection of which equation comments are visible as well as whether or not 
+            // DF analysis comments are visible should persist when you close the comment pane. 
+            // That way when you show it again you are where you left off. The code below reset 
+            // everything to hidden and I don't think we want that.
+            
+            //for (int i = 0; i < EquationEditor.EquationRowCount; i++)
+            //{
+            //    EquationControl ec = EquationEditor.GetRowControl(i);
+            //    ec.Model.CommentsVisible = false;
+            //}
+            //EquationEditor.UpdateRowProperties();
 
-            m_workspace.DegreesOfFreedomAnalysis.CommentsVisible = false;
+            //m_workspace.DegreesOfFreedomAnalysis.CommentsVisible = false;
 
-            // With all of the comments hidden, the update function will hide the pane
-            UpdateCommentsPaneVisibility();
+            CommentsPaneVisible = false;
         }
 
         #endregion Constructor
 
         #region Properties
-
-        public ObservableCollection<string> Compounds
-        {
-            get { return compounds; }
-            set { compounds = value; }
-        }
 
         public ObservableCollection<string> Elements
         {
@@ -102,6 +100,7 @@ namespace ChemProV.UI
             set { elements = value; }
         }
 
+        [Obsolete("Significant changes have rendered this useless. Needs to be rewritten")]
         public bool CheckRules
         {
             get { return checkRules; }
@@ -195,7 +194,7 @@ namespace ChemProV.UI
             //clear any existing messages in the feedback window and rerun the error checker
             CheckRulesForPFD(this, EventArgs.Empty);
 
-            UpdateCommentsPaneVisibility();
+            CommentsPaneVisible = false;
         }
 
         /// <summary>
@@ -233,32 +232,7 @@ namespace ChemProV.UI
             EquationEditor.EquationTokensChanged += new EventHandler(CheckRulesForPFD);
         }
 
-        //public void LoadXmlElements(XDocument doc)
-        //{
-        //    isLoadingFile = true;
-        //    //clear out previous data
-        //    DrawingCanvas.ClearDrawingCanvas();
-        //    m_snUserColors.Clear();
-
-        //    //some items don't have feedback so there might not be a feedbackwindow element.
-        //    if (doc.Descendants("FeedbackWindow").Count() > 0)
-        //    {
-        //        FeedbackWindow.LoadXmlElements(doc.Descendants("FeedbackWindow").ElementAt(0));
-        //    }
-
-        //    //done loading the file so set isLoadingFile to false and call the CheckRulesForPFD to check the rules
-        //    isLoadingFile = false;
-
-        //    //AC: The function will update the equation editor's list of scope and type options.  This needs to be up to date
-        //    //before we can load the equation editor.
-        //    CheckRulesForPFD(this, EventArgs.Empty);
-
-        //    // Update the equations
-        //    EquationEditor.UpdateCompounds();
-
-        //    UpdateCommentsPaneVisibility();
-        //}
-
+        [Obsolete("Significant changes have rendered this useless. Needs to be rewritten")]
         public object GetobjectFromId(string id)
         {
             return null;
@@ -267,38 +241,6 @@ namespace ChemProV.UI
         #endregion Public Methods
 
         #region Private Helper
-
-        //private void UpdateCompounds(IEnumerable<IPropertiesWindow> iPropertiesWindows)
-        //{
-        //    ITableAdapter tableAdapter;
-
-        //    compounds.Clear();
-
-        //    foreach (IPfdElement ipfd in iPropertiesWindows)
-        //    {
-        //        if (ipfd is IPropertiesWindow)
-        //        {
-        //            tableAdapter = TableAdapterFactory.CreateTableAdapter(ipfd as IPropertiesWindow);
-        //            int i = 0;
-        //            while (i < tableAdapter.GetRowCount())
-        //            {
-        //                string compound = tableAdapter.GetCompoundAtRow(i);
-        //                if (compound != "Select" && compound != "Overall" && compound.Length > 0)
-        //                {
-        //                    if (!compounds.Contains(compound))
-        //                    {
-        //                        compounds.Add(compound);
-        //                    }
-        //                }
-        //                i++;
-        //            }
-        //        }
-        //    }
-            
-        //    // Don't need this anymore because the equation editor handles it
-        //    //EquationEditor.Compounds = compounds;
-        //    CompoundsUpdated(this, EventArgs.Empty);
-        //}
 
         private void DrawingCanvas_PfdChanging(object sender, EventArgs e)
         {
@@ -364,20 +306,40 @@ namespace ChemProV.UI
             }
         }
 
-        public void UpdateCommentsPaneVisibility()
+        public bool CommentsPaneVisible
         {
-            // If there are no comments visible then hide the pane and return
-            if (0 == EquationEditor.CountRowsWithCommentsVisible() &&
-                !m_workspace.DegreesOfFreedomAnalysis.CommentsVisible)
+            get
             {
-                CommentsPane.Visibility = System.Windows.Visibility.Collapsed;
-                WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(0.0);
-                return;
+                return m_commentsPaneVisible;
             }
+            set
+            {
+                if (value == m_commentsPaneVisible)
+                {
+                    // No change
+                    return;
+                }
+                
+                m_commentsPaneVisible = value;
+                if (value)
+                {
+                    CommentsPane.Visibility = System.Windows.Visibility.Visible;
+                    WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(175.0);
+                }
+                else
+                {
+                    CommentsPane.Visibility = System.Windows.Visibility.Collapsed;
+                    WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(0.0);
+                }
 
-            // Otherwise make sure its visible and then update
-            CommentsPane.Visibility = System.Windows.Visibility.Visible;
-            WorkspaceGrid.ColumnDefinitions[1].Width = new GridLength(175.0);
+                PropertyChanged(this, new PropertyChangedEventArgs("CommentsPaneVisible"));
+            }
         }
+
+        #region Events
+
+        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+
+        #endregion Events
     }
 }

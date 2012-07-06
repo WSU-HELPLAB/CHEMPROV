@@ -571,8 +571,11 @@ namespace ChemProV.PFD.EquationEditor
 
                 UpdateRowProperties();
 
-                // Tell the workspace to update visibility for the comment pane
-                Core.App.Workspace.UpdateCommentsPaneVisibility();
+                // If we have any rows with visible comments then ensure the comments pane is visible
+                if (CountRowsWithCommentsVisible() > 0)
+                {
+                    Core.App.Workspace.CommentsPaneVisible = true;
+                }
             };
         }
 

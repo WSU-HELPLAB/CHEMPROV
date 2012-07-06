@@ -96,6 +96,25 @@ namespace ChemProV.UI
             switch (e.PropertyName)
             {
                 // TODO: Height
+
+                case "IsVisible":
+                    if (m_note.IsVisible)
+                    {
+                        this.Visibility = System.Windows.Visibility.Visible;
+                        if (null != m_lineToParent)
+                        {
+                            m_lineToParent.Visibility = System.Windows.Visibility.Visible;
+                        }
+                    }
+                    else
+                    {
+                        this.Visibility = System.Windows.Visibility.Collapsed;
+                        if (null != m_lineToParent)
+                        {
+                            m_lineToParent.Visibility = System.Windows.Visibility.Collapsed;
+                        }
+                    }
+                    break;
                 
                 case "LocationX":
                     SetValue(Canvas.LeftProperty, m_note.LocationX);
@@ -168,6 +187,12 @@ namespace ChemProV.UI
 
                 // Position the line to the parent
                 snc.UpdateLineToParent();
+            }
+
+            // Hide if need be
+            if (!memNote.IsVisible)
+            {
+                snc.Hide();
             }
 
             return snc;
@@ -745,26 +770,26 @@ namespace ChemProV.UI
 
         public void Hide()
         {
-            this.Visibility = System.Windows.Visibility.Collapsed;
-            if (null != m_lineToParent)
-            {
-                m_lineToParent.Visibility = System.Windows.Visibility.Collapsed;
-            }
+            // Set the visibility in the data structure to false. Event handlers will respond 
+            // and do the actual hiding of the control
+            m_note.IsVisible = false;
         }
 
         public void Show()
         {
-            this.Visibility = System.Windows.Visibility.Visible;
-            if (null != m_lineToParent)
-            {
-                m_lineToParent.Visibility = System.Windows.Visibility.Visible;
-            }
+            // Set the visibility in the data structure to true. Event handlers will respond 
+            // and do the actual showing of the control
+            m_note.IsVisible = true;
         }
 
         private void CollapseLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
-            Hide();
+            
+            // Set the visibility to false in the data object. Event handlers will fire in 
+            // response and do the actual visibility change for the control (and the line 
+            // to the parent object if applicable)
+            m_note.IsVisible = false;
         }
 
         public static StickyNoteColors GetNextUserStickyColor()

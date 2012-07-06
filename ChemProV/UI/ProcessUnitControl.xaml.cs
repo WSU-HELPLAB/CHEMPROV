@@ -39,7 +39,7 @@ namespace ChemProV.UI
     /// units is completely beneath the UI layer in the logic layer. This control just wraps around an 
     /// AbstractProcessUnit object.
     /// </summary>
-    public partial class ProcessUnitControl : UserControl, PFD.IPfdElement, Core.ICanvasElement
+    public partial class ProcessUnitControl : UserControl, PFD.IPfdElement, Core.ICanvasElement, UI.ICommentControlManager
     {
         #region Instance Variables
 
@@ -82,13 +82,6 @@ namespace ChemProV.UI
         private Brush RedBorderBrush = new SolidColorBrush(Colors.Red);
         private Brush TransparentBorderBrush = new SolidColorBrush(Colors.Transparent);
 
-        /// <summary>
-        /// Keeps track of the process unit's unique ID number.  Needed when parsing
-        /// to/from XML for saving and loading
-        /// </summary>
-        private static int processUnitIdCounter = 0;
-        private string processUnitId;
-
         public event EventHandler LocationChanged = delegate { };
         public event EventHandler SelectionChanged = delegate { };
 
@@ -111,9 +104,6 @@ namespace ChemProV.UI
             m_pu = processUnit;
             m_canvas = canvas;
 
-            //processUnitIdCounter++;
-            //Id = "GPU_" + processUnitIdCounter;
-
             // Create the icon image
             BitmapImage bmp = new BitmapImage();
             bmp.UriSource = new Uri(GetIconSource(processUnit.GetType()), UriKind.Relative);
@@ -132,7 +122,7 @@ namespace ChemProV.UI
 
             // Setup the event listener for the comment collection. It is the responsibility of this 
             // control to create and manage the sticky note controls for its comments
-            processUnit.Comments.CollectionChanged += Comments_CollectionChanged;
+            processUnit.Comments.CollectionChanged += CommentCollectionChanged;
 
             // Setup the event listener for property changes. When things like the location property 
             // change, we'll need to update our position on the canvas.
@@ -140,6 +130,10 @@ namespace ChemProV.UI
 
             // Just a note that we don't need to watch when the incoming or outgoing streams change 
             // because that doesn't affect how we present the process unit in the UI
+
+            // Invoke the comment change event to do the intial creation of comment controls
+            CommentCollectionChanged(m_pu.Comments,
+                new NotifyCollectionChangedEventArgs(NotifyCollectionChangedAction.Reset));
         }
 
         private void ProcessUnit_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -195,7 +189,7 @@ namespace ChemProV.UI
         /// sticky note controls on the drawing canvas that are used to represent comments for 
         /// the process unit.
         /// </summary>
-        private void Comments_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        private void CommentCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             // Start by deleting any sticky note controls that represent comments that are no longer 
             // in the comment collection. While we do this, build a list of all comments that we 
@@ -358,28 +352,13 @@ namespace ChemProV.UI
         }
 
         /// <summary>
-        /// Gets or sets the GenericProcessUnit's unique ID number
+        /// Gets the unique identifier string for the process unit that this control represents
         /// </summary>
         public String Id
         {
             get
             {
-                return processUnitId;
-            }
-            set
-            {
-                //special condition when loading process units from file.
-                //essentially, file ID elements will probably be larger than the current
-                //counter, which means that we'll run into trouble if, by chance,
-                //two process units get the same ID number.  To fix, check the
-                //incoming ID number, if higher, than make the counter larger than the last ID number.
-                string[] pieces = value.Split('_');
-                int idNumber = Convert.ToInt32(pieces[1]);
-                if (idNumber > processUnitIdCounter)
-                {
-                    processUnitIdCounter = idNumber + 1;
-                }
-                processUnitId = value;
+                return m_pu.UIDString;
             }
         }
 
@@ -610,102 +589,13 @@ namespace ChemProV.UI
 
         #endregion GenericProcessUnit Members
 
-        // E.O.
-        // I'm doing massive refactoring to remove all the loading and saving logic from the UI controls
-
-        //#region IXmlSerializable Members
-
-        //public System.Xml.Schema.XmlSchema GetSchema()
-        //{
-        //    return null;
-        //}
-
-        ///// <summary>
-        ///// This isn't used as the IProcessUnitFactory is responsible for the creation
-        ///// of new process units.
-        ///// </summary>
-        ///// <param name="reader"></param>
-        //public void ReadXml(XmlReader reader)
-        //{
-        //}
-
-        //public virtual void WriteXml(XmlWriter writer)
-        //{
-        //    //the process unit's id number
-        //    writer.WriteAttributeString("Id", Id);
-
-        //    //the type of process unit
-        //    writer.WriteAttributeString("ProcessUnitType",
-        //        ProcessUnitFactory.GetProcessUnitType(this).ToString());
-
-        //    //the process units location
-        //    writer.WriteStartElement("Location");
-        //    writer.WriteElementString("X", GetValue(Canvas.LeftProperty).ToString());
-        //    writer.WriteElementString("Y", GetValue(Canvas.TopProperty).ToString());
-        //    writer.WriteEndElement();
-
-        //    // E.O.
-        //    // Write subprocess information, which right now is just an RGBA color
-        //    writer.WriteStartElement("Subgroup");
-        //    writer.WriteAttributeString("Color", Subprocess.ToString());
-        //    writer.WriteEndElement();
-        //}
-
-        //#endregion IXmlSerializable Members
-
-        public virtual ProcessUnitControl FromXml(XElement xpu, ProcessUnitControl targetUnit)
-        {
-            UIElement puElement = targetUnit as UIElement;
-
-            //pull the attribute
-            string id = (string)xpu.Attribute("Id");
-            targetUnit.Id = id;
-
-            //set the correct coordinates for the object
-            var location = from c in xpu.Elements("Location")
-                           select new
-                           {
-                               x = (string)c.Element("X"),
-                               y = (string)c.Element("Y")
-                           };
-            puElement.SetValue(Canvas.LeftProperty, Convert.ToDouble(location.ElementAt(0).x));
-            puElement.SetValue(Canvas.TopProperty, Convert.ToDouble(location.ElementAt(0).y));
-
-            // E.O.
-            XElement subgroupEl = xpu.Element("Subgroup");
-            if (null != subgroupEl)
-            {
-                XAttribute sgAttr = subgroupEl.Attribute("Color");
-                if (null != sgAttr)
-                {
-                    Color clr;
-                    if (!Core.App.TryParseColor(sgAttr.Value, out clr))
-                    {
-                        clr = Colors.White;
-                    }
-                    this.Subprocess = clr;
-                }
-            }
-
-            return targetUnit;
-        }
-
         #region ICanvasElement Members
 
         public virtual Point Location
         {
             get
             {
-                if (double.IsNaN(Width) || double.IsNaN(Height))
-                {
-                    return new Point(
-                        (double)this.GetValue(Canvas.LeftProperty) + this.ActualWidth / 2,
-                        (double)this.GetValue(Canvas.TopProperty) + this.ActualHeight / 2);
-                }
-
-                return new Point(
-                    (double)this.GetValue(Canvas.LeftProperty) + this.Width / 2,
-                    (double)this.GetValue(Canvas.TopProperty) + this.Height / 2);
+                return new Point(m_pu.Location.X, m_pu.Location.Y);
             }
             set
             {
@@ -734,17 +624,17 @@ namespace ChemProV.UI
 
         public void HideAllComments()
         {
-            foreach (StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNote sn in m_pu.Comments)
             {
-                snc.Hide();
+                sn.IsVisible = false;
             }
         }
 
         public void ShowAllComments()
         {
-            foreach (StickyNoteControl snc in m_stickyNotes)
+            foreach (StickyNote sn in m_pu.Comments)
             {
-                snc.Show();
+                sn.IsVisible = true;
             }
         }
 
