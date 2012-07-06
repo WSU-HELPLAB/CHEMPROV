@@ -12,9 +12,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 	xmlns:ctk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
 	xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
     xmlns:ChemProV_UI="clr-namespace:ChemProV.UI"
-    xmlns:ChemProV_UI_DrawingCanvas="clr-namespace:ChemProV.UI.DrawingCanvas"
     xmlns:ChemProV_EquationEditor ="clr-namespace:ChemProV.PFD.EquationEditor"
-    xmlns:ProcessUnits="clr-namespace:ChemProV.PFD.ProcessUnits"
     xmlns:ChemProV_Validation_Feedback="clr-namespace:ChemProV.Validation.Feedback"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
@@ -48,6 +46,9 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 </Button>
                 <Button Margin="0,0,5,0" Click="OptionsButton_Click" ToolTipService.ToolTip="Options" >
                     <Image Source="/UI/Icons/toolbar_settings.png" />
+                </Button>
+                <Button x:Name="CommentPaneButton" Margin="0,0,5,0" Click="CommentPaneButton_Click" ToolTipService.ToolTip="Show comments pane">
+                    <Image Source="/UI/Icons/comment_16x16.png" />
                 </Button>
                 <Button Margin="0,0,5,0" Click="HelpButton_Click" ToolTipService.ToolTip="About ChemProV" >
                     <Image Source="/UI/Icons/toolbar_about.png" />

@@ -1,4 +1,6 @@
-﻿using System.Collections.Specialized;
+﻿using System;
+using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
@@ -6,6 +8,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using ChemProV.Core;
 using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
@@ -15,6 +18,28 @@ namespace ChemProV.UI
     /// </summary>
     public partial class CommentPane : UserControl
     {
+        /// <summary>
+        /// List of process units whose comment collections we are monitoring
+        /// </summary>
+        private List<AbstractProcessUnit> m_puListeners = new List<AbstractProcessUnit>();
+        
+        /// <summary>
+        /// The list of sticky notes whose PropertyChanged events we are subscribed to. This 
+        /// will contain all free floating sticky notes in the workspace, all stream comments, 
+        /// and all process unit comments. Therefore, this collection gets updated whenever:
+        ///  1. The collection of free-floating sticky notes in the workspace changes
+        ///  2. The collection of streams in the workspace changes
+        ///  3. The collection of process units in the workspace changes
+        ///  4. The collection of comments of any stream in the workspace changes
+        ///  5. The collection of comments of any process unit in the workspace changes
+        /// </summary>
+        private List<Logic.StickyNote> m_snListeners = new List<Logic.StickyNote>();
+
+        /// <summary>
+        /// List of streams whose comment collections we are monitoring
+        /// </summary>
+        private List<AbstractStream> m_streamListeners = new List<AbstractStream>();
+        
         private Workspace m_workspace = null;
 
         /// <summary>
@@ -53,6 +78,23 @@ namespace ChemProV.UI
             UpdateComments();
         }
 
+        /// <summary>
+        /// Gets the number of hidden comments (StickyNote objects) within a collection
+        /// </summary>
+        private int CountHiddenComments(IEnumerable<StickyNote> collection)
+        {
+            int count = 0;
+            foreach (StickyNote sn in collection)
+            {
+                if (!sn.IsVisible)
+                {
+                    count++;
+                }
+            }
+
+            return count;
+        }
+
         private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             UpdateComments();
@@ -76,6 +118,54 @@ namespace ChemProV.UI
             }
         }
 
+        private void PFDCommentsOptionChecked(object sender, RoutedEventArgs e)
+        {
+            UpdatePFDComments();
+        }
+
+        private void ProcessUnitCommentsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RebuildStickyNoteList();
+        }
+
+        private void RebuildStickyNoteList()
+        {
+            // Start by unsubscribing from everything we are subscribed to
+            foreach (Logic.StickyNote sn in m_snListeners)
+            {
+                sn.PropertyChanged -= this.StickyNotePropertyChanged;
+            }
+
+            // Subscribe to all free-floating sticky notes and keep track of them in our list
+            foreach (Logic.StickyNote sn in m_workspace.StickyNotes)
+            {
+                m_snListeners.Add(sn);
+                sn.PropertyChanged += this.StickyNotePropertyChanged;
+            }
+
+            // Subscribe to all sticky note comments for all streams
+            foreach (AbstractStream stream in m_workspace.Streams)
+            {
+                foreach (StickyNote sn in stream.Comments)
+                {
+                    m_snListeners.Add(sn);
+                    sn.PropertyChanged += this.StickyNotePropertyChanged;
+                }
+            }
+            
+            // Subscribe to all sticky note comments for all process units
+            foreach (AbstractProcessUnit unit in m_workspace.ProcessUnits)
+            {
+                foreach (StickyNote sn in unit.Comments)
+                {
+                    m_snListeners.Add(sn);
+                    sn.PropertyChanged += this.StickyNotePropertyChanged;
+                }
+            }
+
+            UpdatePFDComments();
+        }
+
         public void SetWorkspace(ChemProV.Core.Workspace workspace)
         {
             m_workspace = workspace;
@@ -85,9 +175,39 @@ namespace ChemProV.UI
             workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
             workspace.Equations.CollectionChanged += new NotifyCollectionChangedEventHandler(Equations_CollectionChanged);
             workspace.Equations.EquationModelPropertyChanged += new EquationCollection.EquationModelPropertyChangedDelegate(Equations_EquationModelPropertyChanged);
+            workspace.StickyNotes.CollectionChanged += new NotifyCollectionChangedEventHandler(WorkspaceStickyNotesCollectionChanged);
+
+            // Subscribe to sticky notes
+            foreach (Logic.StickyNote sn in workspace.StickyNotes)
+            {
+                m_snListeners.Add(sn);
+                sn.PropertyChanged += new PropertyChangedEventHandler(StickyNotePropertyChanged);
+            }
+            
+            // When stream and process unit collections change we also need to update
+            workspace.StreamsCollectionChanged += this.WorkspaceStreamsCollectionChanged;
+            workspace.ProcessUnitsCollectionChanged += this.WorkspaceProcessUnitsCollectionChanged;
             
             // Do an update
             UpdateComments();
+            UpdatePFDComments();
+        }
+
+        /// <summary>
+        /// Invoked when a sticky note in the PFD has a property changed
+        /// </summary>
+        private void StickyNotePropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // The comment control monitors text changes so we only care about visibility here
+            if (e.PropertyName.Equals("IsVisible"))
+            {
+                UpdatePFDComments();
+            }
+        }
+
+        private void StreamsCommentsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RebuildStickyNoteList();
         }
 
         private void UpdateComments()
@@ -129,7 +249,7 @@ namespace ChemProV.UI
                     cc.Margin = new Thickness(3.0);
                     cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
                     {
-                        model.Comments.Remove(cc.CommentObject);
+                        model.Comments.Remove(cc.CommentObject as BasicComment);
                         sp.Children.Remove(cc);
                     };
                     sp.Children.Add(cc);
@@ -174,9 +294,7 @@ namespace ChemProV.UI
                     cc.Margin = new Thickness(3.0);
                     cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
                     {
-                        m_workspace.DegreesOfFreedomAnalysis.Comments.Remove(cc.CommentObject);
-
-                        // TODO: Figure out if we want this or if event listeners are going to take care of it
+                        m_workspace.DegreesOfFreedomAnalysis.Comments.Remove(cc.CommentObject as BasicComment);
                         sp.Children.Remove(cc);
                     };
                     sp.Children.Add(cc);
@@ -193,6 +311,164 @@ namespace ChemProV.UI
 
                 CommentsStack.Children.Add(brdr);
             }
+        }
+
+        private void UpdatePFDComments()
+        {
+            // Apparently this sometimes gets fired before everything is initialized
+            if (null == PFDCommentsStack)
+            {
+                return;
+            }
+
+            // Special case: If we don't want any PFD comments then clear and return
+            if (rbPFDCommentsNone.IsChecked.Value)
+            {
+                PFDCommentsStack.Children.Clear();
+                return;
+            }
+
+            // What we want to do here is avoid needless creation of controls, as this is 
+            // computationally expensive. Therefore we want to reuse any existing controls 
+            // that are already in PFDCommentsStack. The total number of controls we will 
+            // need is: 
+            //   (# free-floating sticky notes that need to be shown) + 
+            //   (# comments in all streams that need to be shown) + 
+            //   (# comments in all process units that need to be shown)
+            int count = 0;
+            if (rbPFDCommentsAll.IsChecked.Value)
+            {
+                // Count up all sticky notes (visible or not)
+                count = m_workspace.StickyNotes.Count;
+                foreach (AbstractStream stream in m_workspace.Streams)
+                {
+                    count += stream.Comments.Count;
+                }
+                foreach (AbstractProcessUnit unit in m_workspace.ProcessUnits)
+                {
+                    count += unit.Comments.Count;
+                }
+            }
+            else
+            {
+                // Count up all hidden sticky notes
+                count = CountHiddenComments(m_workspace.StickyNotes);
+                foreach (AbstractStream stream in m_workspace.Streams)
+                {
+                    count += CountHiddenComments(stream.Comments);
+                }
+                foreach (AbstractProcessUnit unit in m_workspace.ProcessUnits)
+                {
+                    count += CountHiddenComments(unit.Comments);
+                }
+            }
+
+            // We now know how many controls we need, so we need to add or remove controls to get 
+            // to this exact number
+            while (PFDCommentsStack.Children.Count > count)
+            {
+                // Remove the last child. Set its comment object to null first to make sure that 
+                // it unsubsribes from events
+                int index = PFDCommentsStack.Children.Count - 1;
+                (PFDCommentsStack.Children[index] as EqCommentControl).CommentObject = null;
+                PFDCommentsStack.Children.RemoveAt(index);
+            }
+            while (PFDCommentsStack.Children.Count < count)
+            {
+                // Add a new comment control
+                PFDCommentsStack.Children.Add(new EqCommentControl()
+                    {
+                        Margin = new Thickness(3.0)
+                    });
+            }
+
+            // Start with free-floating comments
+            count = 0;
+            foreach (Logic.StickyNote sn in m_workspace.StickyNotes)
+            {
+                if (rbPFDCommentsAll.IsChecked.Value ||
+                    (!sn.IsVisible && rbPFDCommentsHidden.IsChecked.Value))
+                {
+                    // Set the comment object for the existing control
+                    (PFDCommentsStack.Children[count] as EqCommentControl).CommentObject = sn;
+                    count++;
+                }
+            }
+
+            // Now do comments for streams
+            foreach (AbstractStream stream in m_workspace.Streams)
+            {
+                foreach (Logic.StickyNote sn in stream.Comments)
+                {
+                    if (rbPFDCommentsAll.IsChecked.Value ||
+                        (!sn.IsVisible && rbPFDCommentsHidden.IsChecked.Value))
+                    {
+                        // Set the comment object for the existing control
+                        (PFDCommentsStack.Children[count] as EqCommentControl).CommentObject = sn;
+                        count++;
+                    }
+                }
+            }
+
+            // Do comments for process units
+            foreach (AbstractProcessUnit unit in m_workspace.ProcessUnits)
+            {
+                foreach (Logic.StickyNote sn in unit.Comments)
+                {
+                    if (rbPFDCommentsAll.IsChecked.Value ||
+                        (!sn.IsVisible && rbPFDCommentsHidden.IsChecked.Value))
+                    {
+                        // Set the comment object for the existing control
+                        (PFDCommentsStack.Children[count] as EqCommentControl).CommentObject = sn;
+                        count++;
+                    }
+                }
+            }
+        }
+
+        private void WorkspaceProcessUnitsCollectionChanged(object sender, EventArgs e)
+        {
+            // First unsubscribe from everything that we are currently subscribed to
+            foreach (AbstractProcessUnit unit in m_puListeners)
+            {
+                unit.Comments.CollectionChanged -= ProcessUnitCommentsCollectionChanged;
+            }
+            m_puListeners.Clear();
+
+            // Now subscribe to the comment collection in every process unit
+            foreach (AbstractProcessUnit unit in m_workspace.ProcessUnits)
+            {
+                unit.Comments.CollectionChanged += this.StreamsCommentsCollectionChanged;
+                m_puListeners.Add(unit);
+            }
+
+            // Do an update
+            RebuildStickyNoteList();
+        }
+
+        private void WorkspaceStickyNotesCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            RebuildStickyNoteList();
+        }
+
+        private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
+        {
+            // First unsubscribe from everything that we are currently subscribed to
+            foreach (AbstractStream stream in m_streamListeners)
+            {
+                stream.Comments.CollectionChanged -= this.StreamsCommentsCollectionChanged;
+            }
+            m_streamListeners.Clear();
+
+            // Now subscribe to the comment collection in every stream
+            foreach (AbstractStream stream in m_workspace.Streams)
+            {
+                stream.Comments.CollectionChanged += this.StreamsCommentsCollectionChanged;
+                m_streamListeners.Add(stream);
+            }
+
+            // Do an update
+            RebuildStickyNoteList();
         }
     }
 }

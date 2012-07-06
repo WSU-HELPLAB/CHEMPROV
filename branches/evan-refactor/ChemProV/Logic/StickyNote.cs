@@ -25,6 +25,11 @@ namespace ChemProV.Logic
     /// </summary>
     public class StickyNote : INotifyPropertyChanged
     {
+        /// <summary>
+        /// Currently used for runtime convenience only, not saved to /loaded from files
+        /// </summary>
+        private bool m_isVisible = true;
+        
         private double m_locX = 0.0;
 
         private double m_locY = 0.0;
@@ -109,6 +114,33 @@ namespace ChemProV.Logic
                 if (null != PropertyChanged)
                 {
                     PropertyChanged(this, new PropertyChangedEventArgs("Height"));
+                }
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether or not the sticky note should be visible 
+        /// in the UI. This value is not saved to files and implicitly isn't loaded from them 
+        /// either.
+        /// </summary>
+        public bool IsVisible
+        {
+            get
+            {
+                return m_isVisible;
+            }
+            set
+            {
+                if (m_isVisible == value)
+                {
+                    // No change
+                    return;
+                }
+
+                m_isVisible = value;
+                if (null != PropertyChanged)
+                {
+                    PropertyChanged(this, new PropertyChangedEventArgs("IsVisible"));
                 }
             }
         }

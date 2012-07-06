@@ -139,7 +139,7 @@
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\CommentDefs.cs" />
     <Compile Include="Core\EquationCollection.cs" />
-    <Compile Include="Core\Expression.cs" />
+    <Compile Include="Logic\Expression.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Core\NamedColors.cs" />
     <Compile Include="Core\IWorkspaceChangeListener.cs" />
@@ -209,7 +209,6 @@
     <Compile Include="PFD\Streams\PropertiesWindow\Heat\UnitsFormatter.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\IPropertiesWindow.cs" />
     <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
-    <Compile Include="PFD\Streams\PropertiesWindow\View.cs" />
     <Compile Include="Logic\Undos\AttachOutgoingStream.cs" />
     <Compile Include="Logic\Undos\DetachOutgoingStream.cs" />
     <Compile Include="PFD\Undos\InsertComment.cs" />

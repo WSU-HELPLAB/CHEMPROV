@@ -86,13 +86,13 @@ namespace ChemProV.UnitTests
         }
 
         /// <summary>
-        /// Tests the ChemProV.Core.Expression class.
+        /// Tests the ChemProV.Logic.Expression class.
         /// </summary>
         [TestMethod]
         public void ExpressionEvaluatorTests()
         {
             string errors;
-            ChemProV.Core.Expression exp = ChemProV.Core.Expression.Create(
+            ChemProV.Logic.Expression exp = ChemProV.Logic.Expression.Create(
                 "(-VarA + VarB) * VarC", out errors);
             Assert.IsNotNull(exp, errors);
 

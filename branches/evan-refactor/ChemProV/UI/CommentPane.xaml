@@ -4,7 +4,7 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    d:DesignHeight="400" d:DesignWidth="175">
+    d:DesignHeight="300" d:DesignWidth="175">
     
     <Grid x:Name="LayoutRoot" Background="LightGray">
         <Grid.RowDefinitions>
@@ -30,8 +30,31 @@
         </Grid>
 
         <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Visible" VerticalAlignment="Stretch">
-            <StackPanel Name="CommentsStack">
-                <!-- Comment items will be inserted here at runtime -->
+            <StackPanel Orientation="Vertical">
+                <Border CornerRadius="3" BorderBrush="Green" BorderThickness="2" Margin="3">
+                    <StackPanel>
+                        <TextBlock HorizontalAlignment="Center" Foreground="Green">PFD Comments</TextBlock>
+                        <RadioButton
+                            x:Name="rbPFDCommentsHidden"
+                            IsChecked="True"
+                            Checked="PFDCommentsOptionChecked">Hidden (minimized)</RadioButton>
+                        <RadioButton
+                            x:Name="rbPFDCommentsAll"
+                            IsChecked="False"
+                            Checked="PFDCommentsOptionChecked">All</RadioButton>
+                        <RadioButton
+                            x:Name="rbPFDCommentsNone"
+                            IsChecked="False"
+                            Checked="PFDCommentsOptionChecked">None</RadioButton>
+                        <StackPanel Name="PFDCommentsStack" Orientation="Vertical">
+                            <!-- Comment items will be inserted here at runtime -->
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+                
+                <StackPanel Name="CommentsStack">
+                    <!-- Comment items will be inserted here at runtime -->
+                </StackPanel>
             </StackPanel>
         </ScrollViewer>
     </Grid>

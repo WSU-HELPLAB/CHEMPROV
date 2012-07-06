@@ -26,16 +26,17 @@ using ChemProV.UI;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
+using System.Collections.Specialized;
 
 namespace ChemProV
 {
     public partial class MainPage : UserControl
     {
         private string versionNumber = "";
-        private const string saveFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml|Portable Network Graphics (*.png)|*.png";
-        private const string loadFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml";
-        private const string autoSaveFileName = "autoSave.cpml";
-        private const string configFile = "cpv.config";
+        private const string c_saveFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml|Portable Network Graphics (*.png)|*.png";
+        private const string c_loadFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml";
+        private const string c_autoSaveFileName = "autoSave.cpml";
+        private const string c_configFile = "cpv.config";
         private TimeSpan autoSaveTimeSpan = new TimeSpan(0, 1, 0);
 
         private DispatcherTimer saveTimer = new DispatcherTimer();
@@ -61,7 +62,7 @@ namespace ChemProV
             //save the change in the config file
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(configFile, FileMode.Create, isf))
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_configFile, FileMode.Create, isf))
                 {
                     using (StreamWriter sr = new StreamWriter(isfs))
                     {
@@ -98,7 +99,7 @@ namespace ChemProV
             WorkSpace.CommentsPane.SetWorkspace(m_workspace);
             m_workspace.DegreesOfFreedomAnalysis.PropertyChanged += 
                 new PropertyChangedEventHandler(DegreesOfFreedomAnalysis_PropertyChanged);
-            m_workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+            m_workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(DFCommentsCollectionChanged);
             WorkSpace.SetWorkspace(m_workspace);
             CompoundTable.SetWorkspace(m_workspace);
 
@@ -108,6 +109,16 @@ namespace ChemProV
                 if (e.PropertyName.Equals("Difficulty"))
                 {
                     OptionDifficultySettingChanged(m_workspace.Difficulty);
+                }
+            };
+
+            // Monitor when the comments pane visibility changes so we can update tooltips
+            WorkSpace.PropertyChanged += delegate(object o, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName.Equals("CommentsPaneVisible"))
+                {
+                    ToolTipService.SetToolTip(CommentPaneButton, WorkSpace.CommentsPaneVisible ?
+                        "Hide comments pane" : "Show comments pane");
                 }
             };
 
@@ -261,7 +272,7 @@ namespace ChemProV
             Saving_TextBlock.Visibility = System.Windows.Visibility.Visible;
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(autoSaveFileName, FileMode.OpenOrCreate, isf))
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_autoSaveFileName, FileMode.OpenOrCreate, isf))
                 {
                     SaveChemProVFile(isfs);
                 }
@@ -281,11 +292,11 @@ namespace ChemProV
 
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                if (isf.FileExists(autoSaveFileName))
+                if (isf.FileExists(c_autoSaveFileName))
                 {
                     if (MessageBoxResult.OK == MessageBox.Show("There appears to be an auto-saved file would you like to load it?", "Load saved file", MessageBoxButton.OKCancel))
                     {
-                        using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(autoSaveFileName, FileMode.OpenOrCreate, isf))
+                        using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_autoSaveFileName, FileMode.OpenOrCreate, isf))
                         {
                             try
                             {
@@ -298,19 +309,19 @@ namespace ChemProV
                                 MessageBox.Show(ex.ToString());
                             }
                         }
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                     else
                     {
                         //so they choose not to open the auto save file it will be removed
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
                 if (loadConfigFile)
                 {
                     OptionDifficultySetting loadedSetting;
                     bool showOptionsWindow = false;
-                    using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(configFile, FileMode.OpenOrCreate, isf))
+                    using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_configFile, FileMode.OpenOrCreate, isf))
                     {
                         using (StreamReader sw = new StreamReader(isfs))
                         {
@@ -354,54 +365,6 @@ namespace ChemProV
 
             // Restart the auto-save timer
             saveTimer.Start();
-            
-            // Old junk below, should delete after some testing
-            
-            //// This stream may represent an existing file which could potentially be larger than the 
-            //// data that we're about to write. Thus, we start by seeking to the beginning and setting the 
-            //// length to 0.
-            //stream.Position = 0;
-            //stream.SetLength(0);
-            
-            //XmlSerializer canvasSerializer = new XmlSerializer(typeof(DrawingCanvas));
-            //XmlSerializer equationSerializer = new XmlSerializer(typeof(EquationEditor));
-            //XmlSerializer feedbackWindowSerializer = new XmlSerializer(typeof(FeedbackWindow));
-            //// XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(EquationEditor));
-            ////make sure that out XML turns out pretty
-            //XmlWriterSettings settings = new XmlWriterSettings();
-            //saveTimer.Stop();
-            //settings.Indent = true;
-            //settings.IndentChars = "   ";
-
-            ////create our XML writer
-            //using (XmlWriter writer = XmlWriter.Create(stream, settings))
-            //{
-            //    //root node
-            //    writer.WriteStartElement("ProcessFlowDiagram");
-
-            //    //version number
-            //    writer.WriteAttributeString("ChemProV.version", versionNumber);
-
-            //    //setting
-            //    writer.WriteAttributeString("DifficultySetting", currentDifficultySetting.ToString());
-
-            //    //write drawing_canvas properties
-            //    canvasSerializer.Serialize(writer, WorkSpace.DrawingCanvas);
-
-            //    //write equations
-            //    equationSerializer.Serialize(writer, WorkSpace.EquationEditor);
-
-            //    //write feedback
-            //    feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
-
-            //    // Write degrees of freedom analysis
-            //    m_workspace.WriteDegreesOfFreedomAnalysis(writer);
-
-            //    //end root node
-            //    writer.WriteEndElement();
-            //}
-
-            
         }
 
         private void SavePNG(Stream output)
@@ -480,7 +443,7 @@ namespace ChemProV
             if (null == m_saveDialog)
             {
                 m_saveDialog = new SaveFileDialog();
-                m_saveDialog.Filter = saveFileFilter;
+                m_saveDialog.Filter = c_saveFileFilter;
             }
             bool? saveResult = false;
 
@@ -513,9 +476,9 @@ namespace ChemProV
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
                     //remove the temp file because we just saved;
-                    if (isf.FileExists(autoSaveFileName))
+                    if (isf.FileExists(c_autoSaveFileName))
                     {
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
             }
@@ -539,7 +502,7 @@ namespace ChemProV
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog openDialog = new OpenFileDialog();
-            openDialog.Filter = loadFileFilter;
+            openDialog.Filter = c_loadFileFilter;
             bool? openFileResult = false;
 
             openFileResult = openDialog.ShowDialog();
@@ -574,9 +537,9 @@ namespace ChemProV
                 //delete the tempory file as they do not want it
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    if (isf.FileExists(autoSaveFileName))
+                    if (isf.FileExists(c_autoSaveFileName))
                     {
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
 
@@ -659,9 +622,9 @@ namespace ChemProV
                 //delete the tempory file as they do not want it
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    if (isf.FileExists(autoSaveFileName))
+                    if (isf.FileExists(c_autoSaveFileName))
                     {
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
 
@@ -693,7 +656,7 @@ namespace ChemProV
                 }
                 catch
                 {
-                    MessageBox.Show("Installation Failed: is it installed already? Try refreshing this page");
+                    MessageBox.Show("Installation Failed: is it installed already? Please try refreshing this page");
                 }
             }
         }
@@ -810,7 +773,13 @@ namespace ChemProV
         {
             m_workspace.DegreesOfFreedomAnalysis.CommentsVisible =
                 !m_workspace.DegreesOfFreedomAnalysis.CommentsVisible;
-            WorkSpace.UpdateCommentsPaneVisibility();
+            
+            // If we've made the degrees of freedom analysis comments visible, ensure that the 
+            // comments pane is visible as well
+            if (m_workspace.DegreesOfFreedomAnalysis.CommentsVisible)
+            {
+                WorkSpace.CommentsPaneVisible = true;
+            }
         }
 
         private void DFAnalysisTextBox_TextChanged(object sender, TextChangedEventArgs e)
@@ -824,7 +793,7 @@ namespace ChemProV
             m_ignoreWorkspaceChanges = false;
         }
 
-        private void Comments_CollectionChanged(object sender, System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
+        private void DFCommentsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
             DegreesOfFreedomAnalysis_PropertyChanged(
                 m_workspace.DegreesOfFreedomAnalysis, new PropertyChangedEventArgs("CommentsVisible"));
@@ -839,6 +808,11 @@ namespace ChemProV
         public Core.Workspace GetLogicalWorkspace()
         {
             return m_workspace;
+        }
+
+        private void CommentPaneButton_Click(object sender, RoutedEventArgs e)
+        {
+            WorkSpace.CommentsPaneVisible = !WorkSpace.CommentsPaneVisible;
         }
     }
 }

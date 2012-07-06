@@ -13,13 +13,9 @@ namespace ChemProV.PFD
 {
     public interface IPfdElement
     {
-        /// <summary>
-        /// Gets or sets the GenericProcessUnit's unique ID number
-        /// </summary>
-        String Id
+        string Id
         {
             get;
-            set;
         }
 
         /// <summary>
