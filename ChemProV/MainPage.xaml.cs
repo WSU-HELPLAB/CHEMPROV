@@ -763,24 +763,8 @@ namespace ChemProV
         private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
         {
             ChemProV.Library.OSBLE.Views.LoginWindow lw = new LoginWindow();
-            lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
+            //lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
             lw.Show();
-        }
-
-        private void OSBLELoginAttemptCompleted(LoginWindow sender, Library.OSBLE.ViewModels.LoginWindowViewModel model)
-        {
-            // TODO: Deal with this. I've commented it out now because the live version of the OSBLE service 
-            // has some property naming related problems.
-
-            if (!model.IsLoggedIn)
-            {
-                // If we're not logged in then don't do anything
-                return;
-            }
-
-            // For testing purposes:
-            // Get and display some info
-            MessageBox.Show("User Info\nSchool.Name = " + model.Profile.School.Namek__BackingField);
         }
 
         private void DFAnalysisTab_GotFocus(object sender, RoutedEventArgs e)

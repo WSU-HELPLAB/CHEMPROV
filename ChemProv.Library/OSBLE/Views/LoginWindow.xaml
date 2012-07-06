@@ -24,14 +24,14 @@
             Grid.Row="1" 
             Grid.Column="1" 
             Margin="3,3,3,3" 
-            Password="{Binding Path=Password, Mode=TwoWay}" 
             KeyUp="PasswordBox_KeyUp"
             />
         
         <TextBlock Text="Remember Me:" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
-        <CheckBox x:Name="RememberCredentialsCheckBox" Grid.Row="2" Grid.Column="1" Margin="3,3,3,3" IsChecked="{Binding Path=RememberMe, Mode=TwoWay}" />
+        <CheckBox x:Name="RememberCredentialsCheckBox" Grid.Row="2" Grid.Column="1" Margin="3,3,3,3" />
 
-        <TextBlock Visibility="{Binding Path=ErrorVisibility, Mode=TwoWay}" x:Name="ErrorTextBlock" Grid.Row="3" Grid.Column="0" Text="{Binding Path=ErrorText}" TextWrapping="Wrap" Foreground="Red" />
+        <TextBlock x:Name="ErrorTextBlock" Grid.Row="3" Grid.Column="0" TextWrapping="Wrap" Foreground="Red"
+            Visibility="Collapsed"/>
         <Button 
             x:Name="OKButton" 
             Content="Login"

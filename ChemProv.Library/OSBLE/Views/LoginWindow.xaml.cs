@@ -12,39 +12,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProV.Library.OSBLE.ViewModels;
 using System.Windows.Threading;
 
 namespace ChemProV.Library.OSBLE.Views
 {
     public partial class LoginWindow : ChildWindow
     {
-        public LoginWindowViewModel ViewModel
-        {
-            get
-            {
-                return this.DataContext as LoginWindowViewModel;
-            }
-            private set
-            {
-                this.DataContext = value;
-            }
-        }
-
-        public delegate void LoginAttemptCompletedDelegate(LoginWindow sender, LoginWindowViewModel model);
-
-        /// <summary>
-        /// Fires when the login attempt completes. Note that it could have completed with success or failure.
-        /// </summary>
-        public event LoginAttemptCompletedDelegate LoginAttemptCompleted = null;
-
         private const string c_osbleLoginFileName = "ChemProV_OSBLE_Login.dat";
 
         public LoginWindow()
         {
             InitializeComponent();
-            ViewModel = new LoginWindowViewModel();
-            ViewModel.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(ViewModel_PropertyChanged);
 
             // See if the user name and password were stored locally
             using (var store = IsolatedStorageFile.GetUserStoreForApplication())
@@ -78,17 +56,16 @@ namespace ChemProV.Library.OSBLE.Views
                         // Read the data for the encrypted user name
                         byte[] a = new byte[ds1];
                         s.Read(a, 0, ds1);
-                        ViewModel.UserName = Dec(a);
+                        UserNameTextBox.Text = Dec(a);
 
                         // Read the data for the encrypted password
                         a = new byte[ds2];
                         s.Read(a, 0, a.Length);
-                        ViewModel.Password = Dec(a);
+                        PasswordBox.Password = Dec(a);
 
                         // Saved file indicates that they had "Remember me" checked last time, so we'll check it 
                         // again
-                        ViewModel.RememberMe = true;
-
+                        RememberCredentialsCheckBox.IsChecked = true;
                     }
                 }
             }
@@ -198,14 +175,9 @@ namespace ChemProV.Library.OSBLE.Views
 
             this.DialogResult = true;
 
-            //ViewModel.LoginCommand.Execute(null);
-
-            OsbleAuthServices.AuthenticationServiceClient c = new OsbleAuthServices.AuthenticationServiceClient(
-                ServiceBindings.AuthenticationServiceBinding,
-                new System.ServiceModel.EndpointAddress("https://osble.org/Services/AuthenticationService.svc"));
-                //ServiceBindings.RemoteAuthenticationEndpoint);
-            c.ValidateUserCompleted += new EventHandler<OsbleAuthServices.ValidateUserCompletedEventArgs>(c_ValidateUserCompleted);
-            c.ValidateUserAsync(UserNameTextBox.Text, PasswordBox.Password);
+            //AuthenticationServiceClient authClient = new AuthenticationServiceClient();
+            //authClient.ValidateUserCompleted += this.c_ValidateUserCompleted;
+            //authClient.ValidateUserAsync("bob@smith.com", "123123", authClient);
 
             #region DEBUG
 
@@ -219,11 +191,16 @@ namespace ChemProV.Library.OSBLE.Views
             #endregion
         }
 
-        void c_ValidateUserCompleted(object sender, OsbleAuthServices.ValidateUserCompletedEventArgs e)
-        {
-            string result = e.Result;
-            bool breakhere = true;
-        }
+        //void c_ValidateUserCompleted(object sender, OSBLEAuthServices.ValidateUserCompletedEventArgs e)
+        //{
+        //    AuthenticationServiceClient authClient = e.UserState as AuthenticationServiceClient;
+        //    string token = e.Result;
+
+        //    OsbleServiceClient osbleClient = new OsbleServiceClient();
+        //    //UserProfile profile = authClient.GetActiveUser(token);
+        //    //Assignment[] serviceAssignments = osbleClient.GetCourseAssignments(4, token);
+        //    bool breakhere = true;
+        //}
 
         private void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
         {
@@ -237,24 +214,6 @@ namespace ChemProV.Library.OSBLE.Views
             if (e.Key == Key.Enter)
             {
                 OKButton.Command.Execute(this);
-            }
-        }
-
-        void ViewModel_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            if (0 == e.PropertyName.CompareTo("IsProcessingLogin"))
-            {
-                OKButton.IsEnabled = !ViewModel.IsProcessingLogin;
-                if (ViewModel.IsLoggedIn)
-                {
-                    this.DialogResult = true;
-
-                    // Fire the login completion event if non-null
-                    if (null != LoginAttemptCompleted)
-                    {
-                        LoginAttemptCompleted(this, ViewModel);
-                    }
-                }
             }
         }
     }
