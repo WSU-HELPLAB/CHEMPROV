@@ -15,6 +15,7 @@ using System.Windows.Input;
 using ChemProV.Core;
 using ChemProV.PFD.Undos;
 using ChemProV.UI;
+using ChemProV.Logic;
 
 namespace ChemProV.UI.DrawingCanvasStates
 {
@@ -38,11 +39,11 @@ namespace ChemProV.UI.DrawingCanvasStates
         /// <summary>
         /// Reference to the note that we're resizing
         /// </summary>
-        private StickyNoteControl m_note;
+        private StickyNote m_note;
 
         private Size m_sizeOnMouseDown = new Size();
 
-        public ResizingStickyNote(DrawingCanvas canvas, StickyNoteControl note)
+        public ResizingStickyNote(DrawingCanvas canvas, StickyNote note)
         {
             m_canvas = canvas;
             m_note = note;
@@ -77,7 +78,7 @@ namespace ChemProV.UI.DrawingCanvasStates
         {
             m_isMouseDown = true;
             m_mouseDownPt = e.GetPosition(m_canvas);
-            m_sizeOnMouseDown = m_note.RenderSize;
+            m_sizeOnMouseDown = new Size(m_note.Width, m_note.Height);
             e.Handled = true;
 
             // Ensure that we have the right cursor
@@ -94,9 +95,9 @@ namespace ChemProV.UI.DrawingCanvasStates
 
             // Releasing the mouse button signifies completion of the resize and 
             // requires us to create an undo
-            m_canvas.GetWorkspace().AddUndo(
-                new UndoRedoCollection("Undo sticky note resizing",
-                    new ResizeControl(m_note, m_sizeOnMouseDown)));
+            m_canvas.GetWorkspace().AddUndo(new UndoRedoCollection(
+                "Undo sticky note resizing",
+                new Logic.Undos.ResizeStickyNote(m_note, m_sizeOnMouseDown.Width, m_sizeOnMouseDown.Height)));
 
             m_isMouseDown = false;
 

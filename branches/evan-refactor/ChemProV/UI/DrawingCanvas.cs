@@ -390,6 +390,10 @@ namespace ChemProV.UI
             {
                 SelectedElement = (child as DraggableStreamEndpoint).ParentStream;
             }
+            else if (child is StreamTableControl)
+            {
+                SelectedElement = (child as StreamTableControl).ParentStreamControl;
+            }
 
             // A right mouse button down implies that we need to flip to the menu state
             CurrentState = new UI.DrawingCanvasStates.MenuState(this, m_workspace);
@@ -465,7 +469,7 @@ namespace ChemProV.UI
             {
                 // If the selected element does not have its own mouse processing logic then 
                 // we create a MovingState object, which will drag around the selected element.
-                m_currentState = MovingState.Create(this, m_workspace);
+                m_currentState = MovingState.Create(SelectedElement, this, m_workspace);
             }
 
             // Finish up by sending this mouse event to the current state

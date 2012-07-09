@@ -38,24 +38,27 @@ namespace ChemProV.UI
         /// </summary>
         private bool m_ignoreRowPropertyChanges = false;
 
+        private PFD.Streams.StreamControl m_parent;
+
         private bool m_programmaticallyChanging = false;
 
         private Core.StreamPropertiesTable m_table;
 
         private Workspace m_ws = null;
         
-        public StreamTableControl(Core.StreamPropertiesTable table, Workspace workspace,
-            DrawingCanvas canvas)
+        public StreamTableControl(Core.StreamPropertiesTable tableData, 
+            PFD.Streams.StreamControl parent, Workspace workspace, DrawingCanvas canvas)
         {
             InitializeComponent();
 
-            m_table = table;
+            m_table = tableData;
+            m_parent = parent;
             m_ws = workspace;
             m_canvas = canvas;
 
             // Do the initial UI setup
             HeaderTextBlock.Text = "Stream #" + m_table.Stream.Id.ToString();
-            Location = new Point(table.Location.X, table.Location.Y);
+            Location = new Point(tableData.Location.X, tableData.Location.Y);
             UpdateUI();
 
             // Ensure that the minimize button eats mouse events
@@ -216,9 +219,9 @@ namespace ChemProV.UI
         private void HeaderBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DrawingCanvas canvas = Core.App.Workspace.DrawingCanvas;
-            canvas.SelectedElement = this;
+            canvas.SelectedElement = m_parent;
             canvas.CurrentState = UI.DrawingCanvasStates.MovingState.Create(
-                canvas, m_ws);
+                this, canvas, m_ws);
         }
 
         public Point Location
@@ -250,6 +253,14 @@ namespace ChemProV.UI
         private void MinimizeButton_MouseButtonEvent(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
+        }
+
+        public PFD.Streams.StreamControl ParentStreamControl
+        {
+            get
+            {
+                return m_parent;
+            }
         }
 
         private void RemoveRowBtn_Click(object sender, RoutedEventArgs e)
