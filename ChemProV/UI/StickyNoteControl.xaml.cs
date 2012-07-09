@@ -95,7 +95,9 @@ namespace ChemProV.UI
         {
             switch (e.PropertyName)
             {
-                // TODO: Height
+                case "Height":
+                    Height = m_note.Height;
+                    break;
 
                 case "IsVisible":
                     if (m_note.IsVisible)
@@ -132,7 +134,9 @@ namespace ChemProV.UI
                     Header.Text = (null == m_note.UserName) ? string.Empty : m_note.UserName;
                     break;
 
-                // TODO: Width
+                case "Width":
+                    Width = m_note.Width;
+                    break;
             }
         }
 
@@ -270,7 +274,7 @@ namespace ChemProV.UI
 
             // Set the canvas state so that we'll enter resizing mode
             m_canvas.CurrentState = new UI.DrawingCanvasStates.ResizingStickyNote(
-                m_canvas, this);
+                m_canvas, m_note);
             // Kick it off by sending the mouse-down event
             m_canvas.CurrentState.MouseLeftButtonDown(sender, e);
         }
@@ -668,37 +672,6 @@ namespace ChemProV.UI
         //    return undos;
         //}
 
-        #region IComment Members
-
-        // Use the StickyNote data structure instead
-        //   |
-        //   |
-        //   v
-        
-        //public string CommentText
-        //{
-        //    get { return Note.Text; }
-        //    set
-        //    {
-        //        Note.Text = value;
-        //    }
-        //}
-
-        ///// <summary>
-        ///// User name for the creator of this comment
-        ///// </summary>
-        //public string CommentUserName
-        //{
-        //    get
-        //    {
-        //        return Header.Text;
-        //    }
-        //    set
-        //    {
-        //        Header.Text = (null == value) ? string.Empty : value;
-        //    }
-        //}
-
         /// <summary>
         /// Deletes this sticky note from the workspace and adds an undo to bring it back.
         /// </summary>
@@ -765,8 +738,6 @@ namespace ChemProV.UI
             // this control (and the line to the parent control) from the drawing canvas.
             comments.RemoveAt(commentIndex);
         }
-
-        #endregion
 
         public void Hide()
         {

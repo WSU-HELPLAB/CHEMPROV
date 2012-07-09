@@ -843,7 +843,7 @@ namespace ChemProV.PFD.Streams
         protected void CreatePropertiesTable(Core.StreamPropertiesTable table)
         {
             DrawingCanvas canvas = Core.App.Workspace.DrawingCanvas;
-            m_table = new UI.StreamTableControl(table, canvas.GetWorkspace(), canvas);
+            m_table = new UI.StreamTableControl(table, this, canvas.GetWorkspace(), canvas);
             m_table.MinimizeButton.Click += new RoutedEventHandler(MinimizeTableButtonClick);
             UpdateStreamLocation();
         }

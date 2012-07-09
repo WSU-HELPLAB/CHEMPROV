@@ -243,14 +243,25 @@ namespace ChemProV.Core
         }
 
         /// <summary>
-        /// Gets a unique integer identifier for this stream. Logic outside of this class must 
-        /// enforce the uniqueness of stream IDs.
+        /// Gets or sets a unique integer identifier for this stream. Logic outside of this class 
+        /// must enforce the uniqueness of stream IDs.
         /// </summary>
         public int Id
         {
             get
             {
                 return m_uid;
+            }
+            set
+            {
+                if (value == m_uid)
+                {
+                    // No change
+                    return;
+                }
+                
+                m_uid = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Id"));
             }
         }
 

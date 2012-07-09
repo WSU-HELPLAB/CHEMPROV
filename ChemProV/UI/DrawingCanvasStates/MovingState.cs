@@ -30,6 +30,11 @@ namespace ChemProV.UI.DrawingCanvasStates
 
         private MathCore.Vector m_mouseDownPt = new MathCore.Vector();
 
+        /// <summary>
+        /// Reference to the object being moved
+        /// </summary>
+        private ICanvasElement m_object = null;
+
         private MathCore.Vector m_originalLocation;
 
         private ProcessUnitControl m_puThatGotBorderChange = null;
@@ -41,27 +46,24 @@ namespace ChemProV.UI.DrawingCanvasStates
         /// are only certain types of items that we can move so we use the static constructor for error 
         /// checking.
         /// </summary>
-        /// <param name="c"></param>
         private MovingState(DrawingCanvas c, Workspace workspace)
         {
             m_canvas = c;
             m_workspace = workspace;
         }
 
-        public static MovingState Create(DrawingCanvas canvas, Workspace workspace)
+        public static MovingState Create(object objectToMove, DrawingCanvas canvas, Workspace workspace)
         {
-            // It's implied that the element we want to move is the selected item on the canvas
-            object elementToMove = canvas.SelectedElement;
-            
-            if (null == elementToMove || !(elementToMove is ICanvasElement))
+            if (null == objectToMove || !(objectToMove is ICanvasElement))
             {
                 // We can only move canvas elements
                 return null;
             }
 
             MovingState ms = new MovingState(canvas, workspace);
-            ICanvasElement ce = elementToMove as ICanvasElement;
+            ICanvasElement ce = objectToMove as ICanvasElement;
             ms.m_originalLocation = new MathCore.Vector(ce.Location.X, ce.Location.Y);
+            ms.m_object = objectToMove as ICanvasElement;
             return ms;
         }
 
@@ -94,14 +96,14 @@ namespace ChemProV.UI.DrawingCanvasStates
             }
 
             // Various objects have slightly different moving rules so we need to check the type
-            ProcessUnitControl lpu = m_canvas.SelectedElement as ProcessUnitControl;
+            ProcessUnitControl lpu = m_object as ProcessUnitControl;
             if (null != lpu)
             {
                 // First off, move the process unit
                 lpu.ProcessUnit.Location = new MathCore.Vector(pt.X, pt.Y);
                 
                 // See if we're dragging it over anything else
-                object hoveringOver = m_canvas.GetChildAt(pt, m_canvas.SelectedElement);
+                object hoveringOver = m_canvas.GetChildAt(pt, lpu);
 
                 // See if it's a stream connection endpoint
                 DraggableStreamEndpoint endpoint = hoveringOver as DraggableStreamEndpoint;
@@ -114,10 +116,10 @@ namespace ChemProV.UI.DrawingCanvasStates
                         ProcessUnitBorderColor.AcceptingStreams : ProcessUnitBorderColor.NotAcceptingStreams);
                 }
             }
-            else if (m_canvas.SelectedElement is Core.ICanvasElement)
+            else
             {
                 // Other items just get their locations set
-                (m_canvas.SelectedElement as Core.ICanvasElement).Location = pt;
+                m_object.Location = pt;
             }
 
             // NOTE: Stream-oriented moving stuff is handled elsewhere. See the MovingStreamEndpoint class
@@ -135,17 +137,17 @@ namespace ChemProV.UI.DrawingCanvasStates
             m_mouseDown = false;
 
             Point location = e.GetPosition(m_canvas);
-            if (m_canvas.SelectedElement is ProcessUnitControl)
+            if (m_object is ProcessUnitControl)
             {
-                DropProcessUnit(m_canvas.SelectedElement as ProcessUnitControl, location);
+                DropProcessUnit(m_object as ProcessUnitControl, location);
             }
             // Note that stream endpoint stuff is handled in a different state object
-            else if (m_canvas.SelectedElement is ICanvasElement)
+            else if (m_object is ICanvasElement)
             {
                 // All we have to do here is create an undo and then fall through to 
                 // below and go back to the null state
                 m_workspace.AddUndo(new UndoRedoCollection("Undo move",
-                    new PFD.Undos.RestoreLocation((ICanvasElement)m_canvas.SelectedElement, m_originalLocation)));
+                    new PFD.Undos.RestoreLocation(m_object, m_originalLocation)));
             }
 
             // Letting up the left mouse button signifies the end of the moving state. Therefore 
@@ -193,7 +195,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             // source or destination
 
             // Get the element (besides the one being dragged) that's at the mouse location
-            object dropTarget = m_canvas.GetChildAt(location, m_canvas.SelectedElement);
+            object dropTarget = m_canvas.GetChildAt(location, m_object);
 
             // If there is no child at that point or there is a child but it's not a stream endpoint 
             // then this ends up just being a move of the process unit

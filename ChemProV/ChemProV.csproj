@@ -157,7 +157,9 @@
     <Compile Include="Logic\Undos\RemoveProcessUnit.cs" />
     <Compile Include="Logic\Undos\RemoveStickyNote.cs" />
     <Compile Include="Logic\Undos\RemoveStream.cs" />
+    <Compile Include="Logic\Undos\ResizeStickyNote.cs" />
     <Compile Include="Logic\Undos\SetStreamDestinationLocation.cs" />
+    <Compile Include="Logic\Undos\SetStreamId.cs" />
     <Compile Include="Logic\Undos\SetStreamSourceLocation.cs" />
     <Compile Include="Logic\Undos\SetSubprocess.cs" />
     <Compile Include="MainPage.xaml.cs">
@@ -179,6 +181,9 @@
     <Compile Include="PFD\EquationEditor\Models\IEquationModifier.cs" />
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\IPfdElement.cs" />
+    <Compile Include="UI\ChangeStreamNumberWindow.xaml.cs">
+      <DependentUpon>ChangeStreamNumberWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ProcessUnitControl.xaml.cs">
       <DependentUpon>ProcessUnitControl.xaml</DependentUpon>
     </Compile>
@@ -217,7 +222,6 @@
     <Compile Include="PFD\Undos\RemoveEquation.cs" />
     <Compile Include="Logic\Undos\DetachIncomingStream.cs" />
     <Compile Include="Logic\Undos\AttachIncomingStream.cs" />
-    <Compile Include="PFD\Undos\ResizeControl.cs" />
     <Compile Include="PFD\Undos\RestoreLocation.cs" />
     <Compile Include="PFD\Undos\SetProcessUnitLabel.cs" />
     <Compile Include="Logic\Undos\SetStreamDestination.cs" />
@@ -241,14 +245,14 @@
       <DependentUpon>ControlPalette.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\DrawingCanvas.cs" />
-    <Compile Include="UI\DrawingCanvas\States\IState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\MenuState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\MovingState.cs" />
-    <Compile Include="UI\DrawingCanvas\States\MovingStreamEndpoint.cs" />
-    <Compile Include="UI\DrawingCanvas\States\PlacingNewStream.cs" />
-    <Compile Include="UI\DrawingCanvas\States\PlacingNewProcessUnit.cs" />
-    <Compile Include="UI\DrawingCanvas\States\PlacingNewCommentNote.cs" />
-    <Compile Include="UI\DrawingCanvas\States\ResizingStickyNote.cs" />
+    <Compile Include="UI\DrawingCanvasStates\IState.cs" />
+    <Compile Include="UI\DrawingCanvasStates\MenuState.cs" />
+    <Compile Include="UI\DrawingCanvasStates\MovingState.cs" />
+    <Compile Include="UI\DrawingCanvasStates\MovingStreamEndpoint.cs" />
+    <Compile Include="UI\DrawingCanvasStates\PlacingNewStream.cs" />
+    <Compile Include="UI\DrawingCanvasStates\PlacingNewProcessUnit.cs" />
+    <Compile Include="UI\DrawingCanvasStates\PlacingNewCommentNote.cs" />
+    <Compile Include="UI\DrawingCanvasStates\ResizingStickyNote.cs" />
     <Compile Include="UI\EqCommentControl.xaml.cs">
       <DependentUpon>EqCommentControl.xaml</DependentUpon>
     </Compile>
@@ -309,6 +313,10 @@
       <SubType>Designer</SubType>
     </Page>
     <Page Include="PFD\EquationEditor\EquationEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ChangeStreamNumberWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -544,10 +552,7 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="PFD\ProcessUnits\" />
-    <Folder Include="PFD\StickyNote\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

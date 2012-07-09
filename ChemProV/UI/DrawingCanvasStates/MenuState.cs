@@ -102,16 +102,34 @@ namespace ChemProV.UI.DrawingCanvasStates
 
             // ----- Now we start into stuff that's dependent on the selected item -----
 
-            // Show comment options if the item can have comments
-            if (m_canvas.SelectedElement is PFD.Streams.StreamControl ||
-                m_canvas.SelectedElement is ProcessUnitControl)
+            if (m_canvas.SelectedElement is StreamControl)
             {
-                AddCommentCollectionMenuOptions(m_contextMenu);
+                AddCommentCollectionMenuOptions(m_contextMenu,
+                    "Stream #" + (m_canvas.SelectedElement as StreamControl).Stream.Id.ToString());                
+
+                // Show an option to change the stream ID
+                menuItem = new MenuItem();
+                menuItem.Header = "Change stream number...";
+                m_contextMenu.Items.Add(menuItem);
+                menuItem.Click += delegate(object sender, RoutedEventArgs e)
+                {                    
+                    UI.ChangeStreamNumberWindow win = new ChangeStreamNumberWindow(
+                        (m_canvas.SelectedElement as StreamControl).Stream, workspace);
+                    Core.App.ControlPalette.SwitchToSelect();
+                    win.Show();
+                };
             }
 
             // If the user has right-clicked on a process unit then we want to add subprocess options
             if (m_canvas.SelectedElement is ProcessUnitControl)
             {
+                // Show comment options
+                if (m_canvas.SelectedElement is PFD.Streams.StreamControl ||
+                    m_canvas.SelectedElement is ProcessUnitControl)
+                {
+                    AddCommentCollectionMenuOptions(m_contextMenu);
+                }
+                
                 AddSubprocessMenuOptions(m_contextMenu,
                     m_canvas.SelectedElement as ProcessUnitControl);
             }
@@ -203,9 +221,14 @@ namespace ChemProV.UI.DrawingCanvasStates
 
         private void AddCommentCollectionMenuOptions(ContextMenu newContextMenu)
         {
+            AddCommentCollectionMenuOptions(newContextMenu, "Comment Options");
+        }
+        
+        private void AddCommentCollectionMenuOptions(ContextMenu newContextMenu, string title)
+        {
             // Make the header in the menu for the comment-specific options
             MenuItem menuItem = new MenuItem();
-            menuItem.Header = "Comment Options";
+            menuItem.Header = title;
             newContextMenu.Items.Add(menuItem);
             // We're using this item as a label, so don't let the user click it
             menuItem.IsHitTestVisible = false;
