@@ -440,6 +440,15 @@ namespace ChemProV
 
         private void SaveFileAs_BtnClick(object sender, RoutedEventArgs e)
         {
+            // If we have a non-null OSBLE state object and we're logged in, then we need to give the 
+            // user a choice of saving to disk or to OSBLE
+            if (null != Core.App.OSBLEState && Core.App.OSBLEState.IsLoggedIn)
+            {
+                UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(true);
+                win.Show();
+                return;
+            }            
+            
             if (null == m_saveDialog)
             {
                 m_saveDialog = new SaveFileDialog();
@@ -725,8 +734,25 @@ namespace ChemProV
         private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
         {
             ChemProV.Library.OSBLE.Views.LoginWindow lw = new LoginWindow();
+            lw.LoginAttemptCompleted += new EventHandler(OSBLELoginAttemptCompleted);
             //lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
             lw.Show();
+        }
+
+        void OSBLELoginAttemptCompleted(object sender, EventArgs e)
+        {
+            LoginWindow lw = sender as LoginWindow;
+            ChemProV.Library.OSBLE.OSBLEState state = lw.State;
+
+            // Set the global
+            Core.App.OSBLEState = state;
+
+            if (state.IsLoggedIn)
+            {
+                // Show the assignment browser window
+                AssignmentBrowserWindow abw = new AssignmentBrowserWindow(state, true);
+                abw.Show();
+            }
         }
 
         private void DFAnalysisTab_GotFocus(object sender, RoutedEventArgs e)
