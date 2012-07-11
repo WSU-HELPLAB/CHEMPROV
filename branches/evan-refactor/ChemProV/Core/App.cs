@@ -163,6 +163,12 @@ namespace ChemProV.Core
             System.Windows.MessageBox.Show(message);
         }
 
+        public static ChemProV.Library.OSBLE.OSBLEState OSBLEState
+        {
+            get;
+            set;
+        }
+
         /// <summary>
         /// Handles the right-mouse-button-down event for a text box in the properties window. Creates 
         /// and displays a popup menu with cut/copy/paste options.

@@ -184,6 +184,9 @@
     <Compile Include="UI\ChangeStreamNumberWindow.xaml.cs">
       <DependentUpon>ChangeStreamNumberWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\OSBLE\OSBLEOrDiskWindow.xaml.cs">
+      <DependentUpon>OSBLEOrDiskWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\ProcessUnitControl.xaml.cs">
       <DependentUpon>ProcessUnitControl.xaml</DependentUpon>
     </Compile>
@@ -317,6 +320,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\ChangeStreamNumberWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OSBLE\OSBLEOrDiskWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>

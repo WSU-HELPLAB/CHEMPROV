@@ -3,13 +3,13 @@
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
            Width="256" Height="160" 
-           Title="Login">
+           Title="Login" Closing="LoginWindowClosing">
     <Grid x:Name="LayoutRoot" Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="31" />
             <RowDefinition Height="31"/>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="40" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
             <ColumnDefinition />
@@ -35,16 +35,19 @@
         <Button 
             x:Name="OKButton" 
             Content="Login"
-            
             Width="75"
             Height="23" 
             HorizontalAlignment="Right" 
             Grid.Row="3" 
             Grid.Column="1" 
-            Margin="3,3,3,3" Click="OKButton_Click" />
-        <!--
-            Command="{Binding Path=LoginCommand}" 
-            CommandParameter="{Binding Path=Profile}"
-            -->
+            Click="OKButton_Click" />
+        
+        <!-- Progress bar that gets shown as we are doing the async web calls -->
+        <ProgressBar
+            x:Name="LoadingProgressBar"
+            Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"
+            Visibility="Collapsed"
+            IsIndeterminate="True"
+            Height="30" />
     </Grid>
 </controls:ChildWindow>

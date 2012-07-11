@@ -13,11 +13,17 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using ChemProV.Library.ServiceReference1;
+using ChemProV.Library.OsbleService;
 
 namespace ChemProV.Library.OSBLE.Views
 {
     public partial class LoginWindow : ChildWindow
     {
+        private OSBLEState m_state = null;
+
+        private bool m_terminate = false;
+        
         private const string c_osbleLoginFileName = "ChemProV_OSBLE_Login.dat";
 
         public LoginWindow()
@@ -127,6 +133,15 @@ namespace ChemProV.Library.OSBLE.Views
             return output;
         }
 
+        private void LoginWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            e.Cancel = false;
+            
+            // Set the flag to indicate termination. This way, when async callbacks complete, we 
+            // can just ignore them.
+            m_terminate = true;
+        }
+
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             // Ignore this click if they left out the user name or password
@@ -173,11 +188,15 @@ namespace ChemProV.Library.OSBLE.Views
                 }
             }
 
-            this.DialogResult = true;
+            ErrorTextBlock.Visibility = System.Windows.Visibility.Collapsed;
+            OKButton.Visibility = System.Windows.Visibility.Collapsed;
+            LoadingProgressBar.Visibility = System.Windows.Visibility.Visible;
 
-            //AuthenticationServiceClient authClient = new AuthenticationServiceClient();
-            //authClient.ValidateUserCompleted += this.c_ValidateUserCompleted;
-            //authClient.ValidateUserAsync("bob@smith.com", "123123", authClient);
+            m_state = new OSBLEState(UserNameTextBox.Text, PasswordBox.Password);
+            m_state.OnLoginFailure += new EventHandler(OnLoginFailure);
+            m_state.OnError += new EventHandler(OnError);
+            m_state.OnRefreshComplete += new EventHandler(StateRefreshComplete);
+            m_state.RefreshAsync();
 
             #region DEBUG
 
@@ -185,10 +204,61 @@ namespace ChemProV.Library.OSBLE.Views
             //wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
             //wc.DownloadStringAsync(new Uri("https://osble.org/Services/AuthenticationService.svc"));
             //wc.DownloadStringAsync(new Uri("http://www.evanolds.com/"));
-            //wc.DownloadStringAsync(new Uri("https://thefinder.tax.ohio.gov/StreamlineSalesTaxWeb/WebService/About.aspx"));
-            //wc.DownloadStringAsync(new Uri("http://sciencesoft.at/services/latex?wsdl"));
 
             #endregion
+        }
+
+        private void OnError(object sender, EventArgs e)
+        {
+            if (!m_terminate)
+            {
+                Dispatcher.BeginInvoke(new EventHandler(ShowMessage),
+                   (e as OSBLEStateEventArgs).Message, EventArgs.Empty);
+            }
+        }
+
+        private void OnLoginFailure(object sender, EventArgs e)
+        {
+            if (!m_terminate)
+            {
+                // TODO: Check if I need to do this in a thread safe way
+                LoadingProgressBar.Visibility = System.Windows.Visibility.Collapsed;
+                OKButton.Visibility = System.Windows.Visibility.Visible;
+                ErrorTextBlock.Text = (e as OSBLEStateEventArgs).Message;
+                ErrorTextBlock.Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+
+        private void PasswordBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            //shortcut for logon
+            if (e.Key == Key.Enter)
+            {
+                OKButton.Command.Execute(this);
+            }
+        }
+
+        private void ShowMessage(object sender, EventArgs e)
+        {
+            MessageBox.Show(sender as string);
+            this.DialogResult = false;
+        }
+
+        public OSBLEState State
+        {
+            get
+            {
+                return m_state;
+            }
+        }
+
+        private void StateRefreshComplete(object sender, EventArgs e)
+        {
+            if (!m_terminate)
+            {
+                LoginAttemptCompleted(this, EventArgs.Empty);
+                this.DialogResult = true;
+            }
         }
 
         //void c_ValidateUserCompleted(object sender, OSBLEAuthServices.ValidateUserCompletedEventArgs e)
@@ -202,20 +272,17 @@ namespace ChemProV.Library.OSBLE.Views
         //    bool breakhere = true;
         //}
 
-        private void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        {
-            string result = e.Result;
-            bool breakHere = true;
-        }
+        //private void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        //{
+        //    string result = e.Result;
+        //    bool breakHere = true;
+        //}
 
-        private void PasswordBox_KeyUp(object sender, KeyEventArgs e)
-        {
-            //shortcut for logon
-            if (e.Key == Key.Enter)
-            {
-                OKButton.Command.Execute(this);
-            }
-        }
+        /// <summary>
+        /// Invoked when the login window finishes the login attempt, either with a successful 
+        /// login or an error.
+        /// </summary>
+        public event EventHandler LoginAttemptCompleted = delegate { };
     }
 }
 
