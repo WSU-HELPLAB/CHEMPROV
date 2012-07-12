@@ -11,8 +11,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Xml.Linq;
-
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 using ChemProV.Logic;
 
 // Dependencies:

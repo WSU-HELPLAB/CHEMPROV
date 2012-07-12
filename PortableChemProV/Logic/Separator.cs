@@ -1,50 +1,41 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
-    public class Reactor : AbstractProcessUnit
+    public class Separator : AbstractProcessUnit
     {
-        public Reactor()
+        public Separator()
             : this(AbstractProcessUnit.GetNextUID()) { }
 
-        public Reactor(int id)
-            : base(id, "Rct" + id.ToString()) { }
+        public Separator(int id)
+            : base(id, "Sep" + id.ToString()) { }
         
-        public Reactor(XElement loadFromMe)
+        public Separator(XElement loadFromMe)
             : base(loadFromMe)
         {
-            Label = "Rct" + Id.ToString();
+            Label = "Sep" + Id.ToString();
         }
 
         public override string Description
         {
-            get { return "Reactor"; }
+            get { return "Separator"; }
         }
 
         public override bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
         {
-            // Reactors are available on everything but the easiest difficulty setting
-            return (OptionDifficultySetting.MaterialBalance != difficulty);
+            // Separators are available at all difficulty settings
+            return true;
         }
 
         public override int MaxIncomingHeatStreams
         {
-            get { return 1; }
+            get { return 0; }
         }
 
         public override int MaxIncomingStreams
         {
-            get { return -1; }
+            get { return 1; }
         }
 
         public override int MaxOutgoingHeatStreams
@@ -54,7 +45,7 @@ namespace ChemProV.Core
 
         public override int MaxOutgoingStreams
         {
-            get { return 1; }
+            get { return -1; }
         }
 
         /// <summary>
@@ -65,7 +56,7 @@ namespace ChemProV.Core
         {
             get
             {
-                return "Reactor";
+                return "Separator";
             }
         }
     }

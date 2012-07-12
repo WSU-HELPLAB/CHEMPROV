@@ -1,6 +1,6 @@
 ﻿using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public class HeatExchangerWithUtility : AbstractProcessUnit
     {

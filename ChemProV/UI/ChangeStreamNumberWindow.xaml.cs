@@ -9,16 +9,17 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
     public partial class ChangeStreamNumberWindow : ChildWindow
     {
-        private Core.AbstractStream m_stream;
+        private AbstractStream m_stream;
 
-        private Core.Workspace m_workspace;
+        private Workspace m_workspace;
 
-        public ChangeStreamNumberWindow(Core.AbstractStream stream, Core.Workspace workspace)
+        public ChangeStreamNumberWindow(AbstractStream stream, Workspace workspace)
         {
             InitializeComponent();
 
@@ -67,7 +68,7 @@ namespace ChemProV.UI
                 return;
             }
 
-            m_workspace.AddUndo(new Core.UndoRedoCollection("Undo changing stream number from " +
+            m_workspace.AddUndo(new UndoRedoCollection("Undo changing stream number from " +
                 m_stream.Id.ToString() + " to " + id.ToString(),
                 new Logic.Undos.SetStreamId(m_stream, m_stream.Id)));
             m_stream.Id = id;

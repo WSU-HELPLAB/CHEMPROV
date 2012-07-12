@@ -8,6 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
+using ChemProV.Logic;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 
@@ -15,14 +16,14 @@ namespace ChemProV.Validation.Rules.Adapters.Table
 {
     public class HeatTableAdapter : ITableAdapter
     {
-        private Core.StreamPropertiesTable table;
+        private StreamPropertiesTable table;
 
         public IPropertiesWindow Table
         {
             get { return table as IPropertiesWindow; }
         }
 
-        public HeatTableAdapter(Core.StreamPropertiesTable itable)
+        public HeatTableAdapter(StreamPropertiesTable itable)
         {
             // Make sure it's the right kind of table
             if (StreamType.Heat != table.StreamType)
@@ -35,12 +36,12 @@ namespace ChemProV.Validation.Rules.Adapters.Table
 
         public string GetUnitAtRow(int row)
         {
-            return (table.Rows[row] as Core.HeatStreamData).SelectedUnits;
+            return (table.Rows[row] as HeatStreamData).SelectedUnits;
         }
 
         public string GetQuantityAtRow(int row)
         {
-            return (table.Rows[row] as Core.HeatStreamData).Quantity;
+            return (table.Rows[row] as HeatStreamData).Quantity;
         }
 
         public string GetCompoundAtRow(int row)
@@ -51,7 +52,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
 
         public string GetLabelAtRow(int row)
         {
-            return (table.Rows[row] as Core.HeatStreamData).Label;
+            return (table.Rows[row] as HeatStreamData).Label;
         }
 
         public int GetRowCount()

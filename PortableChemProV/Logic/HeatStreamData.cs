@@ -9,12 +9,10 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System;
 using System.ComponentModel;
-using System.Windows.Media;
-
 using System.Linq;
 using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     /// <summary>
     /// Object representation of the data present in the PropertiesWindow for
@@ -53,12 +51,12 @@ namespace ChemProV.Core
             {
                 // This most likely means that we're loading a file that was created with 
                 // an older version of the application. The older version wrote a <Units> 
-                // element that had an integer value, representing the enumerated type 
-                // ChemicalUnits.
+                // element that had an integer value, representing an index into the 
+                // energy units array.
                 int i = Convert.ToInt32(loadFromMe.Element("Units").Value);
-                if (Enum.IsDefined(typeof(ChemicalUnits), i))
+                if (i >= 0 && s_energyUnits.Length > i)
                 {
-                    m_selectedUnits = ((ChemicalUnits)i).ToPrettyString();
+                    m_selectedUnits = s_energyUnits[i];
                 }
             }
             else

@@ -10,7 +10,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
-using ChemProV.Core;
+using ChemProV.Logic;
 using ChemProV.UI;
 using ChemProV.PFD.Undos;
 

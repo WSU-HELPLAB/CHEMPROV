@@ -7,6 +7,7 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
+using ChemProV.Logic;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 
@@ -17,7 +18,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
     /// </summary>
     public class ChemicalTableAdapter : ITableAdapter
     {
-        private Core.StreamPropertiesTable table;
+        private StreamPropertiesTable table;
 
         /// <summary>
         /// This is the table that this adapter is getting the data from
@@ -31,7 +32,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         /// This is the contsructor
         /// </summary>
         /// <param name="itable">This is the table we want data from</param>
-        public ChemicalTableAdapter(Core.StreamPropertiesTable itable)
+        public ChemicalTableAdapter(StreamPropertiesTable itable)
         {
             table = itable;
         }
@@ -45,11 +46,11 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         {
             if (StreamType.Chemical == table.StreamType)
             {
-                return (table.Rows[row] as Core.ChemicalStreamData).SelectedUnits;
+                return (table.Rows[row] as ChemicalStreamData).SelectedUnits;
             }
             else
             {
-                return (table.Rows[row] as Core.HeatStreamData).SelectedUnits;
+                return (table.Rows[row] as HeatStreamData).SelectedUnits;
             }
         }
 
@@ -62,11 +63,11 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         {
             if (StreamType.Chemical == table.StreamType)
             {
-                return (table.Rows[row] as Core.ChemicalStreamData).Quantity;
+                return (table.Rows[row] as ChemicalStreamData).Quantity;
             }
             else
             {
-                return (table.Rows[row] as Core.HeatStreamData).Quantity;
+                return (table.Rows[row] as HeatStreamData).Quantity;
             }
         }
 
@@ -87,7 +88,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         {
             if (StreamType.Chemical == table.StreamType)
             {
-                return (table.Rows[row] as Core.ChemicalStreamData).SelectedCompound;
+                return (table.Rows[row] as ChemicalStreamData).SelectedCompound;
             }
             else
             {
@@ -104,11 +105,11 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         {
             if (StreamType.Chemical == table.StreamType)
             {
-                return (table.Rows[row] as Core.ChemicalStreamData).Label;
+                return (table.Rows[row] as ChemicalStreamData).Label;
             }
             else
             {
-                return (table.Rows[row] as Core.HeatStreamData).Label;
+                return (table.Rows[row] as HeatStreamData).Label;
             }
         }
 

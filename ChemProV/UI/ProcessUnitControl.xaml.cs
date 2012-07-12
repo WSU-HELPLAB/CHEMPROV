@@ -65,7 +65,7 @@ namespace ChemProV.UI
         /// Do not rename. Many comments refer to "m_pu" and those comments won't make sense if 
         /// this is renamed.
         /// </summary>
-        protected ChemProV.Core.AbstractProcessUnit m_pu;
+        protected AbstractProcessUnit m_pu;
 
         /// <summary>
         /// The list of sticky note controls that have been created to represent comments for this 
@@ -96,7 +96,7 @@ namespace ChemProV.UI
         /// <summary>
         /// Use CreateOnCanvas
         /// </summary>
-        private ProcessUnitControl(DrawingCanvas canvas, ChemProV.Core.AbstractProcessUnit processUnit)
+        private ProcessUnitControl(DrawingCanvas canvas, AbstractProcessUnit processUnit)
         {
             InitializeComponent();
 
@@ -167,7 +167,7 @@ namespace ChemProV.UI
         }
 
         public static ProcessUnitControl CreateOnCanvas(DrawingCanvas canvas,
-            ChemProV.Core.AbstractProcessUnit processUnit)
+            AbstractProcessUnit processUnit)
         {
             ProcessUnitControl pu = new ProcessUnitControl(canvas, processUnit);
             canvas.AddNewChild(pu);
@@ -273,7 +273,7 @@ namespace ChemProV.UI
                     // Add the undo
                     string undoText = "Undo renaming process unit from " + m_labelOnEditStart +
                         " to " + m_pu.Label;
-                    m_canvas.GetWorkspace().AddUndo(new Core.UndoRedoCollection(undoText,
+                    m_canvas.GetWorkspace().AddUndo(new UndoRedoCollection(undoText,
                         new PFD.Undos.SetProcessUnitLabel(m_pu, m_labelOnEditStart)));
                 }
             }
@@ -299,23 +299,23 @@ namespace ChemProV.UI
         public static string GetIconSource(Type processUnitType)
         {
             // Determine the icon from the process unit type    
-            if (typeof(ChemProV.Core.HeatExchangerNoUtility) == processUnitType)
+            if (typeof(HeatExchangerNoUtility) == processUnitType)
             {
                 return "/UI/Icons/pu_heat_exchanger_no_utility.png";
             }
-            else if (typeof(ChemProV.Core.HeatExchangerWithUtility) == processUnitType)
+            else if (typeof(HeatExchangerWithUtility) == processUnitType)
             {
                 return "/UI/Icons/pu_heat_exchanger.png";
             }
-            else if (typeof(ChemProV.Core.Mixer) == processUnitType)
+            else if (typeof(Mixer) == processUnitType)
             {
                 return "/UI/Icons/pu_mixer.png";
             }
-            else if (typeof(ChemProV.Core.Reactor) == processUnitType)
+            else if (typeof(Reactor) == processUnitType)
             {
                 return "/UI/Icons/pu_reactor.png";
             }
-            else if (typeof(ChemProV.Core.Separator) == processUnitType)
+            else if (typeof(Logic.Separator) == processUnitType)
             {
                 return "/UI/Icons/pu_separator.png";
             }
@@ -365,7 +365,7 @@ namespace ChemProV.UI
         /// <summary>
         /// Returns a boolean value indicating whether or not the processing unit should be available 
         /// with the specified difficulty setting.
-        /// TODO: Remove and use logic in ChemProV.Core.AbstractProcessUnit.
+        /// TODO: Remove and use logic in AbstractProcessUnit.
         /// </summary>
         public virtual bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
         {
@@ -375,7 +375,7 @@ namespace ChemProV.UI
         /// <summary>
         /// Gets a reference to the process unit that this control encapsulates
         /// </summary>
-        public ChemProV.Core.AbstractProcessUnit ProcessUnit
+        public AbstractProcessUnit ProcessUnit
         {
             get
             {

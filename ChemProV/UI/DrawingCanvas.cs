@@ -57,7 +57,7 @@ namespace ChemProV.UI
         /// </summary>
         private bool m_settingCurrentState = false;
 
-        private Core.Workspace m_workspace = null;
+        private Workspace m_workspace = null;
 
         #region States
 
@@ -331,7 +331,7 @@ namespace ChemProV.UI
             return element;
         }
 
-        public ProcessUnitControl GetProcessUnitControl(Core.AbstractProcessUnit unit)
+        public ProcessUnitControl GetProcessUnitControl(AbstractProcessUnit unit)
         {
             foreach (UIElement uie in Children)
             {
@@ -868,7 +868,7 @@ namespace ChemProV.UI
             }
         }
 
-        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        public void SetWorkspace(Workspace workspace)
         {
             if (object.ReferenceEquals(m_workspace, workspace))
             {
@@ -910,8 +910,8 @@ namespace ChemProV.UI
         {
             // First go through all process unit controls on the canvas and remove ones that are 
             // no longer in the workspace.
-            List<ChemProV.Core.AbstractProcessUnit> unitsThatHaveControls = 
-                new List<ChemProV.Core.AbstractProcessUnit>();
+            List<AbstractProcessUnit> unitsThatHaveControls = 
+                new List<AbstractProcessUnit>();
             for (int i=0; i<Children.Count; i++)
             {
                 ProcessUnitControl lpu = Children[i] as ProcessUnitControl;
@@ -936,7 +936,7 @@ namespace ChemProV.UI
             }
 
             // Now go through and add any process units that are missing
-            foreach (ChemProV.Core.AbstractProcessUnit apu in m_workspace.ProcessUnits)
+            foreach (AbstractProcessUnit apu in m_workspace.ProcessUnits)
             {
                 if (!unitsThatHaveControls.Contains(apu))
                 {
@@ -997,8 +997,8 @@ namespace ChemProV.UI
         {
             // First go through all stream controls on the canvas and remove ones that are 
             // no longer in the workspace.
-            List<ChemProV.Core.AbstractStream> streamsThatHaveControls =
-                new List<ChemProV.Core.AbstractStream>();
+            List<AbstractStream> streamsThatHaveControls =
+                new List<AbstractStream>();
             for (int i = 0; i < Children.Count; i++)
             {
                 PFD.Streams.StreamControl stream = Children[i] as PFD.Streams.StreamControl;
@@ -1023,7 +1023,7 @@ namespace ChemProV.UI
             }
 
             // Now go through and add stream controls that are missing
-            foreach (ChemProV.Core.AbstractStream stream in m_workspace.Streams)
+            foreach (AbstractStream stream in m_workspace.Streams)
             {
                 if (!streamsThatHaveControls.Contains(stream))
                 {
@@ -1034,7 +1034,7 @@ namespace ChemProV.UI
 
         #endregion
 
-        public PFD.Streams.StreamControl GetStreamControl(Core.AbstractStream stream)
+        public PFD.Streams.StreamControl GetStreamControl(AbstractStream stream)
         {
             foreach (UIElement uie in Children)
             {
@@ -1051,7 +1051,7 @@ namespace ChemProV.UI
             return null;
         }
 
-        public bool IntersectsAnyPU(MathCore.LineSegment segment, params Core.AbstractProcessUnit[] exclusionList)
+        public bool IntersectsAnyPU(MathCore.LineSegment segment, params AbstractProcessUnit[] exclusionList)
         {
             foreach (UIElement uie in Children)
             {
@@ -1065,7 +1065,7 @@ namespace ChemProV.UI
                 if (null != exclusionList)
                 {
                     bool goNext = false;
-                    foreach (Core.AbstractProcessUnit excludeMe in exclusionList)
+                    foreach (AbstractProcessUnit excludeMe in exclusionList)
                     {
                         // See if we want to exclude this one
                         if (object.ReferenceEquals(puc.ProcessUnit, excludeMe))

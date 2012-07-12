@@ -1,30 +1,32 @@
-﻿using System.Xml.Linq;
+﻿using System;
+using System.Net;
+using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
-    public class HeatExchangerNoUtility : AbstractProcessUnit
+    public class Mixer : AbstractProcessUnit
     {
-        public HeatExchangerNoUtility()
+        public Mixer()
             : this(AbstractProcessUnit.GetNextUID()) { }
+
+        public Mixer(int id)
+            : base(id, "Mix" + id.ToString()) { }
         
-        public HeatExchangerNoUtility(int id)
-            : base(id, "Exc" + id.ToString()) { }
-        
-        public HeatExchangerNoUtility(XElement loadFromMe)
+        public Mixer(XElement loadFromMe)
             : base(loadFromMe)
         {
-            Label = "Exc" + Id.ToString();
+            Label = "Mix" + Id.ToString();
         }
 
         public override string Description
         {
-            get { return "Heat Exchanger Without Utility"; }
+            get { return "Mixer"; }
         }
 
         public override bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
         {
-            // These are only available on the highest difficulty setting
-            return (OptionDifficultySetting.MaterialAndEnergyBalance == difficulty);
+            // Mixers are available at all difficulty settings
+            return true;
         }
 
         public override int MaxIncomingHeatStreams
@@ -34,7 +36,11 @@ namespace ChemProV.Core
 
         public override int MaxIncomingStreams
         {
-            get { return 2; }
+            get
+            {
+                // -1 implies an infinite number of possible incoming streams
+                return -1;
+            }
         }
 
         public override int MaxOutgoingHeatStreams
@@ -44,7 +50,7 @@ namespace ChemProV.Core
 
         public override int MaxOutgoingStreams
         {
-            get { return 2; }
+            get { return 1; }
         }
 
         /// <summary>
@@ -55,7 +61,7 @@ namespace ChemProV.Core
         {
             get
             {
-                return "HeatExchangerNoUtility";
+                return "Mixer";
             }
         }
     }

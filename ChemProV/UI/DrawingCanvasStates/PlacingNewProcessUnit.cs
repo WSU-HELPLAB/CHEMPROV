@@ -18,6 +18,7 @@ using System.Windows.Media.Imaging;
 using ChemProV.Core;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
+using ChemProV.Logic;
 
 namespace ChemProV.UI.DrawingCanvasStates
 {
@@ -112,7 +113,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             }
             else
             {
-                Core.AbstractProcessUnit temp = (Core.AbstractProcessUnit)
+                AbstractProcessUnit temp = (AbstractProcessUnit)
                     Activator.CreateInstance(m_type, -1);
                 m_placementIcon.BorderThickness = new Thickness(2.0);
                 m_placementIcon.BorderBrush = (endpoint.CanConnectTo(temp) ? s_greenBrush : s_redBrush);
@@ -149,8 +150,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             // If there's not an endpoint, we create the process unit with no stream connections
             if (null == endpoint)
             {
-                Core.AbstractProcessUnit unit = (Core.AbstractProcessUnit)
-                    Activator.CreateInstance(m_type);
+                AbstractProcessUnit unit = (AbstractProcessUnit) Activator.CreateInstance(m_type);
 
                 // Set the location
                 unit.Location = new MathCore.Vector(pos.X, pos.Y);
@@ -172,7 +172,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             // Otherwise, if we HAVE clicked on an endpoint...
 
             // Check to see if we can't connect this way
-            Core.AbstractProcessUnit temp = (Core.AbstractProcessUnit)
+            AbstractProcessUnit temp = (AbstractProcessUnit)
                 Activator.CreateInstance(m_type, -1);
             if (!endpoint.CanConnectTo(temp))
             {
@@ -187,7 +187,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             // Otherwise, if we CAN connect this way...
 
             // Create the process unit
-            Core.AbstractProcessUnit apu = (Core.AbstractProcessUnit)
+            AbstractProcessUnit apu = (AbstractProcessUnit)
                 Activator.CreateInstance(m_type);
 
             // Make the undo and then the actual attachment
@@ -212,7 +212,7 @@ namespace ChemProV.UI.DrawingCanvasStates
                 
                 // Create an undo that sets the stream source back to what it was and removes the 
                 // process unit from the canvas
-                Core.AbstractStream stream = endpoint.ParentStream.Stream;
+                AbstractStream stream = endpoint.ParentStream.Stream;
                 m_workspace.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
                     new Logic.Undos.SetStreamSource(stream, null, apu, stream.SourceLocation),
                     new Logic.Undos.RemoveProcessUnit(apu)));
@@ -283,11 +283,11 @@ namespace ChemProV.UI.DrawingCanvasStates
             if (null == endpoint)
             {
                 // Create the actual process unit
-                Core.AbstractProcessUnit apu = (Core.AbstractProcessUnit)Activator.CreateInstance(
-                    m_type, Core.AbstractProcessUnit.GetNextUID());
+                AbstractProcessUnit apu = (AbstractProcessUnit)Activator.CreateInstance(
+                    m_type, AbstractProcessUnit.GetNextUID());
                 apu.Location = new MathCore.Vector(pos.X, pos.Y);
                 
-                Core.HeatStream s = new Core.HeatStream();
+                HeatStream s = new HeatStream();
                 apu.AttachIncomingStream(s);
                 s.Destination = apu;
                 s.PropertiesTable = new StreamPropertiesTable(s);

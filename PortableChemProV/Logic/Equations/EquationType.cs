@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace ChemProV.PFD.EquationEditor.Models
+namespace ChemProV.Logic.Equations
 {
     public enum EquationTypeClassification
     {

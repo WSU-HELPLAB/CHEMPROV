@@ -47,7 +47,7 @@ namespace ChemProV.PFD.Streams
         /// change events are being monitored. When the destination of the stream changes, we 
         /// need to unsubscribe from this item and then set the reference to the new destination.
         /// </summary>
-        private Core.AbstractProcessUnit m_destEventItem = null;
+        private AbstractProcessUnit m_destEventItem = null;
 
         /// <summary>
         /// This is the draggable stream destination icon that the user can drag and drop over a 
@@ -90,7 +90,7 @@ namespace ChemProV.PFD.Streams
         /// events are being monitored. When the source of the stream changes, we need to 
         /// unsubscribe from this item and then set the reference to the new source.
         /// </summary>
-        private Core.AbstractProcessUnit m_sourceEventItem = null;
+        private AbstractProcessUnit m_sourceEventItem = null;
 
         private Shape m_square = null;
 
@@ -104,7 +104,7 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         private List<StickyNoteControl> m_stickyNotes = new List<StickyNoteControl>();
 
-        private ChemProV.Core.AbstractStream m_stream;
+        private AbstractStream m_stream;
 
         /// <summary>
         /// Brush used for the stream line when it is not selected. Built in the constructor and 
@@ -142,110 +142,6 @@ namespace ChemProV.PFD.Streams
                 return m_stream.DestinationLocation - m_stream.SourceLocation;
             }
         }
-
-        ///// <summary>
-        ///// Reference to the stream's source PFD element
-        ///// </summary>
-        //public GenericProcessUnit Source
-        //{
-        //    get
-        //    {
-        //        return m_source;
-        //    }
-        //    set
-        //    {
-        //        GenericProcessUnit old = m_source as GenericProcessUnit;
-                
-        //        //remove the event listener from the old source
-        //        if (m_source != null)
-        //        {
-        //            m_source.LocationChanged -= new EventHandler(AttachedLocationChanged);
-        //        }
-
-        //        //set new source, attach new listener
-        //        m_source = value;
-        //        TemporaryProcessUnit tpu = value as TemporaryProcessUnit;
-        //        if (null != tpu)
-        //        {
-        //            // This really means that it's an unconnected endpoint
-        //            m_srcDragIcon.EndpointConnectionChanged(
-        //                DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected,
-        //                old, value as GenericProcessUnit);
-        //            m_source = null;
-        //            UpdateStreamLocation();
-        //        }
-        //        else if (m_source != null)
-        //        {
-        //            // Update the source connection draggable icon
-        //            m_srcDragIcon.EndpointConnectionChanged(
-        //                DraggableStreamEndpoint.EndpointType.StreamSourceConnected,
-        //                old, value as GenericProcessUnit);
-                    
-        //            m_source.LocationChanged += new EventHandler(AttachedLocationChanged);
-        //            UpdateStreamLocation();
-        //        }
-        //        else
-        //        {
-        //            if (null != old)
-        //            {
-        //                m_srcDragIcon.EndpointConnectionChanged(
-        //                    DraggableStreamEndpoint.EndpointType.StreamSourceNotConnected,
-        //                    old, null);
-
-        //                UpdateStreamLocation();
-        //            }
-
-        //            // Note that the "else" case here is that it was already null, in which case 
-        //            // we shouldn't need to change anything
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// Reference to the stream's destination PFD element
-        ///// </summary>
-        //public GenericProcessUnit Destination
-        //{
-        //    get
-        //    {
-        //        return m_destination;
-        //    }
-        //    set
-        //    {
-        //        GenericProcessUnit old = m_destination as GenericProcessUnit;
-                
-        //        // Remove the event listener from the old destination
-        //        if (m_destination != null)
-        //        {
-        //            m_destination.LocationChanged -= new EventHandler(AttachedLocationChanged);
-        //        }
-
-        //        // Add the new destination and attach listener
-        //        m_destination = value;
-        //        if (m_destination != null)
-        //        {
-        //            m_dstDragIcon.EndpointConnectionChanged(
-        //                DraggableStreamEndpoint.EndpointType.StreamDestinationConnected,
-        //                old, value as GenericProcessUnit);
-                    
-        //            m_destination.LocationChanged += new EventHandler(AttachedLocationChanged);
-        //            UpdateStreamLocation();
-        //        }
-        //        else
-        //        {
-        //            if (null != old)
-        //            {
-        //                m_dstDragIcon.EndpointConnectionChanged(
-        //                    DraggableStreamEndpoint.EndpointType.StreamDestinationNotConnected,
-        //                    old, value as GenericProcessUnit);
-        //                UpdateStreamLocation();
-        //            }
-
-        //            // Note that the "else" case here is that it was already null, in which case 
-        //            // we shouldn't need to change anything
-        //        }
-        //    }
-        //}
 
         public DraggableStreamEndpoint DestinationDragIcon
         {
@@ -520,7 +416,7 @@ namespace ChemProV.PFD.Streams
 
         }
 
-        private StreamControl(DrawingCanvas canvas, ChemProV.Core.AbstractStream stream)
+        private StreamControl(DrawingCanvas canvas, AbstractStream stream)
         {
             m_canvas = canvas;
             m_stream = stream;
@@ -530,7 +426,7 @@ namespace ChemProV.PFD.Streams
             if (null != canvas && null != stream)
             {
                 // Create the brush for the stream line
-                if (stream is Core.HeatStream)
+                if (stream is HeatStream)
                 {
                     m_streamLineNotSelected = new SolidColorBrush(Colors.Red);
                 }
@@ -584,7 +480,7 @@ namespace ChemProV.PFD.Streams
                     m_arrow.Visibility = Visibility.Collapsed;
                 }
                 // Setup mouse events
-                if (!(m_stream.Destination is Core.HeatExchangerWithUtility))
+                if (!(m_stream.Destination is HeatExchangerWithUtility))
                 {
                     m_arrow.MouseLeftButtonDown += new MouseButtonEventHandler(DestinationArrow_MouseLeftButtonDown);
                 }
@@ -646,8 +542,7 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        public static StreamControl CreateOnCanvas(DrawingCanvas canvas,
-            ChemProV.Core.AbstractStream stream)
+        public static StreamControl CreateOnCanvas(DrawingCanvas canvas, AbstractStream stream)
         {
             StreamControl streamControl = new StreamControl(canvas, stream);
             canvas.AddNewChild(streamControl);
@@ -840,7 +735,7 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        protected void CreatePropertiesTable(Core.StreamPropertiesTable table)
+        protected void CreatePropertiesTable(StreamPropertiesTable table)
         {
             DrawingCanvas canvas = Core.App.Workspace.DrawingCanvas;
             m_table = new UI.StreamTableControl(table, this, canvas.GetWorkspace(), canvas);
@@ -953,7 +848,7 @@ namespace ChemProV.PFD.Streams
             }
         }
 
-        public ChemProV.Core.AbstractStream Stream
+        public AbstractStream Stream
         {
             get
             {

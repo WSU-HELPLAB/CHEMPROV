@@ -8,7 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System.Collections.ObjectModel;
-
+using ChemProV.Logic;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.Validation.Rules.Adapters.Table;
@@ -36,14 +36,14 @@ namespace ChemProV.Validation.Rules
             ValidationResults.Clear();
 
             // Make sure the target is not null and it is an StreamPropertiesTable
-            if (target != null && target is Core.StreamPropertiesTable)
+            if (target != null && target is StreamPropertiesTable)
             {
                 ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(
-                    target as Core.StreamPropertiesTable);
+                    target as StreamPropertiesTable);
 
                 ValidationResult vr;
 
-                if (StreamType.Chemical == (target as Core.StreamPropertiesTable).StreamType)
+                if (StreamType.Chemical == (target as StreamPropertiesTable).StreamType)
                 {
                     vr = unitsAreConsistant(tableAdapter);
 

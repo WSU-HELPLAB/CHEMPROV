@@ -118,6 +118,10 @@
       <Project>{BE128A42-BBE6-4227-A791-0C4A45D55D93}</Project>
       <Name>ChemProV</Name>
     </ProjectReference>
+    <ProjectReference Include="..\PortableChemProV\PortableChemProV.csproj">
+      <Project>{CDF84A87-F71F-44FC-9FA4-2AC97133C983}</Project>
+      <Name>PortableChemProV</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <Import Condition="$(SilverlightVersion)=='v3.0'" Project="$(Registry:HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\SilverlightToolkit\Tools\v3.0)Microsoft.Silverlight.Toolkit.Build.targets" />

@@ -15,12 +15,13 @@ using System.Windows.Controls;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using System.ComponentModel;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
     public partial class CompoundTable : UserControl, ChemProV.Core.IWorkspaceChangeListener
     {
-        private Core.Workspace m_ws = null;
+        private Workspace m_ws = null;
         
         public CompoundTable()
         {
@@ -130,7 +131,7 @@ namespace ChemProV.UI
 
         #region IWorkspaceChangeListener Members
 
-        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        public void SetWorkspace(Workspace workspace)
         {
             // If we have a previous workspace, then unsubscribe from events
             if (null != m_ws)
@@ -151,7 +152,7 @@ namespace ChemProV.UI
 
         private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
         {
-            foreach (Core.AbstractStream stream in m_ws.Streams)
+            foreach (AbstractStream stream in m_ws.Streams)
             {
                 // Unsubscribe first for safety. A += WILL cause the event handler to fire twice if 
                 // we were already subscribing and we want to avoid this. However, a -= when we're 
@@ -181,9 +182,9 @@ namespace ChemProV.UI
             Compound_ComboBox.Items.Clear();
 
             // Go through all stream properties tables
-            foreach (Core.AbstractStream stream in m_ws.Streams)
+            foreach (AbstractStream stream in m_ws.Streams)
             {
-                Core.StreamPropertiesTable table = stream.PropertiesTable;
+                StreamPropertiesTable table = stream.PropertiesTable;
                 if (null == table)
                 {
                     continue;
@@ -195,9 +196,9 @@ namespace ChemProV.UI
 
                 // Go through the rows and look for at the selected compound. Add items to the 
                 // combo box as needed.
-                foreach (Core.IStreamData data in table.Rows)
+                foreach (IStreamData data in table.Rows)
                 {
-                    string s = (data as Core.ChemicalStreamData).SelectedCompound;
+                    string s = (data as ChemicalStreamData).SelectedCompound;
                     if (!string.IsNullOrEmpty(s) && !s.Equals("Overall") && 
                         !Compound_ComboBox.Items.Contains(s))
                     {

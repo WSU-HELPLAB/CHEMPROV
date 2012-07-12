@@ -5,7 +5,7 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using ChemProV.Core;
 
-namespace ChemProV.PFD.EquationEditor.Models
+namespace ChemProV.Logic.Equations
 {
     public class EquationModel : INotifyPropertyChanged, IXmlSerializable
     {
@@ -25,7 +25,7 @@ namespace ChemProV.PFD.EquationEditor.Models
         /// <summary>
         /// List of comments for this equation
         /// </summary>
-        private List<Core.BasicComment> m_comments = new List<Core.BasicComment>();
+        private List<BasicComment> m_comments = new List<BasicComment>();
 
         /// <summary>
         /// Indicates whether or not comments for this equation are visible somewhere in 
@@ -53,7 +53,7 @@ namespace ChemProV.PFD.EquationEditor.Models
             }
         }
 
-        public IList<Core.BasicComment> Comments
+        public IList<BasicComment> Comments
         {
             get
             {
@@ -163,7 +163,7 @@ namespace ChemProV.PFD.EquationEditor.Models
 
             // Write all comments. Older versions used an "Annotation" tag for a single comment. A redesign 
             // gave support for multiple comments but we still use the "Annotation" tag for compatibility.
-            foreach (Core.BasicComment bc in m_comments)
+            foreach (BasicComment bc in m_comments)
             {
                 writer.WriteStartElement("Annotation");
                 if (!string.IsNullOrEmpty(bc.CommentUserName))
@@ -201,7 +201,7 @@ namespace ChemProV.PFD.EquationEditor.Models
                 
                 XAttribute userAttr = cmtsEl.Attribute("UserName");
                 string userName = (null == userAttr) ? null : userAttr.Value;
-                model.m_comments.Add(new Core.BasicComment(cmtText, userName));
+                model.m_comments.Add(new BasicComment(cmtText, userName));
             }
 
             //scope

@@ -22,6 +22,7 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.ComponentModel;
 using ChemProV.Core;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
@@ -42,11 +43,11 @@ namespace ChemProV.UI
 
         private bool m_programmaticallyChanging = false;
 
-        private Core.StreamPropertiesTable m_table;
+        private StreamPropertiesTable m_table;
 
         private Workspace m_ws = null;
         
-        public StreamTableControl(Core.StreamPropertiesTable tableData, 
+        public StreamTableControl(StreamPropertiesTable tableData, 
             PFD.Streams.StreamControl parent, Workspace workspace, DrawingCanvas canvas)
         {
             InitializeComponent();
@@ -85,19 +86,18 @@ namespace ChemProV.UI
         {
             // Start by getting the character for the units
             char startChar;
-            if (row.SelectedUnits == ChemicalUnits.MassFraction.ToPrettyString())
+            if ("massFrac" == row.SelectedUnits)
             {
                 // We use 'X' and 'x' for mass fraction
                 startChar = 'X';
             }
-            else if (ChemicalUnits.MoleFraction.ToPrettyString() == row.SelectedUnits)
+            else if ("molFrac" == row.SelectedUnits)
             {
                 // Y,y for mole fraction
                 startChar = 'Y';
             }
-            else if (ChemicalUnits.MolePercent.ToPrettyString() == row.SelectedUnits ||
-                ChemicalUnits.Moles.ToPrettyString() == row.SelectedUnits ||
-                ChemicalUnits.MolesPerSecond.ToPrettyString() == row.SelectedUnits)
+            else if ("mol %" == row.SelectedUnits || "mol" == row.SelectedUnits ||
+                "mol/sec" == row.SelectedUnits)
             {
                 // N,n for anything remaining that has moles
                 startChar = 'N';
@@ -138,8 +138,8 @@ namespace ChemProV.UI
             // grid (with respect to the data row) for the row removal buttons.
             int column = (int)(sender as ComboBox).GetValue(Grid.ColumnProperty) - 1;
             
-            Tuple<Core.IStreamData, string> info = (sender as ComboBox).Tag as
-                Tuple<Core.IStreamData, string>;
+            Tuple<IStreamData, string> info = (sender as ComboBox).Tag as
+                Tuple<IStreamData, string>;
             if (null != info)
             {
                 string newValue = (sender as ComboBox).SelectedItem as string;
@@ -181,7 +181,7 @@ namespace ChemProV.UI
         /// Returns the data structure for this table. You can change properies in the returned value 
         /// and the UI will automatically update itself.
         /// </summary>
-        public Core.StreamPropertiesTable Data
+        public StreamPropertiesTable Data
         {
             get
             {
@@ -189,7 +189,7 @@ namespace ChemProV.UI
             }
         }
 
-        public Control GetControl(Core.IStreamData row, string propertyName)
+        public Control GetControl(IStreamData row, string propertyName)
         {
             foreach (UIElement uie in MainGrid.Children)
             {
@@ -201,7 +201,7 @@ namespace ChemProV.UI
                 
                 // If it's a control that corresponds to an item in the data structure then it will 
                 // have information in its tag
-                Tuple<Core.IStreamData, string> info = c.Tag as Tuple<Core.IStreamData, string>;
+                Tuple<IStreamData, string> info = c.Tag as Tuple<IStreamData, string>;
                 if (null == info)
                 {
                     continue;
@@ -265,7 +265,7 @@ namespace ChemProV.UI
 
         private void RemoveRowBtn_Click(object sender, RoutedEventArgs e)
         {
-            Core.IStreamData row = (sender as Button).Tag as Core.IStreamData;
+            IStreamData row = (sender as Button).Tag as IStreamData;
             m_table.RemoveRow(row);
         }
 
@@ -293,7 +293,7 @@ namespace ChemProV.UI
                 }
 
                 // Look for information about the row and property in the tag
-                Tuple<Core.IStreamData, string> info = c.Tag as Tuple<Core.IStreamData, string>;
+                Tuple<IStreamData, string> info = c.Tag as Tuple<IStreamData, string>;
                 if (null == info)
                 {
                     continue;
@@ -325,8 +325,8 @@ namespace ChemProV.UI
             // grid (with respect to the data row) for the row removal buttons.
             int column = (int)(sender as TextBox).GetValue(Grid.ColumnProperty) - 1;
             
-            Tuple<Core.IStreamData, string> info = (sender as TextBox).Tag as
-                Tuple<Core.IStreamData, string>;
+            Tuple<IStreamData, string> info = (sender as TextBox).Tag as
+                Tuple<IStreamData, string>;
             if (null != info)
             {
                 m_ignoreRowPropertyChanges = true;
@@ -427,7 +427,7 @@ namespace ChemProV.UI
             }
 
             i = 2;
-            foreach (Core.IStreamData row in m_table.Rows)
+            foreach (IStreamData row in m_table.Rows)
             {
                 MainGrid.RowDefinitions.Add(new RowDefinition()
                     {
@@ -484,7 +484,7 @@ namespace ChemProV.UI
                         Core.App.InitRightClickMenu(tb);
 
                         // When it changes we need to update the data structure
-                        tb.Tag = new Tuple<Core.IStreamData, string>(row, propertyName);
+                        tb.Tag = new Tuple<IStreamData, string>(row, propertyName);
                         tb.TextChanged += this.TextField_TextChanged;
 
                         tb.GotFocus += delegate(object sender, RoutedEventArgs e)
@@ -516,7 +516,7 @@ namespace ChemProV.UI
                         cb.SelectedItem = row[dataColumn] as string;
 
                         // Handle selected item change events
-                        cb.Tag = new Tuple<Core.IStreamData, string>(row, propertyName);
+                        cb.Tag = new Tuple<IStreamData, string>(row, propertyName);
                         cb.SelectionChanged += this.ComboBoxField_SelectionChanged;
                     }
 

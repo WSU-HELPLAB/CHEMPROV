@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using ChemProV.MathCore;
 using ChemProV.PFD.Streams;
+using ChemProV.Logic;
 
 namespace ChemProV.UI.DrawingCanvasStates
 {
@@ -13,7 +14,7 @@ namespace ChemProV.UI.DrawingCanvasStates
 
         private ProcessUnitControl m_changedBorderColor = null;
 
-        private Core.AbstractProcessUnit m_connectedToOnStart;
+        private AbstractProcessUnit m_connectedToOnStart;
 
         private bool m_creatingStream;
 
@@ -31,7 +32,7 @@ namespace ChemProV.UI.DrawingCanvasStates
         /// </summary>
         private Vector m_startLocation;
 
-        private Core.AbstractStream m_stream;
+        private AbstractStream m_stream;
 
         public MovingStreamEndpoint(DraggableStreamEndpoint endpoint, 
             DrawingCanvas canvas, bool creatingStream)
@@ -270,7 +271,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             }
 
             // Create an undo
-            Core.Workspace ws = m_canvas.GetWorkspace();
+            Workspace ws = m_canvas.GetWorkspace();
             if (m_dragIcon.IsSource)
             {
                 // There are 4 cases for what could have happened:
@@ -284,18 +285,18 @@ namespace ChemProV.UI.DrawingCanvasStates
                 if (null == m_connectedToOnStart && null == m_stream.Source)
                 {
                     // This is just a move of the endpoint from one location to another
-                    ws.AddUndo(new Core.UndoRedoCollection("Undo moving stream source",
+                    ws.AddUndo(new UndoRedoCollection("Undo moving stream source",
                         new Logic.Undos.SetStreamSourceLocation(m_stream, m_startLocation)));
                 }
                 else if (null == m_connectedToOnStart && null != m_stream.Source)
                 {
-                    ws.AddUndo(new Core.UndoRedoCollection("Undo changing stream source",
+                    ws.AddUndo(new UndoRedoCollection("Undo changing stream source",
                         new Logic.Undos.SetStreamSource(m_stream, null, m_stream.Source, m_startLocation),
                         new Logic.Undos.DetachOutgoingStream(m_stream.Source, m_stream)));
                 }
                 else if (null != m_connectedToOnStart && null == m_stream.Source)
                 {
-                    ws.AddUndo(new Core.UndoRedoCollection("Undo detaching stream source",
+                    ws.AddUndo(new UndoRedoCollection("Undo detaching stream source",
                         new Logic.Undos.SetStreamSource(m_stream, m_connectedToOnStart, null, m_stream.SourceLocation),
                         new Logic.Undos.AttachOutgoingStream(m_connectedToOnStart, m_stream)));
                 }
@@ -304,7 +305,7 @@ namespace ChemProV.UI.DrawingCanvasStates
                     // Only take action if we've changed the source
                     if (!object.ReferenceEquals(m_connectedToOnStart, m_stream.Source))
                     {
-                        ws.AddUndo(new Core.UndoRedoCollection("Undo changing stream source",
+                        ws.AddUndo(new UndoRedoCollection("Undo changing stream source",
                             new Logic.Undos.SetStreamSource(m_stream, m_connectedToOnStart, m_stream.Source, m_stream.SourceLocation),
                             new Logic.Undos.DetachOutgoingStream(m_stream.Source, m_stream),
                             new Logic.Undos.AttachOutgoingStream(m_connectedToOnStart, m_stream)));
@@ -324,18 +325,18 @@ namespace ChemProV.UI.DrawingCanvasStates
                 if (null == m_connectedToOnStart && null == m_stream.Destination)
                 {
                     // This is just a move of the endpoint from one location to another
-                    ws.AddUndo(new Core.UndoRedoCollection("Undo moving stream destination",
+                    ws.AddUndo(new UndoRedoCollection("Undo moving stream destination",
                         new Logic.Undos.SetStreamDestinationLocation(m_stream, m_startLocation)));
                 }
                 else if (null == m_connectedToOnStart && null != m_stream.Destination)
                 {
-                    ws.AddUndo(new Core.UndoRedoCollection("Undo changing stream destination",
+                    ws.AddUndo(new UndoRedoCollection("Undo changing stream destination",
                         new Logic.Undos.SetStreamDestination(m_stream, null, m_stream.Destination, m_startLocation),
                         new Logic.Undos.DetachIncomingStream(m_stream.Destination, m_stream)));
                 }
                 else if (null != m_connectedToOnStart && null == m_stream.Destination)
                 {
-                    ws.AddUndo(new Core.UndoRedoCollection("Undo detaching stream destination",
+                    ws.AddUndo(new UndoRedoCollection("Undo detaching stream destination",
                         new Logic.Undos.SetStreamDestination(m_stream, m_connectedToOnStart, null, m_stream.DestinationLocation),
                         new Logic.Undos.AttachIncomingStream(m_connectedToOnStart, m_stream)));
                 }
@@ -344,7 +345,7 @@ namespace ChemProV.UI.DrawingCanvasStates
                     // Only take action if we've changed the destination
                     if (!object.ReferenceEquals(m_connectedToOnStart, m_stream.Destination))
                     {
-                        ws.AddUndo(new Core.UndoRedoCollection("Undo changing stream destination",
+                        ws.AddUndo(new UndoRedoCollection("Undo changing stream destination",
                             new Logic.Undos.SetStreamDestination(m_stream, m_connectedToOnStart, m_stream.Destination, m_stream.DestinationLocation),
                             new Logic.Undos.DetachIncomingStream(m_stream.Destination, m_stream),
                             new Logic.Undos.AttachIncomingStream(m_connectedToOnStart, m_stream)));

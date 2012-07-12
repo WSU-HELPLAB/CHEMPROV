@@ -11,7 +11,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 
 namespace ChemProV.PFD.EquationEditor
 {

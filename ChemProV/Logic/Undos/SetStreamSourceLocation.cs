@@ -13,7 +13,7 @@ using ChemProV.Core;
 
 namespace ChemProV.Logic.Undos
 {
-    public class SetStreamSourceLocation : ChemProV.Core.IUndoRedoAction
+    public class SetStreamSourceLocation : IUndoRedoAction
     {
         private MathCore.Vector m_location;
 
@@ -35,7 +35,7 @@ namespace ChemProV.Logic.Undos
             m_opposite.m_stream = m_stream;
         }
 
-        public ChemProV.Core.IUndoRedoAction Execute(ChemProV.Core.Workspace sender)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             m_stream.SourceLocation = m_location;
             return m_opposite;

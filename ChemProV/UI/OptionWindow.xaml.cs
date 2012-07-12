@@ -9,12 +9,13 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System.Windows;
 using System.Windows.Controls;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
     public partial class OptionWindow : ChildWindow
     {
-        private Core.Workspace m_workspace = null;
+        private Workspace m_workspace = null;
         
         public OptionDifficultySetting OptionSelection
         {
@@ -35,7 +36,7 @@ namespace ChemProV.UI
             }
         }
 
-        public OptionWindow(Core.Workspace workspace)
+        public OptionWindow(Workspace workspace)
         {
             InitializeComponent();
 

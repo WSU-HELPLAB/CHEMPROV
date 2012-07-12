@@ -8,7 +8,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using ChemProV.Core;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic;
+using ChemProV.Logic.Equations;
 
 namespace ChemProV.PFD.Undos
 {

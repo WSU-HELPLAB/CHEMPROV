@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public static class WorkspaceUtility
     {

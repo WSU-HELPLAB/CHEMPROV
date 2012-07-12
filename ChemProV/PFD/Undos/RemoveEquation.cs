@@ -18,7 +18,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Core;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.Undos
 {

@@ -9,7 +9,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System;
 
-namespace ChemProV.PFD.EquationEditor.Models
+namespace ChemProV.Logic.Equations
 {
     public enum EquationScopeClassification
     {

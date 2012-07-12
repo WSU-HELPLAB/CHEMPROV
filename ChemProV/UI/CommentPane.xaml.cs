@@ -7,7 +7,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using ChemProV.Core;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 using ChemProV.Logic;
 
 namespace ChemProV.UI
@@ -166,7 +166,7 @@ namespace ChemProV.UI
             UpdatePFDComments();
         }
 
-        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        public void SetWorkspace(Workspace workspace)
         {
             m_workspace = workspace;
 

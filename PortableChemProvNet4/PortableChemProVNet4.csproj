@@ -44,33 +44,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\ChemProV\Core\CommentDefs.cs">
-      <Link>Core\CommentDefs.cs</Link>
-    </Compile>
     <Compile Include="..\ChemProV\Core\CommentMerger.cs">
       <Link>Core\CommentMerger.cs</Link>
     </Compile>
-    <Compile Include="..\ChemProV\Logic\StickyNote.cs">
+    <Compile Include="..\PortableChemProV\Logic\CommentDefs.cs">
+      <Link>Core\CommentDefs.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\EquationModel.cs">
+      <Link>Logic\Equations\EquationModel.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\EquationScope.cs">
+      <Link>Logic\Equations\EquationScope.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\EquationType.cs">
+      <Link>Logic\Equations\EquationType.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\IEquationModifier.cs">
+      <Link>Logic\Equations\IEquationModifier.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\StickyNote.cs">
       <Link>Logic\StickyNote.cs</Link>
-    </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationModel.cs">
-      <Link>PFD\EquationEditor\Model\EquationModel.cs</Link>
-    </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationScope.cs">
-      <Link>PFD\EquationEditor\Model\EquationScope.cs</Link>
-    </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\EquationType.cs">
-      <Link>PFD\EquationEditor\Model\EquationType.cs</Link>
-    </Compile>
-    <Compile Include="..\ChemProV\PFD\EquationEditor\Models\IEquationModifier.cs">
-      <Link>PFD\EquationEditor\Model\IEquationModifier.cs</Link>
-    </Compile>
-    <Compile Include="..\ChemProV\PFD\IPfdElement.cs">
-      <Link>PFD\IPfdElement.cs</Link>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Folder Include="PFD\EquationEditor\Model\" />
     <Folder Include="PFD\StickyNote\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

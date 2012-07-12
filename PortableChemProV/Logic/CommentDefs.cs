@@ -14,7 +14,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System;
 using System.Xml.Serialization;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public interface IComment
     {

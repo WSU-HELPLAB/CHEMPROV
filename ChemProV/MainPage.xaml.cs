@@ -27,6 +27,7 @@ using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
 using System.Collections.Specialized;
+using ChemProV.Logic;
 
 namespace ChemProV
 {
@@ -55,7 +56,7 @@ namespace ChemProV
         /// is to have all data stored in this object and all UI elements would attach listeners 
         /// and do their modifications through this object.
         /// </summary>
-        private Core.Workspace m_workspace = new Core.Workspace();
+        private Workspace m_workspace = new Workspace();
 
         private bool OptionDifficultySettingChanged(OptionDifficultySetting value)
         {
@@ -94,7 +95,7 @@ namespace ChemProV
             InitializeComponent();
 
             // Set the workspace for the equation editor and other controls
-            m_workspace.Equations.Add(new PFD.EquationEditor.Models.EquationModel());
+            m_workspace.Equations.Add(new ChemProV.Logic.Equations.EquationModel());
             WorkSpace.EquationEditor.SetWorkspace(m_workspace);
             WorkSpace.CommentsPane.SetWorkspace(m_workspace);
             m_workspace.DegreesOfFreedomAnalysis.PropertyChanged += 
@@ -185,13 +186,13 @@ namespace ChemProV
             // Remove previous event listeners
             foreach (TreeViewItem child in StreamsDebugNode.Items)
             {
-                Core.AbstractStream stream = child.Tag as Core.AbstractStream;
+                AbstractStream stream = child.Tag as AbstractStream;
                 stream.PropertyChanged -= DebugStream_PropertyChanged;
             }
             
             // Clear and rebuild
             StreamsDebugNode.Items.Clear();
-            foreach (Core.AbstractStream stream in m_workspace.Streams)
+            foreach (AbstractStream stream in m_workspace.Streams)
             {
                 StreamsDebugNode.Items.Add(new TreeViewItem()
                 {
@@ -209,7 +210,7 @@ namespace ChemProV
         {
             if (e.PropertyName.Equals("SourceLocation") || e.PropertyName.Equals("DestinationLocation"))
             {
-                Core.AbstractStream stream = sender as Core.AbstractStream;
+                AbstractStream stream = sender as AbstractStream;
                 
                 // Find the tree view item for this stream
                 TreeViewItem tvi = null;
@@ -772,7 +773,7 @@ namespace ChemProV
                 return;
             }
 
-            Core.DegreesOfFreedomAnalysis df = (sender as Core.DegreesOfFreedomAnalysis);
+            DegreesOfFreedomAnalysis df = (sender as DegreesOfFreedomAnalysis);
             if (e.PropertyName.Equals("CommentsVisible"))
             {
                 if (df.CommentsVisible)
@@ -831,7 +832,7 @@ namespace ChemProV
         /// At the time of this writing the Core.Workspace class doesn't yet contain all the relevant data, 
         /// but future refactoring should change this.
         /// </summary>
-        public Core.Workspace GetLogicalWorkspace()
+        public Logic.Workspace GetLogicalWorkspace()
         {
             return m_workspace;
         }

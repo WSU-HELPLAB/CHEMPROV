@@ -16,6 +16,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using ChemProV.PFD.Undos;
+using ChemProV.Logic;
 
 namespace ChemProV.UI.DrawingCanvasStates
 {
@@ -54,7 +55,7 @@ namespace ChemProV.UI.DrawingCanvasStates
         /// This is the stream that is created in the constructor but not added to the workspace until 
         /// the source is placed.
         /// </summary>
-        private Core.AbstractStream m_stream;
+        private AbstractStream m_stream;
 
         public PlacingNewStream(UI.ControlPalette sender, DrawingCanvas canvas, StreamType streamType)
         {
@@ -77,20 +78,20 @@ namespace ChemProV.UI.DrawingCanvasStates
             int newID;
             do
             {
-                newID = Core.AbstractStream.GetNextUID();
+                newID = AbstractStream.GetNextUID();
             }
             while (canvas.GetWorkspace().StreamExists(newID));
             if (StreamType.Chemical == streamType)
             {
-                m_stream = new Core.ChemicalStream(newID);
+                m_stream = new ChemicalStream(newID);
             }
             else
             {
-                m_stream = new Core.HeatStream(newID);
+                m_stream = new HeatStream(newID);
             }
 
             // Create the table
-            m_stream.PropertiesTable = new Core.StreamPropertiesTable(m_stream);
+            m_stream.PropertiesTable = new StreamPropertiesTable(m_stream);
 
             // Create the default row if we have a heat stream. There is no default row 
             // for chemical streams
@@ -106,8 +107,8 @@ namespace ChemProV.UI.DrawingCanvasStates
                 m_stream.PropertiesTable.Rows[0].Label = "Q" + m_stream.Id.ToString();
 
                 // Select default units
-                (m_stream.PropertiesTable.Rows[0] as Core.HeatStreamData).SelectedUnits =
-                    Core.HeatStreamData.EnergyUnitOptions[0];
+                (m_stream.PropertiesTable.Rows[0] as HeatStreamData).SelectedUnits =
+                    HeatStreamData.EnergyUnitOptions[0];
 
                 // Flag it as not renamed by the user yet
                 m_stream.PropertiesTable.Rows[0].UserHasRenamed = false;
@@ -193,7 +194,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             m_sourcePlacementIcon = null;
 
             // Get a reference to the workspace
-            Core.Workspace ws = m_canvas.GetWorkspace();
+            Workspace ws = m_canvas.GetWorkspace();
 
             // See if we clicked on a valid destination object
             ProcessUnitControl gpu = m_canvas.GetChildAt(location, m_sourcePlacementIcon) as ProcessUnitControl;
@@ -209,7 +210,7 @@ namespace ChemProV.UI.DrawingCanvasStates
                 // We need an undo to remove the stream that we just added. Note that we're going to switch 
                 // over to a different state below and that creates and undo as well. This is fine since 
                 // it allows you to undo the destination placement and stream creation separately.
-                ws.AddUndo(new Core.UndoRedoCollection("Undo stream creation", 
+                ws.AddUndo(new UndoRedoCollection("Undo stream creation", 
                     new Logic.Undos.RemoveStream(m_stream)));
             }
             else if (gpu.ProcessUnit.CanAcceptOutgoingStream(m_stream))
@@ -226,7 +227,7 @@ namespace ChemProV.UI.DrawingCanvasStates
                 
                 // We've linked up the stream and added it to the workspace. Now create an undo that 
                 // does the opposite
-                ws.AddUndo(new Core.UndoRedoCollection("Undo stream creation",
+                ws.AddUndo(new UndoRedoCollection("Undo stream creation",
                     new Logic.Undos.DetachOutgoingStream(gpu.ProcessUnit, m_stream),
                     new Logic.Undos.RemoveStream(m_stream)));
             }

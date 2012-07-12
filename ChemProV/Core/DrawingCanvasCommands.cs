@@ -15,6 +15,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System.Collections.Generic;
 using System.Windows;
+using ChemProV.Logic;
 using ChemProV.Logic.Undos;
 using ChemProV.UI;
 
@@ -63,7 +64,7 @@ namespace ChemProV.Core
             }
             else if (element is ProcessUnitControl)
             {
-                if ((element as ProcessUnitControl).ProcessUnit is ChemProV.Core.HeatExchangerWithUtility)
+                if ((element as ProcessUnitControl).ProcessUnit is HeatExchangerWithUtility)
                 {
                     DeleteHEWU(element as ProcessUnitControl, canvas);
                 }
@@ -97,7 +98,7 @@ namespace ChemProV.Core
             // this does not always hold true when loading from files so it's just safer to search 
             // for it
             HeatStream heatStream = null;
-            foreach (Core.AbstractStream incomingStream in he.ProcessUnit.IncomingStreams)
+            foreach (AbstractStream incomingStream in he.ProcessUnit.IncomingStreams)
             {
                 if (incomingStream is HeatStream)
                 {
@@ -121,7 +122,7 @@ namespace ChemProV.Core
             }
 
             // Detach all outgoing streams and make undos
-            foreach (Core.AbstractStream s in he.ProcessUnit.OutgoingStreams)
+            foreach (AbstractStream s in he.ProcessUnit.OutgoingStreams)
             {
                 undos.Add(new Logic.Undos.SetStreamSource(s, he.ProcessUnit, null,
                     s.SourceLocation));
@@ -130,7 +131,7 @@ namespace ChemProV.Core
             }
 
             // Detach all incoming streams and make undos
-            foreach (Core.AbstractStream s in he.ProcessUnit.IncomingStreams)
+            foreach (AbstractStream s in he.ProcessUnit.IncomingStreams)
             {
                 undos.Add(new Logic.Undos.SetStreamDestination(s, he.ProcessUnit, null,
                     s.DestinationLocation));
@@ -155,14 +156,14 @@ namespace ChemProV.Core
             undos.Add(new ChemProV.Logic.Undos.AddToWorkspace(pu.ProcessUnit));
 
             // Detach all incoming streams and make undos
-            foreach (Core.AbstractStream s in pu.ProcessUnit.IncomingStreams)
+            foreach (AbstractStream s in pu.ProcessUnit.IncomingStreams)
             {
                 undos.Add(new SetStreamDestination(s, pu.ProcessUnit, null, s.DestinationLocation));
                 s.Destination = null;
             }
 
             // Detach all outgoing streams and make undos
-            foreach (Core.AbstractStream s in pu.ProcessUnit.OutgoingStreams)
+            foreach (AbstractStream s in pu.ProcessUnit.OutgoingStreams)
             {
                 undos.Add(new SetStreamSource(s, pu.ProcessUnit, null, s.SourceLocation));
                 s.Source = null;
@@ -192,7 +193,7 @@ namespace ChemProV.Core
         private static void DeleteStreamWithUndo(ChemProV.PFD.Streams.StreamControl stream,
             DrawingCanvas canvas)
         {
-            Core.AbstractStream s = stream.Stream;
+            AbstractStream s = stream.Stream;
             
             // Special case: the old version (before I rewrote a bunch of logic) didn't let 
             // you delete heat streams whose destination was a heat exchanger with utility.

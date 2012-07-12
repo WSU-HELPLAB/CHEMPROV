@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public class HeatStream : AbstractStream
     {

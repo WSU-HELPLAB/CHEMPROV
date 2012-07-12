@@ -19,10 +19,7 @@ using System.Xml;
 using System.Xml.Linq;
 using ChemProV.Core;
 
-// Temporary until further refactoring
-using ChemProV.Logic;
-
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     /// <summary>
     /// Abstract base class for a UI-independent process unit. "UI-independent" in this case means there are no 

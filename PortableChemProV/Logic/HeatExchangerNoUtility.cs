@@ -1,31 +1,30 @@
-﻿using System;
-using System.Xml.Linq;
+﻿using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
-    public class Separator : AbstractProcessUnit
+    public class HeatExchangerNoUtility : AbstractProcessUnit
     {
-        public Separator()
+        public HeatExchangerNoUtility()
             : this(AbstractProcessUnit.GetNextUID()) { }
-
-        public Separator(int id)
-            : base(id, "Sep" + id.ToString()) { }
         
-        public Separator(XElement loadFromMe)
+        public HeatExchangerNoUtility(int id)
+            : base(id, "Exc" + id.ToString()) { }
+        
+        public HeatExchangerNoUtility(XElement loadFromMe)
             : base(loadFromMe)
         {
-            Label = "Sep" + Id.ToString();
+            Label = "Exc" + Id.ToString();
         }
 
         public override string Description
         {
-            get { return "Separator"; }
+            get { return "Heat Exchanger Without Utility"; }
         }
 
         public override bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
         {
-            // Separators are available at all difficulty settings
-            return true;
+            // These are only available on the highest difficulty setting
+            return (OptionDifficultySetting.MaterialAndEnergyBalance == difficulty);
         }
 
         public override int MaxIncomingHeatStreams
@@ -35,7 +34,7 @@ namespace ChemProV.Core
 
         public override int MaxIncomingStreams
         {
-            get { return 1; }
+            get { return 2; }
         }
 
         public override int MaxOutgoingHeatStreams
@@ -45,7 +44,7 @@ namespace ChemProV.Core
 
         public override int MaxOutgoingStreams
         {
-            get { return -1; }
+            get { return 2; }
         }
 
         /// <summary>
@@ -56,7 +55,7 @@ namespace ChemProV.Core
         {
             get
             {
-                return "Separator";
+                return "HeatExchangerNoUtility";
             }
         }
     }

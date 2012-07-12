@@ -7,6 +7,7 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
+using ChemProV.Logic;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
@@ -23,7 +24,7 @@ namespace ChemProV.Validation.Rules.Adapters.Table
         /// </summary>
         /// <param name="table"></param>
         /// <returns></returns>
-        public static ITableAdapter CreateTableAdapter(Core.StreamPropertiesTable table)
+        public static ITableAdapter CreateTableAdapter(StreamPropertiesTable table)
         {
             if (StreamType.Chemical == table.StreamType)
             {

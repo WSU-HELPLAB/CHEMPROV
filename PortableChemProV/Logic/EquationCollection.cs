@@ -15,9 +15,9 @@ using System;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.ComponentModel;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     /// <summary>
     /// Represents a collection of EquationModel objects. This is a UI-independent core-logic class.
@@ -141,7 +141,7 @@ namespace ChemProV.Core
             }
         }
 
-        public IEnumerator<PFD.EquationEditor.Models.EquationModel> GetEnumerator()
+        public IEnumerator<EquationModel> GetEnumerator()
         {
             return new ECEnumerator(m_eqs);
         }
@@ -251,7 +251,7 @@ namespace ChemProV.Core
 
         #region Enumerator class declartion
 
-        private class ECEnumerator : IEnumerator<PFD.EquationEditor.Models.EquationModel>
+        private class ECEnumerator : IEnumerator<EquationModel>
         {
             private bool m_disposed = false;
             
