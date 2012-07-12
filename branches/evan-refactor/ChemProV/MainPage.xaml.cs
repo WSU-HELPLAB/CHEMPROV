@@ -104,6 +104,9 @@ namespace ChemProV
             WorkSpace.SetWorkspace(m_workspace);
             CompoundTable.SetWorkspace(m_workspace);
 
+            // Tell the palette control to update
+            PrimaryPalette.RefreshPalette(m_workspace.Difficulty);
+
             // Monitor when the difficulty changes so we can update the config file
             m_workspace.PropertyChanged += delegate(object o, PropertyChangedEventArgs e)
             {
@@ -149,6 +152,7 @@ namespace ChemProV
             //setup timer
             saveTimer.Interval = autoSaveTimeSpan;
             saveTimer.Tick += new EventHandler(autoSave);
+            saveTimer.Start();
 
             //find our version number
             Assembly asm = Assembly.GetExecutingAssembly();
@@ -269,6 +273,12 @@ namespace ChemProV
 
         private void autoSave(object sender, EventArgs e)
         {
+            // Don't save an empty workspace, as that would be pointless
+            if (m_workspace.IsEmpty)
+            {
+                return;
+            }
+            
             Saving_TextBlock.Text = "Auto Saving...";
             Saving_TextBlock.Visibility = System.Windows.Visibility.Visible;
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())

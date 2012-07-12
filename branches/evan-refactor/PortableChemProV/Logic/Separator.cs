@@ -10,12 +10,9 @@ namespace ChemProV.Logic
 
         public Separator(int id)
             : base(id, "Sep" + id.ToString()) { }
-        
+
         public Separator(XElement loadFromMe)
-            : base(loadFromMe)
-        {
-            Label = "Sep" + Id.ToString();
-        }
+            : base(loadFromMe) { }
 
         public override string Description
         {

@@ -40,9 +40,6 @@
     <Compile Include="..\ChemProV\Core\CommentMerger.cs">
       <Link>Core\CommentMerger.cs</Link>
     </Compile>
-    <Compile Include="..\ChemProV\PFD\IPfdElement.cs">
-      <Link>PFD\IPfdElement.cs</Link>
-    </Compile>
     <Compile Include="Logic\AbstractProcessUnit.cs" />
     <Compile Include="Logic\AbstractStream.cs" />
     <Compile Include="Logic\ChemicalCompounds.cs" />

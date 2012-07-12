@@ -19,7 +19,6 @@ using System.Linq;
 using ChemProV.PFD;
 using ChemProV.UI;
 using ChemProV.PFD.Streams;
-using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow;
 
 namespace ChemProV.UnitTests.Grammars

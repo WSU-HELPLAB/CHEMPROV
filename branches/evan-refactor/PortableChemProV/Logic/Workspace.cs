@@ -254,6 +254,21 @@ namespace ChemProV.Logic
             return null;
         }
 
+        /// <summary>
+        /// Returns true if there are no streams, no process units, no sticky notes, no degrees of 
+        /// freedom comments, a null or empty string for the degrees of freedom analysis, and either 
+        /// no equations or 1 equation with no text.
+        /// </summary>
+        public bool IsEmpty
+        {
+            get
+            {
+                return (0 == m_procUnits.Count && 0 == m_streams.Count && 0 == m_stickyNotes.Count &&
+                    string.IsNullOrEmpty(m_dfAnalysis.Text) && 0 == m_dfAnalysis.Comments.Count &&
+                    (0 == m_equations.Count || (1 == m_equations.Count && string.IsNullOrEmpty(m_equations[0].Equation))));
+            }
+        }
+
         public void Load(System.IO.Stream s)
         {
             s.Position = 0;

@@ -11,12 +11,9 @@ namespace ChemProV.Logic
 
         public Reactor(int id)
             : base(id, "Rct" + id.ToString()) { }
-        
+
         public Reactor(XElement loadFromMe)
-            : base(loadFromMe)
-        {
-            Label = "Rct" + Id.ToString();
-        }
+            : base(loadFromMe) { }
 
         public override string Description
         {

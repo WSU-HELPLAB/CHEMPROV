@@ -9,7 +9,6 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using System.Diagnostics;
 using ChemProV.Core;
 using ChemProV.Logic;

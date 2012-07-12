@@ -10,7 +10,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System.Collections.ObjectModel;
 using ChemProV.Logic;
 using ChemProV.PFD.Streams.PropertiesWindow;
-using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.Validation.Rules.Adapters.Table;
 
 namespace ChemProV.Validation.Rules
