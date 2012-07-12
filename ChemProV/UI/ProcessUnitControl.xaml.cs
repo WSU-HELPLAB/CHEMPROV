@@ -237,7 +237,7 @@ namespace ChemProV.UI
             {
                 e.Handled = true;
             }
-            if (e.Key == Key.Delete)
+            if (e.Key == Key.Delete || Key.Back == e.Key)
             {
                 e.Handled = true;
             }

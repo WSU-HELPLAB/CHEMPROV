@@ -80,12 +80,11 @@ namespace ChemProV.Logic
                 // The file format was unfortunately designed such that an integer is stored for the 
                 // compound identifier. The data structure code was updated to use a string for the 
                 // selected compound and saving code will write the string and not the integer. 
-                // However, we still need to support the old format so we need to convert:
-                //  int -> Enum -> string
+                // However, we still need to support the old format so we need to convert.
                 int SelectedCompoundId = Convert.ToInt32(oldFormatCompoundIdEl.Value);
-                if (Enum.IsDefined(typeof(ChemicalCompounds), (byte)SelectedCompoundId))
+                if (SelectedCompoundId >= 0 && ChemicalCompoundOptions.All.Length > SelectedCompoundId)
                 {
-                    m_compound = ChemicalCompoundsFormatter.ToPrettyString((ChemicalCompounds)SelectedCompoundId);
+                    m_compound = ChemicalCompoundOptions.All[SelectedCompoundId];
                 }
             }
             else

@@ -9,12 +9,9 @@ namespace ChemProV.Logic
         
         public HeatExchangerNoUtility(int id)
             : base(id, "Exc" + id.ToString()) { }
-        
+
         public HeatExchangerNoUtility(XElement loadFromMe)
-            : base(loadFromMe)
-        {
-            Label = "Exc" + Id.ToString();
-        }
+            : base(loadFromMe) { }
 
         public override string Description
         {

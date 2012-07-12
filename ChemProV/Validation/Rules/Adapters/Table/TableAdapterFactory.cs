@@ -9,7 +9,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using ChemProV.Logic;
 using ChemProV.PFD.Streams.PropertiesWindow;
-using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 
 namespace ChemProV.Validation.Rules.Adapters.Table

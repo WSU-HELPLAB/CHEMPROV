@@ -14,10 +14,6 @@ using System.Xml.Linq;
 using ChemProV.Logic.Equations;
 using ChemProV.Logic;
 
-// Dependencies:
-//  1. StickyNote_UIIndependent.cs
-//  2. EquationModel.cs (and all its dependencies)
-
 namespace ChemProV.Core
 {
     /// <summary>

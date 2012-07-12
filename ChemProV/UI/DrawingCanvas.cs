@@ -16,17 +16,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
-using System.Xml.Linq;
 using System.Xml.Serialization;
 using ChemProV.Core;
-using ChemProV.PFD;
 using ChemProV.Logic;
+using ChemProV.PFD;
 using ChemProV.PFD.Streams;
-using ChemProV.PFD.Streams.PropertiesWindow;
-using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
-using ChemProV.PFD.Streams.PropertiesWindow.Heat;
 using ChemProV.UI.DrawingCanvasStates;
-using System.ComponentModel;
 
 namespace ChemProV.UI
 {

@@ -11,12 +11,9 @@ namespace ChemProV.Logic
 
         public Mixer(int id)
             : base(id, "Mix" + id.ToString()) { }
-        
+
         public Mixer(XElement loadFromMe)
-            : base(loadFromMe)
-        {
-            Label = "Mix" + Id.ToString();
-        }
+            : base(loadFromMe) { }
 
         public override string Description
         {

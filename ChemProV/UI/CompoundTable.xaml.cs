@@ -13,7 +13,6 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using ChemProV.PFD.Streams.PropertiesWindow;
-using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using System.ComponentModel;
 using ChemProV.Logic;
 
