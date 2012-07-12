@@ -10,7 +10,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System;
 using System.Collections.Generic;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     /// <summary>
     /// An undo/redo action is an object that provides an undo or redo for a specific action. 

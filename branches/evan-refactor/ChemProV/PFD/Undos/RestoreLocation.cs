@@ -18,6 +18,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Core;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.Undos
 {
@@ -25,6 +26,7 @@ namespace ChemProV.PFD.Undos
     /// E.O.
     /// This class represents an undo action that will set the position of a UserControl 
     /// on a canvas.
+    /// TODO: Make this deal with the data strucures and not the UI elements
     /// </summary>
     public class RestoreLocation : IUndoRedoAction
     {

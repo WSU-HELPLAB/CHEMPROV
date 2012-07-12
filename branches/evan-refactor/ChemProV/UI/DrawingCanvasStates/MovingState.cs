@@ -15,6 +15,7 @@ using ChemProV.UI;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 using ChemProV.Logic.Undos;
+using ChemProV.Logic;
 
 namespace ChemProV.UI.DrawingCanvasStates
 {
@@ -214,7 +215,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             DraggableStreamEndpoint streamEndpoint = dropTarget as DraggableStreamEndpoint;
             if (streamEndpoint.CanConnectTo(pu))
             {
-                Core.AbstractStream stream = streamEndpoint.ParentStream.Stream;
+                AbstractStream stream = streamEndpoint.ParentStream.Stream;
                 switch (streamEndpoint.Type)
                 {
                     case DraggableStreamEndpoint.EndpointType.StreamDestination:

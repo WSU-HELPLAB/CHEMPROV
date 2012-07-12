@@ -1,54 +1,42 @@
 ﻿using System;
 using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
 using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
-    public class Mixer : AbstractProcessUnit
+    public class Reactor : AbstractProcessUnit
     {
-        public Mixer()
+        public Reactor()
             : this(AbstractProcessUnit.GetNextUID()) { }
 
-        public Mixer(int id)
-            : base(id, "Mix" + id.ToString()) { }
+        public Reactor(int id)
+            : base(id, "Rct" + id.ToString()) { }
         
-        public Mixer(XElement loadFromMe)
+        public Reactor(XElement loadFromMe)
             : base(loadFromMe)
         {
-            Label = "Mix" + Id.ToString();
+            Label = "Rct" + Id.ToString();
         }
 
         public override string Description
         {
-            get { return "Mixer"; }
+            get { return "Reactor"; }
         }
 
         public override bool IsAvailableWithDifficulty(OptionDifficultySetting difficulty)
         {
-            // Mixers are available at all difficulty settings
-            return true;
+            // Reactors are available on everything but the easiest difficulty setting
+            return (OptionDifficultySetting.MaterialBalance != difficulty);
         }
 
         public override int MaxIncomingHeatStreams
         {
-            get { return 0; }
+            get { return 1; }
         }
 
         public override int MaxIncomingStreams
         {
-            get
-            {
-                // -1 implies an infinite number of possible incoming streams
-                return -1;
-            }
+            get { return -1; }
         }
 
         public override int MaxOutgoingHeatStreams
@@ -69,7 +57,7 @@ namespace ChemProV.Core
         {
             get
             {
-                return "Mixer";
+                return "Reactor";
             }
         }
     }

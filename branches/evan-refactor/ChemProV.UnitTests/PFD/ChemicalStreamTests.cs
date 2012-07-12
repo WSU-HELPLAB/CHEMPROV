@@ -12,6 +12,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ChemProV.PFD.Streams.PropertiesWindow.Chemical;
 using System.Diagnostics;
 using ChemProV.Core;
+using ChemProV.Logic;
 
 namespace ChemProV.UnitTests.PFD
 {
@@ -60,7 +61,7 @@ namespace ChemProV.UnitTests.PFD
             Assert.IsNotNull(cbUnits, "Could not find combo box control for selected units");
             
             // Select mole %, which should change the label from M1 to N1
-            cbUnits.SelectedItem = Core.ChemicalUnits.MolePercent.ToPrettyString();
+            cbUnits.SelectedItem = "mol %";
 
             // Verify that the label changed to "N1"
             Assert.IsTrue(tbLabel.Text.Equals("N1"), "Test Failed: After unit change, the label " +

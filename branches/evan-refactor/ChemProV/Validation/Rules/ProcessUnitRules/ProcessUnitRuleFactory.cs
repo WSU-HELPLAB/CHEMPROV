@@ -8,6 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using ChemProV.UI;
+using ChemProV.Logic;
 
 namespace ChemProV.Validation.Rules.ProcessUnitRules
 {
@@ -31,11 +32,11 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         {
             GenericProcessUnitRule puRule;
 
-            if (pu.ProcessUnit is Core.Reactor)
+            if (pu.ProcessUnit is Reactor)
             {
                 puRule = new ReactorProcessUnitRule();
             }
-            else if (pu.ProcessUnit is Core.HeatExchangerNoUtility)
+            else if (pu.ProcessUnit is HeatExchangerNoUtility)
             {
                 puRule = new HeatExchangerWithoutUtilityProcessUnitRule();
             }

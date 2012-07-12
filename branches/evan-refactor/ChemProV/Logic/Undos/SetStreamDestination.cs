@@ -9,8 +9,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 // Original file author: Evan Olds
 
-using ChemProV.Core;
-
 namespace ChemProV.Logic.Undos
 {
     /// <summary>
@@ -20,7 +18,7 @@ namespace ChemProV.Logic.Undos
     /// Since setting stream destinations potentially changes the location, this undo takes 
     /// care of restoring position as well.
     /// </summary>
-    public class SetStreamDestination : ChemProV.Core.IUndoRedoAction
+    public class SetStreamDestination : IUndoRedoAction
     {
         private MathCore.Vector m_location;
 
@@ -47,7 +45,7 @@ namespace ChemProV.Logic.Undos
             m_opposite.m_stream = m_stream;
         }
 
-        public ChemProV.Core.IUndoRedoAction Execute(ChemProV.Core.Workspace sender)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             // Set the destination
             m_stream.Destination = m_pu;

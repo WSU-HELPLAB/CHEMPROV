@@ -2,6 +2,6 @@
 {
     public interface IWorkspaceChangeListener
     {
-        void SetWorkspace(ChemProV.Core.Workspace workspace);
+        void SetWorkspace(ChemProV.Logic.Workspace workspace);
     }
 }

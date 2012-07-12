@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Xml.Linq;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public static class ProcessUnitFactory
     {

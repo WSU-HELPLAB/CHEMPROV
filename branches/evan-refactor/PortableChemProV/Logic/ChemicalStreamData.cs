@@ -14,8 +14,9 @@ using System.Xml;
 using System.Xml.Serialization;
 using System.Linq;
 using System.Xml.Linq;
+using System.Reflection;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     /// <summary>
     /// Object representation of a data row in the properties table for chemical streams.
@@ -42,17 +43,18 @@ namespace ChemProV.Core
 
         public ChemicalStreamData()
         {
-            foreach (ChemicalUnits unit in Enum.GetValues(typeof(ChemicalUnits)))
+            foreach (string unit in ChemicalUnitOptions.ShortNames)
             {
-                m_unitOptions.Add(unit.ToPrettyString());
+                m_unitOptions.Add(unit);
             }
 
             // Create the list of compound options. We want the first to be "Overall" and then the 
             // rest should be from the ChemicalCompounds enumeration.
             m_compoundOptions.Add("Overall");
-            foreach (ChemicalCompounds compound in Enum.GetValues(typeof(ChemicalCompounds)))
+            //foreach (ChemicalCompounds compound in Enum.GetValues(typeof(ChemicalCompounds)))
+            foreach (string compound in ChemicalCompoundOptions.All)
             {
-                m_compoundOptions.Add(compound.ToPrettyString());
+                m_compoundOptions.Add(compound);
             }
         }
 
@@ -83,7 +85,7 @@ namespace ChemProV.Core
                 int SelectedCompoundId = Convert.ToInt32(oldFormatCompoundIdEl.Value);
                 if (Enum.IsDefined(typeof(ChemicalCompounds), (byte)SelectedCompoundId))
                 {
-                    m_compound = ((ChemicalCompounds)SelectedCompoundId).ToPrettyString();
+                    m_compound = ChemicalCompoundsFormatter.ToPrettyString((ChemicalCompounds)SelectedCompoundId);
                 }
             }
             else
@@ -103,9 +105,9 @@ namespace ChemProV.Core
                 // Check for item that was used in older versions
                 XElement uidEl = loadFromMe.Element("UnitId");
                 int unitEnumInt = Convert.ToInt32(uidEl.Value);
-                if (Enum.IsDefined(typeof(ChemicalUnits), unitEnumInt))
+                if (unitEnumInt >=0 && unitEnumInt < ChemicalUnitOptions.ShortNames.Length)
                 {
-                    m_selectedUnits = ((ChemicalUnits)unitEnumInt).ToPrettyString();
+                    m_selectedUnits = ChemicalUnitOptions.ShortNames[unitEnumInt];
                 }
             }
 

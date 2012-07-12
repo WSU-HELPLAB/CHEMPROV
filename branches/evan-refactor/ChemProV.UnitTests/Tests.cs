@@ -1,4 +1,6 @@
-﻿using System;
+﻿using System.IO;
+using System.Collections.Generic;
+using System;
 using System.Net;
 using System.Text;
 using System.Windows;
@@ -11,6 +13,8 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using Microsoft.Silverlight.Testing;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using ChemProV.Logic;
+using ChemProV.Logic.Equations;
 
 namespace ChemProV.UnitTests
 {
@@ -27,14 +31,14 @@ namespace ChemProV.UnitTests
             MainPage mp = new MainPage();
 
             // Get a reference to the logical workspace. Modifying it should update the interface.
-            Core.Workspace ws = mp.GetLogicalWorkspace();
+            Workspace ws = mp.GetLogicalWorkspace();
 
             // Add some equations. Just a reminder that one blank one is added by default
-            ws.Equations.Add(new ChemProV.PFD.EquationEditor.Models.EquationModel()
+            ws.Equations.Add(new EquationModel()
             {
                 Equation = "A*B+C",
             });
-            ws.Equations.Add(new ChemProV.PFD.EquationEditor.Models.EquationModel()
+            ws.Equations.Add(new EquationModel()
             {
                 Equation = "(X+Y)*Z",
             });
@@ -53,6 +57,74 @@ namespace ChemProV.UnitTests
                 ws.Equations.Count == mp.WorkspaceReference.EquationEditorReference.EquationRowCount,
                 string.Format("FAIL: Expected equation count after removal={0}, actual={1}",
                     ws.Equations.Count, mp.WorkspaceReference.EquationEditorReference.EquationRowCount));
+        }
+
+        [TestMethod]
+        public void TestSaveLoad()
+        {
+            int i;
+            Workspace ws1 = new Workspace();
+            Random rand = new Random();
+
+            // Add a random number of process units
+            List<int> puIDs = new List<int>();
+            int numPU = rand.Next(25);
+            for (i = 0; i < numPU; i++)
+            {
+                AbstractProcessUnit pu = new Mixer();
+                ws1.AddProcessUnit(pu);
+                puIDs.Add(pu.Id);
+            }
+
+            // Add a random number of chemical streams
+            int numStreams = rand.Next(10);
+            for (i = 0; i < numStreams; i++)
+            {
+                AbstractStream stream = new ChemicalStream(AbstractStream.GetNextUID());
+                ws1.AddStream(stream);
+
+                // Don't forget that the properties table needs to be created separately
+                stream.PropertiesTable = new StreamPropertiesTable(stream);
+
+                // 50% chance of connecting a destination (attempting a connect that is)
+                if (0 == (rand.Next() % 2))
+                {
+                    AbstractProcessUnit pu = ws1.ProcessUnits[rand.Next(ws1.ProcessUnitCount)];
+                    if (pu.AttachIncomingStream(stream))
+                    {
+                        stream.Destination = pu;
+                    }
+                }
+            }
+
+            // Save the workspace to a memory stream
+            MemoryStream ms = new MemoryStream();
+            ws1.Save(ms, "TEST_VersionNA");
+
+            // Load to a new workspace
+            Workspace ws2 = new Workspace();
+            ws2.Load(ms);
+
+            // Make sure the number of process units and streams match
+            Assert.IsTrue(numPU == ws2.ProcessUnitCount,
+                "Number of process units between saved document (" + numPU.ToString() +
+                ") and loaded document (" + ws2.ProcessUnitCount.ToString() + ") do not match");
+            Assert.IsTrue(numStreams == ws2.Streams.Count,
+                "Number of streams between saved document (" + numStreams.ToString() + 
+                ") and loaded document (" + ws2.Streams.Count.ToString() + ") do not match");
+
+            // Test that the incoming/outgoing streams for process units match
+            foreach (AbstractProcessUnit pu1 in ws1.ProcessUnits)
+            {
+                AbstractProcessUnit pu2 = ws2.GetProcessUnit(pu1.Id);
+                Assert.IsNotNull(pu2,
+                    "Process unit with ID=" + pu1.Id.ToString() + " from workspace 1 (saved) was not " +
+                    "found in workspace 2 (loaded).");
+
+                // For now just compare outoging stream count
+                Assert.IsTrue(pu1.OutgoingStreamCount == pu2.OutgoingStreamCount,
+                    "Mis-match outgoing stream count");
+            }
         }
 
         [TestMethod]

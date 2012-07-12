@@ -23,6 +23,7 @@ using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.Validation.Feedback;
 using ChemProV.Validation.Rules;
 using ChemProV.Validation.Rules.Adapters.Table;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
@@ -52,7 +53,7 @@ namespace ChemProV.UI
         private Dictionary<string, StickyNoteColors> m_snUserColors =
             new Dictionary<string, StickyNoteColors>();
 
-        private Core.Workspace m_workspace = null;
+        private Workspace m_workspace = null;
 
         #endregion Fields
 
@@ -186,7 +187,7 @@ namespace ChemProV.UI
             m_workspace.Clear();
 
             // Add the default equation row
-            m_workspace.Equations.Add(new PFD.EquationEditor.Models.EquationModel());
+            m_workspace.Equations.Add(new Logic.Equations.EquationModel());
             
             //now, clear the drawing drawing_canvas
             DrawingCanvas.ClearDrawingCanvas();
@@ -254,7 +255,7 @@ namespace ChemProV.UI
 
         #endregion Private Helper
 
-        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        public void SetWorkspace(Workspace workspace)
         {
             if (object.ReferenceEquals(m_workspace, workspace))
             {

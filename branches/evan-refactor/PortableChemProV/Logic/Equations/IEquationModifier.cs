@@ -7,7 +7,7 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
-namespace ChemProV.PFD.EquationEditor.Models
+namespace ChemProV.Logic.Equations
 {
     public interface IEquationModifier
     {

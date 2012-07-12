@@ -18,9 +18,9 @@ using System.ComponentModel;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     // Do NOT rename properties in this class. Changing various properties fires the PropertyChanged 
     // event (if non-null) and subscribers to this event rely on the property names staying the same.
@@ -228,6 +228,19 @@ namespace ChemProV.Core
             }
         }
 
+        public AbstractProcessUnit GetProcessUnit(int id)
+        {
+            foreach (AbstractProcessUnit pu in m_procUnits)
+            {
+                if (id == pu.Id)
+                {
+                    return pu;
+                }
+            }
+
+            return null;
+        }
+
         public AbstractStream GetStream(int id)
         {
             foreach (AbstractStream stream in m_streams)
@@ -239,6 +252,13 @@ namespace ChemProV.Core
             }
 
             return null;
+        }
+
+        public void Load(System.IO.Stream s)
+        {
+            s.Position = 0;
+            XDocument doc = XDocument.Load(s);
+            Load(doc);
         }
 
         public void Load(XDocument doc)
@@ -318,7 +338,7 @@ namespace ChemProV.Core
                     {
                         userName = userAttr.Value;
                     }
-                    m_dfAnalysis.Comments.Add(new Core.BasicComment(el.Value, userName));
+                    m_dfAnalysis.Comments.Add(new BasicComment(el.Value, userName));
                 }
             }
             else
@@ -361,6 +381,14 @@ namespace ChemProV.Core
             x = 0.0;
             y = 0.0;
             return false;
+        }
+
+        public int ProcessUnitCount
+        {
+            get
+            {
+                return m_procUnits.Count;
+            }
         }
 
         /// <summary>
@@ -559,7 +587,7 @@ namespace ChemProV.Core
                 // Write degrees of freedom analysis
                 writer.WriteStartElement("DegreesOfFreedomAnalysis");
                 writer.WriteElementString("Text", m_dfAnalysis.Text);
-                foreach (Core.BasicComment bc in m_dfAnalysis.Comments)
+                foreach (BasicComment bc in m_dfAnalysis.Comments)
                 {
                     writer.WriteStartElement("Comment");
                     if (!string.IsNullOrEmpty(bc.CommentUserName))

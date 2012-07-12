@@ -17,6 +17,7 @@ using System.Windows.Media.Imaging;
 using ChemProV.Core;
 using ChemProV.UI;
 using ChemProV.UI.DrawingCanvasStates;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.Streams
 {
@@ -98,7 +99,7 @@ namespace ChemProV.PFD.Streams
         /// <summary>
         /// Determines whether or not this endpoint can connect to the specified process unit
         /// </summary>
-        public bool CanConnectTo(Core.AbstractProcessUnit processUnit)
+        public bool CanConnectTo(AbstractProcessUnit processUnit)
         {
             // The logic to determine this is already implemented in the process unit. We just 
             // have to identify whether we're incoming or outgoing.

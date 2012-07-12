@@ -12,7 +12,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Streams.PropertiesWindow;
-
+using ChemProV.Logic;
 using ChemProV.Validation.Rules.Adapters.Table;
 
 namespace ChemProV.Validation.Rules.ProcessUnitRules
@@ -27,7 +27,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// <summary>
         /// This is a reference to the GenericProcessUnit being checked
         /// </summary>
-        protected Core.AbstractProcessUnit target;
+        protected AbstractProcessUnit target;
 
         /// <summary>
         /// List of compounds coming into the target GenericProcessUnit.  Declared as
@@ -128,13 +128,13 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
                 //this should hit both incoming and outgoing streams, so we need to create a new
                 //list that merges the two streams
-                List<Core.AbstractStream> mergedList = new List<Core.AbstractStream>(
+                List<AbstractStream> mergedList = new List<AbstractStream>(
                     target.IncomingStreamCount + target.OutgoingStreamCount);
-                foreach (Core.AbstractStream stream in target.IncomingStreams)
+                foreach (AbstractStream stream in target.IncomingStreams)
                 {
                     mergedList.Add(stream);
                 }
-                foreach (Core.AbstractStream stream in target.OutgoingStreams)
+                foreach (AbstractStream stream in target.OutgoingStreams)
                 {
                     mergedList.Add(stream);
                 }
@@ -261,10 +261,10 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
             //if we found a mismatch, we need to target all streams, so create a master
             //stream list
-            List<Core.AbstractStream> masterList = new List<Core.AbstractStream>();
+            List<AbstractStream> masterList = new List<AbstractStream>();
 
             //loop through incoming & outgoing streams
-            foreach (Core.AbstractStream stream in target.IncomingStreams)
+            foreach (AbstractStream stream in target.IncomingStreams)
             {
                 ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
 
@@ -280,7 +280,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
                     }
                 }
             }
-            foreach (Core.AbstractStream stream in target.OutgoingStreams)
+            foreach (AbstractStream stream in target.OutgoingStreams)
             {
                 ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
 
@@ -336,12 +336,12 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// </summary>
         /// <param name="streams"></param>
         /// <returns></returns>
-        protected virtual Dictionary<string, StreamComponent> TallyCompounds(IEnumerable<Core.AbstractStream> streams)
+        protected virtual Dictionary<string, StreamComponent> TallyCompounds(IEnumerable<AbstractStream> streams)
         {
             Dictionary<string, StreamComponent> compounds = new Dictionary<string, StreamComponent>(5);
 
             //tally up flow rates for each compound
-            foreach (Core.AbstractStream stream in streams)
+            foreach (AbstractStream stream in streams)
             {
                 // TODO: Get the commented-out part working again
                 throw new NotImplementedException();
@@ -374,12 +374,12 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// </summary>
         /// <param name="streams">This is a list of streams whos Overall will be add together</param>
         /// <returns>Returns a StreamComponent which contains the results</returns>
-        private StreamComponent TallyOverallFlowRate(IEnumerable<Core.AbstractStream> streams)
+        private StreamComponent TallyOverallFlowRate(IEnumerable<AbstractStream> streams)
         {
             StreamComponent component = new StreamComponent();
 
             //tally up flow rates coming into this compound
-            foreach (Core.AbstractStream stream in streams)
+            foreach (AbstractStream stream in streams)
             {
                 // TODO: Get the commented-out part working again
                 throw new NotImplementedException();
@@ -438,7 +438,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             }
             set
             {
-                target = value as Core.AbstractProcessUnit;
+                target = value as AbstractProcessUnit;
 
                 if (target != null)
                 {

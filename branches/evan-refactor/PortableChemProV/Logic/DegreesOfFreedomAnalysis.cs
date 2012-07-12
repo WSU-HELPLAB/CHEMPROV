@@ -11,7 +11,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public class DegreesOfFreedomAnalysis : INotifyPropertyChanged
     {

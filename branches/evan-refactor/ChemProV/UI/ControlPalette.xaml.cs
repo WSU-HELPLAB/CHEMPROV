@@ -22,6 +22,7 @@ using System.Windows.Shapes;
 using System.Reflection;
 using ChemProV.UI;
 using ChemProV.PFD.Streams;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
@@ -144,7 +145,7 @@ namespace ChemProV.UI
                 Type newObjType = ((Border)sender).Tag as Type;
 
                 // If it's a process unit, assign the state to create it
-                if (newObjType.IsSubclassOf(typeof(Core.AbstractProcessUnit)))
+                if (newObjType.IsSubclassOf(typeof(AbstractProcessUnit)))
                 {
                     canvas.CurrentState = new UI.DrawingCanvasStates.PlacingNewProcessUnit(
                         this, canvas, newObjType);
@@ -159,7 +160,7 @@ namespace ChemProV.UI
         public void RefreshPalette(OptionDifficultySetting setting)
         {
             // Show or hide the heat stream button based on the setting
-            if ((new Core.HeatStream(-1)).IsAvailableWithDifficulty(setting))
+            if ((new HeatStream(-1)).IsAvailableWithDifficulty(setting))
             {
                 HeatStreamButton.Visibility = System.Windows.Visibility.Visible;
             }
@@ -180,7 +181,7 @@ namespace ChemProV.UI
             int puBtns = 0;
 
             // Use reflection to find appropriate process units and streams for the palette
-            Assembly a = Assembly.GetExecutingAssembly();
+            Assembly a = typeof(Logic.AbstractProcessUnit).Assembly;
             foreach (Type t in a.GetTypes())
             {
                 // Ignore abstract types
@@ -190,12 +191,12 @@ namespace ChemProV.UI
                 }
 
                 // We only are interested in types that inherit from AbstractProcessUnit
-                if (t.IsSubclassOf(typeof(Core.AbstractProcessUnit)) && !t.IsAbstract)
+                if (t.IsSubclassOf(typeof(AbstractProcessUnit)) && !t.IsAbstract)
                 {
                     // We've found a potential process unit, but we need to make sure that 
                     // it can be created under the specified difficulty setting
-                    Core.AbstractProcessUnit unit = 
-                        Activator.CreateInstance(t, (int)-1) as Core.AbstractProcessUnit;
+                    AbstractProcessUnit unit = 
+                        Activator.CreateInstance(t, (int)-1) as AbstractProcessUnit;
                     if (unit.IsAvailableWithDifficulty(setting))
                     {
                         if (0 == (puBtns % m_buttonsPerRow))

@@ -15,11 +15,10 @@ using System.Xml.Linq;
 using System.Collections.Generic;
 using System.Collections.Specialized;
 using System.Collections.ObjectModel;
-using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.MathCore;
 using System.ComponentModel;
 
-namespace ChemProV.Core
+namespace ChemProV.Logic
 {
     public class StreamPropertiesTable : INotifyPropertyChanged
     {
@@ -53,7 +52,7 @@ namespace ChemProV.Core
 
         public StreamPropertiesTable(AbstractStream parentStream)
         {
-            m_type = (parentStream is Core.HeatStream) ? StreamType.Heat : StreamType.Chemical;
+            m_type = (parentStream is HeatStream) ? StreamType.Heat : StreamType.Chemical;
 
             // Keep a reference to the parent stream
             m_parent = parentStream;

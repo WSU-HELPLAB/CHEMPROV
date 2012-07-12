@@ -18,11 +18,12 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Xml;
 using System.Xml.Serialization;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 using ChemProV.UI;
 using ChemProV.PFD.Streams.PropertiesWindow;
 using ChemProV.PFD.Undos;
 using System.ComponentModel;
+using ChemProV.Logic;
 
 namespace ChemProV.PFD.EquationEditor
 {
@@ -43,9 +44,9 @@ namespace ChemProV.PFD.EquationEditor
         /// List of stream property tables that we've attached row-change listeners to. Gets updated 
         /// when the collection of streams in the workspace changes.
         /// </summary>
-        private List<Core.StreamPropertiesTable> m_monitoredTables = new List<Core.StreamPropertiesTable>();
+        private List<StreamPropertiesTable> m_monitoredTables = new List<StreamPropertiesTable>();
 
-        private ChemProV.Core.Workspace m_workspace = null;
+        private Workspace m_workspace = null;
 
         #endregion
 
@@ -237,7 +238,7 @@ namespace ChemProV.PFD.EquationEditor
 #endif
             
             // Create an undo that will add it back
-            m_workspace.AddUndo(new Core.UndoRedoCollection(
+            m_workspace.AddUndo(new UndoRedoCollection(
                 "Undo deleting equation row",
                 new InsertEquation(m_workspace, thisOne.Model, index)));
 
@@ -274,7 +275,7 @@ namespace ChemProV.PFD.EquationEditor
                 return;
             }
             
-            IList<string> compounds = Core.WorkspaceUtility.GetUniqueSelectedCompounds(m_workspace);
+            IList<string> compounds = WorkspaceUtility.GetUniqueSelectedCompounds(m_workspace);
             
             equationTypes = new ObservableCollection<EquationType>();
             elements.Clear();
@@ -317,17 +318,17 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        private List<object> GetElementAndStreams(Core.AbstractProcessUnit unit)
+        private List<object> GetElementAndStreams(AbstractProcessUnit unit)
         {
             List<object> elements = new List<object>();
             
             // Add the process unit as well as its incoming and outgoing streams
             elements.Add(unit);
-            foreach (Core.AbstractStream element in unit.IncomingStreams)
+            foreach (AbstractStream element in unit.IncomingStreams)
             {
                 elements.Add(element);
             }
-            foreach (Core.AbstractStream element in unit.OutgoingStreams)
+            foreach (AbstractStream element in unit.OutgoingStreams)
             {
                 elements.Add(element);
             }
@@ -343,9 +344,9 @@ namespace ChemProV.PFD.EquationEditor
             {
                 //With a single unit, all we care about is that unit and its related streams
                 case EquationScopeClassification.SingleUnit:
-                    Core.AbstractProcessUnit selectedUnit = (from element in m_workspace.ProcessUnits
-                                                      where (element as Core.AbstractProcessUnit).Label == equation.Scope.Name
-                                                      select element).FirstOrDefault() as Core.AbstractProcessUnit;
+                    AbstractProcessUnit selectedUnit = (from element in m_workspace.ProcessUnits
+                                                      where (element as AbstractProcessUnit).Label == equation.Scope.Name
+                                                      select element).FirstOrDefault() as AbstractProcessUnit;
                     if (selectedUnit != null)
                     {
                         relevantUnits = GetElementAndStreams(selectedUnit);
@@ -486,7 +487,7 @@ namespace ChemProV.PFD.EquationEditor
             m_workspace.Equations.Add(new EquationModel());
 
             // Add an undo that will delete that row
-            m_workspace.AddUndo(new Core.UndoRedoCollection(
+            m_workspace.AddUndo(new UndoRedoCollection(
                 "Undo adding new equation row",
                 new RemoveEquation(m_workspace, m_workspace.Equations.Count - 1)));
         }
@@ -509,7 +510,7 @@ namespace ChemProV.PFD.EquationEditor
             return count;
         }
 
-        public void SetWorkspace(ChemProV.Core.Workspace workspace)
+        public void SetWorkspace(Workspace workspace)
         {
             if (object.ReferenceEquals(m_workspace, workspace))
             {
@@ -658,7 +659,7 @@ namespace ChemProV.PFD.EquationEditor
             EquationScopes.Add(new EquationScope(EquationScopeClassification.Unknown, Name = "Unknown"));
 
             // Add any process units and subprocesses to the list of possible scopes
-            foreach (Core.AbstractProcessUnit apu in m_workspace.ProcessUnits)
+            foreach (AbstractProcessUnit apu in m_workspace.ProcessUnits)
             {
                 EquationScopes.Add(new EquationScope(EquationScopeClassification.SingleUnit, Name = apu.Label));
 
@@ -704,23 +705,23 @@ namespace ChemProV.PFD.EquationEditor
         private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
         {
             // Start by unsubscribing from the old list
-            foreach (Core.StreamPropertiesTable table in m_monitoredTables)
+            foreach (StreamPropertiesTable table in m_monitoredTables)
             {
                 table.RowPropertyChanged -= this.TableRowPropertyChanged;
             }
 
             // Rebuild the list and subsribe to changes in chemical stream property tables
             m_monitoredTables.Clear();
-            foreach (Core.AbstractStream stream in m_workspace.Streams)
+            foreach (AbstractStream stream in m_workspace.Streams)
             {
-                Core.ChemicalStream cs = stream as Core.ChemicalStream;
+                ChemicalStream cs = stream as ChemicalStream;
                 if (null == cs)
                 {
                     // Ignore it if it's not a chemical stream
                     continue;
                 }
 
-                Core.StreamPropertiesTable table = cs.PropertiesTable;
+                StreamPropertiesTable table = cs.PropertiesTable;
                 if (null == table)
                 {
                     throw new InvalidOperationException(

@@ -16,14 +16,14 @@ namespace ChemProV.Logic.Undos
     /// Represents an undo/redo action that will add a stream, process unit, or sticky 
     /// note to the workspace.
     /// </summary>
-    public class AddToWorkspace : ChemProV.Core.IUndoRedoAction
+    public class AddToWorkspace : IUndoRedoAction
     {
         private object m_toAdd;
         
         public AddToWorkspace(object objToAdd)
         {
             if (!(objToAdd is AbstractProcessUnit) && !(objToAdd is AbstractStream) &&
-                !(objToAdd is ChemProV.Logic.StickyNote))
+                !(objToAdd is StickyNote))
             {
                 throw new InvalidOperationException(
                     "Object for an AddToWorkspace undo/redo action must be a process unit, " +
@@ -33,7 +33,7 @@ namespace ChemProV.Logic.Undos
             m_toAdd = objToAdd;
         }
 
-        public Core.IUndoRedoAction Execute(Core.Workspace sender)
+        public IUndoRedoAction Execute(Workspace sender)
         {
             if (m_toAdd is AbstractProcessUnit)
             {
