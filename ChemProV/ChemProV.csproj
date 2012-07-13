@@ -138,9 +138,11 @@
     <Compile Include="Grammars\Equation.cs" />
     <Compile Include="Grammars\Variable.cs" />
     <Compile Include="Logic\Undos\AddToWorkspace.cs" />
+    <Compile Include="Logic\Undos\InsertTableRow.cs" />
     <Compile Include="Logic\Undos\RemoveProcessUnit.cs" />
     <Compile Include="Logic\Undos\RemoveStickyNote.cs" />
     <Compile Include="Logic\Undos\RemoveStream.cs" />
+    <Compile Include="Logic\Undos\RemoveTableRow.cs" />
     <Compile Include="Logic\Undos\ResizeStickyNote.cs" />
     <Compile Include="Logic\Undos\SetStreamDestinationLocation.cs" />
     <Compile Include="Logic\Undos\SetStreamId.cs" />
