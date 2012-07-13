@@ -265,7 +265,14 @@ namespace ChemProV.UI
 
         private void RemoveRowBtn_Click(object sender, RoutedEventArgs e)
         {
+            // Get a reference to the row
             IStreamData row = (sender as Button).Tag as IStreamData;
+            
+            // Create an undo first
+            m_ws.AddUndo(new UndoRedoCollection("Undo deletion of row",
+                new Logic.Undos.InsertTableRow(m_table.IndexOfRow(row), row, m_table)));
+            
+            // Remove the row
             m_table.RemoveRow(row);
         }
 
@@ -548,6 +555,10 @@ namespace ChemProV.UI
                 {
                     m_table.AddNewRow();
                     int count = m_table.RowCount;
+
+                    // Add an undo to the workspace that will remove it
+                    m_ws.AddUndo(new UndoRedoCollection("Undo addition of new row",
+                        new Logic.Undos.RemoveTableRow(count - 1, m_table)));
 
                     m_programmaticallyChanging = true;
                     TextBox tbLabel = GetControl(m_table.Rows[count - 1], "Label") as TextBox;

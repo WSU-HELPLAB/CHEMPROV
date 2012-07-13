@@ -238,6 +238,27 @@ namespace ChemProV.Logic
         }
 
         /// <summary>
+        /// Removes the row at the specified index
+        /// </summary>
+        /// <param name="index"></param>
+        public void RemoveRowAt(int index)
+        {
+            if (index < 0 || index >= m_rows.Count)
+            {
+                return;
+            }
+            
+            // Remove the row
+            IStreamData row = m_rows[index];
+            m_rows.RemoveAt(index);
+
+            // Unsubscribe from events
+            row.PropertyChanged -= this.AnyRow_PropertyChanged;
+
+            RowsChanged(this, EventArgs.Empty);
+        }
+
+        /// <summary>
         /// Gets the number of rows of data in the table
         /// </summary>
         public int RowCount
