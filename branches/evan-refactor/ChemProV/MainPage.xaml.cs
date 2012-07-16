@@ -181,10 +181,28 @@ namespace ChemProV
             DebugTab.Visibility = System.Windows.Visibility.Visible;
 
             m_workspace.StreamsCollectionChanged += new EventHandler(WorkspaceStreamsCollectionChanged);
+            m_workspace.ProcessUnitsCollectionChanged += new EventHandler(WorkspaceProcessUnitsCollectionChanged);
 #endif
         }
 
 #if DEBUG
+        private void WorkspaceProcessUnitsCollectionChanged(object sender, EventArgs e)
+        {
+            // Right now we don't monitor any properties of the process units. For more robust debug 
+            // functionality in the future this should probably be implemented eventually.
+
+            // Clear and rebuild
+            ProcessUnitsDebugNode.Items.Clear();
+            foreach (AbstractProcessUnit apu in m_workspace.ProcessUnits)
+            {
+                ProcessUnitsDebugNode.Items.Add(new TreeViewItem()
+                {
+                    Header = apu.UIDString + "(" + apu.Label + ")",
+                    Tag = apu
+                });
+            }
+        }
+
         private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
         {
             // Remove previous event listeners
@@ -456,10 +474,19 @@ namespace ChemProV
             if (null != Core.App.OSBLEState && Core.App.OSBLEState.IsLoggedIn)
             {
                 UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(true);
+                win.OnChooseDiskOption += delegate(object o, EventArgs ea)
+                {
+                    SaveFileToDisk();
+                };
                 win.Show();
                 return;
-            }            
-            
+            }
+
+            SaveFileToDisk();
+        }
+
+        private void SaveFileToDisk()
+        {
             if (null == m_saveDialog)
             {
                 m_saveDialog = new SaveFileDialog();
@@ -761,7 +788,7 @@ namespace ChemProV
             if (state.IsLoggedIn)
             {
                 // Show the assignment browser window
-                AssignmentBrowserWindow abw = new AssignmentBrowserWindow(state, true);
+                AssignmentBrowserWindow abw = new AssignmentBrowserWindow(state, true, false);
                 abw.Show();
             }
         }

@@ -23,7 +23,7 @@ namespace ChemProV.Library.OSBLE
         
         private string m_password;
 
-        private List<Assignment> m_relevantAssignments = new List<Assignment>();
+        private List<RelevantAssignment> m_relevantAssignments = new List<RelevantAssignment>();
         
         private string m_userName;
 
@@ -31,17 +31,6 @@ namespace ChemProV.Library.OSBLE
         {
             m_userName = userName;
             m_password = password;
-        }
-
-        /// <summary>
-        /// Gets the list of assignments that was built during the last refresh.
-        /// </summary>
-        public IList<Assignment> Assignments
-        {
-            get
-            {
-                return m_relevantAssignments;
-            }
         }
 
         private void AuthClient_ValidateUserCompleted(object sender, ValidateUserCompletedEventArgs e)
@@ -100,6 +89,19 @@ namespace ChemProV.Library.OSBLE
             (e.UserState as Course).Assignments = e.Result;
             IList<Assignment> assignments = e.Result;
 
+            // Add assignments with ChemProV deliverables to the list of relevant assignments
+            foreach (Assignment a in assignments)
+            {
+                foreach (Deliverable d in a.Deliverables)
+                {
+                    if (DeliverableType.ChemProV == d.DeliverableType)
+                    {
+                        m_relevantAssignments.Add(new RelevantAssignment(a, e.UserState as Course, d));
+                        break;
+                    }
+                }
+            }
+
             if (0 == Interlocked.Decrement(ref m_coursesRemaining))
             {
                 OnRefreshComplete(this, OSBLEStateEventArgs.Empty);
@@ -156,6 +158,17 @@ namespace ChemProV.Library.OSBLE
             }
         }
 
+        /// <summary>
+        /// Gets the list of assignments from the last refresh that have ChemProV deliverables
+        /// </summary>
+        public IList<RelevantAssignment> RelevantAssignments
+        {
+            get
+            {
+                return m_relevantAssignments;
+            }
+        }
+
         #region Events
 
         /// <summary>
@@ -169,6 +182,59 @@ namespace ChemProV.Library.OSBLE
         public event EventHandler OnRefreshComplete = delegate { };
 
         #endregion Events
+
+        public class RelevantAssignment
+        {
+            private Assignment m_assignment;
+
+            private Course m_course;
+
+            /// <summary>
+            /// Reference to the first deliverable in the assignment that has a ChemProV type
+            /// </summary>
+            private Deliverable m_deliverable;
+
+            /// <param name="deliverable">Reference to the first deliverable in the assignment that has a 
+            /// ChemProV type</param>
+            public RelevantAssignment(Assignment assignment, Course course, Deliverable deliverable)
+            {
+                m_assignment = assignment;
+                m_course = course;
+                m_deliverable = deliverable;
+            }
+
+            public Assignment Assignment
+            {
+                get
+                {
+                    return m_assignment;
+                }
+            }
+
+            public Course Course
+            {
+                get
+                {
+                    return m_course;
+                }
+            }
+
+            /// <summary>
+            /// Gets a reference to the first deliverable in the assignment that has a ChemProV type
+            /// </summary>
+            public Deliverable Deliverable
+            {
+                get
+                {
+                    return m_deliverable;
+                }
+            }
+
+            public override string ToString()
+            {
+                return string.Format("{0} ({1}.cpml)", m_assignment.AssignmentName, m_deliverable.Name);
+            }
+        }
     }
 
     public class OSBLEStateEventArgs : EventArgs
