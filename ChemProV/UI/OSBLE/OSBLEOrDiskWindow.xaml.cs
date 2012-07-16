@@ -33,10 +33,25 @@ namespace ChemProV.UI.OSBLE
             }
         }
 
-        private void CancelButton_Click(object sender, RoutedEventArgs e)
+        private void DiskButton_Click(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
+            this.DialogResult = true;
+
+            OnChooseDiskOption(this, EventArgs.Empty);
         }
+
+        private void OSBLEButton_Click(object sender, RoutedEventArgs e)
+        {
+            // Hide this window first
+            this.DialogResult = true;
+            
+            // Launch the assignment browser
+            ChemProV.Library.OSBLE.Views.AssignmentBrowserWindow abw = new Library.OSBLE.Views.AssignmentBrowserWindow(
+                Core.App.OSBLEState, false, m_saveMode);
+            abw.Show();
+        }
+
+        public event EventHandler OnChooseDiskOption = delegate { };
     }
 }
 

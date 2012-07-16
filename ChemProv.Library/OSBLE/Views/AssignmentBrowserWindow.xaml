@@ -13,8 +13,8 @@
         </Grid.RowDefinitions>
 
         <!-- Text block that gets shown if they have just logged into OSBLE -->
-        <TextBlock x:Name="JustLoggedInMsg" TextWrapping="Wrap" Grid.Row="0" Grid.Column="0">You are now logged in to OSBLE. You can 
-            browse through your courses below and load files from assignments, if applicable. If you do not wish to load files at this 
+        <TextBlock x:Name="JustLoggedInMsg" TextWrapping="Wrap" Grid.Row="0" Grid.Column="0">You are now logged in to OSBLE. The list below 
+            contains assignments with ChemProV deliverables that you can load. If you do not wish to load files at this 
             time then click cancel (you will remain logged into OSBLE).
         </TextBlock>
 

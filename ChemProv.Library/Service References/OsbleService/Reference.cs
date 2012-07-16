@@ -439,6 +439,8 @@ namespace ChemProV.Library.OsbleService {
     [System.Runtime.Serialization.DataContractAttribute(Name="Assignment", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
     public partial class Assignment : object, System.ComponentModel.INotifyPropertyChanged {
         
+        private double AddedPointsField;
+        
         private string AssignmentDescriptionField;
         
         private string AssignmentNameField;
@@ -466,6 +468,8 @@ namespace ChemProV.Library.OsbleService {
         private System.Nullable<int> CourseIDField;
         
         private System.Nullable<System.DateTime> CriticalReviewPublishDateField;
+        
+        private ChemProV.Library.OsbleService.CriticalReviewSettings CriticalReviewSettingsField;
         
         private double DeductionPerUnitField;
         
@@ -511,7 +515,18 @@ namespace ChemProV.Library.OsbleService {
         
         private ChemProV.Library.OsbleService.AssignmentTypes TypeField;
         
-        private double addedPointsField;
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public double AddedPoints {
+            get {
+                return this.AddedPointsField;
+            }
+            set {
+                if ((this.AddedPointsField.Equals(value) != true)) {
+                    this.AddedPointsField = value;
+                    this.RaisePropertyChanged("AddedPoints");
+                }
+            }
+        }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string AssignmentDescription {
@@ -691,6 +706,19 @@ namespace ChemProV.Library.OsbleService {
                 if ((this.CriticalReviewPublishDateField.Equals(value) != true)) {
                     this.CriticalReviewPublishDateField = value;
                     this.RaisePropertyChanged("CriticalReviewPublishDate");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public ChemProV.Library.OsbleService.CriticalReviewSettings CriticalReviewSettings {
+            get {
+                return this.CriticalReviewSettingsField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.CriticalReviewSettingsField, value) != true)) {
+                    this.CriticalReviewSettingsField = value;
+                    this.RaisePropertyChanged("CriticalReviewSettings");
                 }
             }
         }
@@ -977,19 +1005,6 @@ namespace ChemProV.Library.OsbleService {
                 if ((this.TypeField.Equals(value) != true)) {
                     this.TypeField = value;
                     this.RaisePropertyChanged("Type");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double addedPoints {
-            get {
-                return this.addedPointsField;
-            }
-            set {
-                if ((this.addedPointsField.Equals(value) != true)) {
-                    this.addedPointsField = value;
-                    this.RaisePropertyChanged("addedPoints");
                 }
             }
         }
@@ -1816,6 +1831,111 @@ namespace ChemProV.Library.OsbleService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
+    [System.Runtime.Serialization.DataContractAttribute(Name="CriticalReviewSettings", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
+    public partial class CriticalReviewSettings : object, System.ComponentModel.INotifyPropertyChanged {
+        
+        private bool AllowReviewersToDownloadField;
+        
+        private bool AnonymizeAuthorToReviewerField;
+        
+        private bool AnonymizeReviewerToAuthorField;
+        
+        private bool AnonymizeReviewerToReviewersField;
+        
+        private ChemProV.Library.OsbleService.Assignment AssignmentField;
+        
+        private int AssignmentIDField;
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AllowReviewersToDownload {
+            get {
+                return this.AllowReviewersToDownloadField;
+            }
+            set {
+                if ((this.AllowReviewersToDownloadField.Equals(value) != true)) {
+                    this.AllowReviewersToDownloadField = value;
+                    this.RaisePropertyChanged("AllowReviewersToDownload");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AnonymizeAuthorToReviewer {
+            get {
+                return this.AnonymizeAuthorToReviewerField;
+            }
+            set {
+                if ((this.AnonymizeAuthorToReviewerField.Equals(value) != true)) {
+                    this.AnonymizeAuthorToReviewerField = value;
+                    this.RaisePropertyChanged("AnonymizeAuthorToReviewer");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AnonymizeReviewerToAuthor {
+            get {
+                return this.AnonymizeReviewerToAuthorField;
+            }
+            set {
+                if ((this.AnonymizeReviewerToAuthorField.Equals(value) != true)) {
+                    this.AnonymizeReviewerToAuthorField = value;
+                    this.RaisePropertyChanged("AnonymizeReviewerToAuthor");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool AnonymizeReviewerToReviewers {
+            get {
+                return this.AnonymizeReviewerToReviewersField;
+            }
+            set {
+                if ((this.AnonymizeReviewerToReviewersField.Equals(value) != true)) {
+                    this.AnonymizeReviewerToReviewersField = value;
+                    this.RaisePropertyChanged("AnonymizeReviewerToReviewers");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public ChemProV.Library.OsbleService.Assignment Assignment {
+            get {
+                return this.AssignmentField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.AssignmentField, value) != true)) {
+                    this.AssignmentField = value;
+                    this.RaisePropertyChanged("Assignment");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public int AssignmentID {
+            get {
+                return this.AssignmentIDField;
+            }
+            set {
+                if ((this.AssignmentIDField.Equals(value) != true)) {
+                    this.AssignmentIDField = value;
+                    this.RaisePropertyChanged("AssignmentID");
+                }
+            }
+        }
+        
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        
+        protected void RaisePropertyChanged(string propertyName) {
+            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
+            if ((propertyChanged != null)) {
+                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
     [System.Runtime.Serialization.DataContractAttribute(Name="DiscussionSetting", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
     public partial class DiscussionSetting : object, System.ComponentModel.INotifyPropertyChanged {
         
@@ -1825,9 +1945,15 @@ namespace ChemProV.Library.OsbleService {
         
         private int AssignmentIDField;
         
-        private bool HasAnonymousPostsField;
+        private bool HasAnonymousInstructorsToStudentsField;
         
-        private bool HasAnonymousRolesField;
+        private bool HasAnonymousModeratorsToStudentsField;
+        
+        private bool HasAnonymousStudentsToModeratorsField;
+        
+        private bool HasAnonymousStudentsToStudentsField;
+        
+        private bool HasHiddenRolesField;
         
         private System.DateTime InitialPostDueDateField;
         
@@ -1837,7 +1963,7 @@ namespace ChemProV.Library.OsbleService {
         
         private bool RequiresPostBeforeViewField;
         
-        private bool TAsCanPostToAllField;
+        private bool TAsCanPostToAllDiscussionsField;
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public byte AnonymitySettings {
@@ -1879,27 +2005,66 @@ namespace ChemProV.Library.OsbleService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool HasAnonymousPosts {
+        public bool HasAnonymousInstructorsToStudents {
             get {
-                return this.HasAnonymousPostsField;
+                return this.HasAnonymousInstructorsToStudentsField;
             }
             set {
-                if ((this.HasAnonymousPostsField.Equals(value) != true)) {
-                    this.HasAnonymousPostsField = value;
-                    this.RaisePropertyChanged("HasAnonymousPosts");
+                if ((this.HasAnonymousInstructorsToStudentsField.Equals(value) != true)) {
+                    this.HasAnonymousInstructorsToStudentsField = value;
+                    this.RaisePropertyChanged("HasAnonymousInstructorsToStudents");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool HasAnonymousRoles {
+        public bool HasAnonymousModeratorsToStudents {
             get {
-                return this.HasAnonymousRolesField;
+                return this.HasAnonymousModeratorsToStudentsField;
             }
             set {
-                if ((this.HasAnonymousRolesField.Equals(value) != true)) {
-                    this.HasAnonymousRolesField = value;
-                    this.RaisePropertyChanged("HasAnonymousRoles");
+                if ((this.HasAnonymousModeratorsToStudentsField.Equals(value) != true)) {
+                    this.HasAnonymousModeratorsToStudentsField = value;
+                    this.RaisePropertyChanged("HasAnonymousModeratorsToStudents");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool HasAnonymousStudentsToModerators {
+            get {
+                return this.HasAnonymousStudentsToModeratorsField;
+            }
+            set {
+                if ((this.HasAnonymousStudentsToModeratorsField.Equals(value) != true)) {
+                    this.HasAnonymousStudentsToModeratorsField = value;
+                    this.RaisePropertyChanged("HasAnonymousStudentsToModerators");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool HasAnonymousStudentsToStudents {
+            get {
+                return this.HasAnonymousStudentsToStudentsField;
+            }
+            set {
+                if ((this.HasAnonymousStudentsToStudentsField.Equals(value) != true)) {
+                    this.HasAnonymousStudentsToStudentsField = value;
+                    this.RaisePropertyChanged("HasAnonymousStudentsToStudents");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool HasHiddenRoles {
+            get {
+                return this.HasHiddenRolesField;
+            }
+            set {
+                if ((this.HasHiddenRolesField.Equals(value) != true)) {
+                    this.HasHiddenRolesField = value;
+                    this.RaisePropertyChanged("HasHiddenRoles");
                 }
             }
         }
@@ -1957,14 +2122,14 @@ namespace ChemProV.Library.OsbleService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool TAsCanPostToAll {
+        public bool TAsCanPostToAllDiscussions {
             get {
-                return this.TAsCanPostToAllField;
+                return this.TAsCanPostToAllDiscussionsField;
             }
             set {
-                if ((this.TAsCanPostToAllField.Equals(value) != true)) {
-                    this.TAsCanPostToAllField = value;
-                    this.RaisePropertyChanged("TAsCanPostToAll");
+                if ((this.TAsCanPostToAllDiscussionsField.Equals(value) != true)) {
+                    this.TAsCanPostToAllDiscussionsField = value;
+                    this.RaisePropertyChanged("TAsCanPostToAllDiscussions");
                 }
             }
         }
@@ -4018,9 +4183,7 @@ namespace ChemProV.Library.OsbleService {
         
         private string LevelTitleField;
         
-        private int RangeEndField;
-        
-        private int RangeStartField;
+        private int PointSpreadField;
         
         private ChemProV.Library.OsbleService.Rubric RubricField;
         
@@ -4053,27 +4216,14 @@ namespace ChemProV.Library.OsbleService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public int RangeEnd {
+        public int PointSpread {
             get {
-                return this.RangeEndField;
+                return this.PointSpreadField;
             }
             set {
-                if ((this.RangeEndField.Equals(value) != true)) {
-                    this.RangeEndField = value;
-                    this.RaisePropertyChanged("RangeEnd");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int RangeStart {
-            get {
-                return this.RangeStartField;
-            }
-            set {
-                if ((this.RangeStartField.Equals(value) != true)) {
-                    this.RangeStartField = value;
-                    this.RaisePropertyChanged("RangeStart");
+                if ((this.PointSpreadField.Equals(value) != true)) {
+                    this.PointSpreadField = value;
+                    this.RaisePropertyChanged("PointSpread");
                 }
             }
         }
@@ -4128,6 +4278,11 @@ namespace ChemProV.Library.OsbleService {
         
         System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> EndGetCourseAssignments(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/GetAssignmentSubmission", ReplyAction="urn:OsbleService/GetAssignmentSubmissionResponse")]
+        System.IAsyncResult BeginGetAssignmentSubmission(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        byte[] EndGetAssignmentSubmission(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/GetCourseRole", ReplyAction="urn:OsbleService/GetCourseRoleResponse")]
         System.IAsyncResult BeginGetCourseRole(int courseId, string authToken, System.AsyncCallback callback, object asyncState);
         
@@ -4178,6 +4333,25 @@ namespace ChemProV.Library.OsbleService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetAssignmentSubmissionCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetAssignmentSubmissionCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public byte[] Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((byte[])(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class GetCourseRoleCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
         
         private object[] results;
@@ -4210,6 +4384,12 @@ namespace ChemProV.Library.OsbleService {
         private EndOperationDelegate onEndGetCourseAssignmentsDelegate;
         
         private System.Threading.SendOrPostCallback onGetCourseAssignmentsCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginGetAssignmentSubmissionDelegate;
+        
+        private EndOperationDelegate onEndGetAssignmentSubmissionDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetAssignmentSubmissionCompletedDelegate;
         
         private BeginOperationDelegate onBeginGetCourseRoleDelegate;
         
@@ -4273,6 +4453,8 @@ namespace ChemProV.Library.OsbleService {
         public event System.EventHandler<GetCoursesCompletedEventArgs> GetCoursesCompleted;
         
         public event System.EventHandler<GetCourseAssignmentsCompletedEventArgs> GetCourseAssignmentsCompleted;
+        
+        public event System.EventHandler<GetAssignmentSubmissionCompletedEventArgs> GetAssignmentSubmissionCompleted;
         
         public event System.EventHandler<GetCourseRoleCompletedEventArgs> GetCourseRoleCompleted;
         
@@ -4372,6 +4554,54 @@ namespace ChemProV.Library.OsbleService {
             base.InvokeAsync(this.onBeginGetCourseAssignmentsDelegate, new object[] {
                         courseId,
                         authToken}, this.onEndGetCourseAssignmentsDelegate, this.onGetCourseAssignmentsCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult ChemProV.Library.OsbleService.OsbleService.BeginGetAssignmentSubmission(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetAssignmentSubmission(assignmentId, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        byte[] ChemProV.Library.OsbleService.OsbleService.EndGetAssignmentSubmission(System.IAsyncResult result) {
+            return base.Channel.EndGetAssignmentSubmission(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetAssignmentSubmission(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            int assignmentId = ((int)(inValues[0]));
+            string authToken = ((string)(inValues[1]));
+            return ((ChemProV.Library.OsbleService.OsbleService)(this)).BeginGetAssignmentSubmission(assignmentId, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndGetAssignmentSubmission(System.IAsyncResult result) {
+            byte[] retVal = ((ChemProV.Library.OsbleService.OsbleService)(this)).EndGetAssignmentSubmission(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetAssignmentSubmissionCompleted(object state) {
+            if ((this.GetAssignmentSubmissionCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetAssignmentSubmissionCompleted(this, new GetAssignmentSubmissionCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetAssignmentSubmissionAsync(int assignmentId, string authToken) {
+            this.GetAssignmentSubmissionAsync(assignmentId, authToken, null);
+        }
+        
+        public void GetAssignmentSubmissionAsync(int assignmentId, string authToken, object userState) {
+            if ((this.onBeginGetAssignmentSubmissionDelegate == null)) {
+                this.onBeginGetAssignmentSubmissionDelegate = new BeginOperationDelegate(this.OnBeginGetAssignmentSubmission);
+            }
+            if ((this.onEndGetAssignmentSubmissionDelegate == null)) {
+                this.onEndGetAssignmentSubmissionDelegate = new EndOperationDelegate(this.OnEndGetAssignmentSubmission);
+            }
+            if ((this.onGetAssignmentSubmissionCompletedDelegate == null)) {
+                this.onGetAssignmentSubmissionCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetAssignmentSubmissionCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetAssignmentSubmissionDelegate, new object[] {
+                        assignmentId,
+                        authToken}, this.onEndGetAssignmentSubmissionDelegate, this.onGetAssignmentSubmissionCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -4522,6 +4752,20 @@ namespace ChemProV.Library.OsbleService {
             public System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> EndGetCourseAssignments(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> _result = ((System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment>)(base.EndInvoke("GetCourseAssignments", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetAssignmentSubmission(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[2];
+                _args[0] = assignmentId;
+                _args[1] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("GetAssignmentSubmission", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public byte[] EndGetAssignmentSubmission(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                byte[] _result = ((byte[])(base.EndInvoke("GetAssignmentSubmission", _args, result)));
                 return _result;
             }
             
