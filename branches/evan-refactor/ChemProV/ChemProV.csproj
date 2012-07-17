@@ -127,7 +127,6 @@
     </Compile>
     <Compile Include="Core\IRemoveSelfFromCanvas.cs" />
     <Compile Include="Core\App.cs" />
-    <Compile Include="Core\CommentMerger.cs" />
     <Compile Include="Core\DrawingCanvasCommands.cs" />
     <Compile Include="Core\ICanvasElement.cs" />
     <Compile Include="Core\NamedColors.cs" />

@@ -141,6 +141,19 @@ namespace ChemProV.Logic
             }
         }
 
+        public EquationModel GetById(int id)
+        {
+            foreach (EquationModel em in m_eqs)
+            {
+                if (id == em.Id)
+                {
+                    return em;
+                }
+            }
+
+            return null;
+        }
+
         public IEnumerator<EquationModel> GetEnumerator()
         {
             return new ECEnumerator(m_eqs);
