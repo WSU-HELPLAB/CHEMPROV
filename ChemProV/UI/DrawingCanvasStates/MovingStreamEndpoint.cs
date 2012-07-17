@@ -204,7 +204,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             // let up near the source location then we go to "click-click" creation mode 
             // instead of "click-drag-release" creation mode.
             MathCore.Vector v = new Vector(p.X, p.Y);
-            if (m_creatingStream && (v - m_stream.SourceLocation).Length < 10.0)
+            if (m_creatingStream && (v - m_stream.SourceLocation).Length < 20.0)
             {
                 // Ignore this event and wait for the next mouse down
                 return;
@@ -241,9 +241,9 @@ namespace ChemProV.UI.DrawingCanvasStates
                         m_stream.Destination = m_connectedToOnStart;
                     }
 
-                    m_stream = null;
-                    Core.App.ControlPalette.SwitchToSelect();
-                    return;
+                    //m_stream = null;
+                    //Core.App.ControlPalette.SwitchToSelect();
+                    //return;
                 }
             }
             
