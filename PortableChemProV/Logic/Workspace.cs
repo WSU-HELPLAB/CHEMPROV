@@ -518,6 +518,15 @@ namespace ChemProV.Logic
             }
         }
 
+        public void Save(System.IO.Stream outputStream)
+        {
+            // I wish there were a more elegant way to do this than hard-coding a version string 
+            // that has to be changed every build, but it looks like you can't specify a version 
+            // number for a portable class library (at this point in time) and then use 
+            // reflection to retrieve it at runtime.
+            Save(outputStream, "1.12.7.17");
+        }
+
         public void Save(System.IO.Stream outputStream, string versionNumber)
         {
             XmlWriterSettings settings = new XmlWriterSettings();

@@ -69,6 +69,22 @@ namespace ChemProV.Logic
             }
         }
 
+        /// <summary>
+        /// Returns true if there exists a comment in the collection with the specified text
+        /// </summary>
+        public bool ContainsComment(string commentText)
+        {
+            foreach (BasicComment bc in m_comments)
+            {
+                if (commentText == bc.CommentText)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
         public string Text
         {
             get
