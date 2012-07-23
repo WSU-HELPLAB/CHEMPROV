@@ -23,6 +23,7 @@ using System.Xml.Serialization;
 using ChemProV.Library.OSBLE.Views;
 using ChemProV.PFD.EquationEditor;
 using ChemProV.UI;
+using ChemProV.UI.OSBLE;
 using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
@@ -473,16 +474,18 @@ namespace ChemProV
             // user a choice of saving to disk or to OSBLE
             if (null != Core.App.OSBLEState && Core.App.OSBLEState.IsLoggedIn)
             {
-                UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(true);
+                UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(
+                    Core.App.OSBLEState, true);
                 win.OnChooseDiskOption += delegate(object o, EventArgs ea)
                 {
                     SaveFileToDisk();
                 };
                 win.Show();
-                return;
             }
-
-            SaveFileToDisk();
+            else
+            {
+                SaveFileToDisk();
+            }
         }
 
         private void SaveFileToDisk()
@@ -548,6 +551,26 @@ namespace ChemProV
         /// </summary>
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
+            // If we have a non-null OSBLE state object and we're logged in, then we need to give the 
+            // user a choice of saving to disk or to OSBLE
+            if (null != Core.App.OSBLEState && Core.App.OSBLEState.IsLoggedIn)
+            {
+                UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(
+                    Core.App.OSBLEState, false);
+                win.OnChooseDiskOption += delegate(object o, EventArgs ea)
+                {
+                    OpenFileFromDisk();
+                };
+                win.Show();
+            }
+            else
+            {
+                OpenFileFromDisk();
+            }
+        }
+
+        private void OpenFileFromDisk()
+        {            
             OpenFileDialog openDialog = new OpenFileDialog();
             openDialog.Filter = c_loadFileFilter;
             bool? openFileResult = false;
@@ -787,8 +810,9 @@ namespace ChemProV
 
             if (state.IsLoggedIn)
             {
-                // Show the assignment browser window
-                AssignmentBrowserWindow abw = new AssignmentBrowserWindow(state, true, false);
+                // Show the assignment browser window. It will do the loading if the user chooses 
+                // a file to open.
+                AssignmentChooserWindow abw = new AssignmentChooserWindow(state, true, false);
                 abw.Show();
             }
         }

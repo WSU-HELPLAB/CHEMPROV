@@ -3,11 +3,11 @@
         <bindings>
             <basicHttpBinding>
                 <binding name="BasicHttpBinding_AuthenticationService" maxBufferSize="2147483647"
-                    maxReceivedMessageSize="2147483647">
+                    maxReceivedMessageSize="2147483647" sendTimeout="00:00:15">
                     <security mode="None" />
                 </binding>
                 <binding name="BasicHttpBinding_OsbleService" maxBufferSize="2147483647"
-                    maxReceivedMessageSize="2147483647">
+                    maxReceivedMessageSize="2147483647" sendTimeout="00:00:15">
                     <security mode="None" />
                 </binding>
             </basicHttpBinding>
