@@ -1,10 +1,9 @@
-﻿<controls:ChildWindow xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"  
-           x:Class="ChemProV.Library.OSBLE.Views.AssignmentBrowserWindow"
+﻿<controls:ChildWindow xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"  x:Class="ChemProV.UI.OSBLE.AssignmentChooserWindow"
            xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
            xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
            Width="400" Height="300" 
-           Title="OSBLE Assignment Browser">
+           Title="OSBLE Assignments" Closing="ChildWindow_Closing">
     <Grid x:Name="LayoutRoot" Margin="2">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -18,12 +17,16 @@
             time then click cancel (you will remain logged into OSBLE).
         </TextBlock>
 
-        <sdk:TreeView Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" Name="MainTreeView" VerticalAlignment="Stretch" SelectedItemChanged="MainTreeView_SelectedItemChanged">
-
+        <sdk:TreeView Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" Name="MainTreeView" VerticalAlignment="Stretch" 
+            SelectedItemChanged="MainTreeView_SelectedItemChanged">
+            <!-- Items in the tree are created at runtime -->
         </sdk:TreeView>
+
+        <!-- Progress bar that gets shown when a file is being loaded or saved -->
+        <ProgressBar x:Name="MainProgressBar" Grid.Row="2" Visibility="Collapsed" Height="23" IsIndeterminate="True" />
 
         <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="2" />
         <Button x:Name="OKButton" Content="Open" Click="OKButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,79,0" Grid.Row="2" IsEnabled="False" />
-        
+
     </Grid>
 </controls:ChildWindow>

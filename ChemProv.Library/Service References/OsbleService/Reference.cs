@@ -4287,6 +4287,11 @@ namespace ChemProV.Library.OsbleService {
         System.IAsyncResult BeginGetCourseRole(int courseId, string authToken, System.AsyncCallback callback, object asyncState);
         
         ChemProV.Library.OsbleService.CourseRole EndGetCourseRole(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/SubmitAssignment", ReplyAction="urn:OsbleService/SubmitAssignmentResponse")]
+        System.IAsyncResult BeginSubmitAssignment(int assignmentId, byte[] zipData, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        bool EndSubmitAssignment(System.IAsyncResult result);
     }
     
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
@@ -4371,6 +4376,25 @@ namespace ChemProV.Library.OsbleService {
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]
     [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class SubmitAssignmentCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public SubmitAssignmentCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public bool Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
     public partial class OsbleServiceClient : System.ServiceModel.ClientBase<ChemProV.Library.OsbleService.OsbleService>, ChemProV.Library.OsbleService.OsbleService {
         
         private BeginOperationDelegate onBeginGetCoursesDelegate;
@@ -4396,6 +4420,12 @@ namespace ChemProV.Library.OsbleService {
         private EndOperationDelegate onEndGetCourseRoleDelegate;
         
         private System.Threading.SendOrPostCallback onGetCourseRoleCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginSubmitAssignmentDelegate;
+        
+        private EndOperationDelegate onEndSubmitAssignmentDelegate;
+        
+        private System.Threading.SendOrPostCallback onSubmitAssignmentCompletedDelegate;
         
         private BeginOperationDelegate onBeginOpenDelegate;
         
@@ -4457,6 +4487,8 @@ namespace ChemProV.Library.OsbleService {
         public event System.EventHandler<GetAssignmentSubmissionCompletedEventArgs> GetAssignmentSubmissionCompleted;
         
         public event System.EventHandler<GetCourseRoleCompletedEventArgs> GetCourseRoleCompleted;
+        
+        public event System.EventHandler<SubmitAssignmentCompletedEventArgs> SubmitAssignmentCompleted;
         
         public event System.EventHandler<System.ComponentModel.AsyncCompletedEventArgs> OpenCompleted;
         
@@ -4652,6 +4684,56 @@ namespace ChemProV.Library.OsbleService {
                         authToken}, this.onEndGetCourseRoleDelegate, this.onGetCourseRoleCompletedDelegate, userState);
         }
         
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult ChemProV.Library.OsbleService.OsbleService.BeginSubmitAssignment(int assignmentId, byte[] zipData, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginSubmitAssignment(assignmentId, zipData, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        bool ChemProV.Library.OsbleService.OsbleService.EndSubmitAssignment(System.IAsyncResult result) {
+            return base.Channel.EndSubmitAssignment(result);
+        }
+        
+        private System.IAsyncResult OnBeginSubmitAssignment(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            int assignmentId = ((int)(inValues[0]));
+            byte[] zipData = ((byte[])(inValues[1]));
+            string authToken = ((string)(inValues[2]));
+            return ((ChemProV.Library.OsbleService.OsbleService)(this)).BeginSubmitAssignment(assignmentId, zipData, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndSubmitAssignment(System.IAsyncResult result) {
+            bool retVal = ((ChemProV.Library.OsbleService.OsbleService)(this)).EndSubmitAssignment(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnSubmitAssignmentCompleted(object state) {
+            if ((this.SubmitAssignmentCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.SubmitAssignmentCompleted(this, new SubmitAssignmentCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void SubmitAssignmentAsync(int assignmentId, byte[] zipData, string authToken) {
+            this.SubmitAssignmentAsync(assignmentId, zipData, authToken, null);
+        }
+        
+        public void SubmitAssignmentAsync(int assignmentId, byte[] zipData, string authToken, object userState) {
+            if ((this.onBeginSubmitAssignmentDelegate == null)) {
+                this.onBeginSubmitAssignmentDelegate = new BeginOperationDelegate(this.OnBeginSubmitAssignment);
+            }
+            if ((this.onEndSubmitAssignmentDelegate == null)) {
+                this.onEndSubmitAssignmentDelegate = new EndOperationDelegate(this.OnEndSubmitAssignment);
+            }
+            if ((this.onSubmitAssignmentCompletedDelegate == null)) {
+                this.onSubmitAssignmentCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnSubmitAssignmentCompleted);
+            }
+            base.InvokeAsync(this.onBeginSubmitAssignmentDelegate, new object[] {
+                        assignmentId,
+                        zipData,
+                        authToken}, this.onEndSubmitAssignmentDelegate, this.onSubmitAssignmentCompletedDelegate, userState);
+        }
+        
         private System.IAsyncResult OnBeginOpen(object[] inValues, System.AsyncCallback callback, object asyncState) {
             return ((System.ServiceModel.ICommunicationObject)(this)).BeginOpen(callback, asyncState);
         }
@@ -4780,6 +4862,21 @@ namespace ChemProV.Library.OsbleService {
             public ChemProV.Library.OsbleService.CourseRole EndGetCourseRole(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 ChemProV.Library.OsbleService.CourseRole _result = ((ChemProV.Library.OsbleService.CourseRole)(base.EndInvoke("GetCourseRole", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginSubmitAssignment(int assignmentId, byte[] zipData, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[3];
+                _args[0] = assignmentId;
+                _args[1] = zipData;
+                _args[2] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("SubmitAssignment", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public bool EndSubmitAssignment(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                bool _result = ((bool)(base.EndInvoke("SubmitAssignment", _args, result)));
                 return _result;
             }
         }

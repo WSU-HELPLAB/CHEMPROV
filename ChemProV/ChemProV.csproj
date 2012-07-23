@@ -163,6 +163,9 @@
     <Compile Include="UI\ChangeStreamNumberWindow.xaml.cs">
       <DependentUpon>ChangeStreamNumberWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="UI\OSBLE\AssignmentChooserWindow.xaml.cs">
+      <DependentUpon>AssignmentChooserWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="UI\OSBLE\OSBLEOrDiskWindow.xaml.cs">
       <DependentUpon>OSBLEOrDiskWindow.xaml</DependentUpon>
     </Compile>
@@ -288,6 +291,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="UI\OSBLE\AssignmentChooserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="UI\OSBLE\OSBLEOrDiskWindow.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -356,6 +363,7 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Libraries\SharpZipLib.Silverlight4.dll" />
     <Content Include="UI\Icons\down_arrow_16x16.png" />
     <Content Include="UI\Icons\plus_16x16.png" />
     <Content Include="UI\Icons\up_arrow_16x16.png" />
@@ -376,7 +384,6 @@
   <ItemGroup>
     <Content Include="Libraries\Behaviors.dll" />
     <Content Include="Libraries\Behaviors.pdb" />
-    <Content Include="Libraries\ICSharpCode.SharpZipLib.Silverlight.dll" />
     <Content Include="Libraries\ImageTools.Controls.dll" />
     <Content Include="Libraries\ImageTools.Controls.pdb" />
     <Content Include="Libraries\ImageTools.Controls.XML" />
