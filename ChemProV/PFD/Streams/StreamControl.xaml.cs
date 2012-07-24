@@ -57,6 +57,13 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         private DraggableStreamEndpoint m_dstDragIcon = null;
 
+        /// <summary>
+        /// Set to true after a call to "RemoveSelfFromCanvas". After such a call this stream 
+        /// control is considered to be disposed and should not be used. This value is checked in 
+        /// various places to ensure this.
+        /// </summary>
+        private bool m_hasBeenRemoved = false;
+
         public bool m_isSelected = false;
 
         /// <summary>
@@ -133,14 +140,6 @@ namespace ChemProV.PFD.Streams
                 return null;
             }
             set { }
-        }
-
-        public MathCore.Vector StreamVector
-        {
-            get
-            {
-                return m_stream.DestinationLocation - m_stream.SourceLocation;
-            }
         }
 
         public DraggableStreamEndpoint DestinationDragIcon
@@ -491,13 +490,7 @@ namespace ChemProV.PFD.Streams
                 CreatePropertiesTable(m_stream.PropertiesTable);
 
                 // Watch for when the table location changes
-                m_stream.PropertiesTable.PropertyChanged += delegate(object sender, PropertyChangedEventArgs e)
-                {
-                    if (e.PropertyName.Equals("Location"))
-                    {
-                        UpdateStreamLocation();
-                    }
-                };
+                m_stream.PropertiesTable.PropertyChanged += new PropertyChangedEventHandler(PropertiesTable_PropertyChanged);
 
                 // Add it to the canvas and set it up
                 m_canvas.AddNewChild(m_table as UIElement);
@@ -539,6 +532,14 @@ namespace ChemProV.PFD.Streams
 
                 // 4.
                 stream.PropertyChanged += new PropertyChangedEventHandler(Stream_PropertyChanged);
+            }
+        }
+
+        private void PropertiesTable_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Location"))
+            {
+                UpdateStreamLocation();
             }
         }
 
@@ -682,6 +683,11 @@ namespace ChemProV.PFD.Streams
 
         private void SourceOrDest_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (m_hasBeenRemoved)
+            {
+                throw new InvalidOperationException();
+            }
+            
             UpdateStreamLocation();
         }
 
@@ -935,6 +941,7 @@ namespace ChemProV.PFD.Streams
         {
             // Unsubscribe from events (important)
             m_stream.PropertyChanged -= this.Stream_PropertyChanged;
+            m_stream.Comments.CollectionChanged -= this.Comments_CollectionChanged;
             if (null != m_sourceEventItem)
             {
                 m_sourceEventItem.PropertyChanged -= this.SourceOrDest_PropertyChanged;
@@ -944,6 +951,10 @@ namespace ChemProV.PFD.Streams
             {
                 m_destEventItem.PropertyChanged -= this.SourceOrDest_PropertyChanged;
                 m_destEventItem = null;
+            }
+            if (null != m_table)
+            {
+                m_stream.PropertiesTable.PropertyChanged -= this.PropertiesTable_PropertyChanged;
             }
             
             canvas.RemoveChild(this);
@@ -976,6 +987,9 @@ namespace ChemProV.PFD.Streams
                 canvas.RemoveChild(snc);
             }
             m_stickyNotes.Clear();
+
+            // Set the value to indiate that we've removed
+            m_hasBeenRemoved = true;
         }
 
         public Point Location
@@ -1003,6 +1017,13 @@ namespace ChemProV.PFD.Streams
         /// </summary>
         public virtual void UpdateStreamLocation()
         {
+            // Error check: we shouldn't be here if the control has been removed from the canvas
+            if (m_hasBeenRemoved)
+            {
+                throw new InvalidOperationException(
+                    "Stream control that was removed from the PFD is being notified to update its location.");
+            }
+            
             if (m_updatingLocation)
             {
                 return;
