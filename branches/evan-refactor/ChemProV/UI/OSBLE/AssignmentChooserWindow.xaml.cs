@@ -152,6 +152,9 @@ namespace ChemProV.UI.OSBLE
 
         private void State_OnSaveComplete(object sender, EventArgs e)
         {
+            // Remove the event listener
+            m_state.OnSaveComplete -= this.State_OnSaveComplete;
+            
             this.DialogResult = true;
             
             OSBLEStateEventArgs osea = e as OSBLEStateEventArgs;
