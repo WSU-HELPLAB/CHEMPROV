@@ -225,6 +225,17 @@ namespace ChemProV.UI
                     snc.UpdateLineToParent();
                 }
             }
+
+            // If we have 1 or more comments then we show the comment icon over the process unit, 
+            // otherwise we hide it
+            if (m_pu.Comments.Count >= 1)
+            {
+                CommentIcon.Visibility = System.Windows.Visibility.Visible;
+            }
+            else
+            {
+                CommentIcon.Visibility = System.Windows.Visibility.Collapsed;
+            }
         }
 
         private void ProcessUnitNameBox_KeyDown(object sender, KeyEventArgs e)
