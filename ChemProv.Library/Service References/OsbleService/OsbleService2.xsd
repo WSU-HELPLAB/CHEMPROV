@@ -49,6 +49,8 @@
       <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="Rubric" nillable="true" type="q4:Rubric" />
       <xs:element minOccurs="0" name="RubricID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="Scores" nillable="true" type="tns:ArrayOfScore" />
+      <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses.Rubrics" minOccurs="0" name="StudentRubric" nillable="true" type="q5:Rubric" />
+      <xs:element minOccurs="0" name="StudentRubricID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="TeamEvaluationSettings" nillable="true" type="tns:TeamEvaluationSettings" />
       <xs:element minOccurs="0" name="Type" type="tns:AssignmentTypes" />
     </xs:sequence>
@@ -89,7 +91,7 @@
   <xs:element name="ArrayOfTeamMember" nillable="true" type="tns:ArrayOfTeamMember" />
   <xs:complexType name="TeamMember">
     <xs:sequence>
-      <xs:element xmlns:q5="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="CourseUser" nillable="true" type="q5:CourseUser" />
+      <xs:element xmlns:q6="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="CourseUser" nillable="true" type="q6:CourseUser" />
       <xs:element minOccurs="0" name="CourseUserID" type="xs:int" />
       <xs:element minOccurs="0" name="Team" nillable="true" type="tns:Team" />
       <xs:element minOccurs="0" name="TeamID" type="xs:int" />
@@ -188,7 +190,7 @@
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
       <xs:element minOccurs="0" name="DeliverableType" type="tns:DeliverableType" />
-      <xs:element xmlns:q6="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="FileExtensions" nillable="true" type="q6:ArrayOfstring" />
+      <xs:element xmlns:q7="http://schemas.microsoft.com/2003/10/Serialization/Arrays" minOccurs="0" name="FileExtensions" nillable="true" type="q7:ArrayOfstring" />
       <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="Type" type="xs:int" />
     </xs:sequence>
@@ -239,7 +241,7 @@
       <xs:element minOccurs="0" name="AddedPoints" type="xs:double" />
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
-      <xs:element xmlns:q7="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="CourseUser" nillable="true" type="q7:CourseUser" />
+      <xs:element xmlns:q8="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses" minOccurs="0" name="CourseUser" nillable="true" type="q8:CourseUser" />
       <xs:element minOccurs="0" name="CourseUserID" type="xs:int" />
       <xs:element minOccurs="0" name="CustomLatePenaltyPercent" type="xs:double" />
       <xs:element minOccurs="0" name="ID" type="xs:int" />

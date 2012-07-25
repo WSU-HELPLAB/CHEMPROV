@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="OSBLE\OSBLEState.cs" />
+    <Compile Include="OSBLE\RelevantAssignment.cs" />
     <Compile Include="OSBLE\Views\LoginWindow.xaml.cs">
       <DependentUpon>LoginWindow.xaml</DependentUpon>
     </Compile>

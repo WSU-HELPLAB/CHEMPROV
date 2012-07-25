@@ -16,6 +16,8 @@ namespace ChemProV.UI.OSBLE
 {
     public partial class AssignmentChooserWindow : ChildWindow
     {
+        private int m_refreshRemaining = 0;
+        
         private bool m_saveMode;
 
         private OSBLEState m_state = null;
@@ -46,6 +48,45 @@ namespace ChemProV.UI.OSBLE
                 m_state.OnDownloadComplete -= this.State_OnDownloadCompleteCrossThread;
                 m_state.OnDownloadComplete += this.State_OnDownloadCompleteCrossThread;
             }
+        }
+
+        private void AssignmentGetComplete(object sender, EventArgs e)
+        {
+            RelevantAssignment.RelevantAssignmentEventArgs args =
+                e as RelevantAssignment.RelevantAssignmentEventArgs;
+            RelevantAssignment ra = sender as RelevantAssignment;
+
+            // Start with the node for the course/assignment
+            TreeViewItem tvi = new TreeViewItem();
+            tvi.Header = ra.CourseName + " : " + ra.Name;
+            tvi.Tag = ra;
+
+            // Now make child nodes for each file in the assignment
+            foreach (RelevantAssignment.AssignmentStream stream in args.Files)
+            {
+                TreeViewItem tviChild = new TreeViewItem();
+                tviChild.Header = stream.Name;
+                tviChild.Tag = stream;
+                tvi.Items.Add(tviChild);
+            }
+            tvi.IsExpanded = true;
+
+            MainTreeView.Items.Add(tvi);
+
+            if (0 == System.Threading.Interlocked.Decrement(ref m_refreshRemaining))
+            {
+                UpdateComplete();
+            }
+        }
+
+        /// <summary>
+        /// Called when the files for a relevant assignment have been updated and we can add a node to the 
+        /// tree. It is (potentially) called from another thread so we need to call an update method on the 
+        /// UI thread.
+        /// </summary>
+        private void AssignmentGetCompleteCrossThread(object sender, EventArgs e)
+        {
+            Dispatcher.BeginInvoke(new EventHandler(this.AssignmentGetComplete), sender, e);
         }
 
         private void CancelButton_Click(object sender, RoutedEventArgs e)
@@ -79,7 +120,8 @@ namespace ChemProV.UI.OSBLE
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             // Don't do anything if there's nothing selected in the tree
-            if (null == MainTreeView.SelectedItem)
+            if (null == MainTreeView.SelectedItem || 
+                null == (MainTreeView.SelectedItem as TreeViewItem).Tag)
             {
                 return;
             }
@@ -89,14 +131,21 @@ namespace ChemProV.UI.OSBLE
             CancelButton.Visibility = System.Windows.Visibility.Collapsed;
             MainProgressBar.Visibility = System.Windows.Visibility.Visible;
 
-            Assignment a = (MainTreeView.SelectedItem as TreeViewItem).Tag as Assignment;
+            // Get a reference to the workspace
+            Logic.Workspace ws = Core.App.Workspace.DrawingCanvasReference.GetWorkspace();
+
             if (m_saveMode)
             {
                 // Setup callback for save completion
                 m_state.OnSaveComplete -= this.State_OnSaveComplete;
                 m_state.OnSaveComplete += this.State_OnSaveComplete;
-                
-                Logic.Workspace ws = Core.App.Workspace.DrawingCanvasReference.GetWorkspace();
+
+                RelevantAssignment a = (MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment;
+                if (null == a)
+                {
+                    a = ((MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment.AssignmentStream).Parent;
+                }
+
                 System.IO.MemoryStream ms = new System.IO.MemoryStream();
                 ws.Save(ms);
                 byte[] data = ms.ToArray();
@@ -105,8 +154,42 @@ namespace ChemProV.UI.OSBLE
             }
             else
             {
-                // Open the file associated with the selected assignment
-                m_state.GetAssignmentStreamAsync(a);
+                // Get the assignment stream for the selected item
+                RelevantAssignment.AssignmentStream ras = (MainTreeView.SelectedItem as TreeViewItem).Tag as
+                    RelevantAssignment.AssignmentStream;
+                if (null != ras)
+                {
+                    m_state.CurrentAssignment = ras.Parent;
+                    if (0 == ras.Length)
+                    {
+                        MessageBox.Show("Assignment has yet to be submitted. You may save your work to OSBLE to " +
+                            "submit the first version for this assignment.");
+                    }
+                    else
+                    {
+                        try
+                        {
+                            ws.Load(ras);
+                        }
+                        catch (Exception)
+                        {
+                            MessageBox.Show("File could not be loaded. It is recommended that you try downloading " + 
+                                "the file from the OSBLE web interface.");
+                        }
+                    }
+                }
+                else
+                {
+                    RelevantAssignment ra = (MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment;
+                    m_state.CurrentAssignment = ra;
+                    if (0 == (MainTreeView.SelectedItem as TreeViewItem).Items.Count)
+                    {
+                        MessageBox.Show("Assignment has yet to be submitted. You may save your work to OSBLE to " +
+                            "submit the first version for this assignment.");
+                    }
+                    // Else we ignore it because they have to choose a child item
+                }
+                this.DialogResult = true;
             }
         }
 
@@ -170,63 +253,93 @@ namespace ChemProV.UI.OSBLE
             }
         }
 
+        private void UpdateComplete()
+        {
+            MainProgressBar.Visibility = System.Windows.Visibility.Collapsed;
+            OKButton.Visibility = System.Windows.Visibility.Visible;
+            CancelButton.Visibility = System.Windows.Visibility.Visible;
+            MainTreeView.IsEnabled = true;
+        }
+
         private void UpdateTree()
         {
             MainTreeView.Items.Clear();
 
-            if (true)
+            // Special case if there are no relevant assignments
+            if (0 == m_state.RelevantAssignments.Count)
             {
-                if (0 == m_state.Courses.Count)
+                TreeViewItem tvi = new TreeViewItem()
                 {
-                    TreeViewItem tvi = new TreeViewItem()
-                    {
-                        Header = "(no courses found)"
-                    };
-                    MainTreeView.Items.Add(tvi);
-                    return;
-                }
-
-                // Add a node for each course
-                foreach (Course course in m_state.Courses)
-                {
-                    TreeViewItem parentItem = new TreeViewItem()
-                    {
-                        Header = course.Name
-                    };
-
-                    if (0 != course.Assignments.Count)
-                    {
-                        // Add child nodes for each assignment
-                        foreach (Assignment assignment in course.Assignments)
-                        {
-                            TreeViewItem tvi = new TreeViewItem()
-                            {
-                                Header = assignment.AssignmentName
-                            };
-                            tvi.Tag = assignment;
-
-                            // See if we have ChemProV deliverables
-                            foreach (Deliverable d in assignment.Deliverables)
-                            {
-                                if (DeliverableType.ChemProV == d.DeliverableType)
-                                {
-                                    // Put the file name in the text after the assignment name
-                                    tvi.Header = string.Format("{0} ({1}.cpml)",
-                                        assignment.AssignmentName, d.Name);
-
-                                    // Add it to the parent item
-                                    parentItem.Items.Add(tvi);
-
-                                    break;
-                                }
-                            }
-                        }
-
-                        // Add the fully built parent item to the tree
-                        MainTreeView.Items.Add(parentItem);
-                    }
-                }
+                    Header = "(no courses found)"
+                };
+                MainTreeView.Items.Add(tvi);
+                return;
             }
+
+            // Disable the tree view until it is completely built
+            MainTreeView.IsEnabled = false;
+
+            // Hide buttons and show progress bar while we are refreshing
+            OKButton.Visibility = System.Windows.Visibility.Collapsed;
+            CancelButton.Visibility = System.Windows.Visibility.Collapsed;
+            MainProgressBar.Visibility = System.Windows.Visibility.Visible;
+
+            m_refreshRemaining = m_state.RelevantAssignments.Count;
+
+            // Tell each assignment to get its files
+            foreach (RelevantAssignment ra in m_state.RelevantAssignments)
+            {
+                ra.GetFilesAsync(this.AssignmentGetCompleteCrossThread);
+            }
+
+            //// Add a node for each course
+            //foreach (Course course in m_state.Courses)
+            //{
+            //    TreeViewItem parentItem = new TreeViewItem()
+            //    {
+            //        Header = course.Name
+            //    };
+
+            //    if (0 != course.Assignments.Count)
+            //    {
+            //        // Add child nodes for each assignment
+            //        foreach (Assignment assignment in course.Assignments)
+            //        {
+            //            // See if it's a discussion assignment on a ChemProV document
+            //            if (AssignmentTypes.CriticalReview == assignment.Type)
+            //            {
+            //                TreeViewItem tvi = new TreeViewItem();
+            //                tvi.Tag = assignment;
+
+            //                // TODO
+            //            }
+            //            else
+            //            {
+            //                // See if it has ChemProV deliverables
+            //                foreach (Deliverable d in assignment.Deliverables)
+            //                {
+            //                    if (DeliverableType.ChemProV == d.DeliverableType)
+            //                    {
+            //                        TreeViewItem tvi = new TreeViewItem();
+            //                        tvi.Tag = assignment;
+
+            //                        // Put the file name in the text after the assignment name
+            //                        tvi.Header = string.Format("{0} ({1}.cpml)",
+            //                            assignment.AssignmentName, d.Name);
+
+            //                        // Add it to the parent item
+            //                        parentItem.Items.Add(tvi);
+
+            //                        break;
+            //                    }
+            //                }
+            //            }
+            //        }
+
+            //        // Add the fully built parent item to the tree
+            //        MainTreeView.Items.Add(parentItem);
+            //    }
+            //}
         }
     }
 }

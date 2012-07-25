@@ -22,7 +22,7 @@
             <!-- Items in the tree are created at runtime -->
         </sdk:TreeView>
 
-        <!-- Progress bar that gets shown when a file is being loaded or saved -->
+        <!-- Progress bar that gets shown when a file is being loaded or saved or we are refreshing -->
         <ProgressBar x:Name="MainProgressBar" Grid.Row="2" Visibility="Collapsed" Height="23" IsIndeterminate="True" />
 
         <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="2" />

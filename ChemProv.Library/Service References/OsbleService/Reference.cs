@@ -511,6 +511,10 @@ namespace ChemProV.Library.OsbleService {
         
         private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Score> ScoresField;
         
+        private ChemProV.Library.OsbleService.Rubric StudentRubricField;
+        
+        private System.Nullable<int> StudentRubricIDField;
+        
         private ChemProV.Library.OsbleService.TeamEvaluationSettings TeamEvaluationSettingsField;
         
         private ChemProV.Library.OsbleService.AssignmentTypes TypeField;
@@ -979,6 +983,32 @@ namespace ChemProV.Library.OsbleService {
                 if ((object.ReferenceEquals(this.ScoresField, value) != true)) {
                     this.ScoresField = value;
                     this.RaisePropertyChanged("Scores");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public ChemProV.Library.OsbleService.Rubric StudentRubric {
+            get {
+                return this.StudentRubricField;
+            }
+            set {
+                if ((object.ReferenceEquals(this.StudentRubricField, value) != true)) {
+                    this.StudentRubricField = value;
+                    this.RaisePropertyChanged("StudentRubric");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public System.Nullable<int> StudentRubricID {
+            get {
+                return this.StudentRubricIDField;
+            }
+            set {
+                if ((this.StudentRubricIDField.Equals(value) != true)) {
+                    this.StudentRubricIDField = value;
+                    this.RaisePropertyChanged("StudentRubricID");
                 }
             }
         }
@@ -4278,6 +4308,16 @@ namespace ChemProV.Library.OsbleService {
         
         System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> EndGetCourseAssignments(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/GetReviewItems", ReplyAction="urn:OsbleService/GetReviewItemsResponse")]
+        System.IAsyncResult BeginGetReviewItems(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        byte[] EndGetReviewItems(System.IAsyncResult result);
+        
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/SubmitReview", ReplyAction="urn:OsbleService/SubmitReviewResponse")]
+        System.IAsyncResult BeginSubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        bool EndSubmitReview(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/GetAssignmentSubmission", ReplyAction="urn:OsbleService/GetAssignmentSubmissionResponse")]
         System.IAsyncResult BeginGetAssignmentSubmission(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState);
         
@@ -4332,6 +4372,44 @@ namespace ChemProV.Library.OsbleService {
             get {
                 base.RaiseExceptionIfNecessary();
                 return ((System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetReviewItemsCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetReviewItemsCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public byte[] Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((byte[])(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class SubmitReviewCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public SubmitReviewCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public bool Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((bool)(this.results[0]));
             }
         }
     }
@@ -4409,6 +4487,18 @@ namespace ChemProV.Library.OsbleService {
         
         private System.Threading.SendOrPostCallback onGetCourseAssignmentsCompletedDelegate;
         
+        private BeginOperationDelegate onBeginGetReviewItemsDelegate;
+        
+        private EndOperationDelegate onEndGetReviewItemsDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetReviewItemsCompletedDelegate;
+        
+        private BeginOperationDelegate onBeginSubmitReviewDelegate;
+        
+        private EndOperationDelegate onEndSubmitReviewDelegate;
+        
+        private System.Threading.SendOrPostCallback onSubmitReviewCompletedDelegate;
+        
         private BeginOperationDelegate onBeginGetAssignmentSubmissionDelegate;
         
         private EndOperationDelegate onEndGetAssignmentSubmissionDelegate;
@@ -4483,6 +4573,10 @@ namespace ChemProV.Library.OsbleService {
         public event System.EventHandler<GetCoursesCompletedEventArgs> GetCoursesCompleted;
         
         public event System.EventHandler<GetCourseAssignmentsCompletedEventArgs> GetCourseAssignmentsCompleted;
+        
+        public event System.EventHandler<GetReviewItemsCompletedEventArgs> GetReviewItemsCompleted;
+        
+        public event System.EventHandler<SubmitReviewCompletedEventArgs> SubmitReviewCompleted;
         
         public event System.EventHandler<GetAssignmentSubmissionCompletedEventArgs> GetAssignmentSubmissionCompleted;
         
@@ -4586,6 +4680,106 @@ namespace ChemProV.Library.OsbleService {
             base.InvokeAsync(this.onBeginGetCourseAssignmentsDelegate, new object[] {
                         courseId,
                         authToken}, this.onEndGetCourseAssignmentsDelegate, this.onGetCourseAssignmentsCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult ChemProV.Library.OsbleService.OsbleService.BeginGetReviewItems(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetReviewItems(assignmentId, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        byte[] ChemProV.Library.OsbleService.OsbleService.EndGetReviewItems(System.IAsyncResult result) {
+            return base.Channel.EndGetReviewItems(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetReviewItems(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            int assignmentId = ((int)(inValues[0]));
+            string authToken = ((string)(inValues[1]));
+            return ((ChemProV.Library.OsbleService.OsbleService)(this)).BeginGetReviewItems(assignmentId, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndGetReviewItems(System.IAsyncResult result) {
+            byte[] retVal = ((ChemProV.Library.OsbleService.OsbleService)(this)).EndGetReviewItems(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetReviewItemsCompleted(object state) {
+            if ((this.GetReviewItemsCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetReviewItemsCompleted(this, new GetReviewItemsCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetReviewItemsAsync(int assignmentId, string authToken) {
+            this.GetReviewItemsAsync(assignmentId, authToken, null);
+        }
+        
+        public void GetReviewItemsAsync(int assignmentId, string authToken, object userState) {
+            if ((this.onBeginGetReviewItemsDelegate == null)) {
+                this.onBeginGetReviewItemsDelegate = new BeginOperationDelegate(this.OnBeginGetReviewItems);
+            }
+            if ((this.onEndGetReviewItemsDelegate == null)) {
+                this.onEndGetReviewItemsDelegate = new EndOperationDelegate(this.OnEndGetReviewItems);
+            }
+            if ((this.onGetReviewItemsCompletedDelegate == null)) {
+                this.onGetReviewItemsCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetReviewItemsCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetReviewItemsDelegate, new object[] {
+                        assignmentId,
+                        authToken}, this.onEndGetReviewItemsDelegate, this.onGetReviewItemsCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult ChemProV.Library.OsbleService.OsbleService.BeginSubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginSubmitReview(authorId, assignmentId, zippedReviewData, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        bool ChemProV.Library.OsbleService.OsbleService.EndSubmitReview(System.IAsyncResult result) {
+            return base.Channel.EndSubmitReview(result);
+        }
+        
+        private System.IAsyncResult OnBeginSubmitReview(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            int authorId = ((int)(inValues[0]));
+            int assignmentId = ((int)(inValues[1]));
+            byte[] zippedReviewData = ((byte[])(inValues[2]));
+            string authToken = ((string)(inValues[3]));
+            return ((ChemProV.Library.OsbleService.OsbleService)(this)).BeginSubmitReview(authorId, assignmentId, zippedReviewData, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndSubmitReview(System.IAsyncResult result) {
+            bool retVal = ((ChemProV.Library.OsbleService.OsbleService)(this)).EndSubmitReview(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnSubmitReviewCompleted(object state) {
+            if ((this.SubmitReviewCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.SubmitReviewCompleted(this, new SubmitReviewCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void SubmitReviewAsync(int authorId, int assignmentId, byte[] zippedReviewData, string authToken) {
+            this.SubmitReviewAsync(authorId, assignmentId, zippedReviewData, authToken, null);
+        }
+        
+        public void SubmitReviewAsync(int authorId, int assignmentId, byte[] zippedReviewData, string authToken, object userState) {
+            if ((this.onBeginSubmitReviewDelegate == null)) {
+                this.onBeginSubmitReviewDelegate = new BeginOperationDelegate(this.OnBeginSubmitReview);
+            }
+            if ((this.onEndSubmitReviewDelegate == null)) {
+                this.onEndSubmitReviewDelegate = new EndOperationDelegate(this.OnEndSubmitReview);
+            }
+            if ((this.onSubmitReviewCompletedDelegate == null)) {
+                this.onSubmitReviewCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnSubmitReviewCompleted);
+            }
+            base.InvokeAsync(this.onBeginSubmitReviewDelegate, new object[] {
+                        authorId,
+                        assignmentId,
+                        zippedReviewData,
+                        authToken}, this.onEndSubmitReviewDelegate, this.onSubmitReviewCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -4834,6 +5028,36 @@ namespace ChemProV.Library.OsbleService {
             public System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> EndGetCourseAssignments(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> _result = ((System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment>)(base.EndInvoke("GetCourseAssignments", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetReviewItems(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[2];
+                _args[0] = assignmentId;
+                _args[1] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("GetReviewItems", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public byte[] EndGetReviewItems(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                byte[] _result = ((byte[])(base.EndInvoke("GetReviewItems", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginSubmitReview(int authorId, int assignmentId, byte[] zippedReviewData, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[4];
+                _args[0] = authorId;
+                _args[1] = assignmentId;
+                _args[2] = zippedReviewData;
+                _args[3] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("SubmitReview", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public bool EndSubmitReview(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                bool _result = ((bool)(base.EndInvoke("SubmitReview", _args, result)));
                 return _result;
             }
             

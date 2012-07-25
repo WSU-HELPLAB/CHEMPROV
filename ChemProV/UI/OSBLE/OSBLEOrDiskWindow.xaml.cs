@@ -58,11 +58,11 @@ namespace ChemProV.UI.OSBLE
                     });
                     sp.Children.Add(new TextBlock()
                     {
-                        Text = "Course: " + state.CurrentAssignment.Course.Name
+                        Text = "Course: " + state.CurrentAssignment.CourseName
                     });
                     sp.Children.Add(new TextBlock()
                     {
-                        Text = "Assignment name: " + state.CurrentAssignment.AssignmentName
+                        Text = "Assignment name: " + state.CurrentAssignment.Name
                     });
                     OSBLECurrentAssignmentButton.Content = sp;
                     
