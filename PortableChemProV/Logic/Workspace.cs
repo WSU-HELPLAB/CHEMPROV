@@ -78,6 +78,15 @@ namespace ChemProV.Logic
 
         public void AddProcessUnit(AbstractProcessUnit unit)
         {
+            // Make sure that the process unit ID is unique. This is very important.
+            if (null != GetProcessUnit(unit.Id))
+            {
+                throw new InvalidOperationException(string.Format(
+                    "A process unit with ID={0} already exists in the workspace. The new process unit that " +
+                    "was passed to \"AddProcessUnit\" also had this ID. Each process unit in the workspace is " + 
+                    "required to have a unique ID.", unit.Id));
+            }
+            
             m_procUnits.Add(unit);
 
             if (null != ProcessUnitsCollectionChanged)
@@ -92,6 +101,15 @@ namespace ChemProV.Logic
             {
                 throw new ArgumentNullException(
                     "Cannot add a null stream to a workspace");
+            }
+
+            // Make sure that the stream ID is unique. This is very important.
+            if (null != GetStream(stream.Id))
+            {
+                throw new InvalidOperationException(string.Format(
+                    "A stream with ID={0} already exists in the workspace. The new stream that was " +
+                    "passed to \"AddAStream\" also had this ID. Each stream in the workspace is required " +
+                    "to have a unique ID.", stream.Id));
             }
 
             m_streams.Add(stream);
