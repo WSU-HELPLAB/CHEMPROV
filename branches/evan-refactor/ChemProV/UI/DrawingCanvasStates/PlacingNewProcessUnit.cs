@@ -147,10 +147,19 @@ namespace ChemProV.UI.DrawingCanvasStates
             m_canvas.RemoveChild(m_placementIcon);
             m_placementIcon = null;
 
+            // Determine a unique identifier for the process unit
+            int uid;
+            do
+            {
+                uid = AbstractProcessUnit.GetNextUID();
+            }
+            while (null != m_workspace.GetProcessUnit(uid));
+
             // If there's not an endpoint, we create the process unit with no stream connections
             if (null == endpoint)
             {
-                AbstractProcessUnit unit = (AbstractProcessUnit) Activator.CreateInstance(m_type);
+                AbstractProcessUnit unit = (AbstractProcessUnit) Activator.CreateInstance(
+                    m_type, uid);
 
                 // Set the location
                 unit.Location = new MathCore.Vector(pos.X, pos.Y);
@@ -188,7 +197,7 @@ namespace ChemProV.UI.DrawingCanvasStates
 
             // Create the process unit
             AbstractProcessUnit apu = (AbstractProcessUnit)
-                Activator.CreateInstance(m_type);
+                Activator.CreateInstance(m_type, uid);
 
             // Make the undo and then the actual attachment
             if (DraggableStreamEndpoint.EndpointType.StreamDestination == endpoint.Type)
@@ -199,7 +208,7 @@ namespace ChemProV.UI.DrawingCanvasStates
                 // Create an undo that sets the stream destination back to what it was and removes the 
                 // process unit
                 m_workspace.AddUndo(new UndoRedoCollection("Undo process unit creation + attachment",
-                    new Logic.Undos.SetStreamDestination(endpoint.ParentStream.Stream, null, apu,vPos),
+                    new Logic.Undos.SetStreamDestination(endpoint.ParentStream.Stream, null, apu, vPos),
                     new Logic.Undos.RemoveProcessUnit(apu)));
 
                 apu.AttachIncomingStream(endpoint.ParentStream.Stream);
@@ -207,7 +216,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             }
             else
             {                
-                // Set the lofcation
+                // Set the location
                 apu.Location = endpoint.ParentStream.Stream.SourceLocation;
                 
                 // Create an undo that sets the stream source back to what it was and removes the 

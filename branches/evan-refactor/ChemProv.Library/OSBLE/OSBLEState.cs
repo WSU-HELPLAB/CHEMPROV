@@ -23,13 +23,15 @@ namespace ChemProV.Library.OSBLE
         /// </summary>
         private int m_coursesRemaining = 0;
 
-        private Assignment m_currentAssignment = null;
+        private RelevantAssignment m_currentAssignment = null;
 
         private bool m_isLoggedIn = false;
 
         private OsbleServiceClient m_osbleClient = null;
         
         private string m_password;
+
+        private List<RelevantAssignment> m_relevant = new List<RelevantAssignment>();
         
         private string m_userName;
 
@@ -93,6 +95,22 @@ namespace ChemProV.Library.OSBLE
         public const string AuthServiceLink = "http://localhost:17532/Services/AuthenticationService.svc";
         //public const string AuthServiceLink = "https://osble.org/Services/AuthenticationService.svc";
 
+        /// <summary>
+        /// Searches through all the deliverables in an assignment and returns true if any of them have 
+        /// a ChemProV deliverable.
+        /// </summary>
+        public static bool ContainsChemProVDeliverable(Assignment assignment)
+        {
+            foreach (Deliverable d in assignment.Deliverables)
+            {
+                if (DeliverableType.ChemProV == d.DeliverableType)
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public IList<Course> Courses
         {
             get
@@ -101,32 +119,72 @@ namespace ChemProV.Library.OSBLE
             }
         }
 
-        public Assignment CurrentAssignment
+        public RelevantAssignment CurrentAssignment
         {
             get
             {
                 return m_currentAssignment;
             }
+            set
+            {
+                m_currentAssignment = value;
+            }
         }
 
-        public void GetAssignmentStreamAsync(Assignment assignment)
+        /// <summary>
+        /// This method is called after all the courses and their assignments have been retrieved from the 
+        /// web service.
+        /// </summary>
+        private void FinishRefresh()
         {
-            // Re-authenticate
-            // The design choice is to re-authenticate every time we need to download an assignment file. This 
-            // is primarily because previous tests that cached the authentication token were actually failing. 
-            // This could be a bug in the OSBLE API, but rather than wait for that to be fixed I'm just sticking 
-            // with the way that works.
-            // This design also prevents issues from the authentication token expiring after login and then a 
-            // long idle period. So it's not just to work around a bug, it makes sense from a usability 
-            // perspective as well because this way we never have to tell the user that their session has expired 
-            // and they need to log in again.
-            AuthenticationServiceClient authClient = new AuthenticationServiceClient(m_bind,
-                new EndpointAddress(AuthServiceLink));
-            authClient.ValidateUserCompleted += this.ValidateForGetStreamCompleted;
-            authClient.ValidateUserAsync(m_userName, m_password, new object[] { authClient, assignment });
+            foreach (Course c in m_courses)
+            {
+                foreach (Assignment a in c.Assignments)
+                {
+                    // We want to see whether or not this assignment is relevant to ChemProV. There are a few cases 
+                    // in which it is considered relevant.
+                    if (ContainsChemProVDeliverable(a))
+                    {
+                        // If it has a ChemProV deliverable then it is relevant
+                        m_relevant.Add(new RelevantAssignment(a, m_userName, m_password));
+                    }
+                    else if (AssignmentTypes.CriticalReview == a.Type)
+                    {
+                        // If it's a critical review then it MIGHT be relevant. We have to check out the 
+                        // previous assignment to find out.
+                        if (a.PrecededingAssignmentID.HasValue)
+                        {
+                            Assignment linked = GetAssignmentByID(c, a.PrecededingAssignmentID.Value);
+                            if (null != linked)
+                            {
+                                if (ContainsChemProVDeliverable(linked))
+                                {
+                                    m_relevant.Add(new RelevantAssignment(a, m_userName, m_password));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Invoke the completion event
+            OnRefreshComplete(this, OSBLEStateEventArgs.Empty);
         }
 
-        private string GetDeliverableFileName(Assignment assignment)
+        private static Assignment GetAssignmentByID(Course c, int id)
+        {
+            foreach (Assignment a in c.Assignments)
+            {
+                if (id == a.ID)
+                {
+                    return a;
+                }
+            }
+
+            return null;
+        }
+
+        private string GetDeliverableFileName(RelevantAssignment assignment)
         {
             foreach (Deliverable d in assignment.Deliverables)
             {
@@ -136,7 +194,7 @@ namespace ChemProV.Library.OSBLE
                 }
             }
 
-            return assignment.AssignmentName + ".cpml";
+            return assignment.Name + ".cpml";
         }
 
         public bool IsLoggedIn
@@ -224,7 +282,7 @@ namespace ChemProV.Library.OSBLE
             // Decrement the number of remaining courses
             if (0 == Interlocked.Decrement(ref m_coursesRemaining))
             {
-                OnRefreshComplete(this, OSBLEStateEventArgs.Empty);
+                FinishRefresh();
             }
         }
 
@@ -258,8 +316,12 @@ namespace ChemProV.Library.OSBLE
             OnSaveComplete(this, new OSBLEStateEventArgs(e.Result, null));
         }
 
+        public const string OSBLEServiceLink = "http://localhost:17532/Services/OsbleService.svc";
+
         public void RefreshAsync()
         {
+            m_relevant.Clear();
+            
             // Create the authentication client. We need this to get an authentication token which serves 
             // as our "key" for getting lists of courses, assignments, etc.
             AuthenticationServiceClient authClient = new AuthenticationServiceClient(m_bind,
@@ -277,7 +339,15 @@ namespace ChemProV.Library.OSBLE
             }
         }
 
-        public void SaveAssignmentAsync(Assignment a, byte[] assignmentData)
+        public System.Collections.ObjectModel.ReadOnlyCollection<RelevantAssignment> RelevantAssignments
+        {
+            get
+            {
+                return new System.Collections.ObjectModel.ReadOnlyCollection<RelevantAssignment>(m_relevant);
+            }
+        }
+
+        public void SaveAssignmentAsync(RelevantAssignment a, byte[] assignmentData)
         {
             // When we save to an assignment, it becomes the "current" assignment
             m_currentAssignment = a;
@@ -292,55 +362,6 @@ namespace ChemProV.Library.OSBLE
                 new EndpointAddress(AuthServiceLink));
             authClient.ValidateUserCompleted += this.ValidateForSaveCompleted;
             authClient.ValidateUserAsync(m_userName, m_password, new object[] { authClient, assignmentData });
-        }
-
-        private void ValidateForGetStreamCompleted(object sender, ValidateUserCompletedEventArgs e)
-        {
-            // Error check
-            if (e.Cancelled)
-            {
-                return;
-            }
-            if (null != e.Error)
-            {
-                OnError(this, new OSBLEStateEventArgs(false, e.Error.Message));
-                return;
-            }
-            
-            // The authentication token is stored in the result
-            m_authToken = e.Result;
-
-            // Build the OSBLE client
-            System.ServiceModel.BasicHttpBinding bind = new System.ServiceModel.BasicHttpBinding();
-            bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
-            bind.ReceiveTimeout = new TimeSpan(0, 0, 10);
-            bind.SendTimeout = new TimeSpan(0, 0, 10);
-            bind.MaxBufferSize = 2147483647;
-            bind.MaxReceivedMessageSize = 2147483647;
-            m_osbleClient = new OsbleServiceClient(bind,
-                new System.ServiceModel.EndpointAddress("http://localhost:17532/Services/OsbleService.svc"));
-            m_osbleClient.GetAssignmentSubmissionCompleted += this.OsbleClient_GetAssignmentSubmissionCompleted;
-
-            // We built an object array for the user state to keep track of the authentication client 
-            // (which we have to close at the end) and the assignment.
-            object[] objs = e.UserState as object[];
-
-            // The authentication client is the first object in the array
-            AuthenticationServiceClient auth = objs[0] as AuthenticationServiceClient;
-
-            // The assignment is the second object in the array
-            // Store a reference to this assignment as the "current" assignment
-            m_currentAssignment = objs[1] as Assignment;
-
-            // We will reuse the array for our next async call, this time with the OSBLE client as the 
-            // first object
-            objs[0] = m_osbleClient;
-
-            // Get the assignment submission. In the completion function it will actually be decompressed.
-            m_osbleClient.GetAssignmentSubmissionAsync(m_currentAssignment.ID, m_authToken, objs);
-
-            // "Always close the client" says the documentation
-            auth.CloseAsync();
         }
 
         private void ValidateForSaveCompleted(object sender, ValidateUserCompletedEventArgs e)
@@ -362,7 +383,7 @@ namespace ChemProV.Library.OSBLE
             // Build the OSBLE client
             m_osbleClient = new OsbleServiceClient(m_bind,
                 new System.ServiceModel.EndpointAddress("http://localhost:17532/Services/OsbleService.svc"));
-            m_osbleClient.SubmitAssignmentCompleted += new EventHandler<SubmitAssignmentCompletedEventArgs>(OsbleClient_SubmitAssignmentCompleted);
+            m_osbleClient.SubmitAssignmentCompleted += this.OsbleClient_SubmitAssignmentCompleted;
 
             // We built an object array for the user state to keep track of the authentication client 
             // (which we have to close at the end) and the save data
