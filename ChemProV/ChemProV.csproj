@@ -224,8 +224,8 @@
     <Compile Include="UI\DrawingCanvasStates\PlacingNewProcessUnit.cs" />
     <Compile Include="UI\DrawingCanvasStates\PlacingNewCommentNote.cs" />
     <Compile Include="UI\DrawingCanvasStates\ResizingStickyNote.cs" />
-    <Compile Include="UI\EqCommentControl.xaml.cs">
-      <DependentUpon>EqCommentControl.xaml</DependentUpon>
+    <Compile Include="UI\PaneCommentControl.xaml.cs">
+      <DependentUpon>PaneCommentControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\ICommentControlManager.cs" />
     <Compile Include="UI\MiniStreamTable.xaml.cs">
@@ -333,7 +333,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="UI\EqCommentControl.xaml">
+    <Page Include="UI\PaneCommentControl.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
