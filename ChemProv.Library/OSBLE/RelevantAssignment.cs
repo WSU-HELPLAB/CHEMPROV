@@ -55,6 +55,11 @@ namespace ChemProV.Library.OSBLE
 
         private bool AddFromZip(byte[] zipFileData)
         {
+            return AddFromZip(zipFileData, string.Empty);
+        }
+
+        private bool AddFromZip(byte[] zipFileData, string namePrefix)
+        {
             // Make a memory stream for the byte array
             MemoryStream ms = new MemoryStream(zipFileData);
 
@@ -72,16 +77,23 @@ namespace ChemProV.Library.OSBLE
             // Go through the files within the zip
             foreach (ZipEntry ze in zf)
             {
+                string name = namePrefix;
+                if (!string.IsNullOrEmpty(namePrefix))
+                {
+                    name = (name + " - ");
+                }
+                name += System.IO.Path.GetFileName(ZipEntry.CleanName(ze.Name));
+                
                 // Read the whole thing into a memory stream
                 AssignmentStream msUncompressed;
                 using (Stream tempStream = zf.GetInputStream(ze))
                 {
-                    msUncompressed = new AssignmentStream(System.IO.Path.GetFileName(ZipEntry.CleanName(ze.Name)), this);
+                    msUncompressed = new AssignmentStream(name, this);
                     tempStream.CopyTo(msUncompressed);
                 }
 
                 // There might be zips within the zip
-                if (!AddFromZip(msUncompressed.ToArray()))
+                if (!AddFromZip(msUncompressed.ToArray(), ZipEntry.CleanName(ze.Name)))
                 {
                     // This implies failure to read the uncompressed stream as another zip file. So the 
                     // stream we have should be added to the list.
