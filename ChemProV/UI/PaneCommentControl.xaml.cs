@@ -19,45 +19,18 @@ namespace ChemProV.UI
     /// <summary>
     /// This control will wrap around either a BasicComment or StickyNote object
     /// </summary>
-    public partial class EqCommentControl : UserControl
+    public partial class PaneCommentControl : UserControl
     {        
         private BasicComment m_basic = null;
 
         private StickyNote m_sticky = null;
         
-        public EqCommentControl()
+        public PaneCommentControl()
         {
             InitializeComponent();
 
             CommentTextBox.Text = string.Empty;
         }
-
-        //public EqCommentControl(StickyNote stickyNote)
-        //    : this()
-        //{
-        //    if (null == stickyNote)
-        //    {
-        //        throw new ArgumentNullException(
-        //            "StickyNote object cannot be null for an EqCommentControl");
-        //    }
-            
-        //    m_sticky = stickyNote;
-            
-        //    // We don't offer the option to delete these. That must be done in the 
-        //    // PFD area.
-        //    XLabel.Visibility = System.Windows.Visibility.Collapsed;
-
-        //    // We also don't allow editing
-        //    CommentTextBox.IsReadOnly = true;
-
-        //    // Set control text
-        //    UserNameLabel.Content = (null == stickyNote.UserName) ?
-        //        string.Empty : stickyNote.UserName;
-        //    CommentTextBox.Text = stickyNote.Text;
-
-        //    // Monitor property changes
-        //    stickyNote.PropertyChanged += this.StickyNote_PropertyChanged;
-        //}
 
         /// <summary>
         /// Gets the comment object for this control. This can be either a BasicComment object, 
@@ -76,6 +49,10 @@ namespace ChemProV.UI
             if (null != m_basic)
             {
                 m_basic.CommentText = CommentTextBox.Text;
+            }
+            else if (null != m_sticky)
+            {
+                m_sticky.Text = CommentTextBox.Text;
             }
         }
 
@@ -133,9 +110,9 @@ namespace ChemProV.UI
                 // Subsribe to property changes
                 m_sticky.PropertyChanged += this.StickyNote_PropertyChanged;
 
-                // Don't allow deletion or editing
+                // Allow editing but not deletion
+                CommentTextBox.IsReadOnly = false;
                 XLabel.Visibility = System.Windows.Visibility.Collapsed;
-                CommentTextBox.IsReadOnly = true;
 
                 // Show or hide the icon based on the parent
                 if (parent is AbstractStream)
