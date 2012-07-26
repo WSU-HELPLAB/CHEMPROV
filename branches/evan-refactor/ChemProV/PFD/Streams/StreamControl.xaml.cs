@@ -818,6 +818,16 @@ namespace ChemProV.PFD.Streams
             return GetShortestDistanceFromLines(new MathCore.Vector(location.X, location.Y));
         }
 
+        public static string GetIconSource(Type streamType)
+        {
+            // Determine the icon from the process unit type    
+            if (typeof(HeatStream) == streamType)
+            {
+                return "/UI/Icons/pu_heat_stream.png";
+            }
+            return "/UI/Icons/pu_stream.png";
+        }
+
         [Obsolete("Will be removed or re-written in the near future")]
         public void HighlightFeedback(bool highlight)
         {

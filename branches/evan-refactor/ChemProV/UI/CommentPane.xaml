@@ -37,15 +37,15 @@
                         <RadioButton
                             x:Name="rbPFDCommentsHidden"
                             IsChecked="True"
-                            Checked="PFDCommentsOptionChecked">Hidden (minimized)</RadioButton>
+                            Checked="PFDCommentsOptionChecked">Show minimized</RadioButton>
                         <RadioButton
                             x:Name="rbPFDCommentsAll"
                             IsChecked="False"
-                            Checked="PFDCommentsOptionChecked">All</RadioButton>
+                            Checked="PFDCommentsOptionChecked">Show all</RadioButton>
                         <RadioButton
                             x:Name="rbPFDCommentsNone"
                             IsChecked="False"
-                            Checked="PFDCommentsOptionChecked">None</RadioButton>
+                            Checked="PFDCommentsOptionChecked">Show none</RadioButton>
                         <StackPanel Name="PFDCommentsStack" Orientation="Vertical">
                             <!-- Comment items will be inserted here at runtime -->
                         </StackPanel>
