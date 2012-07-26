@@ -244,7 +244,7 @@ namespace ChemProV.UI
                 // Add each comment
                 foreach (BasicComment bc in model.Comments)
                 {
-                    EqCommentControl cc = new EqCommentControl();
+                    PaneCommentControl cc = new PaneCommentControl();
                     cc.SetCommentObject(bc);
                     cc.Margin = new Thickness(3.0);
                     cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
@@ -289,7 +289,7 @@ namespace ChemProV.UI
                 
                 foreach (BasicComment bc in m_workspace.DegreesOfFreedomAnalysis.Comments)
                 {
-                    EqCommentControl cc = new EqCommentControl();
+                    PaneCommentControl cc = new PaneCommentControl();
                     cc.SetCommentObject(bc);
                     cc.Margin = new Thickness(3.0);
                     cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
@@ -370,13 +370,13 @@ namespace ChemProV.UI
                 // Remove the last child. Set its comment object to null first to make sure that 
                 // it unsubsribes from events
                 int index = PFDCommentsStack.Children.Count - 1;
-                (PFDCommentsStack.Children[index] as EqCommentControl).SetCommentObject(null);
+                (PFDCommentsStack.Children[index] as PaneCommentControl).SetCommentObject(null);
                 PFDCommentsStack.Children.RemoveAt(index);
             }
             while (PFDCommentsStack.Children.Count < count)
             {
                 // Add a new comment control
-                PFDCommentsStack.Children.Add(new EqCommentControl()
+                PFDCommentsStack.Children.Add(new PaneCommentControl()
                     {
                         Margin = new Thickness(3.0)
                     });
@@ -390,7 +390,7 @@ namespace ChemProV.UI
                     (!sn.IsVisible && rbPFDCommentsHidden.IsChecked.Value))
                 {
                     // Set the comment object for the existing control
-                    (PFDCommentsStack.Children[count] as EqCommentControl).SetCommentObject(sn, null);
+                    (PFDCommentsStack.Children[count] as PaneCommentControl).SetCommentObject(sn, null);
                     count++;
                 }
             }
@@ -404,7 +404,7 @@ namespace ChemProV.UI
                         (!sn.IsVisible && rbPFDCommentsHidden.IsChecked.Value))
                     {
                         // Set the comment object for the existing control
-                        (PFDCommentsStack.Children[count] as EqCommentControl).SetCommentObject(sn, stream);
+                        (PFDCommentsStack.Children[count] as PaneCommentControl).SetCommentObject(sn, stream);
                         count++;
                     }
                 }
@@ -419,7 +419,7 @@ namespace ChemProV.UI
                         (!sn.IsVisible && rbPFDCommentsHidden.IsChecked.Value))
                     {
                         // Set the comment object for the existing control
-                        (PFDCommentsStack.Children[count] as EqCommentControl).SetCommentObject(sn, unit);
+                        (PFDCommentsStack.Children[count] as PaneCommentControl).SetCommentObject(sn, unit);
                         count++;
                     }
                 }
