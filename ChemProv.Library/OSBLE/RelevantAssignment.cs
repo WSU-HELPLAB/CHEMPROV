@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ICSharpCode.SharpZipLib.Zip;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -46,13 +47,13 @@ namespace ChemProV.Library.OSBLE
 
             m_bind = new System.ServiceModel.BasicHttpBinding();
             m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
-            m_bind.ReceiveTimeout = new TimeSpan(0, 0, 10);
-            m_bind.SendTimeout = new TimeSpan(0, 0, 10);
+            m_bind.ReceiveTimeout = new TimeSpan(0, 0, 15);
+            m_bind.SendTimeout = new TimeSpan(0, 0, 15);
             m_bind.MaxBufferSize = 2147483647;
             m_bind.MaxReceivedMessageSize = 2147483647;
         }
 
-        private void AddFromZip(byte[] zipFileData)
+        private bool AddFromZip(byte[] zipFileData)
         {
             // Make a memory stream for the byte array
             MemoryStream ms = new MemoryStream(zipFileData);
@@ -65,25 +66,31 @@ namespace ChemProV.Library.OSBLE
             }
             catch (Exception)
             {
-                return;
+                return false;
             }
 
             // Go through the files within the zip
-            foreach (ICSharpCode.SharpZipLib.Zip.ZipEntry ze in zf)
+            foreach (ZipEntry ze in zf)
             {
                 // Read the whole thing into a memory stream
                 AssignmentStream msUncompressed;
                 using (Stream tempStream = zf.GetInputStream(ze))
                 {
-                    msUncompressed = new AssignmentStream(ze.Name, this);
+                    msUncompressed = new AssignmentStream(System.IO.Path.GetFileName(ZipEntry.CleanName(ze.Name)), this);
                     tempStream.CopyTo(msUncompressed);
                 }
 
-                // Add it to the list
-                m_files.Add(msUncompressed);
+                // There might be zips within the zip
+                if (!AddFromZip(msUncompressed.ToArray()))
+                {
+                    // This implies failure to read the uncompressed stream as another zip file. So the 
+                    // stream we have should be added to the list.
+                    m_files.Add(msUncompressed);
+                }
             }
 
             ms.Dispose();
+            return true;
         }
 
         private void AuthenticationCompleted(object sender, ValidateUserCompletedEventArgs e)
