@@ -91,6 +91,7 @@
       <HintPath>Libraries\ImageTools.Utils.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.Expression.Drawing, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="SharpZipLib.Silverlight4, Version=0.0.0.0, Culture=neutral, PublicKeyToken=a37ef23abf01322c, processorArchitecture=MSIL" />
     <Reference Include="Silverlight.Controls">
       <HintPath>Libraries\Silverlight.Controls.dll</HintPath>
     </Reference>
@@ -136,6 +137,8 @@
     <Compile Include="Grammars\ChemProVTree.cs" />
     <Compile Include="Grammars\Equation.cs" />
     <Compile Include="Grammars\Variable.cs" />
+    <Compile Include="Logic\OSBLE\OSBLEState.cs" />
+    <Compile Include="Logic\OSBLE\RelevantAssignment.cs" />
     <Compile Include="Logic\Undos\AddToWorkspace.cs" />
     <Compile Include="Logic\Undos\InsertTableRow.cs" />
     <Compile Include="Logic\Undos\RemoveProcessUnit.cs" />
@@ -165,6 +168,9 @@
     </Compile>
     <Compile Include="UI\OSBLE\AssignmentChooserWindow.xaml.cs">
       <DependentUpon>AssignmentChooserWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OSBLE\LoginWin.xaml.cs">
+      <DependentUpon>LoginWin.xaml</DependentUpon>
     </Compile>
     <Compile Include="UI\OSBLE\OSBLEOrDiskWindow.xaml.cs">
       <DependentUpon>OSBLEOrDiskWindow.xaml</DependentUpon>
@@ -292,6 +298,10 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="UI\OSBLE\AssignmentChooserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OSBLE\LoginWin.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
@@ -535,7 +545,6 @@
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,4 +1,13 @@
-﻿using System;
+﻿/*
+Copyright 2010 - 2012 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -9,8 +18,8 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
+using ChemProV.Logic.OSBLE;
 using ChemProV.Library.OsbleService;
-using ChemProV.Library.OSBLE;
 
 namespace ChemProV.UI.OSBLE
 {
@@ -113,8 +122,8 @@ namespace ChemProV.UI.OSBLE
 
         private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-            OKButton.IsEnabled = (null != MainTreeView.SelectedItem &&
-                null != (MainTreeView.SelectedItem as TreeViewItem).Tag);
+            TreeViewItem tvi = MainTreeView.SelectedItem as TreeViewItem;
+            OKButton.IsEnabled = (null != tvi && null != tvi.Tag);
         }
 
         private void OKButton_Click(object sender, RoutedEventArgs e)
@@ -134,23 +143,61 @@ namespace ChemProV.UI.OSBLE
             // Get a reference to the workspace
             Logic.Workspace ws = Core.App.Workspace.DrawingCanvasReference.GetWorkspace();
 
+            // Get the selected tree view item
+            TreeViewItem tvi = MainTreeView.SelectedItem as TreeViewItem;
+
             if (m_saveMode)
             {
                 // Setup callback for save completion
                 m_state.OnSaveComplete -= this.State_OnSaveComplete;
                 m_state.OnSaveComplete += this.State_OnSaveComplete;
 
-                RelevantAssignment a = (MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment;
-                if (null == a)
+                RelevantAssignment.AssignmentStream assignmentObj =
+                    tvi.Tag as RelevantAssignment.AssignmentStream;
+                if (null == assignmentObj)
                 {
-                    a = ((MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment.AssignmentStream).Parent;
+                    m_state.CurrentAssignment = (tvi.Tag as RelevantAssignment);
+                    
+                    // If the selected item is the actual course item and not an assignment file beneath it, then 
+                    // we can only save if there are 0 or 1 files. Otherwise it's ambiguous what the user wants 
+                    // to save and we need to return.
+                    if (0 == tvi.Items.Count)
+                    {
+                        (tvi.Tag as RelevantAssignment).SaveAsync(null, ws, this.SaveCompleteCrossThread);
+                    }
+                    else if (1 == tvi.Items.Count)
+                    {
+                        (tvi.Tag as RelevantAssignment).SaveAsync(
+                            (tvi.Items[0] as TreeViewItem).Tag as RelevantAssignment.AssignmentStream,
+                            ws, this.SaveCompleteCrossThread);
+                    }
+                    else
+                    {
+                        // Show the buttons and hide the progress bar
+                        OKButton.Visibility = System.Windows.Visibility.Visible;
+                        CancelButton.Visibility = System.Windows.Visibility.Visible;
+                        MainProgressBar.Visibility = System.Windows.Visibility.Collapsed;
+                        
+                        MessageBox.Show("You have selected a assignment that has multiple files within it. Please " +
+                            "select a specific file to save to.");
+                    }
+                    
+                    return;
                 }
+                assignmentObj.Parent.SaveAsync(assignmentObj, ws, this.SaveCompleteCrossThread);
+                m_state.CurrentAssignment = assignmentObj.Parent;
 
-                System.IO.MemoryStream ms = new System.IO.MemoryStream();
-                ws.Save(ms);
-                byte[] data = ms.ToArray();
-                ms.Dispose();
-                m_state.SaveAssignmentAsync(a, data);
+                //RelevantAssignment a = (MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment;
+                //if (null == a)
+                //{
+                //    a = ((MainTreeView.SelectedItem as TreeViewItem).Tag as RelevantAssignment.AssignmentStream).Parent;
+                //}
+
+                //System.IO.MemoryStream ms = new System.IO.MemoryStream();
+                //ws.Save(ms);
+                //byte[] data = ms.ToArray();
+                //ms.Dispose();
+                //m_state.SaveAssignmentAsync(a, data);
             }
             else
             {
@@ -191,6 +238,29 @@ namespace ChemProV.UI.OSBLE
                 }
                 this.DialogResult = true;
             }
+        }
+
+        private void SaveComplete(object sender, EventArgs e)
+        {
+            this.DialogResult = true;
+            
+            RelevantAssignment.SaveEventArgs sea = e as RelevantAssignment.SaveEventArgs;
+            if (sea.Success)
+            {
+                MessageBox.Show("Save complete");
+            }
+            else
+            {
+                MessageBox.Show("The save operation could not be completed. It is recommended that you " +
+                    "either try again or save your work to disk and then upload it to OSBLE through the " +
+                    "web interface.");
+            }
+        }
+
+        private void SaveCompleteCrossThread(object sender, EventArgs e)
+        {
+            // Invoke on UI thread
+            Dispatcher.BeginInvoke(new EventHandler(this.SaveComplete), sender, e);
         }
 
         private void State_OnDownloadComplete(object sender, EventArgs e)

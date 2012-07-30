@@ -439,8 +439,6 @@ namespace ChemProV.Library.OsbleService {
     [System.Runtime.Serialization.DataContractAttribute(Name="Assignment", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
     public partial class Assignment : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private double AddedPointsField;
-        
         private string AssignmentDescriptionField;
         
         private string AssignmentNameField;
@@ -452,12 +450,6 @@ namespace ChemProV.Library.OsbleService {
         private ChemProV.Library.OsbleService.Event AssociatedEventField;
         
         private System.Nullable<int> AssociatedEventIDField;
-        
-        private ChemProV.Library.OsbleService.Category CategoryField;
-        
-        private int CategoryIDField;
-        
-        private int ColumnOrderField;
         
         private ChemProV.Library.OsbleService.CommentCategoryConfiguration CommentCategoryField;
         
@@ -491,10 +483,6 @@ namespace ChemProV.Library.OsbleService {
         
         private bool IsDraftField;
         
-        private bool IsWizardAssignmentField;
-        
-        private int PointsPossibleField;
-        
         private System.Nullable<int> PrecededingAssignmentIDField;
         
         private ChemProV.Library.OsbleService.Assignment PreceedingAssignmentField;
@@ -509,8 +497,6 @@ namespace ChemProV.Library.OsbleService {
         
         private System.Nullable<int> RubricIDField;
         
-        private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Score> ScoresField;
-        
         private ChemProV.Library.OsbleService.Rubric StudentRubricField;
         
         private System.Nullable<int> StudentRubricIDField;
@@ -518,19 +504,6 @@ namespace ChemProV.Library.OsbleService {
         private ChemProV.Library.OsbleService.TeamEvaluationSettings TeamEvaluationSettingsField;
         
         private ChemProV.Library.OsbleService.AssignmentTypes TypeField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double AddedPoints {
-            get {
-                return this.AddedPointsField;
-            }
-            set {
-                if ((this.AddedPointsField.Equals(value) != true)) {
-                    this.AddedPointsField = value;
-                    this.RaisePropertyChanged("AddedPoints");
-                }
-            }
-        }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
         public string AssignmentDescription {
@@ -606,45 +579,6 @@ namespace ChemProV.Library.OsbleService {
                 if ((this.AssociatedEventIDField.Equals(value) != true)) {
                     this.AssociatedEventIDField = value;
                     this.RaisePropertyChanged("AssociatedEventID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public ChemProV.Library.OsbleService.Category Category {
-            get {
-                return this.CategoryField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.CategoryField, value) != true)) {
-                    this.CategoryField = value;
-                    this.RaisePropertyChanged("Category");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int CategoryID {
-            get {
-                return this.CategoryIDField;
-            }
-            set {
-                if ((this.CategoryIDField.Equals(value) != true)) {
-                    this.CategoryIDField = value;
-                    this.RaisePropertyChanged("CategoryID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ColumnOrder {
-            get {
-                return this.ColumnOrderField;
-            }
-            set {
-                if ((this.ColumnOrderField.Equals(value) != true)) {
-                    this.ColumnOrderField = value;
-                    this.RaisePropertyChanged("ColumnOrder");
                 }
             }
         }
@@ -858,32 +792,6 @@ namespace ChemProV.Library.OsbleService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool IsWizardAssignment {
-            get {
-                return this.IsWizardAssignmentField;
-            }
-            set {
-                if ((this.IsWizardAssignmentField.Equals(value) != true)) {
-                    this.IsWizardAssignmentField = value;
-                    this.RaisePropertyChanged("IsWizardAssignment");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int PointsPossible {
-            get {
-                return this.PointsPossibleField;
-            }
-            set {
-                if ((this.PointsPossibleField.Equals(value) != true)) {
-                    this.PointsPossibleField = value;
-                    this.RaisePropertyChanged("PointsPossible");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
         public System.Nullable<int> PrecededingAssignmentID {
             get {
                 return this.PrecededingAssignmentIDField;
@@ -970,19 +878,6 @@ namespace ChemProV.Library.OsbleService {
                 if ((this.RubricIDField.Equals(value) != true)) {
                     this.RubricIDField = value;
                     this.RaisePropertyChanged("RubricID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Score> Scores {
-            get {
-                return this.ScoresField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.ScoresField, value) != true)) {
-                    this.ScoresField = value;
-                    this.RaisePropertyChanged("Scores");
                 }
             }
         }
@@ -2775,276 +2670,6 @@ namespace ChemProV.Library.OsbleService {
                 if ((object.ReferenceEquals(this.ReviewingTeamField, value) != true)) {
                     this.ReviewingTeamField = value;
                     this.RaisePropertyChanged("ReviewingTeam");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Score", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
-    public partial class Score : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private double AddedPointsField;
-        
-        private ChemProV.Library.OsbleService.Assignment AssignmentField;
-        
-        private int AssignmentIDField;
-        
-        private ChemProV.Library.OsbleService.CourseUser CourseUserField;
-        
-        private int CourseUserIDField;
-        
-        private double CustomLatePenaltyPercentField;
-        
-        private int IDField;
-        
-        private double LatePenaltyPercentField;
-        
-        private System.Nullable<double> MultiplierField;
-        
-        private double PointsField;
-        
-        private bool PublishedField;
-        
-        private System.Nullable<System.DateTime> PublishedDateField;
-        
-        private double RawPointsField;
-        
-        private double StudentPointsField;
-        
-        private ChemProV.Library.OsbleService.Team TeamField;
-        
-        private int TeamIDField;
-        
-        private bool isDroppedField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double AddedPoints {
-            get {
-                return this.AddedPointsField;
-            }
-            set {
-                if ((this.AddedPointsField.Equals(value) != true)) {
-                    this.AddedPointsField = value;
-                    this.RaisePropertyChanged("AddedPoints");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public ChemProV.Library.OsbleService.Assignment Assignment {
-            get {
-                return this.AssignmentField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.AssignmentField, value) != true)) {
-                    this.AssignmentField = value;
-                    this.RaisePropertyChanged("Assignment");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int AssignmentID {
-            get {
-                return this.AssignmentIDField;
-            }
-            set {
-                if ((this.AssignmentIDField.Equals(value) != true)) {
-                    this.AssignmentIDField = value;
-                    this.RaisePropertyChanged("AssignmentID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public ChemProV.Library.OsbleService.CourseUser CourseUser {
-            get {
-                return this.CourseUserField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.CourseUserField, value) != true)) {
-                    this.CourseUserField = value;
-                    this.RaisePropertyChanged("CourseUser");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int CourseUserID {
-            get {
-                return this.CourseUserIDField;
-            }
-            set {
-                if ((this.CourseUserIDField.Equals(value) != true)) {
-                    this.CourseUserIDField = value;
-                    this.RaisePropertyChanged("CourseUserID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double CustomLatePenaltyPercent {
-            get {
-                return this.CustomLatePenaltyPercentField;
-            }
-            set {
-                if ((this.CustomLatePenaltyPercentField.Equals(value) != true)) {
-                    this.CustomLatePenaltyPercentField = value;
-                    this.RaisePropertyChanged("CustomLatePenaltyPercent");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
-            get {
-                return this.IDField;
-            }
-            set {
-                if ((this.IDField.Equals(value) != true)) {
-                    this.IDField = value;
-                    this.RaisePropertyChanged("ID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double LatePenaltyPercent {
-            get {
-                return this.LatePenaltyPercentField;
-            }
-            set {
-                if ((this.LatePenaltyPercentField.Equals(value) != true)) {
-                    this.LatePenaltyPercentField = value;
-                    this.RaisePropertyChanged("LatePenaltyPercent");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Nullable<double> Multiplier {
-            get {
-                return this.MultiplierField;
-            }
-            set {
-                if ((this.MultiplierField.Equals(value) != true)) {
-                    this.MultiplierField = value;
-                    this.RaisePropertyChanged("Multiplier");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double Points {
-            get {
-                return this.PointsField;
-            }
-            set {
-                if ((this.PointsField.Equals(value) != true)) {
-                    this.PointsField = value;
-                    this.RaisePropertyChanged("Points");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool Published {
-            get {
-                return this.PublishedField;
-            }
-            set {
-                if ((this.PublishedField.Equals(value) != true)) {
-                    this.PublishedField = value;
-                    this.RaisePropertyChanged("Published");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Nullable<System.DateTime> PublishedDate {
-            get {
-                return this.PublishedDateField;
-            }
-            set {
-                if ((this.PublishedDateField.Equals(value) != true)) {
-                    this.PublishedDateField = value;
-                    this.RaisePropertyChanged("PublishedDate");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double RawPoints {
-            get {
-                return this.RawPointsField;
-            }
-            set {
-                if ((this.RawPointsField.Equals(value) != true)) {
-                    this.RawPointsField = value;
-                    this.RaisePropertyChanged("RawPoints");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double StudentPoints {
-            get {
-                return this.StudentPointsField;
-            }
-            set {
-                if ((this.StudentPointsField.Equals(value) != true)) {
-                    this.StudentPointsField = value;
-                    this.RaisePropertyChanged("StudentPoints");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public ChemProV.Library.OsbleService.Team Team {
-            get {
-                return this.TeamField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.TeamField, value) != true)) {
-                    this.TeamField = value;
-                    this.RaisePropertyChanged("Team");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int TeamID {
-            get {
-                return this.TeamIDField;
-            }
-            set {
-                if ((this.TeamIDField.Equals(value) != true)) {
-                    this.TeamIDField = value;
-                    this.RaisePropertyChanged("TeamID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool isDropped {
-            get {
-                return this.isDroppedField;
-            }
-            set {
-                if ((this.isDroppedField.Equals(value) != true)) {
-                    this.isDroppedField = value;
-                    this.RaisePropertyChanged("isDropped");
                 }
             }
         }
