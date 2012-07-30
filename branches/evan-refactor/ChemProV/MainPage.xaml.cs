@@ -8,6 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -17,18 +18,12 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
-using ChemProV.Library.OSBLE.Views;
-using ChemProV.PFD.EquationEditor;
+using ChemProV.Logic;
 using ChemProV.UI;
 using ChemProV.UI.OSBLE;
-using ChemProV.Validation.Feedback;
 using ImageTools;
 using ImageTools.IO.Png;
-using System.Collections.Specialized;
-using ChemProV.Logic;
 
 namespace ChemProV
 {
@@ -794,7 +789,7 @@ namespace ChemProV
 
         private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
         {
-            ChemProV.Library.OSBLE.Views.LoginWindow lw = new LoginWindow();
+            LoginWin lw = new LoginWin();
             lw.LoginAttemptCompleted += new EventHandler(OSBLELoginAttemptCompleted);
             //lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
             lw.Show();
@@ -802,8 +797,8 @@ namespace ChemProV
 
         void OSBLELoginAttemptCompleted(object sender, EventArgs e)
         {
-            LoginWindow lw = sender as LoginWindow;
-            ChemProV.Library.OSBLE.OSBLEState state = lw.State;
+            LoginWin lw = sender as LoginWin;
+            ChemProV.Logic.OSBLE.OSBLEState state = lw.State;
 
             // Set the global
             Core.App.OSBLEState = state;

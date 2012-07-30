@@ -90,7 +90,6 @@ namespace ChemProV.Core
         // Refactoring on this method is done (logic-wise, could use some cleanup otherwise)
         private static void DeleteHEWU(ProcessUnitControl he, DrawingCanvas canvas)
         {
-            int i;
             Workspace ws = canvas.GetWorkspace();
             
             // Heat exchangers with utilities must also delete the heat stream that's incoming

@@ -7,7 +7,7 @@ using ChemProV.Library.ServiceReference1;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
 
-namespace ChemProV.Library.OSBLE
+namespace ChemProV.Logic.OSBLE
 {
     public class OSBLEState
     {
@@ -42,8 +42,8 @@ namespace ChemProV.Library.OSBLE
 
             m_bind = new System.ServiceModel.BasicHttpBinding();
             m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
-            m_bind.ReceiveTimeout = new TimeSpan(0, 0, 10);
-            m_bind.SendTimeout = new TimeSpan(0, 0, 10);
+            m_bind.ReceiveTimeout = new TimeSpan(0, 0, 15);
+            m_bind.SendTimeout = new TimeSpan(0, 0, 15);
             m_bind.MaxBufferSize = 2147483647;
             m_bind.MaxReceivedMessageSize = 2147483647;
         }
@@ -65,13 +65,12 @@ namespace ChemProV.Library.OSBLE
 
             // This means that they're logged in
             m_isLoggedIn = true;
-
-            // The authentication client has delivered what we need and so we can close it
-            AuthenticationServiceClient authClient = e.UserState as AuthenticationServiceClient;
-            authClient.CloseAsync();
             
             // Store the authentication token
             m_authToken = e.Result;
+
+            // We're done with the authentication client
+            (e.UserState as AuthenticationServiceClient).CloseAsync();
 
             // Create the OSBLE client
             System.ServiceModel.BasicHttpBinding bind = new System.ServiceModel.BasicHttpBinding();
@@ -81,8 +80,7 @@ namespace ChemProV.Library.OSBLE
             bind.MaxBufferSize = 2147483647;
             bind.MaxReceivedMessageSize = 2147483647;
             bind.TextEncoding = System.Text.Encoding.Unicode;
-            m_osbleClient = new OsbleServiceClient(bind,
-                new System.ServiceModel.EndpointAddress("http://localhost:17532/Services/OsbleService.svc"));
+            m_osbleClient = new OsbleServiceClient(bind, new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
             
             // Make sure we setup all callbacks here
             m_osbleClient.GetCoursesCompleted += new EventHandler<GetCoursesCompletedEventArgs>(OsbleClient_GetCoursesCompleted);
@@ -184,7 +182,7 @@ namespace ChemProV.Library.OSBLE
             return null;
         }
 
-        private string GetDeliverableFileName(RelevantAssignment assignment)
+        public static string GetDeliverableFileName(RelevantAssignment assignment)
         {
             foreach (Deliverable d in assignment.Deliverables)
             {

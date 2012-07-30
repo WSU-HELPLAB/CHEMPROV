@@ -163,7 +163,7 @@ namespace ChemProV.Core
             System.Windows.MessageBox.Show(message);
         }
 
-        public static ChemProV.Library.OSBLE.OSBLEState OSBLEState
+        public static ChemProV.Logic.OSBLE.OSBLEState OSBLEState
         {
             get;
             set;

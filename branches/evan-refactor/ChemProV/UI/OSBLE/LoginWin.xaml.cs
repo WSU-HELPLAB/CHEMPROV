@@ -15,18 +15,19 @@ using System.Windows.Shapes;
 using System.Windows.Threading;
 using ChemProV.Library.ServiceReference1;
 using ChemProV.Library.OsbleService;
+using ChemProV.Logic.OSBLE;
 
-namespace ChemProV.Library.OSBLE.Views
+namespace ChemProV.UI.OSBLE
 {
-    public partial class LoginWindow : ChildWindow
+    public partial class LoginWin : ChildWindow
     {
         private OSBLEState m_state = null;
 
         private bool m_terminate = false;
-        
+
         private const string c_osbleLoginFileName = "ChemProV_OSBLE_Login.dat";
 
-        public LoginWindow()
+        public LoginWin()
         {
             InitializeComponent();
 
@@ -81,7 +82,7 @@ namespace ChemProV.Library.OSBLE.Views
         /// Decrypts an array of bytes into a string. Public so that it can have unit tests.
         /// </summary>
         public static string Dec(byte[] enc)
-        {            
+        {
             byte[] a1 = new byte[enc.Length / 2];
             for (int i = 0; i < enc.Length; i += 2)
             {
@@ -112,7 +113,7 @@ namespace ChemProV.Library.OSBLE.Views
             {
                 // Start off with a completely random value
                 ushort us = (ushort)r.Next(ushort.MaxValue);
-                
+
                 for (int j = 0; j < 8; j++)
                 {
                     // Clear the bit first
@@ -136,7 +137,7 @@ namespace ChemProV.Library.OSBLE.Views
         private void LoginWindowClosing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             e.Cancel = false;
-            
+
             // Set the flag to indicate termination. This way, when async callbacks complete, we 
             // can just ignore them.
             m_terminate = true;
@@ -150,7 +151,7 @@ namespace ChemProV.Library.OSBLE.Views
             {
                 return;
             }
-            
+
             // Save the user name and password if check box is checked
             if (RememberCredentialsCheckBox.IsChecked.HasValue &&
                 RememberCredentialsCheckBox.IsChecked.Value)

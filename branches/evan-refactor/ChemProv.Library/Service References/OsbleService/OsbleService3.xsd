@@ -85,6 +85,12 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="AbstractRole" nillable="true" type="tns:AbstractRole" />
+  <xs:complexType name="ArrayOfCategory">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="Category" nillable="true" type="tns:Category" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfCategory" nillable="true" type="tns:ArrayOfCategory" />
   <xs:complexType name="Category">
     <xs:sequence>
       <xs:element xmlns:q4="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments" minOccurs="0" name="Assignments" nillable="true" type="q4:ArrayOfAssignment" />
@@ -101,12 +107,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="Category" nillable="true" type="tns:Category" />
-  <xs:complexType name="ArrayOfCategory">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="Category" nillable="true" type="tns:Category" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfCategory" nillable="true" type="tns:ArrayOfCategory" />
   <xs:complexType name="ArrayOfCourseBreak">
     <xs:sequence>
       <xs:element minOccurs="0" maxOccurs="unbounded" name="CourseBreak" nillable="true" type="tns:CourseBreak" />

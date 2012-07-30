@@ -18,7 +18,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProV.Library.OSBLE;
+using ChemProV.Logic.OSBLE;
 
 namespace ChemProV.UI.OSBLE
 {
@@ -47,7 +47,7 @@ namespace ChemProV.UI.OSBLE
                 OSBLEButton.Content = "Save to an OSBLE assignment...";
                 DiskButton.Content = "Save to disk...";
 
-                if (null != state.CurrentAssignment)
+                if (null != state.CurrentAssignment && !state.CurrentAssignment.IsReview)
                 {
                     // Build some components for nice info formatting within the button
                     StackPanel sp = new StackPanel();
