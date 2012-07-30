@@ -94,7 +94,7 @@ namespace ChemProV.Logic.OSBLE
                 AssignmentStream msUncompressed;
                 using (Stream tempStream = zf.GetInputStream(ze))
                 {
-                    msUncompressed = new AssignmentStream(name, this);
+                    msUncompressed = new AssignmentStream(name, this, true);
                     tempStream.CopyTo(msUncompressed);
                 }
 
@@ -123,7 +123,7 @@ namespace ChemProV.Logic.OSBLE
             }
         }
 
-        private void AuthenticationCompleted(object sender, ValidateUserCompletedEventArgs e)
+        private void AuthForLoadCompleted(object sender, ValidateUserCompletedEventArgs e)
         {
             object[] args = e.UserState as object[];
             AuthenticationServiceClient authClient = args[0] as AuthenticationServiceClient;
@@ -170,6 +170,7 @@ namespace ChemProV.Logic.OSBLE
             AuthenticationServiceClient authClient = args[0] as AuthenticationServiceClient;
             EventHandler onSaveComplete = args[1] as EventHandler;
             byte[] zippedData = args[2] as byte[];
+            int originalAuthorID = (int)args[3];
 
             // If we failed then there's not much we can do
             if (null != e.Error || e.Cancelled)
@@ -196,7 +197,8 @@ namespace ChemProV.Logic.OSBLE
                     // within its own "child" zip under the main "parent" zip. This is NOT something we have to deal 
                     // with here. We just submit the review file and we're done.
                     m_osbleClient.SubmitReviewCompleted += new EventHandler<SubmitReviewCompletedEventArgs>(OSBLESubmitReviewCompleted);
-                    m_osbleClient.SubmitReviewAsync(m_userID, m_a.ID, zippedData, authToken, new object[] { m_osbleClient, onSaveComplete });
+                    m_osbleClient.SubmitReviewAsync(originalAuthorID, m_a.ID, zippedData, authToken,
+                        new object[] { m_osbleClient, onSaveComplete });
                 }
                 else
                 {
@@ -411,7 +413,7 @@ namespace ChemProV.Logic.OSBLE
             
             AuthenticationServiceClient auth = new AuthenticationServiceClient(
                 m_bind, new System.ServiceModel.EndpointAddress(OSBLEState.AuthServiceLink));
-            auth.ValidateUserCompleted += this.AuthenticationCompleted;
+            auth.ValidateUserCompleted += this.AuthForLoadCompleted;
             auth.ValidateUserAsync(m_userName, m_password, new object[] { auth, parameter });
         }
 
@@ -490,19 +492,44 @@ namespace ChemProV.Logic.OSBLE
             AuthenticationServiceClient auth = new AuthenticationServiceClient(
                 m_bind, new System.ServiceModel.EndpointAddress(OSBLEState.AuthServiceLink));
             auth.ValidateUserCompleted += new EventHandler<ValidateUserCompletedEventArgs>(AuthForSaveCompleted);
-            auth.ValidateUserAsync(m_userName, m_password, new object[] { auth, onSaveComplete, zipData });
+            auth.ValidateUserAsync(m_userName, m_password,
+                new object[] { auth, onSaveComplete, zipData, stream.OriginalAuthorID });
         }
 
         public class AssignmentStream : MemoryStream
         {
             private string m_name;
 
+            private int m_originalAuthorID = -1;
+
             private RelevantAssignment m_parent;
-            
+
             public AssignmentStream(string name, RelevantAssignment parent)
+                : this(name, parent, false) { }
+
+            public AssignmentStream(string name, RelevantAssignment parent, bool parseOriginalUserID)
                 : base()
             {
                 m_name = name;
+                
+                if (parseOriginalUserID)
+                {
+                    // At the time of this writing, the file names for critical reviews are of the 
+                    // form: "#;UserName", where # is the user ID
+                    int i = name.IndexOf(';');
+                    if (i > 0)
+                    {
+                        int ID;
+                        if (int.TryParse(name.Substring(0, i), out ID))
+                        {
+                            m_originalAuthorID = ID;
+                            
+                            // Take only what's after the ';' for the name
+                            m_name = name.Substring(i + 1);                            
+                        }
+                    }
+                }
+
                 m_parent = parent;
             }
 
@@ -511,6 +538,18 @@ namespace ChemProV.Logic.OSBLE
                 get
                 {
                     return m_name;
+                }
+            }
+
+            /// <summary>
+            /// Gets the the ID of the original author for this assignment, or -1 if the 
+            /// original author is unknown.
+            /// </summary>
+            public int OriginalAuthorID
+            {
+                get
+                {
+                    return m_originalAuthorID;
                 }
             }
 
