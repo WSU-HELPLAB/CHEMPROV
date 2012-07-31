@@ -128,6 +128,90 @@ namespace ChemProV.UnitTests
         }
 
         [TestMethod]
+        public void TestCommentMerge()
+        {
+            // Build a workspace with 2 process units
+            Workspace ws1 = new Workspace();
+            AbstractProcessUnit apu1 = new Separator();
+            AbstractProcessUnit apu2 = new Separator();
+            ws1.AddProcessUnit(apu1);
+            ws1.AddProcessUnit(apu2);
+
+            // Add 2 comments to the first and 3 to the second. These will be comments shared 
+            // between the two workspaces
+            apu1.Comments.Add(new StickyNote() { Text = "Comment 1 on APU1" });
+            apu1.Comments.Add(new StickyNote() { Text = "Comment 2 on APU1" });
+            apu2.Comments.Add(new StickyNote() { Text = "Comment 1 on APU2" });
+            apu2.Comments.Add(new StickyNote() { Text = "Comment 2 on APU2" });
+            apu2.Comments.Add(new StickyNote() { Text = "Comment 3 on APU2" });
+
+            // Save the workspace to a memory stream
+            MemoryStream ms1 = new MemoryStream();
+            ws1.Save(ms1);
+
+            // Load to a new workspace. The two workspaces should have identical content after 
+            // the load.
+            Workspace ws2 = new Workspace();
+            ws2.Load(ms1);
+
+            // Get the process units from the second workspace
+            AbstractProcessUnit ws2_apu1 = ws2.GetProcessUnit(apu1.Id);
+            AbstractProcessUnit ws2_apu2 = ws2.GetProcessUnit(apu2.Id);
+
+            // Make sure that they both exist
+            if (null == ws2_apu1 || null == ws2_apu2)
+            {
+                Assert.Fail("After save, one or more process units was not found (TestCommentMerge)");
+                return;
+            }
+
+            // Now is where we add comments that are unique to the different workspaces
+            apu1.Comments.Add(new StickyNote() { Text = "Comment on APU1 only in WS1" });
+            apu2.Comments.Add(new StickyNote() { Text = "Comment on APU2 only in WS1" });
+            ws2_apu1.Comments.Add(new StickyNote() { Text = "Comment on APU1 only in WS2" });
+            ws2_apu2.Comments.Add(new StickyNote() { Text = "Comment on APU2 only in WS2" });
+            ws2_apu2.Comments.Add(new StickyNote() { Text = "Another comment on APU2 only in WS2" });
+
+            // (Re-)create the memory streams and save both workspaces
+            ms1 = new MemoryStream();
+            MemoryStream ms2 = new MemoryStream();
+            ws1.Save(ms1);
+            ws2.Save(ms2);
+
+            // Allocate a third memory stream for the merge
+            MemoryStream msMerged = new MemoryStream();
+
+            // Merge
+            Core.CommentMerger.Merge(ms1, "WS1_User", ms2, "WS2_User", msMerged);
+
+            // Load back into a workspace and verify
+            ws1.Load(msMerged);
+
+            // ------ VERIFICATION ------
+
+            // There should be 2 process units
+            apu1 = ws1.GetProcessUnit(apu1.Id);
+            apu2 = ws1.GetProcessUnit(apu2.Id);
+            if (null == ws2_apu1 || null == ws2_apu2)
+            {
+                Assert.Fail("After comment merge, one or more process units was not found (TestCommentMerge)");
+                return;
+            }
+
+            // The first one should have 4 comments. 2 from the original two that are in both documents, 1 
+            // unique to the first workspace and 1 unique to the second
+            Assert.IsTrue(4 == apu1.Comments.Count,
+                "Process unit APU1 in document after merge should have 4 comments but has " +
+                apu1.Comments.Count.ToString());
+
+            // The second one should have 6 comments. 3 from the original two that are in both documents, 1 
+            // unique to the first workspace and 2 unique to the second
+            Assert.IsTrue(6 == apu2.Comments.Count,
+                "Process unit APU2 in document after merge should have 5 comments but has " +
+                apu2.Comments.Count.ToString());
+        }
+
+        [TestMethod]
         public void TestOSBLELoginEncDec()
         {
             Random rand = new Random();
