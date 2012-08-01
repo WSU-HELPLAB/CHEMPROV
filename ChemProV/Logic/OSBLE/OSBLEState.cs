@@ -268,13 +268,16 @@ namespace ChemProV.Logic.OSBLE
 
         private void OsbleClient_GetCourseAssignmentsCompleted(object sender, GetCourseAssignmentsCompletedEventArgs e)
         {
-            // Set the assignments for the Course object
-            (e.UserState as Course).Assignments = e.Result;
-
-            // Set the course reference for each assignment since this is NOT done automatically
-            foreach (Assignment a in e.Result)
+            if (null == e.Error)
             {
-                a.Course = e.UserState as Course;
+                // Set the assignments for the Course object
+                (e.UserState as Course).Assignments = e.Result;
+
+                // Set the course reference for each assignment since this is NOT done automatically
+                foreach (Assignment a in e.Result)
+                {
+                    a.Course = e.UserState as Course;
+                }
             }
 
             // Decrement the number of remaining courses
@@ -304,8 +307,12 @@ namespace ChemProV.Logic.OSBLE
             m_coursesRemaining = 0;
             foreach (Course course in m_courses)
             {
-                Interlocked.Increment(ref m_coursesRemaining);
-                osbleClient.GetCourseAssignmentsAsync(course.ID, m_authToken, course);
+                try
+                {
+                    osbleClient.GetCourseAssignmentsAsync(course.ID, m_authToken, course);
+                    Interlocked.Increment(ref m_coursesRemaining);
+                }
+                catch (Exception) { }
             }
         }
 
