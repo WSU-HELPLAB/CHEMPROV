@@ -24,8 +24,6 @@ namespace ChemProV.Library.OsbleService {
         
         private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> AssignmentsField;
         
-        private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Category> CategoriesField;
-        
         private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.CourseBreak> CourseBreaksField;
         
         private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.CourseMeeting> CourseMeetingsField;
@@ -80,19 +78,6 @@ namespace ChemProV.Library.OsbleService {
                 if ((object.ReferenceEquals(this.AssignmentsField, value) != true)) {
                     this.AssignmentsField = value;
                     this.RaisePropertyChanged("Assignments");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Category> Categories {
-            get {
-                return this.CategoriesField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.CategoriesField, value) != true)) {
-                    this.CategoriesField = value;
-                    this.RaisePropertyChanged("Categories");
                 }
             }
         }
@@ -481,6 +466,8 @@ namespace ChemProV.Library.OsbleService {
         
         private int IDField;
         
+        private bool IsAnnotatableField;
+        
         private bool IsDraftField;
         
         private System.Nullable<int> PrecededingAssignmentIDField;
@@ -779,6 +766,19 @@ namespace ChemProV.Library.OsbleService {
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
+        public bool IsAnnotatable {
+            get {
+                return this.IsAnnotatableField;
+            }
+            set {
+                if ((this.IsAnnotatableField.Equals(value) != true)) {
+                    this.IsAnnotatableField = value;
+                    this.RaisePropertyChanged("IsAnnotatable");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
         public bool IsDraft {
             get {
                 return this.IsDraftField;
@@ -930,186 +930,6 @@ namespace ChemProV.Library.OsbleService {
                 if ((this.TypeField.Equals(value) != true)) {
                     this.TypeField = value;
                     this.RaisePropertyChanged("Type");
-                }
-            }
-        }
-        
-        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
-        
-        protected void RaisePropertyChanged(string propertyName) {
-            System.ComponentModel.PropertyChangedEventHandler propertyChanged = this.PropertyChanged;
-            if ((propertyChanged != null)) {
-                propertyChanged(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
-            }
-        }
-    }
-    
-    [System.Diagnostics.DebuggerStepThroughAttribute()]
-    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.Runtime.Serialization", "4.0.0.0")]
-    [System.Runtime.Serialization.DataContractAttribute(Name="Category", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Courses")]
-    public partial class Category : object, System.ComponentModel.INotifyPropertyChanged {
-        
-        private System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> AssignmentsField;
-        
-        private int ColumnOrderField;
-        
-        private ChemProV.Library.OsbleService.Course CourseField;
-        
-        private int CourseIDField;
-        
-        private int CustomizeField;
-        
-        private int IDField;
-        
-        private double MaxAssignmentScoreField;
-        
-        private string NameField;
-        
-        private double PointsField;
-        
-        private string TabColorField;
-        
-        private int dropXField;
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> Assignments {
-            get {
-                return this.AssignmentsField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.AssignmentsField, value) != true)) {
-                    this.AssignmentsField = value;
-                    this.RaisePropertyChanged("Assignments");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ColumnOrder {
-            get {
-                return this.ColumnOrderField;
-            }
-            set {
-                if ((this.ColumnOrderField.Equals(value) != true)) {
-                    this.ColumnOrderField = value;
-                    this.RaisePropertyChanged("ColumnOrder");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public ChemProV.Library.OsbleService.Course Course {
-            get {
-                return this.CourseField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.CourseField, value) != true)) {
-                    this.CourseField = value;
-                    this.RaisePropertyChanged("Course");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int CourseID {
-            get {
-                return this.CourseIDField;
-            }
-            set {
-                if ((this.CourseIDField.Equals(value) != true)) {
-                    this.CourseIDField = value;
-                    this.RaisePropertyChanged("CourseID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int Customize {
-            get {
-                return this.CustomizeField;
-            }
-            set {
-                if ((this.CustomizeField.Equals(value) != true)) {
-                    this.CustomizeField = value;
-                    this.RaisePropertyChanged("Customize");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int ID {
-            get {
-                return this.IDField;
-            }
-            set {
-                if ((this.IDField.Equals(value) != true)) {
-                    this.IDField = value;
-                    this.RaisePropertyChanged("ID");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double MaxAssignmentScore {
-            get {
-                return this.MaxAssignmentScoreField;
-            }
-            set {
-                if ((this.MaxAssignmentScoreField.Equals(value) != true)) {
-                    this.MaxAssignmentScoreField = value;
-                    this.RaisePropertyChanged("MaxAssignmentScore");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string Name {
-            get {
-                return this.NameField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.NameField, value) != true)) {
-                    this.NameField = value;
-                    this.RaisePropertyChanged("Name");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public double Points {
-            get {
-                return this.PointsField;
-            }
-            set {
-                if ((this.PointsField.Equals(value) != true)) {
-                    this.PointsField = value;
-                    this.RaisePropertyChanged("Points");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public string TabColor {
-            get {
-                return this.TabColorField;
-            }
-            set {
-                if ((object.ReferenceEquals(this.TabColorField, value) != true)) {
-                    this.TabColorField = value;
-                    this.RaisePropertyChanged("TabColor");
-                }
-            }
-        }
-        
-        [System.Runtime.Serialization.DataMemberAttribute()]
-        public int dropX {
-            get {
-                return this.dropXField;
-            }
-            set {
-                if ((this.dropXField.Equals(value) != true)) {
-                    this.dropXField = value;
-                    this.RaisePropertyChanged("dropX");
                 }
             }
         }
@@ -1759,66 +1579,68 @@ namespace ChemProV.Library.OsbleService {
     [System.Runtime.Serialization.DataContractAttribute(Name="CriticalReviewSettings", Namespace="http://schemas.datacontract.org/2004/07/OSBLE.Models.Assignments")]
     public partial class CriticalReviewSettings : object, System.ComponentModel.INotifyPropertyChanged {
         
-        private bool AllowReviewersToDownloadField;
+        private bool AllowDownloadAfterPublishField;
         
-        private bool AnonymizeAuthorToReviewerField;
+        private bool AnonymizeAuthorField;
         
-        private bool AnonymizeReviewerToAuthorField;
+        private bool AnonymizeCommentsField;
         
-        private bool AnonymizeReviewerToReviewersField;
+        private bool AnonymizeCommentsAfterPublishField;
         
         private ChemProV.Library.OsbleService.Assignment AssignmentField;
         
         private int AssignmentIDField;
         
+        private byte ReviewSettingsField;
+        
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool AllowReviewersToDownload {
+        public bool AllowDownloadAfterPublish {
             get {
-                return this.AllowReviewersToDownloadField;
+                return this.AllowDownloadAfterPublishField;
             }
             set {
-                if ((this.AllowReviewersToDownloadField.Equals(value) != true)) {
-                    this.AllowReviewersToDownloadField = value;
-                    this.RaisePropertyChanged("AllowReviewersToDownload");
+                if ((this.AllowDownloadAfterPublishField.Equals(value) != true)) {
+                    this.AllowDownloadAfterPublishField = value;
+                    this.RaisePropertyChanged("AllowDownloadAfterPublish");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool AnonymizeAuthorToReviewer {
+        public bool AnonymizeAuthor {
             get {
-                return this.AnonymizeAuthorToReviewerField;
+                return this.AnonymizeAuthorField;
             }
             set {
-                if ((this.AnonymizeAuthorToReviewerField.Equals(value) != true)) {
-                    this.AnonymizeAuthorToReviewerField = value;
-                    this.RaisePropertyChanged("AnonymizeAuthorToReviewer");
+                if ((this.AnonymizeAuthorField.Equals(value) != true)) {
+                    this.AnonymizeAuthorField = value;
+                    this.RaisePropertyChanged("AnonymizeAuthor");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool AnonymizeReviewerToAuthor {
+        public bool AnonymizeComments {
             get {
-                return this.AnonymizeReviewerToAuthorField;
+                return this.AnonymizeCommentsField;
             }
             set {
-                if ((this.AnonymizeReviewerToAuthorField.Equals(value) != true)) {
-                    this.AnonymizeReviewerToAuthorField = value;
-                    this.RaisePropertyChanged("AnonymizeReviewerToAuthor");
+                if ((this.AnonymizeCommentsField.Equals(value) != true)) {
+                    this.AnonymizeCommentsField = value;
+                    this.RaisePropertyChanged("AnonymizeComments");
                 }
             }
         }
         
         [System.Runtime.Serialization.DataMemberAttribute()]
-        public bool AnonymizeReviewerToReviewers {
+        public bool AnonymizeCommentsAfterPublish {
             get {
-                return this.AnonymizeReviewerToReviewersField;
+                return this.AnonymizeCommentsAfterPublishField;
             }
             set {
-                if ((this.AnonymizeReviewerToReviewersField.Equals(value) != true)) {
-                    this.AnonymizeReviewerToReviewersField = value;
-                    this.RaisePropertyChanged("AnonymizeReviewerToReviewers");
+                if ((this.AnonymizeCommentsAfterPublishField.Equals(value) != true)) {
+                    this.AnonymizeCommentsAfterPublishField = value;
+                    this.RaisePropertyChanged("AnonymizeCommentsAfterPublish");
                 }
             }
         }
@@ -1845,6 +1667,19 @@ namespace ChemProV.Library.OsbleService {
                 if ((this.AssignmentIDField.Equals(value) != true)) {
                     this.AssignmentIDField = value;
                     this.RaisePropertyChanged("AssignmentID");
+                }
+            }
+        }
+        
+        [System.Runtime.Serialization.DataMemberAttribute()]
+        public byte ReviewSettings {
+            get {
+                return this.ReviewSettingsField;
+            }
+            set {
+                if ((this.ReviewSettingsField.Equals(value) != true)) {
+                    this.ReviewSettingsField = value;
+                    this.RaisePropertyChanged("ReviewSettings");
                 }
             }
         }
@@ -3595,28 +3430,25 @@ namespace ChemProV.Library.OsbleService {
         ChemProV = 2,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        XPS = 3,
+        Video = 3,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Video = 4,
+        Zip = 4,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        Zip = 5,
+        InBrowserText = 5,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        InBrowserText = 6,
+        PowerPoint = 6,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        PowerPoint = 7,
+        WordDocument = 7,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        WordDocument = 8,
+        PDF = 8,
         
         [System.Runtime.Serialization.EnumMemberAttribute()]
-        PDF = 9,
-        
-        [System.Runtime.Serialization.EnumMemberAttribute()]
-        ExcelSpreadSheet = 10,
+        ExcelSpreadSheet = 9,
     }
     
     [System.Diagnostics.DebuggerStepThroughAttribute()]

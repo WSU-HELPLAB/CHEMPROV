@@ -34,6 +34,7 @@
       <xs:element minOccurs="0" name="HoursLateWindow" type="xs:int" />
       <xs:element minOccurs="0" name="HoursPerDeduction" type="xs:double" />
       <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="IsAnnotatable" type="xs:boolean" />
       <xs:element minOccurs="0" name="IsDraft" type="xs:boolean" />
       <xs:element minOccurs="0" name="PrecededingAssignmentID" nillable="true" type="xs:int" />
       <xs:element minOccurs="0" name="PreceedingAssignment" nillable="true" type="tns:Assignment" />
@@ -163,12 +164,13 @@
   <xs:element name="CommentCategoryOption" nillable="true" type="tns:CommentCategoryOption" />
   <xs:complexType name="CriticalReviewSettings">
     <xs:sequence>
-      <xs:element minOccurs="0" name="AllowReviewersToDownload" type="xs:boolean" />
-      <xs:element minOccurs="0" name="AnonymizeAuthorToReviewer" type="xs:boolean" />
-      <xs:element minOccurs="0" name="AnonymizeReviewerToAuthor" type="xs:boolean" />
-      <xs:element minOccurs="0" name="AnonymizeReviewerToReviewers" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AllowDownloadAfterPublish" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeAuthor" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeComments" type="xs:boolean" />
+      <xs:element minOccurs="0" name="AnonymizeCommentsAfterPublish" type="xs:boolean" />
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
       <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewSettings" type="xs:unsignedByte" />
     </xs:sequence>
   </xs:complexType>
   <xs:element name="CriticalReviewSettings" nillable="true" type="tns:CriticalReviewSettings" />
@@ -194,7 +196,6 @@
       <xs:enumeration value="Code" />
       <xs:enumeration value="Text" />
       <xs:enumeration value="ChemProV" />
-      <xs:enumeration value="XPS" />
       <xs:enumeration value="Video" />
       <xs:enumeration value="Zip" />
       <xs:enumeration value="InBrowserText" />

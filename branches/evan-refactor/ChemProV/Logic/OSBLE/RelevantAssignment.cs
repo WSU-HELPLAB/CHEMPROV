@@ -1,20 +1,11 @@
-﻿using ICSharpCode.SharpZipLib.Zip;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Ink;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Animation;
-using System.Windows.Shapes;
+using System.Threading;
 using ChemProV.Library.OsbleService;
 using ChemProV.Library.ServiceReference1;
-using System.Threading;
-using System.Collections.ObjectModel;
+using ICSharpCode.SharpZipLib.Zip;
 
 namespace ChemProV.Logic.OSBLE
 {
@@ -29,8 +20,6 @@ namespace ChemProV.Logic.OSBLE
         private System.ServiceModel.BasicHttpBinding m_bind;
 
         private List<AssignmentStream> m_files = new List<AssignmentStream>();
-
-        private int m_getFilesThreadID = -1;
 
         private bool m_gettingFiles = false;
 
@@ -59,12 +48,15 @@ namespace ChemProV.Logic.OSBLE
             m_bind.MaxReceivedMessageSize = 2147483647;
         }
 
-        private bool AddFromZip(byte[] zipFileData)
+        public Assignment ActualAssignment
         {
-            return AddFromZip(zipFileData, string.Empty);
+            get
+            {
+                return m_a;
+            }
         }
 
-        private bool AddFromZip(byte[] zipFileData, string namePrefix)
+        private bool AddFromZip(byte[] zipFileData)
         {
             // Make a memory stream for the byte array
             MemoryStream ms = new MemoryStream(zipFileData);
@@ -83,28 +75,39 @@ namespace ChemProV.Logic.OSBLE
             // Go through the files within the zip
             foreach (ZipEntry ze in zf)
             {
-                string name = namePrefix;
-                if (!string.IsNullOrEmpty(namePrefix))
+                string name = ZipEntry.CleanName(ze.Name);
+                string nameLwr = name.ToLower();
+
+                // The file name structure tells us whether or not this file is one of the "originals" 
+                // for a review assignment. An original in this case means the file that was submitted 
+                // for review. A single review assignment will have a collection of files, some of 
+                // which are originals and the rest are submitted reviews.
+                bool isOriginal = false;
+                if (nameLwr.StartsWith("originals/"))
                 {
-                    name = (name + " - ");
+                    name = name.Substring(10);
+                    isOriginal = true;
                 }
-                name += System.IO.Path.GetFileName(ZipEntry.CleanName(ze.Name));
+                else if (nameLwr.StartsWith("reviews/"))
+                {
+                    name = name.Substring(8);
+                    isOriginal = false;
+                }
+                else
+                {
+                    name = System.IO.Path.GetFileName(name);
+                }
                 
                 // Read the whole thing into a memory stream
                 AssignmentStream msUncompressed;
                 using (Stream tempStream = zf.GetInputStream(ze))
                 {
-                    msUncompressed = new AssignmentStream(name, this, true);
+                    msUncompressed = new AssignmentStream(name, this, true, isOriginal);
                     tempStream.CopyTo(msUncompressed);
                 }
 
-                // There might be zips within the zip
-                if (!AddFromZip(msUncompressed.ToArray(), ZipEntry.CleanName(ze.Name)))
-                {
-                    // This implies failure to read the uncompressed stream as another zip file. So the 
-                    // stream we have should be added to the list.
-                    m_files.Add(msUncompressed);
-                }
+                // Add the file to the collection
+                m_files.Add(msUncompressed);
             }
 
             ms.Dispose();
@@ -154,13 +157,22 @@ namespace ChemProV.Logic.OSBLE
             {
                 // We need to use "GetReviewItems"
                 osc.GetReviewItemsCompleted += new EventHandler<GetReviewItemsCompletedEventArgs>(GetReviewItemsCompleted);
-                osc.GetReviewItemsAsync(m_a.ID, authToken, args);
+                try
+                {
+                    osc.GetReviewItemsAsync(m_a.ID, authToken, args);
+                }
+                catch (Exception)
+                { }
             }
             else
             {
                 // We need to use "GetAssignmentSubmission"
                 osc.GetAssignmentSubmissionCompleted += new EventHandler<GetAssignmentSubmissionCompletedEventArgs>(GetAssignmentSubmissionCompleted);
-                osc.GetAssignmentSubmissionAsync(m_a.ID, authToken, args);
+                try
+                {
+                    osc.GetAssignmentSubmissionAsync(m_a.ID, authToken, args);
+                }
+                catch (Exception) { }
             }
         }
 
@@ -457,16 +469,10 @@ namespace ChemProV.Logic.OSBLE
             MemoryStream ms = new MemoryStream();
             workspace.Save(ms);
 
-            // Next compress the file data
-            string fileName;
-            if (null != stream)
-            {
-                fileName = stream.Name;
-            }
-            else
-            {
-                fileName = OSBLEState.GetDeliverableFileName(this);
-            }
+            // Determine a file name and compress the file data. The contract (at the time of this writing) 
+            // is that the file name in the uploaded assignments must ALWAYS match the deliverable file 
+            // name. This is true for both reviews and basic assignments.
+            string fileName = OSBLEState.GetDeliverableFileName(this);
             byte[] zipData = CreateZipFile(ms.ToArray(), fileName);
 
             // Dispose the memory stream, as we are done with it
@@ -498,6 +504,8 @@ namespace ChemProV.Logic.OSBLE
 
         public class AssignmentStream : MemoryStream
         {
+            protected bool m_isOriginalForReview = false;
+            
             private string m_name;
 
             private int m_originalAuthorID = -1;
@@ -508,9 +516,13 @@ namespace ChemProV.Logic.OSBLE
                 : this(name, parent, false) { }
 
             public AssignmentStream(string name, RelevantAssignment parent, bool parseOriginalUserID)
-                : base()
+                : this(name, parent, parseOriginalUserID, false) { }
+
+            public AssignmentStream(string name, RelevantAssignment parent, bool parseOriginalUserID,
+                bool isOriginalForReview) : base()
             {
                 m_name = name;
+                m_isOriginalForReview = isOriginalForReview;
                 
                 if (parseOriginalUserID)
                 {
@@ -531,6 +543,37 @@ namespace ChemProV.Logic.OSBLE
                 }
 
                 m_parent = parent;
+            }
+
+            /// <summary>
+            /// Attempts to parse the author name out of the file name. If the file name is of 
+            /// the form: "author name/FileName.cpml" then "author name" is returned. Otherwise 
+            /// an empty string is returned.
+            /// </summary>
+            public string AuthorName
+            {
+                get
+                {
+                    int index = m_name.IndexOf('/');
+                    if (-1 == index)
+                    {
+                        index = m_name.IndexOf('\\');
+                        if (-1 == index)
+                        {
+                            return string.Empty;
+                        }
+                    }
+
+                    return m_name.Substring(0, index);
+                }
+            }
+
+            public bool IsOriginalForReview
+            {
+                get
+                {
+                    return m_isOriginalForReview;
+                }
             }
 
             public string Name
