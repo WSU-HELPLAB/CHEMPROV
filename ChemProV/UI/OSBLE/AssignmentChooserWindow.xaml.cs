@@ -36,10 +36,6 @@ namespace ChemProV.UI.OSBLE
 
         private OSBLEState m_state = null;
 
-        private SolidColorBrush s_borderGreen = new SolidColorBrush(Color.FromArgb(255, 160, 205, 160));
-        
-        private SolidColorBrush s_lightGreen = new SolidColorBrush(Color.FromArgb(255, 210, 255, 210));
-
         public AssignmentChooserWindow(OSBLEState state, bool showLoginMessage, bool saveMode)
         {
             InitializeComponent();
@@ -99,53 +95,72 @@ namespace ChemProV.UI.OSBLE
                 courseNode = m_courseNodes[ra.CourseName];
             }
 
-            // Build the node for the assignment
-            TreeViewItem tvi = new TreeViewItem();
-            tvi.Header = string.Format("{0}\nType: {1}\nDue Date: {2}",
-                ra.Name, (AssignmentTypes.CriticalReview == ra.ActualAssignment.Type) ?
-                    "Critical Review" : ra.ActualAssignment.Type.ToString(),
-                ra.ActualAssignment.DueDate.ToString("f"));
-            tvi.Tag = ra;
-            //tvi.Background = s_borderGreen;// s_lightGreen;
-            tvi.IsExpanded = true;
-
-            // Put it under the course node
-            courseNode.Items.Add(tvi);
-
-            // Now make child nodes for each file in the assignment
-            foreach (RelevantAssignment.AssignmentStream stream in args.Files)
+            // Critical review discussions are a special case because they don't actually contain any 
+            // files that we can open. Instead, we want to give a link to the relevant OSBLE page. We 
+            // only show them in open mode (they are hidden in save mode).
+            if (!m_saveMode && AssignmentTypes.CriticalReviewDiscussion == ra.ActualAssignment.Type)
             {
-                // If the assignment is a critical review then it can potentially have both original 
-                // documents and reviewed documents as streams within it. In the case where we're 
-                // loading, we want to show all of these.
-                // However, in the case where we're saving we cannot overwrite the originals. Rather, 
-                // we can only save reviews. So for that save case we should show only originals and 
-                // label them in a way that implies that a save submits a review for that document.
-                if (!m_saveMode)
+                StackPanel sp = new StackPanel();
+                TextBlock tb = new TextBlock();
+                tb.Text = string.Format("{0}\nType: Critical Review Discussion\nDue Date: {1}",
+                    ra.Name, ra.ActualAssignment.DueDate.ToString("f"));
+                sp.Children.Add(tb);
+                HyperlinkButton hb = new HyperlinkButton();
+                string url = "https://www.osble.org/AssignmentDetails/" + ra.ActualAssignment.ID.ToString();
+                hb.NavigateUri = new Uri(url);
+                hb.Content = url;
+                sp.Children.Add(hb);
+                courseNode.Items.Add(sp);
+            }
+            else
+            {
+                // Build the node for the assignment
+                TreeViewItem tvi = new TreeViewItem();
+                tvi.Header = string.Format("{0}\nType: {1}\nDue Date: {2}",
+                    ra.Name, (AssignmentTypes.CriticalReview == ra.ActualAssignment.Type) ?
+                        "Critical Review" : ra.ActualAssignment.Type.ToString(),
+                    ra.ActualAssignment.DueDate.ToString("f"));
+                tvi.Tag = ra;
+                tvi.IsExpanded = true;
+
+                // Put it under the course node
+                courseNode.Items.Add(tvi);
+
+                // Now make child nodes for each file in the assignment
+                foreach (RelevantAssignment.AssignmentStream stream in args.Files)
                 {
-                    TreeViewItem tviChild = new TreeViewItem();
-                    tviChild.Header = stream.Name;
-                    if (ra.IsReview)
+                    // If the assignment is a critical review then it can potentially have both original 
+                    // documents and reviewed documents as streams within it. In the case where we're 
+                    // loading, we want to show all of these.
+                    // However, in the case where we're saving we cannot overwrite the originals. Rather, 
+                    // we can only save reviews. So for that save case we should show only originals and 
+                    // label them in a way that implies that a save submits a review for that document.
+                    if (!m_saveMode)
                     {
-                        // Mark files as originals or reviews
-                        if (stream.IsOriginalForReview)
+                        TreeViewItem tviChild = new TreeViewItem();
+                        tviChild.Header = stream.Name;
+                        if (ra.IsCriticalReview)
                         {
-                            tviChild.Header += " (author's original file)";
+                            // Mark files as originals or reviews
+                            if (stream.IsOriginalForReview)
+                            {
+                                tviChild.Header += " (author's original file)";
+                            }
+                            else
+                            {
+                                tviChild.Header += " (your review file)";
+                            }
                         }
-                        else
-                        {
-                            tviChild.Header += " (your review file)";
-                        }
+                        tviChild.Tag = stream;
+                        tvi.Items.Add(tviChild);
                     }
-                    tviChild.Tag = stream;
-                    tvi.Items.Add(tviChild);
-                }
-                else if (stream.IsOriginalForReview)
-                {
-                    TreeViewItem tviChild = new TreeViewItem();
-                    tviChild.Header = "Save as review for " + stream.AuthorName;
-                    tviChild.Tag = stream;
-                    tvi.Items.Add(tviChild);
+                    else if (stream.IsOriginalForReview)
+                    {
+                        TreeViewItem tviChild = new TreeViewItem();
+                        tviChild.Header = "Save as review for " + stream.AuthorName;
+                        tviChild.Tag = stream;
+                        tvi.Items.Add(tviChild);
+                    }
                 }
             }
 

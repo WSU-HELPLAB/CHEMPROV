@@ -377,7 +377,7 @@ namespace ChemProV.Logic.OSBLE
             }
         }
 
-        public bool IsReview
+        public bool IsCriticalReview
         {
             get
             {

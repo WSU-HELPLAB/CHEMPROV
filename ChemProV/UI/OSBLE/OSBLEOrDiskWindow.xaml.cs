@@ -47,7 +47,7 @@ namespace ChemProV.UI.OSBLE
                 OSBLEButton.Content = "Save to an OSBLE assignment...";
                 DiskButton.Content = "Save to disk...";
 
-                if (null != state.CurrentAssignment && !state.CurrentAssignment.IsReview)
+                if (null != state.CurrentAssignment && !state.CurrentAssignment.IsCriticalReview)
                 {
                     // Build some components for nice info formatting within the button
                     StackPanel sp = new StackPanel();
