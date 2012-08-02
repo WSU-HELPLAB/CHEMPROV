@@ -139,28 +139,23 @@ namespace ChemProV.Logic.OSBLE
             {
                 foreach (Assignment a in c.Assignments)
                 {
-                    // We want to see whether or not this assignment is relevant to ChemProV. There are a few cases 
-                    // in which it is considered relevant.
+                    // We want to see whether or not this assignment is relevant to ChemProV. There are a few 
+                    // cases in which it is considered relevant.
                     if (ContainsChemProVDeliverable(a))
                     {
                         // If it has a ChemProV deliverable then it is relevant
                         m_relevant.Add(new RelevantAssignment(a, m_userName, m_password));
                     }
-                    else if (AssignmentTypes.CriticalReview == a.Type)
+                    else if (IsChemProVCriticalReviewAssignment(c, a))
                     {
-                        // If it's a critical review then it MIGHT be relevant. We have to check out the 
-                        // previous assignment to find out.
-                        if (a.PrecededingAssignmentID.HasValue)
-                        {
-                            Assignment linked = GetAssignmentByID(c, a.PrecededingAssignmentID.Value);
-                            if (null != linked)
-                            {
-                                if (ContainsChemProVDeliverable(linked))
-                                {
-                                    m_relevant.Add(new RelevantAssignment(a, m_userName, m_password));
-                                }
-                            }
-                        }
+                        // If it's a critical review of a ChemProV assignment then it is relevant
+                        m_relevant.Add(new RelevantAssignment(a, m_userName, m_password));
+                    }
+                    else if (IsCRDAssignment(c, a))
+                    {
+                        // We can't actually open these in ChemProV, but we will provide a link 
+                        // to the relevant OSBLE page
+                        m_relevant.Add(new RelevantAssignment(a, m_userName, m_password));
                     }
                 }
             }
@@ -193,6 +188,55 @@ namespace ChemProV.Logic.OSBLE
             }
 
             return assignment.Name + ".cpml";
+        }
+
+        public static bool IsChemProVCriticalReviewAssignment(Course c, Assignment assignment)
+        {
+            if (null == assignment)
+            {
+                return false;
+            }
+            
+            if (AssignmentTypes.CriticalReview != assignment.Type)
+            {
+                return false;
+            }
+            
+            // If it's a critical review then we have to check out the previous assignment 
+            // to find out whether it's a ChemProV assignment.
+            if (assignment.PrecededingAssignmentID.HasValue)
+            {
+                Assignment linked = GetAssignmentByID(c, assignment.PrecededingAssignmentID.Value);
+                if (null != linked)
+                {
+                    if (ContainsChemProVDeliverable(linked))
+                    {
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Determines whether or not the specified assignment is a critical review discussion assignment 
+        /// where the discussion is of a review assignment that was a review of a ChemProV assignment.
+        /// </summary>
+        public static bool IsCRDAssignment(Course c, Assignment assignment)
+        {
+            if (AssignmentTypes.CriticalReviewDiscussion != assignment.Type)
+            {
+                return false;
+            }
+
+            if (assignment.PrecededingAssignmentID.HasValue)
+            {
+                Assignment linked = GetAssignmentByID(c, assignment.PrecededingAssignmentID.Value);
+                return IsChemProVCriticalReviewAssignment(c, linked);
+            }
+
+            return false;
         }
 
         public bool IsLoggedIn
