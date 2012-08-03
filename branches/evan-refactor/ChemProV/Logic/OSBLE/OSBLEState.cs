@@ -41,7 +41,11 @@ namespace ChemProV.Logic.OSBLE
             m_password = password;
 
             m_bind = new System.ServiceModel.BasicHttpBinding();
+#if DEBUG
             m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
+#else
+            m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.Transport;
+#endif
             m_bind.ReceiveTimeout = new TimeSpan(0, 0, 15);
             m_bind.SendTimeout = new TimeSpan(0, 0, 15);
             m_bind.MaxBufferSize = 2147483647;
@@ -73,14 +77,7 @@ namespace ChemProV.Logic.OSBLE
             (e.UserState as AuthenticationServiceClient).CloseAsync();
 
             // Create the OSBLE client
-            System.ServiceModel.BasicHttpBinding bind = new System.ServiceModel.BasicHttpBinding();
-            bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
-            bind.ReceiveTimeout = new TimeSpan(0, 0, 10);
-            bind.SendTimeout = new TimeSpan(0, 0, 10);
-            bind.MaxBufferSize = 2147483647;
-            bind.MaxReceivedMessageSize = 2147483647;
-            bind.TextEncoding = System.Text.Encoding.Unicode;
-            m_osbleClient = new OsbleServiceClient(bind, new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
+            m_osbleClient = new OsbleServiceClient(m_bind, new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
             
             // Make sure we setup all callbacks here
             m_osbleClient.GetCoursesCompleted += new EventHandler<GetCoursesCompletedEventArgs>(OsbleClient_GetCoursesCompleted);
@@ -90,8 +87,11 @@ namespace ChemProV.Logic.OSBLE
             m_osbleClient.GetCoursesAsync(m_authToken, m_osbleClient);
         }
 
+#if DEBUG
         public const string AuthServiceLink = "http://localhost:17532/Services/AuthenticationService.svc";
-        //public const string AuthServiceLink = "https://osble.org/Services/AuthenticationService.svc";
+#else
+        public const string AuthServiceLink = "https://osble.org/Services/AuthenticationService.svc";
+#endif
 
         /// <summary>
         /// Searches through all the deliverables in an assignment and returns true if any of them have 
@@ -365,7 +365,11 @@ namespace ChemProV.Logic.OSBLE
             OnSaveComplete(this, new OSBLEStateEventArgs(e.Result, null));
         }
 
+#if DEBUG
         public const string OSBLEServiceLink = "http://localhost:17532/Services/OsbleService.svc";
+#else
+        public const string OSBLEServiceLink = "https://www.osble.org/Services/OsbleService.svc";
+#endif
 
         public void RefreshAsync()
         {
