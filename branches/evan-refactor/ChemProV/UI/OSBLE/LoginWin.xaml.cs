@@ -232,10 +232,10 @@ namespace ChemProV.UI.OSBLE
 
         private void PasswordBox_KeyUp(object sender, KeyEventArgs e)
         {
-            //shortcut for logon
+            // Shortcut for logon
             if (e.Key == Key.Enter)
             {
-                OKButton.Command.Execute(this);
+                OKButton_Click(null, null);
             }
         }
 
@@ -262,22 +262,14 @@ namespace ChemProV.UI.OSBLE
             }
         }
 
-        //void c_ValidateUserCompleted(object sender, OSBLEAuthServices.ValidateUserCompletedEventArgs e)
-        //{
-        //    AuthenticationServiceClient authClient = e.UserState as AuthenticationServiceClient;
-        //    string token = e.Result;
-
-        //    OsbleServiceClient osbleClient = new OsbleServiceClient();
-        //    //UserProfile profile = authClient.GetActiveUser(token);
-        //    //Assignment[] serviceAssignments = osbleClient.GetCourseAssignments(4, token);
-        //    bool breakhere = true;
-        //}
-
-        //private void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
-        //{
-        //    string result = e.Result;
-        //    bool breakHere = true;
-        //}
+        private void UserNameTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            // Shortcut for logon
+            if (e.Key == Key.Enter)
+            {
+                OKButton_Click(null, null);
+            }
+        }
 
         /// <summary>
         /// Invoked when the login window finishes the login attempt, either with a successful 
