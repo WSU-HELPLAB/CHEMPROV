@@ -50,6 +50,13 @@ namespace ChemProV.Logic
         /// </summary>
         private StreamType m_type;
 
+        /// <summary>
+        /// Keeps track of whether or not the user has altered the "Temperature" property of the 
+        /// table. We keep track of this because we auto-rename the temperature variable based 
+        /// on stream number changes if the user has not manually modified it.
+        /// </summary>
+        private bool m_userHasChangedTemperature = false;
+
         public StreamPropertiesTable(AbstractStream parentStream)
         {
             m_type = (parentStream is HeatStream) ? StreamType.Heat : StreamType.Chemical;
@@ -103,6 +110,19 @@ namespace ChemProV.Logic
                 {
                     m_temperature = temperatureEl.Element("Quantity").Value;
                     m_temperatureUnits = Convert.ToInt32(temperatureEl.Element("Units").Value);
+
+                    // Look for "UserHasChangedTemperature" element. This property was added in 
+                    // August 2012 which is after several professors had been working with 
+                    // ChemProV files. So in older files this element is not likely to be present.
+                    XElement userChangedEl = temperatureEl.Element("UserHasChangedTemperature");
+                    if (null != userChangedEl)
+                    {
+                        if (!bool.TryParse(userChangedEl.Value, out m_userHasChangedTemperature))
+                        {
+                            // Default to false if the parse fails
+                            m_userHasChangedTemperature = false;
+                        }
+                    }
                 }
             }
             else if (loadFromMe.Name.LocalName.Equals("HeatStreamPropertiesWindow"))
@@ -342,6 +362,22 @@ namespace ChemProV.Logic
             }
         }
 
+        public bool UserHasChangedTemperature
+        {
+            get
+            {
+                return m_userHasChangedTemperature;
+            }
+            set
+            {
+                if (value != m_userHasChangedTemperature)
+                {
+                    m_userHasChangedTemperature = value;
+                    PropertyChanged(this, new PropertyChangedEventArgs("UserHasChangedTemperature"));
+                }
+            }
+        }
+
         public void WriteXml(System.Xml.XmlWriter writer, string parentStreamIdentifier)
         {
             if (StreamType.Heat == m_type)
@@ -376,6 +412,8 @@ namespace ChemProV.Logic
                 writer.WriteStartElement("Temperature");
                 writer.WriteElementString("Quantity", m_temperature);
                 writer.WriteElementString("Units", m_temperatureUnits.ToString());
+                writer.WriteElementString("UserHasChangedTemperature",
+                    m_userHasChangedTemperature.ToString());
                 writer.WriteEndElement();
             }
 
