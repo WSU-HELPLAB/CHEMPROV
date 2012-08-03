@@ -106,9 +106,11 @@ namespace ChemProV.UI.OSBLE
                     ra.Name, ra.ActualAssignment.DueDate.ToString("f"));
                 sp.Children.Add(tb);
                 HyperlinkButton hb = new HyperlinkButton();
-                string url = "https://www.osble.org/AssignmentDetails/" + ra.ActualAssignment.ID.ToString();
+                string url = string.Format(
+                    "http://localhost:17532/Account/TokenLogin?authToken={0}&destinationUrl=/AssignmentDetails/{1}",
+                    ra.LastAuthToken, ra.ActualAssignment.ID.ToString());
                 hb.NavigateUri = new Uri(url);
-                hb.Content = url;
+                hb.Content = "Go to this assignment in OSBLE";
                 sp.Children.Add(hb);
 
                 // Every assignment node must have the assignment object as its tag
