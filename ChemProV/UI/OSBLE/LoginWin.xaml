@@ -16,7 +16,8 @@
             <ColumnDefinition />
         </Grid.ColumnDefinitions>
         <TextBlock Text="User Name:" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center"  />
-        <TextBox x:Name="UserNameTextBox" Grid.Row="0" Grid.Column="1" Margin="3,3,3,3" Text="{Binding Path=UserName, Mode=TwoWay}"  />
+        
+        <TextBox x:Name="UserNameTextBox" Grid.Row="0" Grid.Column="1" Margin="3,3,3,3" KeyUp="UserNameTextBox_KeyUp"  />
 
         <TextBlock Text="Password:" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Right" VerticalAlignment="Center" />
         <PasswordBox 
