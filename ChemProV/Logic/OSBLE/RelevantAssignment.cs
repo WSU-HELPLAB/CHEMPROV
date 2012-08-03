@@ -23,6 +23,8 @@ namespace ChemProV.Logic.OSBLE
 
         private bool m_gettingFiles = false;
 
+        private string m_lastAuthToken = string.Empty;
+
         private OsbleServiceClient m_osbleClient = null;
 
         private string m_password;
@@ -143,6 +145,7 @@ namespace ChemProV.Logic.OSBLE
             }
 
             string authToken = e.Result;
+            m_lastAuthToken = authToken;
 
             // The last thing we do with the authentication client is get the active user
             authClient.GetActiveUserCompleted += new EventHandler<GetActiveUserCompletedEventArgs>(AuthClient_GetActiveUserCompleted);
@@ -204,6 +207,7 @@ namespace ChemProV.Logic.OSBLE
             }
 
             string authToken = e.Result;
+            m_lastAuthToken = authToken;
 
             // Build the OSBLE service client
             m_osbleClient = new OsbleServiceClient(m_bind,
@@ -419,6 +423,14 @@ namespace ChemProV.Logic.OSBLE
             get
             {
                 return (AssignmentTypes.CriticalReview == m_a.Type);
+            }
+        }
+
+        public string LastAuthToken
+        {
+            get
+            {
+                return m_lastAuthToken;
             }
         }
 
