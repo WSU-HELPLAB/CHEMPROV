@@ -3765,6 +3765,11 @@ namespace ChemProV.Library.OsbleService {
         
         System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> EndGetCourseAssignments(System.IAsyncResult result);
         
+        [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/GetMergedReviewDocument", ReplyAction="urn:OsbleService/GetMergedReviewDocumentResponse")]
+        System.IAsyncResult BeginGetMergedReviewDocument(int criticalReviewAssignmentId, string authToken, System.AsyncCallback callback, object asyncState);
+        
+        byte[] EndGetMergedReviewDocument(System.IAsyncResult result);
+        
         [System.ServiceModel.OperationContractAttribute(AsyncPattern=true, Action="urn:OsbleService/GetReviewItems", ReplyAction="urn:OsbleService/GetReviewItemsResponse")]
         System.IAsyncResult BeginGetReviewItems(int assignmentId, string authToken, System.AsyncCallback callback, object asyncState);
         
@@ -3829,6 +3834,25 @@ namespace ChemProV.Library.OsbleService {
             get {
                 base.RaiseExceptionIfNecessary();
                 return ((System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment>)(this.results[0]));
+            }
+        }
+    }
+    
+    [System.Diagnostics.DebuggerStepThroughAttribute()]
+    [System.CodeDom.Compiler.GeneratedCodeAttribute("System.ServiceModel", "4.0.0.0")]
+    public partial class GetMergedReviewDocumentCompletedEventArgs : System.ComponentModel.AsyncCompletedEventArgs {
+        
+        private object[] results;
+        
+        public GetMergedReviewDocumentCompletedEventArgs(object[] results, System.Exception exception, bool cancelled, object userState) : 
+                base(exception, cancelled, userState) {
+            this.results = results;
+        }
+        
+        public byte[] Result {
+            get {
+                base.RaiseExceptionIfNecessary();
+                return ((byte[])(this.results[0]));
             }
         }
     }
@@ -3944,6 +3968,12 @@ namespace ChemProV.Library.OsbleService {
         
         private System.Threading.SendOrPostCallback onGetCourseAssignmentsCompletedDelegate;
         
+        private BeginOperationDelegate onBeginGetMergedReviewDocumentDelegate;
+        
+        private EndOperationDelegate onEndGetMergedReviewDocumentDelegate;
+        
+        private System.Threading.SendOrPostCallback onGetMergedReviewDocumentCompletedDelegate;
+        
         private BeginOperationDelegate onBeginGetReviewItemsDelegate;
         
         private EndOperationDelegate onEndGetReviewItemsDelegate;
@@ -4030,6 +4060,8 @@ namespace ChemProV.Library.OsbleService {
         public event System.EventHandler<GetCoursesCompletedEventArgs> GetCoursesCompleted;
         
         public event System.EventHandler<GetCourseAssignmentsCompletedEventArgs> GetCourseAssignmentsCompleted;
+        
+        public event System.EventHandler<GetMergedReviewDocumentCompletedEventArgs> GetMergedReviewDocumentCompleted;
         
         public event System.EventHandler<GetReviewItemsCompletedEventArgs> GetReviewItemsCompleted;
         
@@ -4137,6 +4169,54 @@ namespace ChemProV.Library.OsbleService {
             base.InvokeAsync(this.onBeginGetCourseAssignmentsDelegate, new object[] {
                         courseId,
                         authToken}, this.onEndGetCourseAssignmentsDelegate, this.onGetCourseAssignmentsCompletedDelegate, userState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        System.IAsyncResult ChemProV.Library.OsbleService.OsbleService.BeginGetMergedReviewDocument(int criticalReviewAssignmentId, string authToken, System.AsyncCallback callback, object asyncState) {
+            return base.Channel.BeginGetMergedReviewDocument(criticalReviewAssignmentId, authToken, callback, asyncState);
+        }
+        
+        [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
+        byte[] ChemProV.Library.OsbleService.OsbleService.EndGetMergedReviewDocument(System.IAsyncResult result) {
+            return base.Channel.EndGetMergedReviewDocument(result);
+        }
+        
+        private System.IAsyncResult OnBeginGetMergedReviewDocument(object[] inValues, System.AsyncCallback callback, object asyncState) {
+            int criticalReviewAssignmentId = ((int)(inValues[0]));
+            string authToken = ((string)(inValues[1]));
+            return ((ChemProV.Library.OsbleService.OsbleService)(this)).BeginGetMergedReviewDocument(criticalReviewAssignmentId, authToken, callback, asyncState);
+        }
+        
+        private object[] OnEndGetMergedReviewDocument(System.IAsyncResult result) {
+            byte[] retVal = ((ChemProV.Library.OsbleService.OsbleService)(this)).EndGetMergedReviewDocument(result);
+            return new object[] {
+                    retVal};
+        }
+        
+        private void OnGetMergedReviewDocumentCompleted(object state) {
+            if ((this.GetMergedReviewDocumentCompleted != null)) {
+                InvokeAsyncCompletedEventArgs e = ((InvokeAsyncCompletedEventArgs)(state));
+                this.GetMergedReviewDocumentCompleted(this, new GetMergedReviewDocumentCompletedEventArgs(e.Results, e.Error, e.Cancelled, e.UserState));
+            }
+        }
+        
+        public void GetMergedReviewDocumentAsync(int criticalReviewAssignmentId, string authToken) {
+            this.GetMergedReviewDocumentAsync(criticalReviewAssignmentId, authToken, null);
+        }
+        
+        public void GetMergedReviewDocumentAsync(int criticalReviewAssignmentId, string authToken, object userState) {
+            if ((this.onBeginGetMergedReviewDocumentDelegate == null)) {
+                this.onBeginGetMergedReviewDocumentDelegate = new BeginOperationDelegate(this.OnBeginGetMergedReviewDocument);
+            }
+            if ((this.onEndGetMergedReviewDocumentDelegate == null)) {
+                this.onEndGetMergedReviewDocumentDelegate = new EndOperationDelegate(this.OnEndGetMergedReviewDocument);
+            }
+            if ((this.onGetMergedReviewDocumentCompletedDelegate == null)) {
+                this.onGetMergedReviewDocumentCompletedDelegate = new System.Threading.SendOrPostCallback(this.OnGetMergedReviewDocumentCompleted);
+            }
+            base.InvokeAsync(this.onBeginGetMergedReviewDocumentDelegate, new object[] {
+                        criticalReviewAssignmentId,
+                        authToken}, this.onEndGetMergedReviewDocumentDelegate, this.onGetMergedReviewDocumentCompletedDelegate, userState);
         }
         
         [System.ComponentModel.EditorBrowsableAttribute(System.ComponentModel.EditorBrowsableState.Advanced)]
@@ -4485,6 +4565,20 @@ namespace ChemProV.Library.OsbleService {
             public System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> EndGetCourseAssignments(System.IAsyncResult result) {
                 object[] _args = new object[0];
                 System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment> _result = ((System.Collections.ObjectModel.ObservableCollection<ChemProV.Library.OsbleService.Assignment>)(base.EndInvoke("GetCourseAssignments", _args, result)));
+                return _result;
+            }
+            
+            public System.IAsyncResult BeginGetMergedReviewDocument(int criticalReviewAssignmentId, string authToken, System.AsyncCallback callback, object asyncState) {
+                object[] _args = new object[2];
+                _args[0] = criticalReviewAssignmentId;
+                _args[1] = authToken;
+                System.IAsyncResult _result = base.BeginInvoke("GetMergedReviewDocument", _args, callback, asyncState);
+                return _result;
+            }
+            
+            public byte[] EndGetMergedReviewDocument(System.IAsyncResult result) {
+                object[] _args = new object[0];
+                byte[] _result = ((byte[])(base.EndInvoke("GetMergedReviewDocument", _args, result)));
                 return _result;
             }
             

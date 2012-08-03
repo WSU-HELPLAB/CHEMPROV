@@ -164,6 +164,17 @@ namespace ChemProV.Logic.OSBLE
                 catch (Exception)
                 { }
             }
+            else if (AssignmentTypes.CriticalReviewDiscussion == m_a.Type)
+            {
+                // We need to use "GetMergedReviewDocument"
+                osc.GetMergedReviewDocumentCompleted += new EventHandler<GetMergedReviewDocumentCompletedEventArgs>(GetMergedReviewDocumentCompleted);
+                try
+                {
+                    osc.GetMergedReviewDocumentAsync(m_a.ID, authToken, args);
+                }
+                catch (Exception)
+                { }
+            }
             else
             {
                 // We need to use "GetAssignmentSubmission"
@@ -318,6 +329,32 @@ namespace ChemProV.Logic.OSBLE
             ParameterizedThreadStart pts = new ParameterizedThreadStart(this.RefreshThreadProc);
             Thread t = new Thread(pts);
             t.Start(onCompletion);
+        }
+
+        private void GetMergedReviewDocumentCompleted(object sender, GetMergedReviewDocumentCompletedEventArgs e)
+        {
+            object[] args = e.UserState as object[];
+            OsbleServiceClient client = args[0] as OsbleServiceClient;
+            EventHandler onCompletion = args[1] as EventHandler;
+            
+            if (null != e.Error || e.Cancelled || null == e.Result)
+            {
+                // Failure to get the merged reviews for a critical review discussion assignment 
+                // probably just means that OSBLE hasn't built one yet because the due date isn't 
+                // up for the critical review. My opinion is that we shouldn't have a bunch of logic 
+                // in ChemProV to try to determine whether or not this is the case, so if it fails 
+                // we'll just call it finished.
+                onCompletion(this, new RelevantAssignmentEventArgs(m_files));
+                return;
+            }
+
+            // Add the files from the zip
+            AddFromZip(e.Result);
+
+            // Finish up
+            client.CloseAsync();
+            m_gettingFiles = false;
+            onCompletion(this, new RelevantAssignmentEventArgs(m_files));
         }
 
         private void GetReviewItemsCompleted(object sender, GetReviewItemsCompletedEventArgs e)
@@ -494,12 +531,16 @@ namespace ChemProV.Logic.OSBLE
             }
 #endif
 
-            // Authenticate so that we can save to OSBLE
             AuthenticationServiceClient auth = new AuthenticationServiceClient(
                 m_bind, new System.ServiceModel.EndpointAddress(OSBLEState.AuthServiceLink));
             auth.ValidateUserCompleted += new EventHandler<ValidateUserCompletedEventArgs>(AuthForSaveCompleted);
-            auth.ValidateUserAsync(m_userName, m_password,
-                new object[] { auth, onSaveComplete, zipData, stream.OriginalAuthorID });
+
+            // Build an array of parameters
+            object[] args = new object[] { auth, onSaveComplete, zipData, 
+                (null == stream) ? -1 : stream.OriginalAuthorID };
+
+            // Authenticate so that we can save to OSBLE
+            auth.ValidateUserAsync(m_userName, m_password, args);
         }
 
         public class AssignmentStream : MemoryStream
