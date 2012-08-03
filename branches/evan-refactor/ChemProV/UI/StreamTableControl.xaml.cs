@@ -45,6 +45,12 @@ namespace ChemProV.UI
 
         private StreamPropertiesTable m_table;
 
+        /// <summary>
+        /// Reference to the temperature text box that only shows for chemical streams under a 
+        /// certain difficulty setting. This is generated in the UpdateUI function.
+        /// </summary>
+        private TextBox m_tempTextBox = null;
+
         private Workspace m_ws = null;
         
         public StreamTableControl(StreamPropertiesTable tableData, 
@@ -336,14 +342,24 @@ namespace ChemProV.UI
                 Tuple<IStreamData, string>;
             if (null != info)
             {
-                m_ignoreRowPropertyChanges = true;
-                info.Item1[column] = (sender as TextBox).Text;
-                m_ignoreRowPropertyChanges = false;
-
-                // If this was a label change by the user then we need to mark it as user-renamed
-                if (info.Item2.Equals("Label") && !m_programmaticallyChanging)
+                // We handle the "Label" property in a specific way because we need to keep track of 
+                // when the user changes this. If this was a label change by the user then we'll need 
+                // to mark it as user-renamed. We will assume that it was a user change only if the 
+                // current data row label is different from the text box text.
+                if (info.Item2.Equals("Label"))
                 {
-                    info.Item1.UserHasRenamed = true;
+                    if (!m_programmaticallyChanging && info.Item1.Label != (sender as TextBox).Text)
+                    {
+                        info.Item1.UserHasRenamed = true;
+                    }
+                }
+                else
+                {
+                    // This is how we handle the general case for text field changes: just update the 
+                    // corresponding data structure value.
+                    m_ignoreRowPropertyChanges = true;
+                    info.Item1[column] = (sender as TextBox).Text;
+                    m_ignoreRowPropertyChanges = false;
                 }
             }
         }
@@ -352,7 +368,34 @@ namespace ChemProV.UI
         {
             if (e.PropertyName.Equals("Id"))
             {
+                // Update the header text at the top of the table
                 HeaderTextBlock.Text = "Stream #" + m_table.Stream.Id.ToString();
+
+                m_programmaticallyChanging = true;
+                // The stream ID affects any auto-named labels, so update these too
+                if (StreamType.Chemical == m_table.StreamType)
+                {
+                    foreach (IStreamData row in m_table.Rows)
+                    {
+                        if (row.UserHasRenamed)
+                        {
+                            // We don't touch it if the user has renamed it
+                            continue;
+                        }
+
+                        AutoLabel(row as ChemicalStreamData);
+                        row.UserHasRenamed = false;
+                    }
+                }
+
+                // Auto label the temperature (if applicable)
+                if (!m_table.UserHasChangedTemperature)
+                {
+                    // Change it only in the data structure (event handlers will update the UI)
+                    m_table.Temperature = "TM" + m_table.Stream.Id.ToString();
+                }
+
+                m_programmaticallyChanging = false;
             }
         }
 
@@ -360,10 +403,16 @@ namespace ChemProV.UI
         {
             if (!m_ignoreTablePropertyChanges)
             {
-                // All we care about is the location
                 if (e.PropertyName.Equals("Location"))
                 {
                     Location = new Point(m_table.Location.X, m_table.Location.Y);
+                }
+                else if (e.PropertyName.Equals("Temperature"))
+                {
+                    if (null != m_tempTextBox)
+                    {
+                        m_tempTextBox.Text = m_table.Temperature;
+                    }
                 }
             }
         }
@@ -375,8 +424,28 @@ namespace ChemProV.UI
 
         private void TemperatureTextChanged(object sender, TextChangedEventArgs e)
         {
+            // There are two cases that could cause the text in the temperature text box to change:
+            // 1. The user is typing a new value in the UI
+            // 2. The text is being changed programmatically in response to a property change
+            // In the first case we want to make sure we mark the temperature as having been changed 
+            // by the user ("UserHasChangedTemperature" property of the table).
+            // In the second case we must make sure that we do NOT change any properties in the table 
+            // data structure.
+            
+            // Note that in case 2 the following sequence of events occurs:
+            // 1. The property in the data structure will change
+            // 2. this will fire an event that will set the text of the temperature text box
+            // 3. this will invoke this text change event function.
+            // In this case the text in the text box will match the text in the data structure and we 
+            // don't have to take any action.
+            if (m_table.Temperature == (sender as TextBox).Text)
+            {
+                return;
+            }
+            
             m_ignoreRowPropertyChanges = true;
             m_table.Temperature = (sender as TextBox).Text;
+            m_table.UserHasChangedTemperature = true;
             m_ignoreRowPropertyChanges = false;
         }
 
@@ -600,6 +669,9 @@ namespace ChemProV.UI
                 tb.TextChanged += new TextChangedEventHandler(TemperatureTextChanged);
                 Core.App.InitRightClickMenu(tb);
 
+                // Keep a reference to this temperature text box
+                m_tempTextBox = tb;
+
                 tblock = new TextBlock()
                 {
                     Text = "Temp. Units:"
@@ -616,6 +688,10 @@ namespace ChemProV.UI
                 cb.SetValue(Grid.RowProperty, i);
                 cb.SetValue(Grid.ColumnProperty, 4);
                 cb.SelectionChanged += new SelectionChangedEventHandler(TempUnitsCBSelectionChanged);
+            }
+            else
+            {
+                m_tempTextBox = null;
             }
         }
 
