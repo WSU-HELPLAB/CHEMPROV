@@ -36,6 +36,12 @@ namespace ChemProV.UI.OSBLE
 
         private OSBLEState m_state = null;
 
+#if DEBUG
+        private static string s_URLPrefix = "http://localhost:17532";
+#else
+        private static string s_URLPrefix = "https://www.osble.org";
+#endif
+
         public AssignmentChooserWindow(OSBLEState state, bool showLoginMessage, bool saveMode)
         {
             InitializeComponent();
@@ -107,8 +113,8 @@ namespace ChemProV.UI.OSBLE
                 sp.Children.Add(tb);
                 HyperlinkButton hb = new HyperlinkButton();
                 string url = string.Format(
-                    "http://localhost:17532/Account/TokenLogin?authToken={0}&destinationUrl=/AssignmentDetails/{1}",
-                    ra.LastAuthToken, ra.ActualAssignment.ID.ToString());
+                    "{0}/Account/TokenLogin?authToken={1}&destinationUrl=/AssignmentDetails/{2}",
+                    s_URLPrefix, ra.LastAuthToken, ra.ActualAssignment.ID.ToString());
                 hb.NavigateUri = new Uri(url);
                 hb.Content = "Go to this assignment in OSBLE";
                 sp.Children.Add(hb);
