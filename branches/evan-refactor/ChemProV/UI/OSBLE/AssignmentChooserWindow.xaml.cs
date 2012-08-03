@@ -110,7 +110,12 @@ namespace ChemProV.UI.OSBLE
                 hb.NavigateUri = new Uri(url);
                 hb.Content = url;
                 sp.Children.Add(hb);
-                courseNode.Items.Add(sp);
+
+                // Every assignment node must have the assignment object as its tag
+                sp.Tag = ra;
+
+                // Insert the assignment item in sorted position by due date
+                InsertAssignmentNodeSorted(courseNode, sp, ra.ActualAssignment.DueDate);
             }
             else
             {
@@ -123,8 +128,8 @@ namespace ChemProV.UI.OSBLE
                 tvi.Tag = ra;
                 tvi.IsExpanded = true;
 
-                // Put it under the course node
-                courseNode.Items.Add(tvi);
+                // Put it under the course node, in sorted order by due date
+                InsertAssignmentNodeSorted(courseNode, tvi, ra.ActualAssignment.DueDate);
 
                 // Now make child nodes for each file in the assignment
                 foreach (RelevantAssignment.AssignmentStream stream in args.Files)
@@ -200,6 +205,39 @@ namespace ChemProV.UI.OSBLE
                 m_state.OnDownloadComplete -= this.State_OnDownloadCompleteCrossThread;
                 m_state = null;
             }
+        }
+
+        /// <summary>
+        /// Inserts a child item under the tree view node in sorted order by assignment due date. All 
+        /// children currently under the parent node must have a RelevantAssignment object in their tag 
+        /// that can be used to get the assignment due date. Also, all existing children under the 
+        /// parent must in sorted order.
+        /// </summary>
+        private void InsertAssignmentNodeSorted(TreeViewItem courseParent, object newItem, DateTime dueDate)
+        {            
+            if (0 == courseParent.Items.Count)
+            {
+                courseParent.Items.Add(newItem);
+                return;
+            }
+
+            int index = 0;
+            while (index < courseParent.Items.Count)
+            {
+                FrameworkElement fe = courseParent.Items[index] as FrameworkElement;
+                DateTime due = (fe.Tag as RelevantAssignment).ActualAssignment.DueDate;
+
+                // If the due date of the assignment at 'index' is greater than the due date of the 
+                // one that we want to insert, then insert at this index.
+                if (due > dueDate)
+                {
+                    break;
+                }
+
+                index++;
+            }
+
+            courseParent.Items.Insert(index, newItem);
         }
 
         private void MainTreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
