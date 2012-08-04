@@ -310,6 +310,9 @@ namespace ChemProV.UI.OSBLE
                         MessageBox.Show("File could not be loaded. It is recommended that you try downloading " +
                             "the file from the OSBLE web interface.");
                     }
+
+                    // Tell the drawing canvas to update stream positions now that everything is loaded
+                    Core.App.Workspace.DrawingCanvas.UpdateAllStreamLocations();
                 }
 
                 this.DialogResult = true;
