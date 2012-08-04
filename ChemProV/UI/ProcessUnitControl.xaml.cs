@@ -149,6 +149,16 @@ namespace ChemProV.UI
                 case "Location":
                     this.SetValue(Canvas.LeftProperty, m_pu.Location.X - this.Width / 2.0);
                     this.SetValue(Canvas.TopProperty, m_pu.Location.Y - this.Height / 2.0);
+
+                    // Moving any process unit could cause it to be in a position on the canvas that 
+                    // intersects a stream line that it didn't intersect while in its previous position. 
+                    // So we'll tell the canvas to update all streams so they can build stream lines that 
+                    // move around the process units if need be.
+                    // I don't know if this will be bad for performance for really large workspaces, but 
+                    // the stream updates are designed to be efficient, so hopefully it won't be a 
+                    // problem.
+                    m_canvas.UpdateAllStreamLocations();
+
                     break;
 
                 case "Label":
