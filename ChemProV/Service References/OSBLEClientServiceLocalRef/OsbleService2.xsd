@@ -71,8 +71,6 @@
       <xs:element minOccurs="0" name="Name" nillable="true" type="xs:string" />
       <xs:element minOccurs="0" name="TeamMembers" nillable="true" type="tns:ArrayOfTeamMember" />
       <xs:element minOccurs="0" name="UsedAsAssignmentTeam" nillable="true" type="tns:ArrayOfAssignmentTeam" />
-      <xs:element minOccurs="0" name="UsedAsDiscussionTeam" nillable="true" type="tns:ArrayOfDiscussionTeam" />
-      <xs:element minOccurs="0" name="UsedAsReviewTeam" nillable="true" type="tns:ArrayOfReviewTeam" />
       <xs:element minOccurs="0" name="UsedInAssignments" nillable="true" type="tns:ArrayOfAssignment" />
     </xs:sequence>
   </xs:complexType>
@@ -92,41 +90,6 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="TeamMember" nillable="true" type="tns:TeamMember" />
-  <xs:complexType name="ArrayOfDiscussionTeam">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="DiscussionTeam" nillable="true" type="tns:DiscussionTeam" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfDiscussionTeam" nillable="true" type="tns:ArrayOfDiscussionTeam" />
-  <xs:complexType name="DiscussionTeam">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
-      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
-      <xs:element minOccurs="0" name="AuthorTeam" nillable="true" type="tns:Team" />
-      <xs:element minOccurs="0" name="AuthorTeamID" nillable="true" type="xs:int" />
-      <xs:element minOccurs="0" name="ID" type="xs:int" />
-      <xs:element minOccurs="0" name="Team" nillable="true" type="tns:Team" />
-      <xs:element minOccurs="0" name="TeamID" type="xs:int" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="DiscussionTeam" nillable="true" type="tns:DiscussionTeam" />
-  <xs:complexType name="ArrayOfReviewTeam">
-    <xs:sequence>
-      <xs:element minOccurs="0" maxOccurs="unbounded" name="ReviewTeam" nillable="true" type="tns:ReviewTeam" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ArrayOfReviewTeam" nillable="true" type="tns:ArrayOfReviewTeam" />
-  <xs:complexType name="ReviewTeam">
-    <xs:sequence>
-      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
-      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
-      <xs:element minOccurs="0" name="AuthorTeam" nillable="true" type="tns:Team" />
-      <xs:element minOccurs="0" name="AuthorTeamID" type="xs:int" />
-      <xs:element minOccurs="0" name="ReviewTeamID" type="xs:int" />
-      <xs:element minOccurs="0" name="ReviewingTeam" nillable="true" type="tns:Team" />
-    </xs:sequence>
-  </xs:complexType>
-  <xs:element name="ReviewTeam" nillable="true" type="tns:ReviewTeam" />
   <xs:complexType name="CommentCategoryConfiguration">
     <xs:sequence>
       <xs:element minOccurs="0" name="Categories" nillable="true" type="tns:ArrayOfCommentCategory" />
@@ -224,6 +187,41 @@
     </xs:sequence>
   </xs:complexType>
   <xs:element name="DiscussionSetting" nillable="true" type="tns:DiscussionSetting" />
+  <xs:complexType name="ArrayOfDiscussionTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="DiscussionTeam" nillable="true" type="tns:DiscussionTeam" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfDiscussionTeam" nillable="true" type="tns:ArrayOfDiscussionTeam" />
+  <xs:complexType name="DiscussionTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="AuthorTeam" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="AuthorTeamID" nillable="true" type="xs:int" />
+      <xs:element minOccurs="0" name="ID" type="xs:int" />
+      <xs:element minOccurs="0" name="Team" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="TeamID" type="xs:int" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="DiscussionTeam" nillable="true" type="tns:DiscussionTeam" />
+  <xs:complexType name="ArrayOfReviewTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" maxOccurs="unbounded" name="ReviewTeam" nillable="true" type="tns:ReviewTeam" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ArrayOfReviewTeam" nillable="true" type="tns:ArrayOfReviewTeam" />
+  <xs:complexType name="ReviewTeam">
+    <xs:sequence>
+      <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />
+      <xs:element minOccurs="0" name="AssignmentID" type="xs:int" />
+      <xs:element minOccurs="0" name="AuthorTeam" nillable="true" type="tns:Team" />
+      <xs:element minOccurs="0" name="AuthorTeamID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewTeamID" type="xs:int" />
+      <xs:element minOccurs="0" name="ReviewingTeam" nillable="true" type="tns:Team" />
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element name="ReviewTeam" nillable="true" type="tns:ReviewTeam" />
   <xs:complexType name="TeamEvaluationSettings">
     <xs:sequence>
       <xs:element minOccurs="0" name="Assignment" nillable="true" type="tns:Assignment" />

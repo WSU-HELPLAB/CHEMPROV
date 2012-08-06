@@ -1,6 +1,39 @@
 ﻿<configuration>
     <system.serviceModel>
-        <bindings />
-        <client />
+        <bindings>
+            <basicHttpBinding>
+                <binding name="BasicHttpBinding_AuthenticationService" sendTimeout="00:00:15"
+                    maxBufferSize="2147483647" maxReceivedMessageSize="2147483647">
+                    <security mode="Transport" />
+                </binding>
+                <binding name="BasicHttpBinding_OsbleService" sendTimeout="00:00:15"
+                    maxBufferSize="2147483647" maxReceivedMessageSize="2147483647">
+                    <security mode="Transport" />
+                </binding>
+                <binding name="BasicHttpBinding_AuthenticationService1" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+                <binding name="BasicHttpBinding_OsbleService1" maxBufferSize="2147483647"
+                    maxReceivedMessageSize="2147483647">
+                    <security mode="None" />
+                </binding>
+            </basicHttpBinding>
+        </bindings>
+        <client>
+            <endpoint address="https://www.osble.org/Services/AuthenticationService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService"
+                contract="OSBLEAuthServiceRef.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
+            <endpoint address="https://www.osble.org/Services/OsbleService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService"
+                contract="OSBLEClientServiceRef.OsbleService" name="BasicHttpBinding_OsbleService" />
+            <endpoint address="http://localhost:17532/Services/AuthenticationService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService1"
+                contract="OSBLEAuthServiceLocalRef.AuthenticationService"
+                name="BasicHttpBinding_AuthenticationService1" />
+            <endpoint address="http://localhost:17532/Services/OsbleService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService1"
+                contract="OSBLEClientServiceLocalRef.OsbleService" name="BasicHttpBinding_OsbleService1" />
+        </client>
     </system.serviceModel>
 </configuration>

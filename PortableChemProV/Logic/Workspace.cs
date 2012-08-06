@@ -542,7 +542,7 @@ namespace ChemProV.Logic
             // that has to be changed every build, but it looks like you can't specify a version 
             // number for a portable class library (at this point in time) and then use 
             // reflection to retrieve it at runtime.
-            Save(outputStream, "1.12.7.17");
+            Save(outputStream, "1.12.8.6");
         }
 
         public void Save(System.IO.Stream outputStream, string versionNumber)
