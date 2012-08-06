@@ -7,8 +7,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Web", "ChemProV.We
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.UnitTests", "ChemProV.UnitTests\ChemProV.UnitTests.csproj", "{2234DF9A-DE8E-44CC-A9F0-878954AD62E2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Library", "ChemProv.Library\ChemProV.Library.csproj", "{DF61D940-8605-4098-AFA7-26823E579870}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProV", "PortableChemProV\PortableChemProV.csproj", "{CDF84A87-F71F-44FC-9FA4-2AC97133C983}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProV_Tests", "PortableChemProV_Tests\PortableChemProV_Tests.csproj", "{2C323049-4BEA-4AA4-A933-3EA9B5CEE5AE}"
@@ -17,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PortableChemProVNet4", "Por
 EndProject
 Global
 	GlobalSection(TeamFoundationVersionControl) = preSolution
-		SccNumberOfProjects = 8
+		SccNumberOfProjects = 7
 		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
 		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
 		SccLocalPath0 = .
@@ -30,18 +28,15 @@ Global
 		SccProjectUniqueName3 = ChemProV.UnitTests\\ChemProV.UnitTests.csproj
 		SccProjectName3 = ChemProV.UnitTests
 		SccLocalPath3 = ChemProV.UnitTests
-		SccProjectUniqueName4 = ChemProv.Library\\ChemProV.Library.csproj
-		SccProjectName4 = ChemProv.Library
-		SccLocalPath4 = ChemProv.Library
-		SccProjectUniqueName5 = PortableChemProV\\PortableChemProV.csproj
-		SccProjectName5 = PortableChemProV
-		SccLocalPath5 = PortableChemProV
-		SccProjectUniqueName6 = PortableChemProV_Tests\\PortableChemProV_Tests.csproj
-		SccProjectName6 = PortableChemProV_Tests
-		SccLocalPath6 = PortableChemProV_Tests
-		SccProjectUniqueName7 = PortableChemProvNet4\\PortableChemProvNet4.csproj
-		SccProjectName7 = PortableChemProvNet4
-		SccLocalPath7 = PortableChemProvNet4
+		SccProjectUniqueName4 = PortableChemProV\\PortableChemProV.csproj
+		SccProjectName4 = PortableChemProV
+		SccLocalPath4 = PortableChemProV
+		SccProjectUniqueName5 = PortableChemProV_Tests\\PortableChemProV_Tests.csproj
+		SccProjectName5 = PortableChemProV_Tests
+		SccLocalPath5 = PortableChemProV_Tests
+		SccProjectUniqueName6 = PortableChemProvNet4\\PortableChemProVNet4.csproj
+		SccProjectName6 = PortableChemProvNet4
+		SccLocalPath6 = PortableChemProvNet4
 	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -82,16 +77,6 @@ Global
 		{2234DF9A-DE8E-44CC-A9F0-878954AD62E2}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
 		{2234DF9A-DE8E-44CC-A9F0-878954AD62E2}.Release|Mixed Platforms.Build.0 = Release|Any CPU
 		{2234DF9A-DE8E-44CC-A9F0-878954AD62E2}.Release|x86.ActiveCfg = Release|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Debug|Mixed Platforms.Build.0 = Debug|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Release|Mixed Platforms.ActiveCfg = Release|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Release|Mixed Platforms.Build.0 = Release|Any CPU
-		{DF61D940-8605-4098-AFA7-26823E579870}.Release|x86.ActiveCfg = Release|Any CPU
 		{CDF84A87-F71F-44FC-9FA4-2AC97133C983}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{CDF84A87-F71F-44FC-9FA4-2AC97133C983}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDF84A87-F71F-44FC-9FA4-2AC97133C983}.Debug|Mixed Platforms.ActiveCfg = Debug|Any CPU

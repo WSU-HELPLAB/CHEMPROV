@@ -2,10 +2,16 @@
 using System.Collections.Generic;
 using System.ServiceModel;
 using System.Threading;
-using ChemProV.Library.OsbleService;
-using ChemProV.Library.ServiceReference1;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
+
+#if DEBUG
+using ChemProV.OSBLEAuthServiceLocalRef;
+using ChemProV.OSBLEClientServiceLocalRef;
+#else
+using ChemProV.OSBLEAuthServiceRef;
+using ChemProV.OSBLEClientServiceRef;
+#endif
 
 namespace ChemProV.Logic.OSBLE
 {
@@ -90,7 +96,7 @@ namespace ChemProV.Logic.OSBLE
 #if DEBUG
         public const string AuthServiceLink = "http://localhost:17532/Services/AuthenticationService.svc";
 #else
-        public const string AuthServiceLink = "https://osble.org/Services/AuthenticationService.svc";
+        public const string AuthServiceLink = "https://www.osble.org/Services/AuthenticationService.svc";
 #endif
 
         /// <summary>
@@ -254,7 +260,6 @@ namespace ChemProV.Logic.OSBLE
             {
                 m_currentAssignment = null;
                 
-                // TODO: See if we need to re-authenticate (?)
                 OnDownloadComplete(this, new OSBLEStateEventArgs(false,
                     "Could not download the specified assignment file"));
                 
@@ -435,7 +440,7 @@ namespace ChemProV.Logic.OSBLE
 
             // Build the OSBLE client
             m_osbleClient = new OsbleServiceClient(m_bind,
-                new System.ServiceModel.EndpointAddress("http://localhost:17532/Services/OsbleService.svc"));
+                new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
             m_osbleClient.SubmitAssignmentCompleted += this.OsbleClient_SubmitAssignmentCompleted;
 
             // We built an object array for the user state to keep track of the authentication client 

@@ -3,9 +3,15 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
-using ChemProV.Library.OsbleService;
-using ChemProV.Library.ServiceReference1;
 using ICSharpCode.SharpZipLib.Zip;
+
+#if DEBUG
+using ChemProV.OSBLEAuthServiceLocalRef;
+using ChemProV.OSBLEClientServiceLocalRef;
+#else
+using ChemProV.OSBLEAuthServiceRef;
+using ChemProV.OSBLEClientServiceRef;
+#endif
 
 namespace ChemProV.Logic.OSBLE
 {
