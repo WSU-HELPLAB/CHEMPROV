@@ -19,14 +19,8 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using ChemProV.Logic.OSBLE;
-
-#if DEBUG
-using ChemProV.OSBLEAuthServiceLocalRef;
-using ChemProV.OSBLEClientServiceLocalRef;
-#else
 using ChemProV.OSBLEAuthServiceRef;
-using ChemProV.OSBLEClientServiceRef;
-#endif
+using ChemProV.OSBLEClientReference;
 
 namespace ChemProV.UI.OSBLE
 {

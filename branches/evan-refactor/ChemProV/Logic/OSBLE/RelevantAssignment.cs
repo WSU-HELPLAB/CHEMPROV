@@ -4,14 +4,8 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Threading;
 using ICSharpCode.SharpZipLib.Zip;
-
-#if DEBUG
-using ChemProV.OSBLEAuthServiceLocalRef;
-using ChemProV.OSBLEClientServiceLocalRef;
-#else
 using ChemProV.OSBLEAuthServiceRef;
-using ChemProV.OSBLEClientServiceRef;
-#endif
+using ChemProV.OSBLEClientReference;
 
 namespace ChemProV.Logic.OSBLE
 {
@@ -22,8 +16,6 @@ namespace ChemProV.Logic.OSBLE
         /// this object and provide data in a more meaningful and logical way.
         /// </summary>
         private Assignment m_a = null;
-
-        private System.ServiceModel.BasicHttpBinding m_bind;
 
         private List<AssignmentStream> m_files = new List<AssignmentStream>();
 
@@ -48,12 +40,13 @@ namespace ChemProV.Logic.OSBLE
             m_userName = userName;
             m_password = password;
 
-            m_bind = new System.ServiceModel.BasicHttpBinding();
-            m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
-            m_bind.ReceiveTimeout = new TimeSpan(0, 0, 15);
-            m_bind.SendTimeout = new TimeSpan(0, 0, 15);
-            m_bind.MaxBufferSize = 2147483647;
-            m_bind.MaxReceivedMessageSize = 2147483647;
+            // This is old code for when I had to manually build the HTTP binding object
+            //m_bind = new System.ServiceModel.BasicHttpBinding();
+            //m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
+            //m_bind.ReceiveTimeout = new TimeSpan(0, 0, 15);
+            //m_bind.SendTimeout = new TimeSpan(0, 0, 15);
+            //m_bind.MaxBufferSize = 2147483647;
+            //m_bind.MaxReceivedMessageSize = 2147483647;
         }
 
         public Assignment ActualAssignment
@@ -157,8 +150,7 @@ namespace ChemProV.Logic.OSBLE
             authClient.GetActiveUserCompleted += new EventHandler<GetActiveUserCompletedEventArgs>(AuthClient_GetActiveUserCompleted);
             authClient.GetActiveUserAsync(authToken, authClient);
 
-            OsbleServiceClient osc = new OsbleServiceClient(m_bind,
-                new System.ServiceModel.EndpointAddress(OSBLEState.OSBLEServiceLink));
+            OsbleServiceClient osc = new OsbleServiceClient();
             
             // What we query for depends on the assignment type
             args[0] = osc;
@@ -216,8 +208,7 @@ namespace ChemProV.Logic.OSBLE
             m_lastAuthToken = authToken;
 
             // Build the OSBLE service client
-            m_osbleClient = new OsbleServiceClient(m_bind,
-                new System.ServiceModel.EndpointAddress(OSBLEState.OSBLEServiceLink));
+            m_osbleClient = new OsbleServiceClient();
             m_osbleClient.OpenCompleted += delegate(object sender2, System.ComponentModel.AsyncCompletedEventArgs e2)
             {
 
@@ -478,8 +469,7 @@ namespace ChemProV.Logic.OSBLE
             // The parameter is the event handler for completion
             //EventHandler onCompletion = parameter as EventHandler;
             
-            AuthenticationServiceClient auth = new AuthenticationServiceClient(
-                m_bind, new System.ServiceModel.EndpointAddress(OSBLEState.AuthServiceLink));
+            AuthenticationServiceClient auth = new AuthenticationServiceClient();
             auth.ValidateUserCompleted += this.AuthForLoadCompleted;
             auth.ValidateUserAsync(m_userName, m_password, new object[] { auth, parameter });
         }
@@ -549,8 +539,9 @@ namespace ChemProV.Logic.OSBLE
             }
 #endif
 
-            AuthenticationServiceClient auth = new AuthenticationServiceClient(
-                m_bind, new System.ServiceModel.EndpointAddress(OSBLEState.AuthServiceLink));
+            //AuthenticationServiceClient auth = new AuthenticationServiceClient(
+            //    m_bind, new System.ServiceModel.EndpointAddress(OSBLEState.AuthServiceLink));
+            AuthenticationServiceClient auth = new AuthenticationServiceClient();
             auth.ValidateUserCompleted += new EventHandler<ValidateUserCompletedEventArgs>(AuthForSaveCompleted);
 
             // Build an array of parameters

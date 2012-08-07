@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="gkCDcn8zR+4fYC3/O/tI6qA7CMM=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="nXWuIGhIFscCkkOiDbbs0QjVpi8=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_OsbleService">
       <properties>
@@ -112,7 +112,7 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_OsbleService" contract="OSBLEClientServiceRef.OsbleService" bindingType="basicHttpBinding" address="https://www.osble.org/Services/OsbleService.svc/Services/OsbleService.svc" bindingConfiguration="BasicHttpBinding_OsbleService">
+    <endpoint name="BasicHttpBinding_OsbleService" contract="OSBLEClientReference.OsbleService" bindingType="basicHttpBinding" address="https://www.osble.org/Services/OsbleService.svc/Services/OsbleService.svc" bindingConfiguration="BasicHttpBinding_OsbleService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue>https://www.osble.org/Services/OsbleService.svc/Services/OsbleService.svc</serializedValue>
@@ -127,7 +127,7 @@
           <serializedValue>BasicHttpBinding_OsbleService</serializedValue>
         </property>
         <property path="/contract" isComplexType="false" isExplicitlyDefined="true" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>OSBLEClientServiceRef.OsbleService</serializedValue>
+          <serializedValue>OSBLEClientReference.OsbleService</serializedValue>
         </property>
         <property path="/headers" isComplexType="true" isExplicitlyDefined="false" clrType="System.ServiceModel.Configuration.AddressHeaderCollectionElement, System.ServiceModel, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue>System.ServiceModel.Configuration.AddressHeaderCollectionElement</serializedValue>
