@@ -121,11 +121,16 @@ namespace ChemProV.PFD.EquationEditor
                 return;
             }
 
-            // Move it down by removing it then inserting it
-            EquationsStackPanel.Children.Remove(row);
-            EquationsStackPanel.Children.Insert(indexOfThis + 1, row);
+            // Move the row down by removing it and then inserting it at a higher index. Event 
+            // handlers are subscribed to changes in the equation collection, so the UI will 
+            // be updated automatically.
+            EquationModel toMoveDown = m_workspace.Equations[indexOfThis];
+            m_workspace.Equations.Remove(toMoveDown);
+            m_workspace.Equations.Insert(indexOfThis + 1, toMoveDown);
 
-            UpdateRowProperties();
+            // Add an undo that will move it back up
+            m_workspace.AddUndo(new UndoRedoCollection("Undo moving equation down",
+                new Logic.Undos.MoveEquationUp(indexOfThis + 1)));
         }
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
@@ -157,11 +162,16 @@ namespace ChemProV.PFD.EquationEditor
                 return;
             }
 
-            // Move it down by removing it then inserting it
-            EquationsStackPanel.Children.Remove(row);
-            EquationsStackPanel.Children.Insert(indexOfThis - 1, row);
+            // Move the row up by removing it and then inserting it at a lower index. Event 
+            // handlers are subscribed to changes in the equation collection, so the UI will 
+            // be updated automatically.
+            EquationModel toMoveUp = m_workspace.Equations[indexOfThis];
+            m_workspace.Equations.Remove(toMoveUp);
+            m_workspace.Equations.Insert(indexOfThis - 1, toMoveUp);
 
-            UpdateRowProperties();
+            // Add an undo that will move it back down
+            m_workspace.AddUndo(new UndoRedoCollection("Undo moving equation up",
+                new Logic.Undos.MoveEquationDown(indexOfThis - 1)));
         }
 
         public void UpdateRowProperties()
