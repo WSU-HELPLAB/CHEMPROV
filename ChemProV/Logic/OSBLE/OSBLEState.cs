@@ -4,22 +4,14 @@ using System.ServiceModel;
 using System.Threading;
 using System.IO;
 using ICSharpCode.SharpZipLib.Zip;
-
-#if DEBUG
-using ChemProV.OSBLEAuthServiceLocalRef;
-using ChemProV.OSBLEClientServiceLocalRef;
-#else
 using ChemProV.OSBLEAuthServiceRef;
-using ChemProV.OSBLEClientServiceRef;
-#endif
+using ChemProV.OSBLEClientReference;
 
 namespace ChemProV.Logic.OSBLE
 {
     public class OSBLEState
     {
         private string m_authToken = null;
-
-        private System.ServiceModel.BasicHttpBinding m_bind;
 
         private IList<Course> m_courses = null;
 
@@ -45,17 +37,6 @@ namespace ChemProV.Logic.OSBLE
         {
             m_userName = userName;
             m_password = password;
-
-            m_bind = new System.ServiceModel.BasicHttpBinding();
-#if DEBUG
-            m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.None;
-#else
-            m_bind.Security.Mode = System.ServiceModel.BasicHttpSecurityMode.Transport;
-#endif
-            m_bind.ReceiveTimeout = new TimeSpan(0, 0, 15);
-            m_bind.SendTimeout = new TimeSpan(0, 0, 15);
-            m_bind.MaxBufferSize = 2147483647;
-            m_bind.MaxReceivedMessageSize = 2147483647;
         }
 
         private void AuthClient_ValidateUserCompleted(object sender, ValidateUserCompletedEventArgs e)
@@ -83,7 +64,7 @@ namespace ChemProV.Logic.OSBLE
             (e.UserState as AuthenticationServiceClient).CloseAsync();
 
             // Create the OSBLE client
-            m_osbleClient = new OsbleServiceClient(m_bind, new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
+            m_osbleClient = new OsbleServiceClient();//m_bind, new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
             
             // Make sure we setup all callbacks here
             m_osbleClient.GetCoursesCompleted += new EventHandler<GetCoursesCompletedEventArgs>(OsbleClient_GetCoursesCompleted);
@@ -339,7 +320,18 @@ namespace ChemProV.Logic.OSBLE
         private void OsbleClient_GetCoursesCompleted(object sender, GetCoursesCompletedEventArgs e)
         {
             OsbleServiceClient osbleClient = e.UserState as OsbleServiceClient;
-            m_courses = e.Result;
+            try
+            {
+                m_courses = e.Result;
+            }
+            catch (Exception)
+            {
+                OnError(this, new OSBLEStateEventArgs(false,
+                    "Could not get list of courses for this user. You may need to contact your professor " +
+                    "or systems administrator to remedy this."));
+                osbleClient.CloseAsync();
+                return;
+            }
 
             // If we don't have any courses then let the user know
             if (0 == m_courses.Count)
@@ -382,8 +374,9 @@ namespace ChemProV.Logic.OSBLE
             
             // Create the authentication client. We need this to get an authentication token which serves 
             // as our "key" for getting lists of courses, assignments, etc.
-            AuthenticationServiceClient authClient = new AuthenticationServiceClient(m_bind,
-                new EndpointAddress(AuthServiceLink));
+            //AuthenticationServiceClient authClient = new AuthenticationServiceClient(m_bind,
+            //    new EndpointAddress(AuthServiceLink));
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
             authClient.ValidateUserCompleted += new EventHandler<ValidateUserCompletedEventArgs>(AuthClient_ValidateUserCompleted);
             try
             {
@@ -416,8 +409,7 @@ namespace ChemProV.Logic.OSBLE
 
         public void SaveCurrentAssignmentAsync(byte[] assignmentData)
         {
-            AuthenticationServiceClient authClient = new AuthenticationServiceClient(m_bind,
-                new EndpointAddress(AuthServiceLink));
+            AuthenticationServiceClient authClient = new AuthenticationServiceClient();
             authClient.ValidateUserCompleted += this.ValidateForSaveCompleted;
             authClient.ValidateUserAsync(m_userName, m_password, new object[] { authClient, assignmentData });
         }
@@ -439,8 +431,9 @@ namespace ChemProV.Logic.OSBLE
             m_authToken = e.Result;
 
             // Build the OSBLE client
-            m_osbleClient = new OsbleServiceClient(m_bind,
-                new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
+            //m_osbleClient = new OsbleServiceClient(m_bind,
+            //    new System.ServiceModel.EndpointAddress(OSBLEServiceLink));
+            m_osbleClient = new OsbleServiceClient();
             m_osbleClient.SubmitAssignmentCompleted += this.OsbleClient_SubmitAssignmentCompleted;
 
             // We built an object array for the user state to keep track of the authentication client 

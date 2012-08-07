@@ -20,7 +20,7 @@ using ChemProV.OSBLEAuthServiceLocalRef;
 using ChemProV.OSBLEClientServiceLocalRef;
 #else
 using ChemProV.OSBLEAuthServiceRef;
-using ChemProV.OSBLEClientServiceRef;
+using ChemProV.OSBLEClientReference;
 #endif
 
 namespace ChemProV.UI.OSBLE
@@ -209,10 +209,14 @@ namespace ChemProV.UI.OSBLE
 
             //WebClient wc = new WebClient();
             //wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
-            //wc.DownloadStringAsync(new Uri("https://osble.org/Services/AuthenticationService.svc"));
-            //wc.DownloadStringAsync(new Uri("http://www.evanolds.com/"));
+            //wc.DownloadStringAsync(new Uri("https://www.osble.org/Services/AuthenticationService.svc"));
 
             #endregion
+        }
+
+        void wc_DownloadStringCompleted(object sender, DownloadStringCompletedEventArgs e)
+        {
+            throw new NotImplementedException();
         }
 
         private void OnError(object sender, EventArgs e)
