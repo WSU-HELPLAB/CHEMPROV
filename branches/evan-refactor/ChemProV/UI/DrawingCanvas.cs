@@ -556,135 +556,19 @@ namespace ChemProV.UI
                 Core.DrawingCanvasCommands.DeleteSelectedElement(this);
                 e.Handled = true;
             }
+            else if (e.Key == Key.Z && (Keyboard.Modifiers == ModifierKeys.Control))
+            {
+                Core.App.Workspace.Undo();
+                e.Handled = true;
+            }
+            else if (e.Key == Key.Y && (Keyboard.Modifiers == ModifierKeys.Control))
+            {
+                Core.App.Workspace.Redo();
+                e.Handled = true;
+            }
         }
 
         #region Load/Save
-
-        // Keeping commented out for reference purposes, but I think I have all this in the workspace class now
-
-        ///// <summary>
-        ///// Loads an XML-generated list of elements.
-        ///// </summary>
-        ///// <param name="doc"></param>
-        //public void LoadXmlElements(XElement doc)
-        //{            
-        //    // Process units first
-        //    XElement processUnits = doc.Descendants("ProcessUnits").ElementAt(0);
-        //    foreach (XElement unit in processUnits.Elements())
-        //    {
-        //        // Create the process unit and add it to the canvas
-        //        GenericProcessUnit pu = ChemProV.PFD.ProcessUnits.ProcessUnitFactory.ProcessUnitFromXml(unit);
-        //        AddNewChild((UIElement)pu);
-
-        //        // E.O.
-        //        // Load any comments that are present
-        //        XElement cmtElement = unit.Element("Comments");
-        //        if (null != cmtElement)
-        //        {
-        //            foreach (XElement child in cmtElement.Elements())
-        //            {                        
-        //                StickyNoteControl sn;
-        //                StickyNoteControl.CreateCommentNote(
-        //                    this, pu as Core.ICommentCollection, child, out sn);
-        //            }
-        //        }
-        //    }
-
-        //    //then streams
-        //    List<ChemProV.PFD.Streams.AbstractStream> streamObjects = new List<ChemProV.PFD.Streams.AbstractStream>();
-        //    XElement streamList = doc.Descendants("Streams").ElementAt(0);
-        //    foreach (XElement stream in streamList.Elements())
-        //    {
-        //        // Create the stream. The factory will connect it to the process units and create 
-        //        // sticky notes for comments if present
-        //        ChemProV.PFD.Streams.AbstractStream s = StreamFactory.StreamFromXml(stream, this, true);
-
-        //        // The stream control itself is really just lines and these lines need a low Z-index
-        //        (s as AbstractStream).SetValue(Canvas.ZIndexProperty, -3);
-
-        //        s.UpdateStreamLocation();
-
-        //        //we can't add the streams until we have also built the properties table
-        //        //so just add to local list variable
-        //        streamObjects.Add(s);
-        //    }
-
-        //    //and finally, properties tables
-        //    XElement tablesList = doc.Descendants("PropertiesWindows").ElementAt(0);
-        //    foreach (XElement table in tablesList.Elements())
-        //    {
-        //        //store the table's target
-        //        string parentName = (string)table.Element("ParentStream");
-
-        //        //create the table
-        //        IPropertiesWindow pTable = PropertiesWindowFactory.TableFromXml(table, currentDifficultySetting, isReadOnly);
-
-        //        //find the parent on the drawing_canvas
-        //        var parent = from c in streamObjects
-        //                     where c.Id.CompareTo(parentName) == 0
-        //                     select c;
-        //        pTable.ParentStream = parent.ElementAt(0);
-        //        parent.ElementAt(0).Table = pTable;
-
-        //        // Add the stream. Streams take care of adding/removing their tables to/from
-        //        // the drawing canvas
-        //        AddNewChild((UIElement)parent.ElementAt(0));
-
-        //        pTable.TableDataChanged += new TableDataEventHandler(TableDataChanged);
-        //        pTable.TableDataChanging += new EventHandler(TableDataChanging);
-
-        //        //tell the stream to redraw in order to fix any graphical glitches
-        //        parent.ElementAt(0).UpdateStreamLocation();
-        //    }
-
-        //    //don't forget about the sticky notes!
-        //    XElement stickyNoteList = doc.Descendants("StickyNotes").ElementAt(0);
-        //    foreach (XElement note in stickyNoteList.Elements())
-        //    {
-        //        StickyNoteControl sn = new StickyNoteControl(note, this);
-        //        AddNewChild(sn);
-        //    }
-
-        //    // Tell all stream endpoints to update their locations
-        //    foreach (UIElement uie in Children)
-        //    {
-        //        if (!(uie is DraggableStreamEndpoint))
-        //        {
-        //            continue;
-        //        }
-
-        //        DraggableStreamEndpoint dse = uie as DraggableStreamEndpoint;
-        //        dse.EndpointConnectionChanged(dse.Type, null, null);
-        //    }
-
-        //    // Go through all sticky notes on the canvas and assign colors
-        //    Dictionary<string, StickyNoteColors> clrs = new Dictionary<string, StickyNoteColors>();
-        //    foreach (UIElement uie in Children)
-        //    {
-        //        StickyNoteControl sn = uie as StickyNoteControl;
-        //        if (null == sn)
-        //        {
-        //            continue;
-        //        }
-
-        //        // Assign a color based on the user name
-        //        if (!string.IsNullOrEmpty(sn.CommentUserName))
-        //        {
-        //            if (!clrs.ContainsKey(sn.CommentUserName))
-        //            {
-        //                StickyNoteColors clr = StickyNoteControl.GetNextUserStickyColor();
-        //                clrs[sn.CommentUserName] = clr;
-        //                sn.ColorChange(clr);
-        //            }
-        //            else
-        //            {
-        //                sn.ColorChange(clrs[sn.CommentUserName]);
-        //            }
-        //        }
-        //    }
-
-        //    PFDModified();
-        //}
 
         private StickyNoteColors GetStickyNoteColor(StickyNoteControl forThis)
         {
@@ -701,86 +585,6 @@ namespace ChemProV.UI
                 return Core.App.Workspace.UserStickyNoteColors[forThis.StickyNote.UserName];
             }
         }
-
-        ///// <summary>
-        ///// Turns the drawing drawing_canvas into an XML object
-        ///// </summary>
-        ///// <param name="writer"></param>
-        //public void WriteXml(XmlWriter writer)
-        //{
-        //    //before writing, separate the elements based on type
-        //    List<GenericProcessUnit> processUnits = new List<GenericProcessUnit>();
-        //    List<ChemProV.PFD.Streams.AbstractStream> streams = new List<ChemProV.PFD.Streams.AbstractStream>();
-        //    List<IPropertiesWindow> PropertiesWindows = new List<IPropertiesWindow>();
-        //    List<StickyNoteControl> stickyNotes = new List<StickyNoteControl>();
-        //    List<IPfdElement> other = new List<IPfdElement>();
-
-        //    //create the lists by looping through all children
-        //    foreach (UIElement element in this.Children)
-        //    {
-        //        if (element is IPfdElement)
-        //        {
-        //            if (element is GenericProcessUnit)
-        //            {
-        //                processUnits.Add(element as GenericProcessUnit);
-        //            }
-        //            else if (element is ChemProV.PFD.Streams.AbstractStream)
-        //            {
-        //                streams.Add(element as ChemProV.PFD.Streams.AbstractStream);
-        //            }
-        //            else if (element is IPropertiesWindow)
-        //            {
-        //                PropertiesWindows.Add(element as IPropertiesWindow);
-        //            }
-        //            else if (element is StickyNoteControl)
-        //            {
-        //                stickyNotes.Add(element as StickyNoteControl);
-        //            }
-        //            else
-        //            {
-        //                other.Add(element as IPfdElement);
-        //            }
-        //        }
-        //    }
-
-        //    //process units first
-        //    writer.WriteStartElement("ProcessUnits");
-        //    foreach (IPfdElement element in processUnits)
-        //    {
-        //        objectFromIPfdElement(element).Serialize(writer, element);
-        //    }
-        //    writer.WriteEndElement();
-
-        //    //then streams
-        //    writer.WriteStartElement("Streams");
-        //    foreach (IPfdElement element in streams)
-        //    {
-        //        objectFromIPfdElement(element).Serialize(writer, element);
-        //    }
-        //    writer.WriteEndElement();
-
-        //    //next, properties tables
-        //    writer.WriteStartElement("PropertiesWindows");
-        //    foreach (IPfdElement element in PropertiesWindows)
-        //    {
-        //        objectFromIPfdElement(element).Serialize(writer, element);
-        //    }
-        //    writer.WriteEndElement();
-
-        //    // Write "free-floating" sticky notes. These are ones that have don't have a 
-        //    // comment collection parent
-        //    writer.WriteStartElement("StickyNotes");
-        //    foreach (IPfdElement element in stickyNotes)
-        //    {
-        //        if (!((StickyNoteControl)element).HasCommentCollectionParent)
-        //        {
-        //            writer.WriteStartElement("StickyNote");
-        //            (element as StickyNoteControl).WriteXml(writer);
-        //            writer.WriteEndElement();
-        //        }
-        //    }
-        //    writer.WriteEndElement();
-        //}
 
         /// <summary>
         /// Null class used in XML output.  Does nothing.
@@ -882,9 +686,7 @@ namespace ChemProV.UI
             // Store a reference to the workspace
             m_workspace = workspace;
 
-            // We must monitor changes to the list of process units, streams, sticky notes, and 
-            // comments for streams or process units. (Or should the controls monitor their own 
-            // comment collections?)
+            // We must monitor changes to the list of process units, streams, and sticky notes
             m_workspace.ProcessUnitsCollectionChanged += this.ProcessUnits_CollectionChanged;
             m_workspace.StreamsCollectionChanged += new EventHandler(Streams_CollectionChanged);
             m_workspace.StickyNotes.CollectionChanged += this.StickyNotes_CollectionChanged;

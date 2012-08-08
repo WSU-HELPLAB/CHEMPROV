@@ -56,7 +56,7 @@
     <Compile Include="Logic\HeatExchangerWithUtility.cs" />
     <Compile Include="Logic\HeatStream.cs" />
     <Compile Include="Logic\HeatStreamData.cs" />
-    <Compile Include="Logic\IStreamData.cs" />
+    <Compile Include="Logic\IStreamDataRow.cs" />
     <Compile Include="Logic\Mixer.cs" />
     <Compile Include="Logic\ProcessUnitFactory.cs" />
     <Compile Include="Logic\Reactor.cs" />

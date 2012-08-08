@@ -11,6 +11,7 @@ using System;
 using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
+using ChemProV.Logic;
 using ChemProV.Logic.Equations;
 
 namespace ChemProV.PFD.EquationEditor
@@ -19,9 +20,9 @@ namespace ChemProV.PFD.EquationEditor
     /// Control to represent a single equation row in the equation editor. This control serves as UI for 
     /// an EquationModel object.
     /// </summary>
-    public partial class EquationControl : UserControl
+    public partial class EquationRowControl : UserControl
     {
-        public delegate void DeleteRequestDelegate(EquationControl sender);
+        public delegate void DeleteRequestDelegate(EquationRowControl sender);
 
         /// <summary>
         /// Temporarily set to true in methods that change the model
@@ -32,19 +33,26 @@ namespace ChemProV.PFD.EquationEditor
         /// Reference to the model that this control represents. This control modifies this 
         /// object but does not "own it". In other words, it is instantiated elsewhere and 
         /// passed in to the constructor of this control.
+        /// This reference can be changed at runtime, allowing the control to change from 
+        /// one model to another. See the "SetModel" function.
         /// </summary>
         private EquationModel m_model;
 
         private DeleteRequestDelegate m_requestDelete = null;
 
-        public EquationControl(EquationEditor parent, EquationModel equationModel)
+        private Workspace m_workspace;
+
+        public EquationRowControl(Workspace workspace, EquationEditor parent, EquationModel equationModel)
         {
             InitializeComponent();
 
-            m_model = equationModel;
+            m_workspace = workspace;
             SetScopeOptions(parent.EquationScopes);
             SetTypeOptions(parent.EquationTypes);
 
+            // Use the SetModel function to set the current model. This will update the UI and subscribe 
+            // to relevant events.
+            m_model = null;
             SetModel(equationModel);
 
             // We want to make sure we have a right-click menu for the equation text box
@@ -66,11 +74,24 @@ namespace ChemProV.PFD.EquationEditor
             {
                 return;
             }
-            
-            // Update the model
-            m_changingModel = true;
-            m_model.Equation = EquationTextBox.Text;
-            m_changingModel = false;
+
+            // If the equation in the model is not equal to the equation in the text box, then this 
+            // implies that the user is changing the text in the equation text box (i.e. it's not 
+            // being changed programatically). In this case we need to update the model and add 
+            // an undo.
+            if (m_model.Equation != EquationTextBox.Text)
+            {
+                string oldText = m_model.Equation;
+                
+                // Update the model
+                m_changingModel = true;
+                m_model.Equation = EquationTextBox.Text;
+                m_changingModel = false;
+
+                // For now, create an undo for every text change
+                m_workspace.AddUndo(new UndoRedoCollection("Undo changing equation text",
+                    new Logic.Undos.SetEquationText(m_model, oldText)));
+            }
         }
 
         /// <summary>
@@ -82,6 +103,14 @@ namespace ChemProV.PFD.EquationEditor
             get
             {
                 return m_model;
+            }
+        }
+
+        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Equation"))
+            {
+                EquationTextBox.Text = m_model.Equation;
             }
         }
 
@@ -148,6 +177,12 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         public void SetModel(EquationModel model)
         {
+            // IMPORTANT: Unsubscribe from the old model
+            if (null != m_model)
+            {
+                m_model.PropertyChanged -= this.Model_PropertyChanged;
+            }
+            
             m_model = model;
 
             // Calling this method with a null reference for the model is considered valid, so 
@@ -176,6 +211,9 @@ namespace ChemProV.PFD.EquationEditor
                 }
 
                 EquationTextBox.Text = model.Equation;
+
+                // Watch for property changes
+                m_model.PropertyChanged += this.Model_PropertyChanged;
             }
         }
 

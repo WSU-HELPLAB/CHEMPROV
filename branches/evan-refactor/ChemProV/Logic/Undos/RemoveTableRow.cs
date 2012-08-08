@@ -26,7 +26,7 @@ namespace ChemProV.Logic.Undos
         public IUndoRedoAction Execute(Workspace sender)
         {
             // Get the row we're about to remove
-            IStreamData row = m_table.Rows[m_index];
+            IStreamDataRow row = m_table.Rows[m_index];
 
             // Remove it
             m_table.RemoveRowAt(m_index);

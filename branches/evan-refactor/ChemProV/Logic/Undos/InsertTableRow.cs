@@ -8,11 +8,11 @@
     {
         private int m_index;
 
-        private IStreamData m_row;
+        private IStreamDataRow m_row;
 
         private StreamPropertiesTable m_table;
 
-        public InsertTableRow(int index, IStreamData row, StreamPropertiesTable table)
+        public InsertTableRow(int index, IStreamDataRow row, StreamPropertiesTable table)
         {
             m_index = index;
             m_row = row;

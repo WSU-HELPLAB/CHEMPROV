@@ -125,8 +125,8 @@ namespace ChemProV.UI
             }
             else if (string.IsNullOrEmpty(row.SelectedCompound))
             {
-                // Label of the form: "[startChar.Lower][streamNum][rowNum]"
-                row.Label = char.ToLower(startChar).ToString() + m_table.Stream.Id.ToString() + rowNum.ToString();
+                // Label of the form: "[startChar.Lower][streamNum][rowIndex + 1]"
+                row.Label = char.ToLower(startChar).ToString() + m_table.Stream.Id.ToString() + (rowNum + 1).ToString();
             }
             else
             {
@@ -144,8 +144,8 @@ namespace ChemProV.UI
             // grid (with respect to the data row) for the row removal buttons.
             int column = (int)(sender as ComboBox).GetValue(Grid.ColumnProperty) - 1;
             
-            Tuple<IStreamData, string> info = (sender as ComboBox).Tag as
-                Tuple<IStreamData, string>;
+            Tuple<IStreamDataRow, string> info = (sender as ComboBox).Tag as
+                Tuple<IStreamDataRow, string>;
             if (null != info)
             {
                 string newValue = (sender as ComboBox).SelectedItem as string;
@@ -195,7 +195,7 @@ namespace ChemProV.UI
             }
         }
 
-        public Control GetControl(IStreamData row, string propertyName)
+        public Control GetControl(IStreamDataRow row, string propertyName)
         {
             foreach (UIElement uie in MainGrid.Children)
             {
@@ -207,7 +207,7 @@ namespace ChemProV.UI
                 
                 // If it's a control that corresponds to an item in the data structure then it will 
                 // have information in its tag
-                Tuple<IStreamData, string> info = c.Tag as Tuple<IStreamData, string>;
+                Tuple<IStreamDataRow, string> info = c.Tag as Tuple<IStreamDataRow, string>;
                 if (null == info)
                 {
                     continue;
@@ -272,7 +272,7 @@ namespace ChemProV.UI
         private void RemoveRowBtn_Click(object sender, RoutedEventArgs e)
         {
             // Get a reference to the row
-            IStreamData row = (sender as Button).Tag as IStreamData;
+            IStreamDataRow row = (sender as Button).Tag as IStreamDataRow;
             
             // Create an undo first
             m_ws.AddUndo(new UndoRedoCollection("Undo deletion of row",
@@ -306,7 +306,7 @@ namespace ChemProV.UI
                 }
 
                 // Look for information about the row and property in the tag
-                Tuple<IStreamData, string> info = c.Tag as Tuple<IStreamData, string>;
+                Tuple<IStreamDataRow, string> info = c.Tag as Tuple<IStreamDataRow, string>;
                 if (null == info)
                 {
                     continue;
@@ -336,10 +336,17 @@ namespace ChemProV.UI
         {
             // Get the column index for the control.Remember that there's an extra column in the 
             // grid (with respect to the data row) for the row removal buttons.
-            int column = (int)(sender as TextBox).GetValue(Grid.ColumnProperty) - 1;
+            TextBox tb = sender as TextBox;
+            int column = (int)tb.GetValue(Grid.ColumnProperty) - 1;
+
+            // If the column for the add/remove buttons is not present, then decrement the column index
+            if (!m_table.CanAddRemoveRows)
+            {
+                column--;
+            }
             
-            Tuple<IStreamData, string> info = (sender as TextBox).Tag as
-                Tuple<IStreamData, string>;
+            Tuple<IStreamDataRow, string> info = (sender as TextBox).Tag as
+                Tuple<IStreamDataRow, string>;
             if (null != info)
             {
                 // We handle the "Label" property in a specific way because we need to keep track of 
@@ -348,18 +355,36 @@ namespace ChemProV.UI
                 // current data row label is different from the text box text.
                 if (info.Item2.Equals("Label"))
                 {
-                    if (!m_programmaticallyChanging && info.Item1.Label != (sender as TextBox).Text)
+                    if (!m_programmaticallyChanging && info.Item1.Label != tb.Text)
                     {
-                        info.Item1.UserHasRenamed = true;
+                        List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
+                        if (!info.Item1.UserHasRenamed)
+                        {
+                            info.Item1.UserHasRenamed = true;
+                            undos.Add(new Logic.Undos.SetProperty(info.Item1, "UserHasRenamed", false));
+                        }                        
+                        
+                        string previousValue = info.Item1.Label;
+                        info.Item1.Label = tb.Text;
+
+                        // Create and undo to change it back
+                        undos.Add(new Logic.Undos.SetTableRowData(info.Item1, column, previousValue));
+                        m_ws.AddUndo(new UndoRedoCollection("Undo changing label in table", undos.ToArray()));
                     }
                 }
-                else
+                else if ((string)info.Item1[column] != tb.Text)
                 {
+                    string previousValue = info.Item1[column] as string;
+                    
                     // This is how we handle the general case for text field changes: just update the 
                     // corresponding data structure value.
                     m_ignoreRowPropertyChanges = true;
-                    info.Item1[column] = (sender as TextBox).Text;
+                    info.Item1[column] = tb.Text;
                     m_ignoreRowPropertyChanges = false;
+
+                    // Create and undo to change it back
+                    m_ws.AddUndo(new UndoRedoCollection("Undo changing value in table",
+                        new Logic.Undos.SetTableRowData(info.Item1, column, previousValue)));
                 }
             }
         }
@@ -375,7 +400,7 @@ namespace ChemProV.UI
                 // The stream ID affects any auto-named labels, so update these too
                 if (StreamType.Chemical == m_table.StreamType)
                 {
-                    foreach (IStreamData row in m_table.Rows)
+                    foreach (IStreamDataRow row in m_table.Rows)
                     {
                         if (row.UserHasRenamed)
                         {
@@ -385,6 +410,15 @@ namespace ChemProV.UI
 
                         AutoLabel(row as ChemicalStreamData);
                         row.UserHasRenamed = false;
+                    }
+                }
+                else if (StreamType.Heat == m_table.StreamType)
+                {
+                    // The label in the first (and only) row in the heat stream table is also auto-generated 
+                    // if the user hasn't renamed it
+                    if (!m_table.Rows[0].UserHasRenamed)
+                    {
+                        m_table.Rows[0].Label = "Q" + m_table.Stream.Id.ToString();
                     }
                 }
 
@@ -503,7 +537,7 @@ namespace ChemProV.UI
             }
 
             i = 2;
-            foreach (IStreamData row in m_table.Rows)
+            foreach (IStreamDataRow row in m_table.Rows)
             {
                 MainGrid.RowDefinitions.Add(new RowDefinition()
                     {
@@ -560,7 +594,7 @@ namespace ChemProV.UI
                         Core.App.InitRightClickMenu(tb);
 
                         // When it changes we need to update the data structure
-                        tb.Tag = new Tuple<IStreamData, string>(row, propertyName);
+                        tb.Tag = new Tuple<IStreamDataRow, string>(row, propertyName);
                         tb.TextChanged += this.TextField_TextChanged;
 
                         tb.GotFocus += delegate(object sender, RoutedEventArgs e)
@@ -592,7 +626,7 @@ namespace ChemProV.UI
                         cb.SelectedItem = row[dataColumn] as string;
 
                         // Handle selected item change events
-                        cb.Tag = new Tuple<IStreamData, string>(row, propertyName);
+                        cb.Tag = new Tuple<IStreamDataRow, string>(row, propertyName);
                         cb.SelectionChanged += this.ComboBoxField_SelectionChanged;
                     }
 

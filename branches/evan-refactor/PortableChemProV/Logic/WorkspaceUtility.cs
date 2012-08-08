@@ -53,7 +53,7 @@ namespace ChemProV.Logic
                 if (null != cs)
                 {
                     // Go through all the rows in the properties table
-                    foreach (IStreamData row in cs.PropertiesTable.Rows)
+                    foreach (IStreamDataRow row in cs.PropertiesTable.Rows)
                     {
                         string selectedCompound = (row as ChemicalStreamData).SelectedCompound;
                         if (!string.IsNullOrEmpty(selectedCompound) &&

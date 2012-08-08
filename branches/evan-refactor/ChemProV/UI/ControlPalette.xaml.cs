@@ -29,6 +29,8 @@ namespace ChemProV.UI
     public partial class ControlPalette : UserControl
     {
         private int m_buttonsPerRow = 3;
+
+        private bool m_suppressFocus = false;
         
         public ControlPalette()
         {
@@ -109,6 +111,15 @@ namespace ChemProV.UI
 
             // First, set the canvas's selected element to null
             Core.App.Workspace.DrawingCanvas.SelectedElement = null;
+
+            if (!m_suppressFocus)
+            {
+                // Clicking the mouse down in the control palette does NOT set it as the focus element. Silverlight 
+                // has some weird quirks about what can and cannot be a focus element. But, we don't want the focus 
+                // to remain in some text box somewhere when we click a control palette "button", so we'll just set 
+                // the focus to the main page.
+                Core.App.MainPage.Focus();
+            }
 
             // Highlight the button that was clicked
             HighlightButton(sender as Border);
@@ -241,6 +252,12 @@ namespace ChemProV.UI
 
         public void SwitchToSelect()
         {
+            SwitchToSelect(true);
+        }
+
+        public void SwitchToSelect(bool setFocus)
+        {
+            m_suppressFocus = !setFocus;
             PaletteButton_MouseLeftButtonDown(SelectButton, null);
         }
 

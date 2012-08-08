@@ -158,6 +158,14 @@ namespace ChemProV.Core
             s_log.Add(new LogItem(type, message));
         }
 
+        public static MainPage MainPage
+        {
+            get
+            {
+                return s_mainPage;
+            }
+        }
+
         public static void MessageBox(string message)
         {
             System.Windows.MessageBox.Show(message);

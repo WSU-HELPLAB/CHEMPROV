@@ -148,17 +148,21 @@
     <Compile Include="Logic\Undos\RemoveStream.cs" />
     <Compile Include="Logic\Undos\RemoveTableRow.cs" />
     <Compile Include="Logic\Undos\ResizeStickyNote.cs" />
+    <Compile Include="Logic\Undos\SetEquationText.cs" />
+    <Compile Include="Logic\Undos\SetProperty.cs" />
+    <Compile Include="Logic\Undos\SetStickyNoteText.cs" />
     <Compile Include="Logic\Undos\SetStreamDestinationLocation.cs" />
     <Compile Include="Logic\Undos\SetStreamId.cs" />
     <Compile Include="Logic\Undos\SetStreamSourceLocation.cs" />
     <Compile Include="Logic\Undos\SetSubprocess.cs" />
+    <Compile Include="Logic\Undos\SetTableRowData.cs" />
     <Compile Include="MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
     <Compile Include="MathCore\LineSegment.cs" />
     <Compile Include="MathCore\Rectangle.cs" />
-    <Compile Include="PFD\EquationEditor\EquationControl.xaml.cs">
-      <DependentUpon>EquationControl.xaml</DependentUpon>
+    <Compile Include="PFD\EquationEditor\EquationRowControl.xaml.cs">
+      <DependentUpon>EquationRowControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
       <DependentUpon>EquationEditor.xaml</DependentUpon>
@@ -297,7 +301,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="PFD\EquationEditor\EquationControl.xaml">
+    <Page Include="PFD\EquationEditor\EquationRowControl.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

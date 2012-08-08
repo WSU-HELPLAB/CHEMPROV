@@ -18,11 +18,11 @@ namespace ChemProV.Logic
     /// Object representation of the data present in the PropertiesWindow for
     /// chemical streams.
     /// </summary>
-    public class HeatStreamData : IStreamData, INotifyPropertyChanged, IComparable
+    public class HeatStreamData : IStreamDataRow, INotifyPropertyChanged, IComparable
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         
-        private string quantity = string.Empty;
+        private string m_quantity = string.Empty;
         private string feedback = string.Empty;
         private string toolTipMessage = string.Empty;
 
@@ -44,7 +44,7 @@ namespace ChemProV.Logic
             }
 
             m_label = loadFromMe.Element("Label").Value;
-            quantity = loadFromMe.Element("Quantity").Value;
+            m_quantity = loadFromMe.Element("Quantity").Value;
 
             XElement selectedUnitsEl = loadFromMe.Element("SelectedUnits");
             if (null == selectedUnitsEl)
@@ -67,11 +67,6 @@ namespace ChemProV.Logic
             // Load <Feedback> and <ToolTipMessage> (not sure if we need these)
             feedback = loadFromMe.Element("Feedback").Value;
             toolTipMessage = loadFromMe.Element("ToolTipMessage").Value;
-        }
-
-        private void CheckIfEnabled(string propertyName = "")
-        {
-            PropertyChanged(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public int CompareTo(object obj)
@@ -117,7 +112,7 @@ namespace ChemProV.Logic
                 case 1:
                     // Quantity column (string field)
                     propertyName = "Quantity";
-                    return quantity;
+                    return m_quantity;
 
                 case 2:
                     // Energy units column (string collection field)
@@ -153,12 +148,18 @@ namespace ChemProV.Logic
         {
             get
             {
-                return quantity;
+                return m_quantity;
             }
             set
             {
-                quantity = value;
-                CheckIfEnabled("Quantity");
+                if (value == m_quantity)
+                {
+                    // No change
+                    return;
+                }
+                
+                m_quantity = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Quantity"));
             }
         }
 
@@ -191,7 +192,7 @@ namespace ChemProV.Logic
                         return m_label;
 
                     case 1:
-                        return quantity;
+                        return m_quantity;
 
                     case 2:
                         return m_selectedUnits;
@@ -205,15 +206,15 @@ namespace ChemProV.Logic
                 switch (index)
                 {
                     case 0:
-                        m_label = value as string;
+                        Label = value as string;
                         break;
 
                     case 1:
-                        quantity = value as string;
+                        Quantity = value as string;
                         break;
 
                     case 2:
-                        m_selectedUnits = value as string;
+                        SelectedUnits = value as string;
                         break;
                 }
             }
