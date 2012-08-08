@@ -21,7 +21,7 @@ namespace ChemProV.Logic
     /// <summary>
     /// Object representation of a data row in the properties table for chemical streams.
     /// </summary>
-    public class ChemicalStreamData : IStreamData, INotifyPropertyChanged, IComparable
+    public class ChemicalStreamData : IStreamDataRow, INotifyPropertyChanged, IComparable
     {
         public event PropertyChangedEventHandler PropertyChanged = delegate { };
         

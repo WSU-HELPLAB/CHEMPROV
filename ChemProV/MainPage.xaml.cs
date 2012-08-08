@@ -165,11 +165,11 @@ namespace ChemProV
             // control palette switches back to select mode
             WorkSpace.EquationEditor.GotFocus += delegate(object sender, RoutedEventArgs e)
             {
-                Core.App.ControlPalette.SwitchToSelect();
+                Core.App.ControlPalette.SwitchToSelect(false);
             };
             CompoundTable.GotFocus += delegate(object sender, RoutedEventArgs e)
             {
-                Core.App.ControlPalette.SwitchToSelect();
+                Core.App.ControlPalette.SwitchToSelect(false);
             };
 
             // Show the debug tab if this is a debug build

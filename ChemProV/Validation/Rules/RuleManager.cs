@@ -172,7 +172,7 @@ namespace ChemProV.Validation.Rules
         /// </summary>
         /// <param name="pfdElements">list of all pfdElements that need to be checked</param>
         /// <param name="equations">list of all equations that need to be checked</param>
-        public void Validate(IEnumerable<IPfdElement> pfdElements, IList<Tuple<string, EquationControl>> userDefinedVariables)
+        public void Validate(IEnumerable<IPfdElement> pfdElements, IList<Tuple<string, EquationRowControl>> userDefinedVariables)
         {
             //clear out the dictionary before we begin adding new stuff
             EveryoneDict.Clear();

@@ -230,13 +230,6 @@ namespace ChemProV.UI
             set;
         }
 
-        /// <summary>
-        /// This is not currently used but must have it since IPfdElement has it
-        /// TODO: Get rid of it. All location monitoring should happen through the 
-        /// workspace objects.
-        /// </summary>
-        public event EventHandler LocationChanged;
-
         public void HighlightFeedback(bool highlight)
         {
         }
@@ -277,47 +270,6 @@ namespace ChemProV.UI
                 m_canvas, m_note);
             // Kick it off by sending the mouse-down event
             m_canvas.CurrentState.MouseLeftButtonDown(sender, e);
-        }
-
-        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
-        {
-            Point currentSize = new Point(this.Width, this.Height);
-
-            if (this.Width > 36)
-            {
-                Header.Width = this.Width - 36;
-            }
-            else
-            {
-                this.Width = 36;
-            }
-
-            if (this.Height < 23 + 7)
-            {
-                this.Height = 23 + 7;
-            }
-
-            //Note.Height = (double)currentSize.Y - (double)Note.GetValue(System.Windows.Controls.Canvas.TopProperty);
-            Note.Height = this.Height - 23.0;
-            Note.Width = (double)currentSize.X - (double)Note.GetValue(System.Windows.Controls.Canvas.LeftProperty);
-            try
-            {
-                Thickness thick = new Thickness(currentSize.X - 7, currentSize.Y - 7, 0, 0);
-
-                Bottem_Left_Corner.Margin = thick;
-            }
-            catch
-            {
-            }
-        }
-
-        private void X_Label_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
-        {
-            // Make sure we mark this mouse event as handled
-            e.Handled = true;
-
-            // We have a special function to delete
-            DeleteWithUndo(m_canvas);
         }
 
         public static StickyNoteColors StickyNoteColorsFromString(string colorString)
@@ -453,30 +405,6 @@ namespace ChemProV.UI
 
         #endregion
 
-        public void UpdateLineToParent()
-        {
-            if (null == m_lineToParent || null == m_commentParent)
-            {
-                return;
-            }
-
-            Point location;
-            StreamControl stream = m_commentParent as StreamControl;
-            if (null == stream)
-            {
-                location = (m_commentParent as ProcessUnitControl).Location;
-            }
-            else
-            {
-                location = stream.StreamLineMidpoint;
-            }
-
-            m_lineToParent.X1 = Location.X;
-            m_lineToParent.Y1 = Location.Y;
-            m_lineToParent.X2 = location.X;
-            m_lineToParent.Y2 = location.Y;
-        }
-
         /// <summary>
         /// Sticky notes can be used as comments that are tied to specific elements in the process flow 
         /// diagram. When the are in this mode, this will be the line that connects them to their parent 
@@ -599,78 +527,6 @@ namespace ChemProV.UI
                 }
             }
         }
-
-        ///// <summary>
-        ///// Creates a new sticky note to be used as a comment attached to a specific PFD element. The comment is added
-        ///// to the specified comment-collection-parent and appropriate controls are added to the drawing canvas.
-        ///// Undo items are created and returned in a list but are not actually added to the drawing canvas via its 
-        ///// "AddUndo" method. Rather, a list is returned so that if the caller is doing multiple things at once it can 
-        ///// pack more undo items into a single collection as it sees fit.
-        ///// </summary>
-        //[Obsolete("Removing this, do not use. Keeping for positioning algorithm reference.")]
-        //public static List<IUndoRedoAction> CreateCommentNote(DrawingCanvas canvas, object parent,
-        //    XElement optionalToLoadFromXML, out StickyNoteControl createdNote)
-        //{
-        //    if (!(parent is AbstractStream) && !(parent is GenericProcessUnit))
-        //    {
-        //        throw new InvalidOperationException(
-        //            "The parent element for a comment-sticky-note must be a stream or process unit");
-        //    }
-            
-        //    StickyNoteControl sn;
-        //    if (null == optionalToLoadFromXML)
-        //    {
-        //        sn = new StickyNoteControl(canvas);
-        //        sn.Width = 100.0;
-        //        sn.Height = 100.0;
-        //    }
-        //    else
-        //    {
-        //        sn = new StickyNoteControl(optionalToLoadFromXML, canvas);
-        //    }
-        //    sn.m_commentParent = parent;
-        //    canvas.AddNewChild(sn);
-
-        //    // Give it a high z-index since we want comments above everything else
-        //    sn.SetValue(Canvas.ZIndexProperty, (int)4);
-
-        //    // Create the line and add it to the drawing canvas
-        //    sn.m_lineToParent = new Line();
-        //    canvas.AddNewChild(sn.m_lineToParent);
-        //    sn.m_lineToParent.SetValue(Canvas.ZIndexProperty, -3);
-        //    sn.m_lineToParent.Stroke = new SolidColorBrush(Color.FromArgb(255, 245, 222, 179));
-        //    sn.m_lineToParent.StrokeThickness = 1.0;
-
-        //    // Compute a location if we don't have XML data
-        //    if (null == optionalToLoadFromXML)
-        //    {
-                
-        //    }
-
-        //    // Make sure that when the parent moves we update the line
-        //    (parent as IPfdElement).LocationChanged +=
-        //        delegate(object sender, EventArgs e)
-        //        {
-        //            sn.UpdateLineToParent();
-        //        };
-
-        //    sn.UpdateLineToParent();
-
-        //    // Set the output value
-        //    createdNote = sn;
-
-        //    // Add the comment to the collection
-        //    parent.AddComment(sn);
-
-        //    // Build and return a list of undos that will remove the elements that we added to the 
-        //    // drawing canvas and will remove the comment from the collection
-        //    List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
-        //    undos.Add(new RemoveFromCanvas(sn, canvas));
-        //    undos.Add(new RemoveFromCanvas(sn.LineToParent, canvas));
-        //    undos.Add(new RemoveComment(parent, parent.CommentCount - 1));
-
-        //    return undos;
-        //}
 
         /// <summary>
         /// Deletes this sticky note from the workspace and adds an undo to bring it back.
@@ -796,34 +652,89 @@ namespace ChemProV.UI
                 double top = (double)GetValue(Canvas.TopProperty);
                 return (left < 0.0 || top < 0.0);
 
-                // TODO: Checks on the right and bottom edges with respect to the drawing canvas
+                // TODO: Checks on the right and bottom edges with respect to the drawing 
+                // canvas (not a high priority)
             }
-        }
-
-        /// <summary>
-        /// Goes through all controls on the drawing canvas and returns true if any one is 
-        /// a sticky note control with the exact specified location.
-        /// </summary>
-        private static bool ContainsCommentSNAt(DrawingCanvas canvas, Point location)
-        {
-            for (int i = 0; i < canvas.Children.Count; i++)
-            {
-                StickyNoteControl sn = canvas.Children[i] as StickyNoteControl;
-                if (null != sn)
-                {
-                    if (sn.Location.Equals(location))
-                    {
-                        return true;
-                    }
-                }
-            }
-
-            return false;
         }
 
         private void Note_TextChanged(object sender, TextChangedEventArgs e)
         {
-            m_note.Text = Note.Text;
+            if (m_note.Text != Note.Text)
+            {
+                string oldText = m_note.Text;
+                
+                m_note.Text = Note.Text;
+
+                // For now, create an undo for every text change
+                Workspace ws = Core.App.Workspace.DrawingCanvas.GetWorkspace();
+                ws.AddUndo(new UndoRedoCollection("Undo changing comment text",
+                    new Logic.Undos.SetStickyNoteText(m_note, oldText)));
+            }
+        }
+
+        public void UpdateLineToParent()
+        {
+            if (null == m_lineToParent || null == m_commentParent)
+            {
+                return;
+            }
+
+            Point location;
+            StreamControl stream = m_commentParent as StreamControl;
+            if (null == stream)
+            {
+                location = (m_commentParent as ProcessUnitControl).Location;
+            }
+            else
+            {
+                location = stream.StreamLineMidpoint;
+            }
+
+            m_lineToParent.X1 = Location.X;
+            m_lineToParent.Y1 = Location.Y;
+            m_lineToParent.X2 = location.X;
+            m_lineToParent.Y2 = location.Y;
+        }
+
+        private void UserControl_SizeChanged(object sender, SizeChangedEventArgs e)
+        {
+            Point currentSize = new Point(this.Width, this.Height);
+
+            if (this.Width > 36)
+            {
+                Header.Width = this.Width - 36;
+            }
+            else
+            {
+                this.Width = 36;
+            }
+
+            if (this.Height < 23 + 7)
+            {
+                this.Height = 23 + 7;
+            }
+
+            //Note.Height = (double)currentSize.Y - (double)Note.GetValue(System.Windows.Controls.Canvas.TopProperty);
+            Note.Height = this.Height - 23.0;
+            Note.Width = (double)currentSize.X - (double)Note.GetValue(System.Windows.Controls.Canvas.LeftProperty);
+            try
+            {
+                Thickness thick = new Thickness(currentSize.X - 7, currentSize.Y - 7, 0, 0);
+
+                Bottem_Left_Corner.Margin = thick;
+            }
+            catch
+            {
+            }
+        }
+
+        private void X_Label_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            // Make sure we mark this mouse event as handled
+            e.Handled = true;
+
+            // We have a special function to delete
+            DeleteWithUndo(m_canvas);
         }
     }
 }

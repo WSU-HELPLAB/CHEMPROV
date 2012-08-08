@@ -2,7 +2,7 @@
 
 namespace ChemProV.Logic
 {
-    public interface IStreamData
+    public interface IStreamDataRow
     {
         /// <summary>
         /// Returns an object that represents what should be used to build the UI at the 

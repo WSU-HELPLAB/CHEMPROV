@@ -29,7 +29,7 @@ namespace ChemProV.Logic
         /// </summary>
         private AbstractStream m_parent;
 
-        private ObservableCollection<IStreamData> m_rows = new ObservableCollection<IStreamData>();
+        private ObservableCollection<IStreamDataRow> m_rows = new ObservableCollection<IStreamDataRow>();
 
         /// <summary>
         /// Only used for chemical stream properties tables
@@ -154,9 +154,9 @@ namespace ChemProV.Logic
             }
         }
 
-        public IStreamData AddNewRow()
+        public IStreamDataRow AddNewRow()
         {
-            IStreamData newRow;
+            IStreamDataRow newRow;
             if (StreamType.Heat == m_type)
             {
                 newRow = new HeatStreamData();
@@ -173,10 +173,10 @@ namespace ChemProV.Logic
             return newRow;
         }
 
-        protected bool AddRow(IStreamData newRow)
+        protected bool AddRow(IStreamDataRow newRow)
         {
             // Deny the add if the exact same object (reference comparison) exists in the collection
-            foreach (IStreamData row in m_rows)
+            foreach (IStreamDataRow row in m_rows)
             {
                 if (object.ReferenceEquals(row, newRow))
                 {
@@ -200,20 +200,35 @@ namespace ChemProV.Logic
             RowPropertyChanged(sender, e);
         }
 
-        public int IndexOfRow(IStreamData row)
+        public int IndexOfRow(IStreamDataRow row)
         {
             return m_rows.IndexOf(row);
         }
 
-        public bool InsertRow(int index, IStreamData row)
+        public bool InsertRow(int index, IStreamDataRow row)
         {
             if (index < 0 || index > m_rows.Count)
             {
                 return false;
             }
 
+            // Don't allow insertion of the same row (reference) twice. Two different row instances 
+            // with exactly the same data is fine, but two of the exact same instances is not.
+            for (int i = 0; i < m_rows.Count; i++)
+            {
+                if (object.ReferenceEquals(row, m_rows[i]))
+                {
+                    return false;
+                }
+            }
+
             m_rows.Insert(index, row);
+
+            // Hook up the event listener
+            row.PropertyChanged += new PropertyChangedEventHandler(AnyRow_PropertyChanged);
+
             RowsChanged(this, EventArgs.Empty);
+            
             return true;
         }
 
@@ -244,7 +259,7 @@ namespace ChemProV.Logic
             }
         }
 
-        public void RemoveRow(IStreamData row)
+        public void RemoveRow(IStreamDataRow row)
         {
             if (m_rows.Contains(row))
             {
@@ -260,7 +275,6 @@ namespace ChemProV.Logic
         /// <summary>
         /// Removes the row at the specified index
         /// </summary>
-        /// <param name="index"></param>
         public void RemoveRowAt(int index)
         {
             if (index < 0 || index >= m_rows.Count)
@@ -269,7 +283,7 @@ namespace ChemProV.Logic
             }
             
             // Remove the row
-            IStreamData row = m_rows[index];
+            IStreamDataRow row = m_rows[index];
             m_rows.RemoveAt(index);
 
             // Unsubscribe from events
@@ -292,11 +306,11 @@ namespace ChemProV.Logic
         /// <summary>
         /// Gets the collection of data rows in the properties table
         /// </summary>
-        public ReadOnlyCollection<IStreamData> Rows
+        public ReadOnlyCollection<IStreamDataRow> Rows
         {
             get
             {
-                return new ReadOnlyCollection<IStreamData>(m_rows);
+                return new ReadOnlyCollection<IStreamDataRow>(m_rows);
             }
         }
 
@@ -394,7 +408,7 @@ namespace ChemProV.Logic
 
             // Write the data rows
             writer.WriteStartElement("DataRows");
-            foreach (IStreamData row in Rows)
+            foreach (IStreamDataRow row in Rows)
             {
                 row.WriteXml(writer);
             }

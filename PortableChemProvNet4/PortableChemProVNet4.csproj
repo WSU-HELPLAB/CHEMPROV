@@ -101,8 +101,8 @@
     <Compile Include="..\PortableChemProV\Logic\HeatStreamData.cs">
       <Link>Logic\HeatStreamData.cs</Link>
     </Compile>
-    <Compile Include="..\PortableChemProV\Logic\IStreamData.cs">
-      <Link>Logic\IStreamData.cs</Link>
+    <Compile Include="..\PortableChemProV\Logic\IStreamDataRow.cs">
+      <Link>Logic\IStreamDataRow.cs</Link>
     </Compile>
     <Compile Include="..\PortableChemProV\Logic\Mixer.cs">
       <Link>Logic\Mixer.cs</Link>

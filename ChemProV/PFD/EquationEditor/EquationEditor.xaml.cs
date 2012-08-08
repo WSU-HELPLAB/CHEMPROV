@@ -94,7 +94,7 @@ namespace ChemProV.PFD.EquationEditor
 
         private void MoveDownButton_Click(object sender, RoutedEventArgs e)
         {
-            EquationControl row = null;
+            EquationRowControl row = null;
             
             // Start by finding the row index in the stack panel
             int indexOfThis = -1;
@@ -103,7 +103,7 @@ namespace ChemProV.PFD.EquationEditor
                 // Will throw an exception if it the object is not an EquationControl, but that's 
                 // what we want since the design contract is that all objects in the stack panel 
                 // must be EquationControl objects.
-                EquationControl ec = (EquationControl)EquationsStackPanel.Children[i];
+                EquationRowControl ec = (EquationRowControl)EquationsStackPanel.Children[i];
                 
                 if (object.ReferenceEquals(sender, ec.MoveDownButton))
                 {
@@ -135,7 +135,7 @@ namespace ChemProV.PFD.EquationEditor
 
         private void MoveUpButton_Click(object sender, RoutedEventArgs e)
         {
-            EquationControl row = null;
+            EquationRowControl row = null;
 
             // Start by finding the row index in the stack panel
             int indexOfThis = -1;
@@ -144,7 +144,7 @@ namespace ChemProV.PFD.EquationEditor
                 // Will throw an exception if it the object is not an EquationControl, but that's 
                 // what we want since the design contract is that all objects in the stack panel 
                 // must be EquationControl objects.
-                EquationControl ec = (EquationControl)EquationsStackPanel.Children[i];
+                EquationRowControl ec = (EquationRowControl)EquationsStackPanel.Children[i];
 
                 if (object.ReferenceEquals(sender, ec.MoveUpButton))
                 {
@@ -179,7 +179,7 @@ namespace ChemProV.PFD.EquationEditor
             int count = EquationRowCount;
             for (int i = 0; i < count; i++)
             {
-                EquationControl ec = GetRow(i);
+                EquationRowControl ec = GetRow(i);
 
                 // Row number label
                 Brush clrBrush = new SolidColorBrush(Color.FromArgb(255,42,176,240));
@@ -235,7 +235,7 @@ namespace ChemProV.PFD.EquationEditor
         /// This is called from an equation control when it wants to delete itself. We must remove 
         /// it from the stack panel.
         /// </summary>
-        private void DeleteEquationRow(EquationControl thisOne)
+        private void DeleteEquationRow(EquationRowControl thisOne)
         {
             int index = m_workspace.Equations.IndexOf(thisOne.Model);
 
@@ -265,14 +265,14 @@ namespace ChemProV.PFD.EquationEditor
         /// </summary>
         /// <param name="index">Zero-based index of the row.</param>
         /// <returns>Null if index is invalid, reference to the appropriate EquationControl otherwise.</returns>
-        private EquationControl GetRow(int index)
+        private EquationRowControl GetRow(int index)
         {
             if (index < 0 || index >= EquationsStackPanel.Children.Count)
             {
                 return null;
             }
 
-            return (EquationControl)EquationsStackPanel.Children[index];
+            return (EquationRowControl)EquationsStackPanel.Children[index];
         }
 
         /// <summary>
@@ -434,7 +434,7 @@ namespace ChemProV.PFD.EquationEditor
                 int rowsSeen = 0;
                 foreach (UIElement uie in EquationsStackPanel.Children)
                 {
-                    EquationControl ec = uie as EquationControl;
+                    EquationRowControl ec = uie as EquationRowControl;
                     if (null == ec)
                     {
                         throw new InvalidOperationException(
@@ -502,9 +502,9 @@ namespace ChemProV.PFD.EquationEditor
                 new RemoveEquation(m_workspace, m_workspace.Equations.Count - 1)));
         }
 
-        internal EquationControl GetRowControl(int index)
+        internal EquationRowControl GetRowControl(int index)
         {
-            return EquationsStackPanel.Children[index] as EquationControl;
+            return EquationsStackPanel.Children[index] as EquationRowControl;
         }
 
         public int CountRowsWithCommentsVisible()
@@ -512,7 +512,7 @@ namespace ChemProV.PFD.EquationEditor
             int count = 0;
             foreach (UIElement uie in EquationsStackPanel.Children)
             {
-                if ((uie as EquationControl).Model.CommentsVisible)
+                if ((uie as EquationRowControl).Model.CommentsVisible)
                 {
                     count++;
                 }
@@ -559,7 +559,7 @@ namespace ChemProV.PFD.EquationEditor
             UpdateFromWorkspace();
         }
 
-        private void SetupEquationControlEvents(EquationControl control)
+        private void SetupEquationControlEvents(EquationRowControl control)
         {
             // Set the deletion callback function
             control.SetDeleteRequestDelegate(this.DeleteEquationRow);
@@ -618,8 +618,8 @@ namespace ChemProV.PFD.EquationEditor
             while (EquationsStackPanel.Children.Count > m_workspace.Equations.Count)
             {
                 // Remove the last one
-                EquationControl ec = 
-                    EquationsStackPanel.Children[EquationsStackPanel.Children.Count - 1] as EquationControl;
+                EquationRowControl ec = 
+                    EquationsStackPanel.Children[EquationsStackPanel.Children.Count - 1] as EquationRowControl;
                 ec.SetModel(null);
                 EquationsStackPanel.Children.Remove(ec);
             }
@@ -627,7 +627,7 @@ namespace ChemProV.PFD.EquationEditor
             // If there are too few equation row controls then add additional ones
             while (EquationsStackPanel.Children.Count < m_workspace.Equations.Count)
             {
-                EquationControl ec = new EquationControl(
+                EquationRowControl ec = new EquationRowControl(m_workspace,
                     this, m_workspace.Equations[EquationsStackPanel.Children.Count]);
                 SetupEquationControlEvents(ec);
                 EquationsStackPanel.Children.Add(ec);
@@ -639,9 +639,9 @@ namespace ChemProV.PFD.EquationEditor
             {
                 // If the control doesn't already have the correct model then update it
                 if (!object.ReferenceEquals(m_workspace.Equations[i],
-                    (EquationsStackPanel.Children[i] as EquationControl).Model))
+                    (EquationsStackPanel.Children[i] as EquationRowControl).Model))
                 {
-                    (EquationsStackPanel.Children[i] as EquationControl).SetModel(m_workspace.Equations[i]);
+                    (EquationsStackPanel.Children[i] as EquationRowControl).SetModel(m_workspace.Equations[i]);
                 }
             }
 
@@ -697,7 +697,7 @@ namespace ChemProV.PFD.EquationEditor
             // Update all of the equation controls
             for (int i = 0; i < EquationRowCount; i++)
             {
-                EquationControl ec = GetRow(i);
+                EquationRowControl ec = GetRow(i);
                 ec.SetScopeOptions(EquationScopes);
                 UpdateEquationModelElements(ec.Model);
             }

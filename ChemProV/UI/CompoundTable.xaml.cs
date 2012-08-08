@@ -195,7 +195,7 @@ namespace ChemProV.UI
 
                 // Go through the rows and look for at the selected compound. Add items to the 
                 // combo box as needed.
-                foreach (IStreamData data in table.Rows)
+                foreach (IStreamDataRow data in table.Rows)
                 {
                     string s = (data as ChemicalStreamData).SelectedCompound;
                     if (!string.IsNullOrEmpty(s) && !s.Equals("Overall") && 
