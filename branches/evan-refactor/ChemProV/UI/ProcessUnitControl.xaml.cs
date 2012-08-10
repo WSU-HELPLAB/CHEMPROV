@@ -109,6 +109,13 @@ namespace ChemProV.UI
             bmp.UriSource = new Uri(GetIconSource(processUnit.GetType()), UriKind.Relative);
             ProcessUnitImage.SetValue(Image.SourceProperty, bmp);
 
+            // Set the background color based on the subprocess
+            Color clr;
+            if (Core.App.TryParseColor(m_pu.Subprocess, out clr))
+            {
+                ProcessUnitBorder.Background = new SolidColorBrush(clr);
+            }
+
             ProcessUnitNameText.MouseLeftButtonDown += new MouseButtonEventHandler(ProcessUnitNameText_MouseLeftButtonDown);
             ProcessUnitNameBox.MouseLeftButtonDown += new MouseButtonEventHandler(ProcessUnitNameBox_MouseLeftButtonDown);
             ProcessUnitNameBox.LostFocus += new RoutedEventHandler(ProcessUnitNameBox_LostFocus);

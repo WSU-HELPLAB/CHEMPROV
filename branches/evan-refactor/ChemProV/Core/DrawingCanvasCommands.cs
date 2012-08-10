@@ -18,6 +18,7 @@ using System.Windows;
 using ChemProV.Logic;
 using ChemProV.Logic.Undos;
 using ChemProV.UI;
+using ChemProV.Logic.Equations;
 
 namespace ChemProV.Core
 {
@@ -70,7 +71,7 @@ namespace ChemProV.Core
                 }
                 else
                 {
-                    DeleteProcessUnitWithUndo(element as ProcessUnitControl, canvas);
+                    DeleteProcessUnitWithUndo(element as ProcessUnitControl, canvas.GetWorkspace());
                 }
             }
             else
@@ -125,7 +126,6 @@ namespace ChemProV.Core
             {
                 undos.Add(new Logic.Undos.SetStreamSource(s, he.ProcessUnit, null,
                     s.SourceLocation));
-                    //(s as AbstractStream).SourceDragIcon.Location));
                 s.Source = null;
             }
 
@@ -140,19 +140,29 @@ namespace ChemProV.Core
             ws.AddUndo(new UndoRedoCollection(
                 "Undo deletion of heat exchanger with utility", undos.ToArray()));
 
-            // Tell the process unit and heat stream to remove themselves from the canvas
-            he.RemoveSelfFromCanvas(canvas);
-            heatStreamControl.RemoveSelfFromCanvas(canvas);
+            // Remove the stream and process unit from the workspace. Event handlers will update the UI.
+            ws.RemoveStream(heatStream);
+            ws.RemoveProcessUnit(he.ProcessUnit);
         }
 
-        // Refactoring on this method is done
-        private static void DeleteProcessUnitWithUndo(ProcessUnitControl pu, DrawingCanvas canvas)
+        private static void DeleteProcessUnitWithUndo(ProcessUnitControl pu, Workspace ws)
         {
-            Workspace ws = canvas.GetWorkspace();
-
             // Initialize the list of undos
             List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
             undos.Add(new ChemProV.Logic.Undos.AddToWorkspace(pu.ProcessUnit));
+
+            // Deleting a process unit could potentially affect equations because equations can reference 
+            // a process unit as their scope. Therefore we need to check all equations if they have this 
+            // process unit set as their scope and change w/ undo if they do.
+            foreach (EquationModel em in ws.Equations)
+            {
+                if (em.Scope.Classification == EquationScopeClassification.SingleUnit &&
+                    em.Scope.Name == pu.ProcessUnit.Label)
+                {
+                    undos.Add(new Logic.Undos.SetProperty(em, "Scope", em.Scope));
+                    em.Scope = new EquationScope(EquationScopeClassification.Overall, "Overall");
+                }
+            }
 
             // Detach all incoming streams and make undos
             foreach (AbstractStream s in pu.ProcessUnit.IncomingStreams)
@@ -175,7 +185,6 @@ namespace ChemProV.Core
             ws.AddUndo(new UndoRedoCollection("Undo deletion of process unit", undos.ToArray()));
         }
 
-        // Refactoring on this method is done (none needed)
         public static void DeleteSelectedElement(DrawingCanvas canvas)
         {
             // If there's nothing selected then we just go to null state and return
@@ -188,7 +197,6 @@ namespace ChemProV.Core
             DeleteElement(canvas, (UIElement)canvas.SelectedElement);
         }
 
-        // Refactoring on this method is done
         private static void DeleteStreamWithUndo(ChemProV.PFD.Streams.StreamControl stream,
             DrawingCanvas canvas)
         {

@@ -23,6 +23,8 @@ using System.Windows.Shapes;
 using System.ComponentModel;
 using ChemProV.Core;
 using ChemProV.Logic;
+using ChemProV.Logic.Equations;
+using ChemProV.PFD.Streams.PropertiesWindow;
 
 namespace ChemProV.UI
 {
@@ -222,6 +224,71 @@ namespace ChemProV.UI
             return null;
         }
 
+        private static List<string> GetTypeOptions(Workspace workspace, IStreamDataRow excludeMe)
+        {
+            // Start by making a list of unique selected compounds from all rows in all stream tables, 
+            // except for the one we need to exclude.
+            List<string> compounds = new List<string>();
+            foreach (AbstractStream stream in workspace.Streams)
+            {
+                ChemicalStream cs = stream as ChemicalStream;
+                if (null != cs)
+                {
+                    // Go through all the rows in the properties table
+                    foreach (IStreamDataRow otherRow in cs.PropertiesTable.Rows)
+                    {
+                        // Skip the row if it's the one we need to exclude
+                        if (object.ReferenceEquals(otherRow, excludeMe))
+                        {
+                            continue;
+                        }
+
+                        string selectedCompound = (otherRow as ChemicalStreamData).SelectedCompound;
+                        if (!string.IsNullOrEmpty(selectedCompound) &&
+                            !compounds.Contains(selectedCompound))
+                        {
+                            compounds.Add(selectedCompound);
+                        }
+                    }
+                }
+            }
+
+            // Now build a list of elements for the compounds in the list
+            List<string> elements = new List<string>();
+            foreach (string compoundstr in compounds)
+            {
+                Compound compound = CompoundFactory.GetElementsOfCompound((compoundstr).ToLower());
+
+                foreach (KeyValuePair<Element, int> element in compound.elements)
+                {
+                    if (!elements.Contains(element.Key.Name))
+                    {
+                        elements.Add(element.Key.Name);
+                    }
+                }
+            }
+
+            List<string> equationTypes = new List<string>();
+            equationTypes.Add("Total");
+            equationTypes.Add("Specification");
+            foreach (string compound in compounds)
+            {
+                if (compound != "Overall")
+                {
+                    equationTypes.Add((new EquationType(EquationTypeClassification.Compound, compound)).ToString());
+                }
+            }
+            if (workspace.Difficulty != OptionDifficultySetting.MaterialBalance)
+            {
+                foreach (string element in elements)
+                {
+                    equationTypes.Add((new EquationType(EquationTypeClassification.Atom, element + "(e)")).ToString());
+                }
+            }
+
+            return equationTypes;
+        }
+
         private void HeaderBorder_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             DrawingCanvas canvas = Core.App.Workspace.DrawingCanvas;
@@ -273,10 +340,29 @@ namespace ChemProV.UI
         {
             // Get a reference to the row
             IStreamDataRow row = (sender as Button).Tag as IStreamDataRow;
-            
-            // Create an undo first
-            m_ws.AddUndo(new UndoRedoCollection("Undo deletion of row",
-                new Logic.Undos.InsertTableRow(m_table.IndexOfRow(row), row, m_table)));
+
+            // Deleting a row could potentially affect the selected type option in the equations. Here 
+            // we build a list of all the selected compounds, exlcuding the one in the row we're about 
+            // to delete.
+            List<string> compounds = GetTypeOptions(m_ws, row);
+
+            // Initialize a list of undos
+            List<IUndoRedoAction> undos = new List<IUndoRedoAction>();
+
+            // For each equation row that has a type that will NOT be valid after the deletion, we 
+            // need to change it and add an undo.
+            foreach (Logic.Equations.EquationModel model in m_ws.Equations)
+            {
+                if (!compounds.Contains(model.Type.ToString()))
+                {
+                    undos.Add(new Logic.Undos.SetProperty(model, "Type", model.Type));
+                    model.Type = new Logic.Equations.EquationType();
+                }
+            }
+
+            // Add the undo item to restore the row and then add the collection to the workspace
+            undos.Add(new Logic.Undos.InsertTableRow(m_table.IndexOfRow(row), row, m_table));
+            m_ws.AddUndo(new UndoRedoCollection("Undo deletion of row", undos.ToArray()));
             
             // Remove the row
             m_table.RemoveRow(row);

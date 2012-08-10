@@ -9,6 +9,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 
 using System;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
 using ChemProV.Logic;
@@ -106,25 +107,37 @@ namespace ChemProV.PFD.EquationEditor
             }
         }
 
-        private void Model_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        private void Model_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             if (e.PropertyName.Equals("Equation"))
             {
                 EquationTextBox.Text = m_model.Equation;
             }
+            else if (e.PropertyName.Equals("Type"))
+            {
+                foreach (object item in TypeComboBox.Items)
+                {
+                    if (item.Equals(m_model.Type))
+                    {
+                        TypeComboBox.SelectedItem = item;
+                        return;
+                    }
+                }
+            }
+            else if (e.PropertyName.Equals("Scope"))
+            {
+                foreach (object item in ScopeComboBox.Items)
+                {
+                    if (item.Equals(m_model.Scope))
+                    {
+                        ScopeComboBox.SelectedItem = item;
+                        return;
+                    }
+                }
+            }
         }
 
         #region Compatibility stuff until further refactoring
-
-        /// <summary>
-        /// Compatibility item
-        /// Other code references this, but I'm fairly sure all that code is obsolete. But rather than trying 
-        /// to do a major clean-out of all unused stuff right now, I'm just going to keep compatibility.
-        /// </summary>
-        public EquationType SelectedItem
-        {
-            get { return TypeComboBox.SelectedItem as EquationType; }
-        }
 
         public void HighlightFeedback(bool highlight)
         {
@@ -158,10 +171,19 @@ namespace ChemProV.PFD.EquationEditor
             {
                 return;
             }
-            
-            m_changingModel = true;            
-            m_model.Scope = ScopeComboBox.SelectedItem as EquationScope;
-            m_changingModel = false;
+
+            if (null == ScopeComboBox.SelectedItem ||
+                !m_model.Scope.Equals(ScopeComboBox.SelectedItem))
+            {
+                object oldVal = m_model.Scope;
+                
+                m_changingModel = true;
+                m_model.Scope = ScopeComboBox.SelectedItem as EquationScope;
+                m_changingModel = false;
+
+                m_workspace.AddUndo(new UndoRedoCollection("Undo changing equation scope",
+                    new Logic.Undos.SetProperty(m_model, "Scope", oldVal)));
+            }
         }
 
         public void SetDeleteRequestDelegate(DeleteRequestDelegate deleteFunc)
@@ -277,9 +299,18 @@ namespace ChemProV.PFD.EquationEditor
                 return;
             }
 
-            m_changingModel = true;
-            m_model.Type = TypeComboBox.SelectedItem as EquationType;
-            m_changingModel = false;
+            if (null == TypeComboBox.SelectedItem || 
+                !m_model.Type.Equals(TypeComboBox.SelectedItem as EquationType))
+            {
+                object oldVal = m_model.Type;
+                
+                m_changingModel = true;
+                m_model.Type = TypeComboBox.SelectedItem as EquationType;
+                m_changingModel = false;
+
+                m_workspace.AddUndo(new UndoRedoCollection("Undo changing equation type",
+                    new Logic.Undos.SetProperty(m_model, "Type", oldVal)));
+            }
         }
     }
 }
