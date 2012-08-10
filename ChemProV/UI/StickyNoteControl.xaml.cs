@@ -32,7 +32,7 @@ namespace ChemProV.UI
         Yellow
     }
 
-    public partial class StickyNoteControl : UserControl, PFD.IPfdElement, Core.ICanvasElement
+    public partial class StickyNoteControl : UserControl, PFD.IPfdElement, Core.ICanvasElement, Core.IRemoveSelfFromCanvas
     {
         private DrawingCanvas m_canvas = null;
 
@@ -45,7 +45,7 @@ namespace ChemProV.UI
         private Line m_lineToParent = null;
 
         /// <summary>
-        /// Reference to the parent comment collection if this is a comment-sticky-note, null otherwise.
+        /// Reference to the parent object control if this is a comment-sticky-note, null otherwise.
         /// </summary>
         private object m_commentParent = null;
 
@@ -84,59 +84,6 @@ namespace ChemProV.UI
 
                 // Monitor changes in the memNote object
                 memNote.PropertyChanged += new System.ComponentModel.PropertyChangedEventHandler(MemNote_PropertyChanged);
-            }
-        }
-
-        /// <summary>
-        /// Callback for changes in the data structure that this control wraps around. We have to update UI 
-        /// elements appropriately based on changes to the data.
-        /// </summary>
-        private void MemNote_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-        {
-            switch (e.PropertyName)
-            {
-                case "Height":
-                    Height = m_note.Height;
-                    break;
-
-                case "IsVisible":
-                    if (m_note.IsVisible)
-                    {
-                        this.Visibility = System.Windows.Visibility.Visible;
-                        if (null != m_lineToParent)
-                        {
-                            m_lineToParent.Visibility = System.Windows.Visibility.Visible;
-                        }
-                    }
-                    else
-                    {
-                        this.Visibility = System.Windows.Visibility.Collapsed;
-                        if (null != m_lineToParent)
-                        {
-                            m_lineToParent.Visibility = System.Windows.Visibility.Collapsed;
-                        }
-                    }
-                    break;
-                
-                case "LocationX":
-                    SetValue(Canvas.LeftProperty, m_note.LocationX);
-                    break;
-
-                case "LocationY":
-                    SetValue(Canvas.TopProperty, m_note.LocationY);
-                    break;
-                
-                case "Text":
-                    Note.Text = m_note.Text;
-                    break;
-                
-                case "UserName":
-                    Header.Text = (null == m_note.UserName) ? string.Empty : m_note.UserName;
-                    break;
-
-                case "Width":
-                    Width = m_note.Width;
-                    break;
             }
         }
 
@@ -202,25 +149,6 @@ namespace ChemProV.UI
             return snc;
         }
 
-        private void ProcessUnitParentPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals("Location"))
-            {
-                UpdateLineToParent();
-            }
-        }
-
-        private void StreamParentPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            if (e.PropertyName.Equals("Source") ||
-                e.PropertyName.Equals("Destination") ||
-                e.PropertyName.Equals("SourceLocation") || 
-                e.PropertyName.Equals("DestinationLocation"))
-            {
-                UpdateLineToParent();
-            }
-        }
-
         /// <summary>
         /// Only here because IPFDElement requires it
         /// </summary>
@@ -234,33 +162,6 @@ namespace ChemProV.UI
         {
         }
 
-        public void SetFeedback(string feedbackMessage, int errorNumber)
-        {
-        }
-
-        public void RemoveFeedback()
-        {
-        }
-
-        private bool selected;
-
-        public bool Selected
-        {
-            get
-            {
-                return selected;
-            }
-            set
-            {
-                selected = value;
-            }
-        }
-
-        /// <summary>
-        /// This is not currently used but must have it since IPfdElement has it
-        /// </summary>
-        public event EventHandler SelectionChanged;
-
         private void Bottom_Left_Corner_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -270,38 +171,6 @@ namespace ChemProV.UI
                 m_canvas, m_note);
             // Kick it off by sending the mouse-down event
             m_canvas.CurrentState.MouseLeftButtonDown(sender, e);
-        }
-
-        public static StickyNoteColors StickyNoteColorsFromString(string colorString)
-        {
-            StickyNoteColors color;
-            switch (colorString)
-            {
-                case "Blue":
-                    color = StickyNoteColors.Blue;
-                    break;
-
-                case "Pink":
-                    color = StickyNoteColors.Pink;
-                    break;
-
-                case "Yellow":
-                    color = StickyNoteColors.Yellow;
-                    break;
-
-                case "Green":
-                    color = StickyNoteColors.Green;
-                    break;
-
-                case "Orange":
-                    color = StickyNoteColors.Orange;
-                    break;
-
-                default:
-                    color = StickyNoteColors.Yellow;
-                    break;
-            }
-            return color;
         }
 
         public void ColorChange(StickyNoteColors color)
@@ -349,73 +218,6 @@ namespace ChemProV.UI
             get
             {
                 return this.color;
-            }
-        }
-
-        /// <summary>
-        /// Gets a reference to the StickyNote object that this control represents
-        /// </summary>
-        public StickyNote StickyNote
-        {
-            get
-            {
-                return m_note;
-            }
-        }
-
-        #region ICanvasElement Members
-
-        /// <summary>
-        /// Gets or sets the location of the sticky note on the canvas. The location for sticky 
-        /// notes is in the center of the note horizontally, but 10 pixels down from the top 
-        /// edge vertically.
-        /// </summary>
-        public Point Location
-        {
-            get
-            {
-                return new Point(
-                    (double)GetValue(Canvas.LeftProperty) + Width / 2.0,
-                    (double)GetValue(Canvas.TopProperty) + 10.0);
-            }
-            set
-            {
-                if (Location.Equals(value))
-                {
-                    // No change, so nothing to do
-                    return;
-                }
-
-                // Stop listening while we change the data
-                m_note.PropertyChanged -= this.MemNote_PropertyChanged;
-                
-                double left = value.X - Width / 2.0;
-                double top = value.Y - 10.0;
-                SetValue(Canvas.LeftProperty, left);
-                SetValue(Canvas.TopProperty, top);
-                m_note.LocationX = left;
-                m_note.LocationY = top;
-
-                // Start listening again
-                m_note.PropertyChanged += this.MemNote_PropertyChanged;
-
-                UpdateLineToParent();
-            }
-        }
-
-        #endregion
-
-        /// <summary>
-        /// Sticky notes can be used as comments that are tied to specific elements in the process flow 
-        /// diagram. When the are in this mode, this will be the line that connects them to their parent 
-        /// element in the interface.
-        /// If the note is just free-floating and not connected to anything, then this will be null.
-        /// </summary>
-        public Line LineToParent
-        {
-            get
-            {
-                return m_lineToParent;
             }
         }
 
@@ -602,13 +404,6 @@ namespace ChemProV.UI
             m_note.IsVisible = false;
         }
 
-        public void Show()
-        {
-            // Set the visibility in the data structure to true. Event handlers will respond 
-            // and do the actual showing of the control
-            m_note.IsVisible = true;
-        }
-
         private void CollapseLabel_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             e.Handled = true;
@@ -657,6 +452,103 @@ namespace ChemProV.UI
             }
         }
 
+        #region ICanvasElement Members
+
+        /// <summary>
+        /// Gets or sets the location of the sticky note on the canvas. The location for sticky 
+        /// notes is in the center of the note horizontally, but 10 pixels down from the top 
+        /// edge vertically.
+        /// </summary>
+        public Point Location
+        {
+            get
+            {
+                return new Point(
+                    (double)GetValue(Canvas.LeftProperty) + Width / 2.0,
+                    (double)GetValue(Canvas.TopProperty) + 10.0);
+            }
+            set
+            {
+                if (Location.Equals(value))
+                {
+                    // No change, so nothing to do
+                    return;
+                }
+
+                // Stop listening while we change the data
+                m_note.PropertyChanged -= this.MemNote_PropertyChanged;
+
+                double left = value.X - Width / 2.0;
+                double top = value.Y - 10.0;
+                SetValue(Canvas.LeftProperty, left);
+                SetValue(Canvas.TopProperty, top);
+                m_note.LocationX = left;
+                m_note.LocationY = top;
+
+                // Start listening again
+                m_note.PropertyChanged += this.MemNote_PropertyChanged;
+
+                UpdateLineToParent();
+            }
+        }
+
+        #endregion
+
+        /// <summary>
+        /// Callback for changes in the data structure that this control wraps around. We have to update UI 
+        /// elements appropriately based on changes to the data.
+        /// </summary>
+        private void MemNote_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+        {
+            switch (e.PropertyName)
+            {
+                case "Height":
+                    Height = m_note.Height;
+                    break;
+
+                case "IsVisible":
+                    if (m_note.IsVisible)
+                    {
+                        this.Visibility = System.Windows.Visibility.Visible;
+                        if (null != m_lineToParent)
+                        {
+                            m_lineToParent.Visibility = System.Windows.Visibility.Visible;
+                        }
+                    }
+                    else
+                    {
+                        this.Visibility = System.Windows.Visibility.Collapsed;
+                        if (null != m_lineToParent)
+                        {
+                            m_lineToParent.Visibility = System.Windows.Visibility.Collapsed;
+                        }
+                    }
+                    break;
+
+                case "LocationX":
+                    SetValue(Canvas.LeftProperty, m_note.LocationX);
+                    UpdateLineToParent();
+                    break;
+
+                case "LocationY":
+                    SetValue(Canvas.TopProperty, m_note.LocationY);
+                    UpdateLineToParent();
+                    break;
+
+                case "Text":
+                    Note.Text = m_note.Text;
+                    break;
+
+                case "UserName":
+                    Header.Text = (null == m_note.UserName) ? string.Empty : m_note.UserName;
+                    break;
+
+                case "Width":
+                    Width = m_note.Width;
+                    break;
+            }
+        }
+
         private void Note_TextChanged(object sender, TextChangedEventArgs e)
         {
             if (m_note.Text != Note.Text)
@@ -669,6 +561,120 @@ namespace ChemProV.UI
                 Workspace ws = Core.App.Workspace.DrawingCanvas.GetWorkspace();
                 ws.AddUndo(new UndoRedoCollection("Undo changing comment text",
                     new Logic.Undos.SetStickyNoteText(m_note, oldText)));
+            }
+        }
+
+        private void ProcessUnitParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Location"))
+            {
+                UpdateLineToParent();
+            }
+        }
+
+        public void RemoveFeedback()
+        {
+        }
+
+        public void RemoveSelfFromCanvas(ChemProV.UI.DrawingCanvas owner)
+        {
+            // Start by unsubscribing from events on the parent process unit or stream
+            if (m_commentParent is ProcessUnitControl)
+            {
+                (m_commentParent as ProcessUnitControl).ProcessUnit.PropertyChanged -= 
+                    this.ProcessUnitParentPropertyChanged;
+            }
+            else if (m_commentParent is StreamControl)
+            {
+                (m_commentParent as StreamControl).Stream.PropertyChanged -=
+                    this.StreamParentPropertyChanged;
+            }
+            m_commentParent = null;
+
+            // Now unsubscribe from events on the sticky note object
+            m_note.PropertyChanged -= this.MemNote_PropertyChanged;
+            m_note = null;
+
+            // Now do the actual removal of controls from the drawing canvas
+            if (null != m_lineToParent)
+            {
+                owner.RemoveChild(m_lineToParent);
+                m_lineToParent = null;
+            }
+            owner.RemoveChild(this);
+        }
+
+        public bool Selected
+        {
+            get;
+            set;
+        }
+
+        /// <summary>
+        /// This is not currently used but must have it since IPfdElement has it
+        /// </summary>
+        public event EventHandler SelectionChanged;
+
+        public void SetFeedback(string feedbackMessage, int errorNumber) { }
+
+        public void Show()
+        {
+            // Set the visibility in the data structure to true. Event handlers will respond 
+            // and do the actual showing of the control
+            m_note.IsVisible = true;
+        }
+
+        /// <summary>
+        /// Gets a reference to the StickyNote object that this control represents
+        /// </summary>
+        public StickyNote StickyNote
+        {
+            get
+            {
+                return m_note;
+            }
+        }
+
+        public static StickyNoteColors StickyNoteColorsFromString(string colorString)
+        {
+            StickyNoteColors color;
+            switch (colorString)
+            {
+                case "Blue":
+                    color = StickyNoteColors.Blue;
+                    break;
+
+                case "Pink":
+                    color = StickyNoteColors.Pink;
+                    break;
+
+                case "Yellow":
+                    color = StickyNoteColors.Yellow;
+                    break;
+
+                case "Green":
+                    color = StickyNoteColors.Green;
+                    break;
+
+                case "Orange":
+                    color = StickyNoteColors.Orange;
+                    break;
+
+                default:
+                    color = StickyNoteColors.Yellow;
+                    break;
+            }
+            return color;
+        }
+
+        private void StreamParentPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Source") ||
+                e.PropertyName.Equals("Destination") ||
+                e.PropertyName.Equals("SourceLocation") ||
+                e.PropertyName.Equals("DestinationLocation"))
+            {
+                UpdateLineToParent();
             }
         }
 

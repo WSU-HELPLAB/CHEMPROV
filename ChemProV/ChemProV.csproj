@@ -150,6 +150,7 @@
     <Compile Include="Logic\Undos\ResizeStickyNote.cs" />
     <Compile Include="Logic\Undos\SetEquationText.cs" />
     <Compile Include="Logic\Undos\SetProperty.cs" />
+    <Compile Include="Logic\Undos\SetStickyNoteLocation.cs" />
     <Compile Include="Logic\Undos\SetStickyNoteText.cs" />
     <Compile Include="Logic\Undos\SetStreamDestinationLocation.cs" />
     <Compile Include="Logic\Undos\SetStreamId.cs" />

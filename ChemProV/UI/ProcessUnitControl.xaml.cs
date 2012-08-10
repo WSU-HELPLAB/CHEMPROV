@@ -39,7 +39,7 @@ namespace ChemProV.UI
     /// units is completely beneath the UI layer in the logic layer. This control just wraps around an 
     /// AbstractProcessUnit object.
     /// </summary>
-    public partial class ProcessUnitControl : UserControl, PFD.IPfdElement, Core.ICanvasElement, UI.ICommentControlManager
+    public partial class ProcessUnitControl : UserControl, PFD.IPfdElement, Core.ICanvasElement, UI.ICommentControlManager, Core.IRemoveSelfFromCanvas
     {
         #region Instance Variables
 
@@ -211,15 +211,13 @@ namespace ChemProV.UI
             // Start by deleting any sticky note controls that represent comments that are no longer 
             // in the comment collection. While we do this, build a list of all comments that we 
             // have a sticky note control for (used in next step).
-            List<Logic.StickyNote> existing =
-                new List<Logic.StickyNote>();
+            List<Logic.StickyNote> existing = new List<Logic.StickyNote>();
             for (int i = 0; i < m_stickyNotes.Count; i++)
             {
                 if (!m_pu.Comments.Contains(m_stickyNotes[i].StickyNote))
                 {
-                    // Remove the sticky note and its connecting line from the drawing canvas
-                    m_canvas.RemoveChild(m_stickyNotes[i].LineToParent);
-                    m_canvas.RemoveChild(m_stickyNotes[i]);
+                    // Tell the sticky note to remove itself from the drawing canvas
+                    m_stickyNotes[i].RemoveSelfFromCanvas(m_canvas);
 
                     // Remove it from our collection as well and then back up the index
                     m_stickyNotes.RemoveAt(i);
@@ -669,15 +667,22 @@ namespace ChemProV.UI
         /// <summary>
         /// Removes this control from the canvas. This includes removal of controls that are 
         /// "attached" to this control, such as the comment sticky note controls.
+        /// This is considered "disposing" the control and it should not be used after this call.
         /// </summary>
         public void RemoveSelfFromCanvas(UI.DrawingCanvas owner)
         {
+            // Unsubscribe from events
+            m_pu.Comments.CollectionChanged -= this.CommentCollectionChanged;
+            m_pu.PropertyChanged -= this.ProcessUnit_PropertyChanged;
+            
             owner.RemoveChild(this);
             foreach (ChemProV.UI.StickyNoteControl snc in m_stickyNotes)
             {
-                owner.RemoveChild(snc.LineToParent);
-                owner.RemoveChild(snc);
+                snc.RemoveSelfFromCanvas(owner);
             }
+
+            // Set the process unit reference to null
+            m_pu = null;
         }
 
         private void ProcessUnitNameBox_TextChanged(object sender, TextChangedEventArgs e)
