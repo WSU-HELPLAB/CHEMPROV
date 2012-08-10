@@ -38,6 +38,19 @@ namespace ChemProV.UI
             CommentTextBox.Text = string.Empty;
         }
 
+        private void BasicComment_OnTextChanged(object sender, EventArgs e)
+        {
+#if DEBUG
+            if (null == m_basic)
+            {
+                throw new InvalidOperationException(
+                    "Received a text-change event for a BasicComment object but the reference to " +
+                    "the object is null.");
+            }
+#endif
+            CommentTextBox.Text = m_basic.CommentText;
+        }
+
         /// <summary>
         /// Gets the comment object for this control. This can be either a BasicComment object, 
         /// a StickyNote object, or null.
@@ -52,13 +65,26 @@ namespace ChemProV.UI
 
         private void CommentTextBox_TextChanged(object sender, TextChangedEventArgs e)
         {
+            // Get a reference to the workspace so we can create undos
+            Workspace ws = Core.App.MainPage.GetLogicalWorkspace();
+            
             if (null != m_basic)
             {
-                m_basic.CommentText = CommentTextBox.Text;
+                if (m_basic.CommentText != CommentTextBox.Text)
+                {
+                    ws.AddUndo(new UndoRedoCollection("Undo changing comment text",
+                        new Logic.Undos.SetProperty(m_basic, "CommentText", m_basic.CommentText)));
+                    m_basic.CommentText = CommentTextBox.Text;
+                }
             }
             else if (null != m_sticky)
             {
-                m_sticky.Text = CommentTextBox.Text;
+                if (m_sticky.Text != CommentTextBox.Text)
+                {
+                    ws.AddUndo(new UndoRedoCollection("Undo changing comment text",
+                        new Logic.Undos.SetProperty(m_sticky, "Text", m_sticky.Text)));
+                    m_sticky.Text = CommentTextBox.Text;
+                }
             }
         }
 
@@ -93,6 +119,10 @@ namespace ChemProV.UI
                 // Remove event handler before changing this value
                 m_sticky.PropertyChanged -= this.StickyNote_PropertyChanged;
             }
+            if (null != m_basic)
+            {
+                m_basic.OnTextChanged -= this.BasicComment_OnTextChanged;
+            }
 
             // IMPORTANT: Unsubscribe from parent control property changes (if applicable)
             if (null != m_parentObject)
@@ -126,6 +156,9 @@ namespace ChemProV.UI
                 // Make sure the icon is hidden
                 IconImage.Visibility = System.Windows.Visibility.Collapsed;
                 TitleBarGrid.ColumnDefinitions[0].Width = new GridLength(0.0);
+
+                // Subscribe to property changes
+                m_basic.OnTextChanged += new EventHandler(BasicComment_OnTextChanged);
             }
         }
 
@@ -135,6 +168,10 @@ namespace ChemProV.UI
             {
                 // Remove event handler before changing this value
                 m_sticky.PropertyChanged -= this.StickyNote_PropertyChanged;
+            }
+            if (null != m_basic)
+            {
+                m_basic.OnTextChanged -= this.BasicComment_OnTextChanged;
             }
 
             // IMPORTANT: Unsubscribe from parent control property changes (if applicable)

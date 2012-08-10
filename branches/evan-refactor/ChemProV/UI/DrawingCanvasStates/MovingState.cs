@@ -142,7 +142,12 @@ namespace ChemProV.UI.DrawingCanvasStates
             {
                 DropProcessUnit(m_object as ProcessUnitControl, location);
             }
-            // Note that stream endpoint stuff is handled in a different state object
+            else if (m_object is StickyNoteControl)
+            {
+                StickyNote sn = (m_object as StickyNoteControl).StickyNote;
+                m_workspace.AddUndo(new UndoRedoCollection("Undo move",
+                    new Logic.Undos.SetStickyNoteLocation(sn, m_originalLocation)));
+            }
             else if (m_object is ICanvasElement)
             {
                 // All we have to do here is create an undo and then fall through to 
@@ -150,6 +155,8 @@ namespace ChemProV.UI.DrawingCanvasStates
                 m_workspace.AddUndo(new UndoRedoCollection("Undo move",
                     new PFD.Undos.RestoreLocation(m_object, m_originalLocation)));
             }
+
+            // Note that stream endpoint stuff is handled in a different state object
 
             // Letting up the left mouse button signifies the end of the moving state. Therefore 
             // we want to set the drawing canvas state to null

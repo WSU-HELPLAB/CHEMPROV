@@ -706,9 +706,8 @@ namespace ChemProV.PFD.Streams
             {
                 if (!m_stream.Comments.Contains(m_stickyNotes[i].StickyNote))
                 {
-                    // Remove the sticky note and its connecting line from the drawing canvas
-                    m_canvas.RemoveChild(m_stickyNotes[i].LineToParent);
-                    m_canvas.RemoveChild(m_stickyNotes[i]);
+                    // Tell the sticky note to remove itself from the drawing canvas
+                    m_stickyNotes[i].RemoveSelfFromCanvas(m_canvas);
 
                     // Remove it from our collection as well and then back up the index
                     m_stickyNotes.RemoveAt(i);
@@ -993,8 +992,7 @@ namespace ChemProV.PFD.Streams
 
             foreach (StickyNoteControl snc in m_stickyNotes)
             {
-                canvas.RemoveChild(snc.LineToParent);
-                canvas.RemoveChild(snc);
+                snc.RemoveSelfFromCanvas(canvas);
             }
             m_stickyNotes.Clear();
 
