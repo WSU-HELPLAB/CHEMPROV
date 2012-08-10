@@ -56,13 +56,9 @@ namespace ChemProV.Logic.Equations
 
         public override bool Equals(object obj)
         {
-            if (obj == null)
+            if (null != obj)
             {
-                return false;
-            }
-            if (this.CompareTo(obj) == 0)
-            {
-                return true;
+                return (0 == this.CompareTo(obj));
             }
             return false;
         }
