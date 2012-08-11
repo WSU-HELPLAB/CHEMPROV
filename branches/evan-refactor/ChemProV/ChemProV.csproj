@@ -149,6 +149,7 @@
     <Compile Include="Logic\Undos\RemoveTableRow.cs" />
     <Compile Include="Logic\Undos\ResizeStickyNote.cs" />
     <Compile Include="Logic\Undos\SetEquationText.cs" />
+    <Compile Include="Logic\Undos\SetProcessUnitLocation.cs" />
     <Compile Include="Logic\Undos\SetProperty.cs" />
     <Compile Include="Logic\Undos\SetStickyNoteLocation.cs" />
     <Compile Include="Logic\Undos\SetStickyNoteText.cs" />
@@ -214,9 +215,9 @@
     <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
     <Compile Include="Logic\Undos\AttachOutgoingStream.cs" />
     <Compile Include="Logic\Undos\DetachOutgoingStream.cs" />
-    <Compile Include="PFD\Undos\InsertComment.cs" />
+    <Compile Include="Logic\Undos\InsertComment.cs" />
     <Compile Include="PFD\Undos\InsertEquation.cs" />
-    <Compile Include="PFD\Undos\RemoveComment.cs" />
+    <Compile Include="Logic\Undos\RemoveComment.cs" />
     <Compile Include="PFD\Undos\RemoveEquation.cs" />
     <Compile Include="Logic\Undos\DetachIncomingStream.cs" />
     <Compile Include="Logic\Undos\AttachIncomingStream.cs" />

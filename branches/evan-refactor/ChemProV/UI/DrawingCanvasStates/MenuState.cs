@@ -18,6 +18,7 @@ using ChemProV.Logic;
 using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 using ChemProV.UI;
+using ChemProV.Logic.Undos;
 
 namespace ChemProV.UI.DrawingCanvasStates
 {

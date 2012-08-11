@@ -211,7 +211,7 @@ namespace ChemProV.UI.DrawingCanvasStates
             {
                 // Add an undo that will move the process unit back to where it was
                 m_workspace.AddUndo(new UndoRedoCollection("Undo moving process unit",
-                    new PFD.Undos.RestoreLocation(pu, m_originalLocation)));
+                    new Logic.Undos.SetProcessUnitLocation(pu.ProcessUnit, m_originalLocation)));
 
                 // The control is already in the right position from the mouse-move event, so we're done
                 return;
