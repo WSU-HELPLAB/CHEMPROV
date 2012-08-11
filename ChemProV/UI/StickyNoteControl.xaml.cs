@@ -20,6 +20,7 @@ using ChemProV.PFD.Streams;
 using ChemProV.PFD.Undos;
 using System.ComponentModel;
 using ChemProV.Logic;
+using ChemProV.Logic.Undos;
 
 namespace ChemProV.UI
 {
