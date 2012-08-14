@@ -19,6 +19,11 @@ namespace ChemProV.UI
     public partial class CommentPane : UserControl
     {
         /// <summary>
+        /// List of EquationModel objects whose comment collections we are monitoring
+        /// </summary>
+        private List<EquationModel> m_equationListeners = new List<EquationModel>();
+        
+        /// <summary>
         /// List of process units whose comment collections we are monitoring
         /// </summary>
         private List<AbstractProcessUnit> m_puListeners = new List<AbstractProcessUnit>();
@@ -60,16 +65,28 @@ namespace ChemProV.UI
             CommentsStack.Children.Clear();
         }
 
-        private void AddCommentButtonClick(object sender, RoutedEventArgs e)
+        private void AddDFCommentButtonClick(object sender, RoutedEventArgs e)
+        {
+            DegreesOfFreedomAnalysis dfa = m_workspace.DegreesOfFreedomAnalysis;
+
+            // Create an undo that will remove the comment that we're about to add
+            m_workspace.AddUndo(new UndoRedoCollection("Undo adding degrees of freedom analysis comment",
+                new Logic.Undos.RemoveBasicComment(dfa.Comments, dfa.Comments.Count)));
+            
+            // Add a new comment to the collection. Event handlers will update the UI.
+            dfa.Comments.Add(new BasicComment());
+        }
+
+        private void AddEqCommentButtonClick(object sender, RoutedEventArgs e)
         {
             EquationModel model = (sender as Button).Tag as EquationModel;
             model.Comments.Add(new BasicComment(string.Empty, null));
-            UpdateComments();
-        }
-
-        private void AddDFCommentButtonClick(object sender, RoutedEventArgs e)
-        {
-            m_workspace.DegreesOfFreedomAnalysis.Comments.Add(new BasicComment());
+            
+            // Create and undo that will delete the comment we just added
+            m_workspace.AddUndo(new UndoRedoCollection(
+                "Undo addition of new equation comment",
+                new Logic.Undos.RemoveBasicComment(model.Comments, model.Comments.Count - 1)));
+            
             UpdateComments();
         }
 
@@ -95,8 +112,33 @@ namespace ChemProV.UI
             return count;
         }
 
+        private void DFPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // We only care about comment visibility
+            if (e.PropertyName.Equals("CommentsVisible"))
+            {
+                UpdateComments();
+            }
+        }
+
         private void Equations_CollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
         {
+            // Start by unsubscribing from all the equation events in our local list. This is exactly why 
+            // we keep this list. If equations are deleted from the workspace then we must make sure we 
+            // no longer monitor events for them.
+            foreach (EquationModel em in m_equationListeners)
+            {
+                em.Comments.CollectionChanged -= new NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+            }
+
+            // Clear and rebuild the list, subscribing to comment collection changes on each equation
+            m_equationListeners.Clear();
+            foreach (EquationModel em in m_workspace.Equations)
+            {
+                em.Comments.CollectionChanged += new NotifyCollectionChangedEventHandler(Comments_CollectionChanged);
+                m_equationListeners.Add(em);
+            }
+            
             UpdateComments();
         }
 
@@ -104,15 +146,6 @@ namespace ChemProV.UI
         {
             // We only care about comment visibility
             if (propertyName.Equals("CommentsVisible"))
-            {
-                UpdateComments();
-            }
-        }
-
-        private void DFPropertyChanged(object sender, PropertyChangedEventArgs e)
-        {
-            // We only care about comment visibility
-            if (e.PropertyName.Equals("CommentsVisible"))
             {
                 UpdateComments();
             }
@@ -249,6 +282,12 @@ namespace ChemProV.UI
                     cc.Margin = new Thickness(3.0);
                     cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
                     {
+                        // Create and undo that adds the comment back
+                        BasicComment toRemove = cc.CommentObject as BasicComment;
+                        m_workspace.AddUndo(new UndoRedoCollection(
+                            "Undo deletion of equation comment",
+                            new Logic.Undos.InsertBasicComment(toRemove, model.Comments, model.Comments.IndexOf(toRemove))));
+                        
                         model.Comments.Remove(cc.CommentObject as BasicComment);
                         sp.Children.Remove(cc);
                     };
@@ -262,7 +301,7 @@ namespace ChemProV.UI
                 btnIcon.Width = btnIcon.Height = 16;
                 btn.Content = btnIcon;
                 btn.Tag = model;
-                btn.Click += new RoutedEventHandler(AddCommentButtonClick);
+                btn.Click += new RoutedEventHandler(AddEqCommentButtonClick);
                 sp.Children.Add(btn);
 
                 CommentsStack.Children.Add(brdr);
@@ -287,17 +326,26 @@ namespace ChemProV.UI
                 numLabel.HorizontalAlignment = System.Windows.HorizontalAlignment.Center;
                 sp.Children.Add(numLabel);
                 
-                foreach (BasicComment bc in m_workspace.DegreesOfFreedomAnalysis.Comments)
+                DegreesOfFreedomAnalysis dfa = m_workspace.DegreesOfFreedomAnalysis;
+                foreach (BasicComment bc in dfa.Comments)
                 {
-                    PaneCommentControl cc = new PaneCommentControl();
-                    cc.SetCommentObject(bc);
-                    cc.Margin = new Thickness(3.0);
-                    cc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
+                    PaneCommentControl pcc = new PaneCommentControl();
+                    pcc.SetCommentObject(bc);
+                    pcc.Margin = new Thickness(3.0);
+                    pcc.XLabel.MouseLeftButtonDown += delegate(object sender, MouseButtonEventArgs e)
                     {
-                        m_workspace.DegreesOfFreedomAnalysis.Comments.Remove(cc.CommentObject as BasicComment);
-                        sp.Children.Remove(cc);
+                        BasicComment toRemove = pcc.CommentObject as BasicComment;
+                        int index = dfa.Comments.IndexOf(toRemove);
+                        
+                        // Add an undo that will re-insert the comment that we're about to delete
+                        m_workspace.AddUndo(new UndoRedoCollection(
+                            "Undo deletion of comment for degrees of freedom analysis",
+                            new Logic.Undos.InsertBasicComment(toRemove, dfa.Comments, index)));
+
+                        // Now delete the comment
+                        m_workspace.DegreesOfFreedomAnalysis.Comments.Remove(pcc.CommentObject as BasicComment);
                     };
-                    sp.Children.Add(cc);
+                    sp.Children.Add(pcc);
                 }
 
                 // Add a button to allow addition of more comments

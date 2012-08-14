@@ -140,9 +140,11 @@
     <Compile Include="Logic\OSBLE\OSBLEState.cs" />
     <Compile Include="Logic\OSBLE\RelevantAssignment.cs" />
     <Compile Include="Logic\Undos\AddToWorkspace.cs" />
+    <Compile Include="Logic\Undos\InsertBasicComment.cs" />
     <Compile Include="Logic\Undos\InsertTableRow.cs" />
     <Compile Include="Logic\Undos\MoveEquationDown.cs" />
     <Compile Include="Logic\Undos\MoveEquationUp.cs" />
+    <Compile Include="Logic\Undos\RemoveBasicComment.cs" />
     <Compile Include="Logic\Undos\RemoveProcessUnit.cs" />
     <Compile Include="Logic\Undos\RemoveStickyNote.cs" />
     <Compile Include="Logic\Undos\RemoveStream.cs" />

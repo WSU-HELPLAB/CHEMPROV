@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Xml.Linq;
 using System.Xml.Serialization;
-using ChemProV.Core;
 
 namespace ChemProV.Logic.Equations
 {
@@ -25,7 +25,7 @@ namespace ChemProV.Logic.Equations
         /// <summary>
         /// List of comments for this equation
         /// </summary>
-        private List<BasicComment> m_comments = new List<BasicComment>();
+        private ObservableCollection<BasicComment> m_comments = new ObservableCollection<BasicComment>();
 
         /// <summary>
         /// Indicates whether or not comments for this equation are visible somewhere in 
@@ -53,7 +53,7 @@ namespace ChemProV.Logic.Equations
             }
         }
 
-        public IList<BasicComment> Comments
+        public ObservableCollection<BasicComment> Comments
         {
             get
             {
