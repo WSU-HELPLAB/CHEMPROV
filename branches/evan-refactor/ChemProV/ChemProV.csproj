@@ -394,6 +394,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Libraries\SharpZipLib.Silverlight4.dll" />
+    <None Include="DevDocs\ChemProV Design Overview.pptx" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.wsdl" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService21.wsdl" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService4.xsd">
