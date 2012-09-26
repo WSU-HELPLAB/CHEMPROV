@@ -54,6 +54,9 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                 case "ee":
                     return "ethylene";
 
+                case "fo":
+                    return "formaldehyde";
+
                 case "ha":
                     return "hydrochloric acid";
 
@@ -227,6 +230,21 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                         newCompound.Abbr = "ee";
                     }
                     break;
+
+                case "formaldehyde":
+                    {
+                        elements.Add(carbon, 1);
+                        elements.Add(hydrogren, 2);
+                        elements.Add(oxygen, 1);
+                        newCompound.HeatCapacity = 34.28;
+                        newCompound.HeatFormation = -115.9;
+                        newCompound.HeatVaporization = 24.48;
+                        newCompound.BoilingPoint = -19.3;
+                        newCompound.MeltingPoint = -92.0;
+                        newCompound.Abbr = "fo";
+                    }
+                    break;
+
                 case "hydrochloric acid":
                     {
                         elements.Add(hydrogren, 1);
