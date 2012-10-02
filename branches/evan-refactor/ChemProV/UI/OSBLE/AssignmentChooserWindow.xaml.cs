@@ -30,9 +30,9 @@ namespace ChemProV.UI.OSBLE
         /// Dictionary that maps a course name string to a parent node in the tree
         /// </summary>
         private Dictionary<string, TreeViewItem> m_courseNodes = new Dictionary<string, TreeViewItem>();
-        
+
         private int m_refreshRemaining = 0;
-        
+
         private bool m_saveMode;
 
         private OSBLEState m_state = null;
@@ -69,11 +69,55 @@ namespace ChemProV.UI.OSBLE
             }
         }
 
+
+        /// <summary>
+        /// Makes child nodes for each file in the assignment
+        /// </summary>
+        private void BuildFileTreeView(RelevantAssignment ra, TreeViewItem tvi, IList<RelevantAssignment.AssignmentStream> files)
+        {
+            // make child nodes for each file in the assignment
+            foreach (RelevantAssignment.AssignmentStream stream in files)
+            {
+                // If the assignment is a critical review then it can potentially have both original 
+                // documents and reviewed documents as streams within it. In the case where we're 
+                // loading, we want to show all of these.
+                // However, in the case where we're saving we cannot overwrite the originals. Rather, 
+                // we can only save reviews. So for that save case we should show only originals and 
+                // label them in a way that implies that a save submits a review for that document.
+                if (!m_saveMode)
+                {
+                    TreeViewItem tviChild = new TreeViewItem();
+                    tviChild.Header = stream.Name;
+                    if (ra.IsCriticalReview)
+                    {
+                        // Mark files as originals or reviews
+                        if (stream.IsOriginalForReview)
+                        {
+                            tviChild.Header += " (author's original file)";
+                        }
+                        else
+                        {
+                            tviChild.Header += " (your review file)";
+                        }
+                    }
+                    tviChild.Tag = stream;
+                    tvi.Items.Add(tviChild);
+                }
+                else if (stream.IsOriginalForReview)
+                {
+                    TreeViewItem tviChild = new TreeViewItem();
+                    tviChild.Header = "Save as review for " + stream.AuthorName;
+                    tviChild.Tag = stream;
+                    tvi.Items.Add(tviChild);
+                }
+            }
+        }
+
         /// <summary>
         /// Must be invoked on the UI thread.
         /// </summary>
         private void AssignmentGetComplete(object sender, EventArgs e)
-        {            
+        {
             RelevantAssignment.RelevantAssignmentEventArgs args =
                 e as RelevantAssignment.RelevantAssignmentEventArgs;
             RelevantAssignment ra = sender as RelevantAssignment;
@@ -93,7 +137,7 @@ namespace ChemProV.UI.OSBLE
                 };
                 MainTreeView.Items.Add(courseNode);
                 m_courseNodes.Add(ra.CourseName, courseNode);
-                
+
                 // We want all nodes expanded by default
                 courseNode.IsExpanded = true;
             }
@@ -102,16 +146,41 @@ namespace ChemProV.UI.OSBLE
                 courseNode = m_courseNodes[ra.CourseName];
             }
 
-            // Critical review discussions are a special case because they don't actually contain any 
-            // files that we can open. Instead, we want to give a link to the relevant OSBLE page. We 
+            // Build the node for the assignment
+            TreeViewItem tvi = new TreeViewItem();
+            string type = ra.ActualAssignment.Type.ToString();
+            switch(ra.ActualAssignment.Type)
+            {
+                case AssignmentTypes.CriticalReview:
+                    type = "Critical Review";
+                    break;
+
+                case AssignmentTypes.CriticalReviewDiscussion:
+                    type = "Critical Review Discussion";
+                    break;
+
+                //keep default name
+                default:
+                    type = ra.ActualAssignment.Type.ToString();
+                    break;
+            }
+            tvi.Header = string.Format("{0}\nType: {1}\nDue Date: {2}",
+                ra.Name, 
+                type,
+                ra.ActualAssignment.DueDate.ToString("f")
+                );
+            tvi.Tag = ra;
+            tvi.IsExpanded = true;
+
+            // Put it under the course node, in sorted order by due date
+            InsertAssignmentNodeSorted(courseNode, tvi, ra.ActualAssignment.DueDate);
+
+            // Critical review discussions are special as they need a link into OSBLE. We 
             // only show them in open mode (they are hidden in save mode).
             if (!m_saveMode && AssignmentTypes.CriticalReviewDiscussion == ra.ActualAssignment.Type)
             {
+
                 StackPanel sp = new StackPanel();
-                TextBlock tb = new TextBlock();
-                tb.Text = string.Format("{0}\nType: Critical Review Discussion\nDue Date: {1}",
-                    ra.Name, ra.ActualAssignment.DueDate.ToString("f"));
-                sp.Children.Add(tb);
                 HyperlinkButton hb = new HyperlinkButton();
                 string url = string.Format(
                     "{0}/Account/TokenLogin?authToken={1}&destinationUrl=/AssignmentDetails/{2}",
@@ -122,61 +191,48 @@ namespace ChemProV.UI.OSBLE
 
                 // Every assignment node must have the assignment object as its tag
                 sp.Tag = ra;
-
-                // Insert the assignment item in sorted position by due date
-                InsertAssignmentNodeSorted(courseNode, sp, ra.ActualAssignment.DueDate);
+                TreeViewItem ti = new TreeViewItem();
+                ti.Header = sp;
+                tvi.Items.Add(ti);
             }
-            else
+
+            // Now make child nodes for each file in the assignment
+            foreach (RelevantAssignment.AssignmentStream stream in args.Files)
             {
-                // Build the node for the assignment
-                TreeViewItem tvi = new TreeViewItem();
-                tvi.Header = string.Format("{0}\nType: {1}\nDue Date: {2}",
-                    ra.Name, (AssignmentTypes.CriticalReview == ra.ActualAssignment.Type) ?
-                        "Critical Review" : ra.ActualAssignment.Type.ToString(),
-                    ra.ActualAssignment.DueDate.ToString("f"));
-                tvi.Tag = ra;
-                tvi.IsExpanded = true;
-
-                // Put it under the course node, in sorted order by due date
-                InsertAssignmentNodeSorted(courseNode, tvi, ra.ActualAssignment.DueDate);
-
-                // Now make child nodes for each file in the assignment
-                foreach (RelevantAssignment.AssignmentStream stream in args.Files)
+                // If the assignment is a critical review then it can potentially have both original 
+                // documents and reviewed documents as streams within it. In the case where we're 
+                // loading, we want to show all of these.
+                // However, in the case where we're saving we cannot overwrite the originals. Rather, 
+                // we can only save reviews. So for that save case we should show only originals and 
+                // label them in a way that implies that a save submits a review for that document.
+                if (!m_saveMode)
                 {
-                    // If the assignment is a critical review then it can potentially have both original 
-                    // documents and reviewed documents as streams within it. In the case where we're 
-                    // loading, we want to show all of these.
-                    // However, in the case where we're saving we cannot overwrite the originals. Rather, 
-                    // we can only save reviews. So for that save case we should show only originals and 
-                    // label them in a way that implies that a save submits a review for that document.
-                    if (!m_saveMode)
+                    TreeViewItem tviChild = new TreeViewItem();
+                    tviChild.Header = stream.Name;
+                    if (ra.IsCriticalReview)
                     {
-                        TreeViewItem tviChild = new TreeViewItem();
-                        tviChild.Header = stream.Name;
-                        if (ra.IsCriticalReview)
+                        // Mark files as originals or reviews
+                        if (stream.IsOriginalForReview)
                         {
-                            // Mark files as originals or reviews
-                            if (stream.IsOriginalForReview)
-                            {
-                                tviChild.Header += " (author's original file)";
-                            }
-                            else
-                            {
-                                tviChild.Header += " (your review file)";
-                            }
+                            tviChild.Header += " (author's original file)";
                         }
-                        tviChild.Tag = stream;
-                        tvi.Items.Add(tviChild);
+                        else
+                        {
+                            tviChild.Header += " (your review file)";
+                        }
                     }
-                    else if (stream.IsOriginalForReview)
-                    {
-                        TreeViewItem tviChild = new TreeViewItem();
-                        tviChild.Header = "Save as review for " + stream.AuthorName;
-                        tviChild.Tag = stream;
-                        tvi.Items.Add(tviChild);
-                    }
+                    tviChild.Tag = stream;
+                    tvi.Items.Add(tviChild);
+                }
+                else if (stream.IsOriginalForReview)
+                {
+                    TreeViewItem tviChild = new TreeViewItem();
+                    tviChild.Header = "Save as review for " + stream.AuthorName;
+                    tviChild.Tag = stream;
+                    tvi.Items.Add(tviChild);
                 }
             }
+
 
             if (0 == System.Threading.Interlocked.Decrement(ref m_refreshRemaining))
             {
@@ -202,7 +258,7 @@ namespace ChemProV.UI.OSBLE
                 m_state.OnDownloadComplete -= this.State_OnDownloadCompleteCrossThread;
                 m_state = null;
             }
-            
+
             this.DialogResult = false;
         }
 
@@ -223,7 +279,7 @@ namespace ChemProV.UI.OSBLE
         /// parent must in sorted order.
         /// </summary>
         private void InsertAssignmentNodeSorted(TreeViewItem courseParent, object newItem, DateTime dueDate)
-        {            
+        {
             if (0 == courseParent.Items.Count)
             {
                 courseParent.Items.Add(newItem);
@@ -258,7 +314,7 @@ namespace ChemProV.UI.OSBLE
         private void OKButton_Click(object sender, RoutedEventArgs e)
         {
             // Route the call based on whether we are loading or saving
-            
+
             if (m_saveMode)
             {
                 OKButton_Click_Save(sender, e);
@@ -301,7 +357,7 @@ namespace ChemProV.UI.OSBLE
                     OKButton.Visibility = System.Windows.Visibility.Collapsed;
                     CancelButton.Visibility = System.Windows.Visibility.Collapsed;
                     MainProgressBar.Visibility = System.Windows.Visibility.Visible;
-                    
+
                     try
                     {
                         ws.Load(ras);
@@ -333,7 +389,7 @@ namespace ChemProV.UI.OSBLE
                     if (AssignmentTypes.Basic == ra.ActualAssignment.Type)
                     {
                         m_state.CurrentAssignment = ra;
-                        
+
                         // 0 files for a basic assignment means the user has yet to submit anything
                         MessageBox.Show("Assignment has yet to be submitted. You may save your work to OSBLE to " +
                             "submit the first version for this assignment.");
@@ -341,7 +397,7 @@ namespace ChemProV.UI.OSBLE
                     else if (AssignmentTypes.CriticalReview == ra.ActualAssignment.Type)
                     {
                         // 0 files for a critical review means that no one has submitted files to review
-                        MessageBox.Show("You have selected a critical review assignment for which there are " + 
+                        MessageBox.Show("You have selected a critical review assignment for which there are " +
                             "currently no files available. Files for this assignment will become available " +
                             "after the individuals who you are assigned to review submit their files.");
                         return;
@@ -436,7 +492,7 @@ namespace ChemProV.UI.OSBLE
         private void SaveComplete(object sender, EventArgs e)
         {
             this.DialogResult = true;
-            
+
             RelevantAssignment.SaveEventArgs sea = e as RelevantAssignment.SaveEventArgs;
             if (sea.Success)
             {
@@ -500,9 +556,9 @@ namespace ChemProV.UI.OSBLE
         {
             // Remove the event listener
             m_state.OnSaveComplete -= this.State_OnSaveComplete;
-            
+
             this.DialogResult = true;
-            
+
             OSBLEStateEventArgs osea = e as OSBLEStateEventArgs;
             if (osea.Success)
             {
