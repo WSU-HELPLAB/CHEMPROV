@@ -395,8 +395,22 @@
   <ItemGroup>
     <Content Include="Libraries\SharpZipLib.Silverlight4.dll" />
     <None Include="DevDocs\ChemProV Design Overview.pptx" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService21.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService4.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -418,7 +432,6 @@
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.disco" />
     <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.Assignment.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
@@ -428,26 +441,8 @@
     <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.CourseRole.datasource">
       <DependentUpon>Reference.svcmap</DependentUpon>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService.disco" />
     <None Include="Service References\OSBLEClientReference\configuration91.svcinfo" />
     <None Include="Service References\OSBLEClientReference\configuration.svcinfo" />
-    <None Include="Service References\OSBLEClientReference\Reference.svcmap">
-      <Generator>WCF Proxy Generator</Generator>
-      <LastGenOutput>Reference.cs</LastGenOutput>
-    </None>
-    <Content Include="UI\Icons\down_arrow_16x16.png" />
-    <Content Include="UI\Icons\plus_16x16.png" />
-    <Content Include="UI\Icons\up_arrow_16x16.png" />
-    <Content Include="UI\Icons\XBtn_16x16.png" />
-    <None Include="Grammars\ChemProV.g" />
-    <None Include="Grammars\ChemProV.tokens" />
-    <None Include="Grammars\ChemProVTree.g" />
-    <None Include="Grammars\ChemProVTree.tokens" />
-    <None Include="Properties\AppManifest.xml" />
-    <None Include="Properties\DataSources\ChemProv.Library.OsbleServices.UserProfile.datasource" />
-    <Content Include="ServiceReferences.ClientConfig">
-      <SubType>Designer</SubType>
-    </Content>
     <None Include="Service References\OSBLEClientReference\OsbleService.wsdl" />
     <None Include="Service References\OSBLEClientReference\OsbleService.xsd">
       <SubType>Designer</SubType>
@@ -456,9 +451,11 @@
     <None Include="Service References\OSBLEClientReference\OsbleService1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService2.wsdl" />
     <None Include="Service References\OSBLEClientReference\OsbleService2.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService21.wsdl" />
     <None Include="Service References\OSBLEClientReference\OsbleService3.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -477,6 +474,54 @@
     <None Include="Service References\OSBLEClientReference\OsbleService8.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService9.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService91.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService92.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService93.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService94.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService95.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService96.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService97.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService98.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService1.disco" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.disco" />
+    <Content Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.disco" />
+    <Content Include="Service References\OSBLEClientReference\OsbleService.disco" />
+    <Content Include="UI\Icons\down_arrow_16x16.png" />
+    <Content Include="UI\Icons\plus_16x16.png" />
+    <Content Include="UI\Icons\up_arrow_16x16.png" />
+    <Content Include="UI\Icons\XBtn_16x16.png" />
+    <None Include="Grammars\ChemProV.g" />
+    <None Include="Grammars\ChemProV.tokens" />
+    <None Include="Grammars\ChemProVTree.g" />
+    <None Include="Grammars\ChemProVTree.tokens" />
+    <None Include="Properties\AppManifest.xml" />
+    <None Include="Properties\DataSources\ChemProv.Library.OsbleServices.UserProfile.datasource" />
+    <Content Include="ServiceReferences.ClientConfig">
+      <SubType>Designer</SubType>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\OutOfBrowserSettings.xml">
