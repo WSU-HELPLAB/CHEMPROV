@@ -173,6 +173,16 @@
     </Compile>
     <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
     <Compile Include="PFD\IPfdElement.cs" />
+    <Compile Include="Service References\OSBLEAuthServiceRef\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\OSBLEClientReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
     <Compile Include="UI\ChangeStreamNumberWindow.xaml.cs">
       <DependentUpon>ChangeStreamNumberWindow.xaml</DependentUpon>
     </Compile>
@@ -385,6 +395,46 @@
   <ItemGroup>
     <Content Include="Libraries\SharpZipLib.Silverlight4.dll" />
     <None Include="DevDocs\ChemProV Design Overview.pptx" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\ChemProV.OSBLEAuthServiceRef.UserProfile.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.Assignment.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.Course.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.CourseRole.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService.disco" />
+    <None Include="Service References\OSBLEClientReference\configuration91.svcinfo" />
+    <None Include="Service References\OSBLEClientReference\configuration.svcinfo" />
+    <None Include="Service References\OSBLEClientReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.disco" />
+    <None Include="Service References\OSBLEAuthServiceRef\configuration91.svcinfo" />
+    <None Include="Service References\OSBLEAuthServiceRef\configuration.svcinfo" />
+    <None Include="Service References\OSBLEAuthServiceRef\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
     <Content Include="UI\Icons\down_arrow_16x16.png" />
     <Content Include="UI\Icons\plus_16x16.png" />
     <Content Include="UI\Icons\up_arrow_16x16.png" />
@@ -398,6 +448,35 @@
     <Content Include="ServiceReferences.ClientConfig">
       <SubType>Designer</SubType>
     </Content>
+    <None Include="Service References\OSBLEClientReference\OsbleService.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService1.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService8.xsd">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\OutOfBrowserSettings.xml">
@@ -553,6 +632,10 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\OSBLEAuthServiceRef\" />
+    <WCFMetadataStorage Include="Service References\OSBLEClientReference\" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
