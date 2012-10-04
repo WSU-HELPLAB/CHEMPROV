@@ -78,6 +78,7 @@ namespace ChemProV.Logic.OSBLE
             {
                 string name = ZipEntry.CleanName(ze.Name);
                 string nameLwr = name.ToLower();
+                int placeholder = 0;
 
                 // The file name structure tells us whether or not this file is one of the "originals" 
                 // for a review assignment. An original in this case means the file that was submitted 
@@ -93,6 +94,12 @@ namespace ChemProV.Logic.OSBLE
                 {
                     name = name.Substring(8);
                     isOriginal = false;
+                }
+                else if (Int32.TryParse(nameLwr[0].ToString(), out placeholder))
+                {
+                    //document is a merged document for review discussions
+                    string[] pieces = name.Split(';');
+                    name = pieces[1];
                 }
                 else
                 {
