@@ -805,10 +805,8 @@ namespace ChemProV
 
             if (state.IsLoggedIn)
             {
-                // Show the assignment browser window. It will do the loading if the user chooses 
-                // a file to open.
-                AssignmentChooserWindow abw = new AssignmentChooserWindow(state, true, false);
-                abw.Show();
+                NormalOsbleIcon.Visibility = System.Windows.Visibility.Collapsed;
+                LoggedInOsble.Visibility = System.Windows.Visibility.Visible;
             }
         }
 

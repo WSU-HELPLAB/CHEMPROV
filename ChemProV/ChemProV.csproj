@@ -422,6 +422,9 @@
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <Content Include="UI\Icons\down_arrow_16x16.png" />
+    <Content Include="UI\Icons\OSBLE_person_active_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="UI\Icons\plus_16x16.png" />
     <Content Include="UI\Icons\up_arrow_16x16.png" />
     <Content Include="UI\Icons\XBtn_16x16.png" />
