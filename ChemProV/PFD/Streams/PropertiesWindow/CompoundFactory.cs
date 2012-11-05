@@ -54,6 +54,9 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                 case "ee":
                     return "ethylene";
 
+                case "eo":
+                    return "ethylene oxide";
+                
                 case "fo":
                     return "formaldehyde";
 
@@ -227,6 +230,20 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                         newCompound.HeatVaporization = 13.54;
                         newCompound.BoilingPoint = -103.7;
                         newCompound.MeltingPoint = -169.2;
+                        newCompound.Abbr = "ee";
+                    }
+                    break;
+
+                case "ethylene oxide":
+                    {
+                        elements.Add(carbon, 2);
+                        elements.Add(hydrogren, 4);
+                        elements.Add(oxygen, 1);
+                        newCompound.HeatCapacity = 48.19;
+                        newCompound.HeatFormation = -52.28;
+                        newCompound.HeatVaporization = 581.7;
+                        newCompound.BoilingPoint = 10.7;
+                        newCompound.MeltingPoint = -111.3;
                         newCompound.Abbr = "ee";
                     }
                     break;
