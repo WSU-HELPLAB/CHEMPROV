@@ -1,0 +1,258 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ProcessFlowDiagram ChemProV.version="1.12.7.17" DifficultySetting="MaterialBalanceWithReactors">
+  <DrawingCanvas>
+    <ProcessUnits>
+      <GenericProcessUnit Id="GPU_1" ProcessUnitType="Reactor" Name="Rct1">
+        <Location>
+          <X>444</X>
+          <Y>273</Y>
+        </Location>
+        <Subgroup Color="#FFffFFff" />
+      </GenericProcessUnit>
+    </ProcessUnits>
+    <Streams>
+      <AbstractStream Id="S_1" StreamType="Chemical">
+        <UnattachedSource Location="211,274" />
+        <Destination>GPU_1</Destination>
+      </AbstractStream>
+      <AbstractStream Id="S_2" StreamType="Chemical">
+        <Source>GPU_1</Source>
+        <UnattachedDestination Location="665,275" />
+      </AbstractStream>
+    </Streams>
+    <PropertiesWindows>
+      <ChemicalStreamPropertiesWindow>
+        <ParentStream>S_1</ParentStream>
+        <DataRows>
+          <ChemicalStreamData>
+            <Label>x1me</Label>
+            <Quantity>0.50</Quantity>
+            <SelectedUnits>molFrac</SelectedUnits>
+            <SelectedCompound>methane</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+          <ChemicalStreamData>
+            <Label>x1ox</Label>
+            <Quantity>0.50</Quantity>
+            <SelectedUnits>molFrac</SelectedUnits>
+            <SelectedCompound>oxygen</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+          <ChemicalStreamData>
+            <Label>N1</Label>
+            <Quantity>100</Quantity>
+            <SelectedUnits>mol/sec</SelectedUnits>
+            <SelectedCompound>Overall</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+        </DataRows>
+        <Location>
+          <X>294.5</X>
+          <Y>80</Y>
+        </Location>
+        <Temperature>
+          <Quantity>TM1</Quantity>
+          <Units>0</Units>
+        </Temperature>
+      </ChemicalStreamPropertiesWindow>
+      <ChemicalStreamPropertiesWindow>
+        <ParentStream>S_2</ParentStream>
+        <DataRows>
+          <ChemicalStreamData>
+            <Label>n1me</Label>
+            <Quantity></Quantity>
+            <SelectedUnits>mol/sec</SelectedUnits>
+            <SelectedCompound>methane</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+          <ChemicalStreamData>
+            <Label>n2ox</Label>
+            <Quantity></Quantity>
+            <SelectedUnits>mol/sec</SelectedUnits>
+            <SelectedCompound>oxygen</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+          <ChemicalStreamData>
+            <Label>n3fo</Label>
+            <Quantity></Quantity>
+            <SelectedUnits>mol/sec</SelectedUnits>
+            <SelectedCompound>formaldehyde</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+          <ChemicalStreamData>
+            <Label>n4wa</Label>
+            <Quantity></Quantity>
+            <SelectedUnits>mol/sec</SelectedUnits>
+            <SelectedCompound>water</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+          <ChemicalStreamData>
+            <Label>n5cd</Label>
+            <Quantity></Quantity>
+            <SelectedUnits>mol/sec</SelectedUnits>
+            <SelectedCompound>carbon dioxide</SelectedCompound>
+            <Feedback></Feedback>
+            <ToolTipMessage></ToolTipMessage>
+            <UserHasRenamed>True</UserHasRenamed>
+          </ChemicalStreamData>
+        </DataRows>
+        <Location>
+          <X>614.5</X>
+          <Y>59</Y>
+        </Location>
+        <Temperature>
+          <Quantity>TM2</Quantity>
+          <Units>0</Units>
+        </Temperature>
+      </ChemicalStreamPropertiesWindow>
+    </PropertiesWindows>
+    <StickyNotes>
+      <StickyNote>
+        <Location>
+          <X>216</X>
+          <Y>487</Y>
+        </Location>
+        <Content></Content>
+        <Size>100,100</Size>
+        <UserName>Adam Willey</UserName>
+      </StickyNote>
+      <StickyNote>
+        <Location>
+          <X>240</X>
+          <Y>360</Y>
+        </Location>
+        <Content>
+          Fractional Conversion: (50-n1)/50 = 0.900 = 5.00 mol CH4
+          Fracitonal Yield: n3/50 = 0.855, n3 = 42.75 mol HCHO/s
+
+          equation 3 =     zeta1=42.75
+          equation 1 =     zeta2=2.25
+          equation 2 =     n2=2.75
+          equation 4 =     n4=47.25
+          equation 5 =     n5=2.25
+          yCH4 = 0.0500 mol CH4/mol
+          yO2 = 0.0275 mol O2/mol
+          yHCHO = 0.4275 mol HCHO/mol
+          yH2O = 0.4275 mol H2O/mol
+          yCO2 = 0.0225 mol CO2/mol
+        </Content>
+        <Size>397,246</Size>
+        <UserName>Adam Willey</UserName>
+      </StickyNote>
+      <StickyNote>
+        <Location>
+          <X>1095</X>
+          <Y>110</Y>
+        </Location>
+        <Content>
+          you have done a great job. you have solved alll the unknown correctly . also your flow diagram loook good. here is some comments.
+          1- you picked 100 mol/sec as base calculations is this value is the same value that your instructer assigned?
+          2-the names for unknowns are different for example  carbon dioxide in stream 2 was labeled as n5cd but you solved for it in your system of equations as n5.
+          3-what is zeta 1 and zeta 2 in terms of the reaction and the flow chart?
+          4- have considered putting elemental balance to show that the mass in equal the mass out .because I have the solution I know your numbers are right but  we need to prove  that
+        </Content>
+        <Size>182,282</Size>
+        <UserName>Mohammad Alabdulelah</UserName>
+      </StickyNote>
+      <StickyNote>
+        <Location>
+          <X>506</X>
+          <Y>284</Y>
+        </Location>
+        <Content>
+          Fractional Conversion: (50-n1)/50 = 0.900 = 5.00 mol CH4
+          Fracitonal Yield: n3/50 = 0.855, n3 = 42.75 mol HCHO/s
+
+          equation 3 =     zeta1=42.75
+          equation 1 =     zeta2=2.25
+          equation 2 =     n2=2.75
+          equation 4 =     n4=47.25
+          equation 5 =     n5=2.25
+          yCH4 = 0.0500 mol CH4/mol
+          yO2 = 0.0275 mol O2/mol
+          yHCHO = 0.4275 mol HCHO/mol
+          yH2O = 0.4275 mol H2O/mol
+          yCO2 = 0.0225 mol CO2/mol
+        </Content>
+        <Size>397,246</Size>
+        <UserName>Mohammad Alabdulelah</UserName>
+      </StickyNote>
+      <StickyNote>
+        <Location>
+          <X>7</X>
+          <Y>74</Y>
+        </Location>
+        <Content>
+          Issues with the solution:
+          1. The overall mole flow rate should be 1000 mol/s rather than 100.
+          2. I am not sure if you can put the final solution in the comment box. Also, the equation for fractional conversion and fractional yield would be better put in the Equations area.
+          3. Based on your stream #2, the unit of the product is mol/s, but the unit for your final answer is mole fraction.
+        </Content>
+        <Size>182,295</Size>
+        <UserName>Renjie Zhang</UserName>
+      </StickyNote>
+      <StickyNote>
+        <Location>
+          <X>880</X>
+          <Y>127</Y>
+        </Location>
+        <Content>
+          Strengths of the solution:
+          The diagram is right for both streams.
+          The equations provided are right and enough to solve the problem.
+          The final anwers would be right if you use the 1000 mole/s as the mole flow rate.
+          You got the right number of DF .
+        </Content>
+        <Size>271,183</Size>
+        <UserName>Renjie Zhang</UserName>
+      </StickyNote>
+    </StickyNotes>
+  </DrawingCanvas>
+  <EquationEditor>
+    <Equations>
+      <EquationModel Id="2">
+        <Scope Name="Overall" ClassificationId="0" />
+        <Type Name="methane" ClassificationId="1" />
+        <Equation>n1 = 50-zeta1-zeta2</Equation>
+      </EquationModel>
+      <EquationModel Id="3">
+        <Scope Name="Overall" ClassificationId="0" />
+        <Type Name="oxygen" ClassificationId="1" />
+        <Equation>n2 = 50-zeta1-2zeta2</Equation>
+      </EquationModel>
+      <EquationModel Id="4">
+        <Scope Name="Overall" ClassificationId="0" />
+        <Type Name="formaldehyde" ClassificationId="1" />
+        <Equation>n3 = zeta1</Equation>
+      </EquationModel>
+      <EquationModel Id="5">
+        <Scope Name="Overall" ClassificationId="0" />
+        <Type Name="water" ClassificationId="1" />
+        <Equation>n4 = zeta1+2zeta2</Equation>
+      </EquationModel>
+      <EquationModel Id="6">
+        <Scope Name="Overall" ClassificationId="0" />
+        <Type Name="carbon dioxide" ClassificationId="1" />
+        <Equation>n5 = zeta2</Equation>
+      </EquationModel>
+    </Equations>
+  </EquationEditor>
+  <FeedbackWindow />
+  <DegreesOfFreedomAnalysis>
+    <Text>7 unknowns - 5 equations for ni = 2 DF </Text>
+  </DegreesOfFreedomAnalysis>
+</ProcessFlowDiagram>
