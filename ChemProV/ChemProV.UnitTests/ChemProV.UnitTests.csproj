@@ -78,6 +78,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr3.Runtime.Silverlight, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
+    <Reference Include="ChemProV.Library, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL" />
     <Reference Include="Microsoft.Silverlight.Testing">
       <HintPath>$(MSBuildExtensionsPath)\..\Microsoft SDKs\Silverlight\v4.0\Toolkit\Apr10\Testing\Microsoft.Silverlight.Testing.dll</HintPath>
     </Reference>
@@ -89,8 +90,10 @@
     <Reference Include="system" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Controls, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Windows.Browser" />
+    <Reference Include="System.Xml.Linq, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App.xaml.cs">
@@ -114,6 +117,10 @@
     <ProjectReference Include="..\ChemProV\ChemProV.csproj">
       <Project>{BE128A42-BBE6-4227-A791-0C4A45D55D93}</Project>
       <Name>ChemProV</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\PortableChemProV\PortableChemProV.csproj">
+      <Project>{CDF84A87-F71F-44FC-9FA4-2AC97133C983}</Project>
+      <Name>PortableChemProV</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />

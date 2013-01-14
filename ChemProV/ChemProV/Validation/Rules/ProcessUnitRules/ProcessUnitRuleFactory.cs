@@ -7,7 +7,8 @@ ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
 Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
-using ChemProV.PFD.ProcessUnits;
+using ChemProV.UI;
+using ChemProV.Logic;
 
 namespace ChemProV.Validation.Rules.ProcessUnitRules
 {
@@ -21,21 +22,21 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         }
 
         /// <summary>
-        /// This returns the rule that needs to be checked for the IProcessUnit
+        /// This returns the rule that needs to be checked for the GenericProcessUnit
         /// Currently it returns the ReactorProcessUnitRule if pu is a reactor otherwise
         /// it returns the GenericProcessUnitRule
         /// </summary>
         /// <param name="pu">The process unit that will be checked with the rule returned</param>
         /// <returns>GenericProcessUnitRule which could be a ReactorProcessUnitRule since it inherients from GenericProcessUnitRule</returns>
-        public static GenericProcessUnitRule GetProcessUnitRule(IProcessUnit pu)
+        public static GenericProcessUnitRule GetProcessUnitRule(ProcessUnitControl pu)
         {
             GenericProcessUnitRule puRule;
 
-            if (pu.Description == ProcessUnitDescriptions.Reactor)
+            if (pu.ProcessUnit is Reactor)
             {
                 puRule = new ReactorProcessUnitRule();
             }
-            else if (pu.Description == ProcessUnitDescriptions.HeatExchangerNoUtility)
+            else if (pu.ProcessUnit is HeatExchangerNoUtility)
             {
                 puRule = new HeatExchangerWithoutUtilityProcessUnitRule();
             }

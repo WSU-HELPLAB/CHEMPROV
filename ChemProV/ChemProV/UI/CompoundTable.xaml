@@ -64,7 +64,6 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                                     x:Name="Constant_Symbol_Button"
                                     Content="{Binding Symbol}"
                                     Click="Constant_Symbol_Button_Click"
-                                    ToolTipService.ToolTip="Click to insert this symbol at the end of the current equation."
                                     />
                             </DataTemplate>
                         </sdk:DataGridTemplateColumn.CellTemplate>

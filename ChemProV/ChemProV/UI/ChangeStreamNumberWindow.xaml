@@ -1,0 +1,26 @@
+﻿<controls:ChildWindow x:Class="ChemProV.UI.ChangeStreamNumberWindow"
+           xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" 
+           xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" 
+           xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
+           Width="277" Height="115" 
+           Title="Change Stream Number">
+    <Grid x:Name="LayoutRoot" Margin="2">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="50" />
+        </Grid.ColumnDefinitions>
+
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2">Please select a new stream number:</TextBlock>
+
+        <ComboBox x:Name="NumberComboBox" Grid.Row="0" Grid.Column="1" />
+        
+        <Button x:Name="CancelButton" Content="Cancel" Click="CancelButton_Click" Width="75" Height="23" 
+            HorizontalAlignment="Right" Margin="0,12,0,0" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" />
+        <Button x:Name="OKButton" Content="OK" Click="OKButton_Click" Width="75" Height="23" HorizontalAlignment="Right" 
+            Margin="0,12,79,0" Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2" />
+    </Grid>
+</controls:ChildWindow>

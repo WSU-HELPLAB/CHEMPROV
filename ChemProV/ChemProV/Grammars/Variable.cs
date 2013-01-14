@@ -8,8 +8,9 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
-using ChemProV.PFD.EquationEditor.Models;
+using ChemProV.Logic.Equations;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using ChemProV.Logic;
 
 namespace ChemProV.Grammars
 {
@@ -21,7 +22,7 @@ namespace ChemProV.Grammars
 
         #region properties
         public EquationModel Model { get; set; }
-        public IStreamData Data { get; set; }
+        public IStreamDataRow Data { get; set; }
         public string Name { get; set; }
         public VariableSigns Sign { get; set; }
         public bool IsPercent { get; set; }

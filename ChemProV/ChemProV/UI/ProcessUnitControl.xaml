@@ -1,0 +1,40 @@
+<!--
+Copyright 2010, 2011 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+-->
+<UserControl x:Class="ChemProV.UI.ProcessUnitControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Width="43" Height="43" IsTabStop="True" Background="White">
+        
+    <Border Name="ProcessUnitBorder" BorderThickness="2" BorderBrush="Transparent" Background="White">
+            <Grid>
+                <Image x:Name="ProcessUnitImage"
+               Source="/UI/Icons/pu_reactor.png"
+               Stretch="None"
+               />
+                <Image Source="/UI/Icons/comment_16x16.png" HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Width="16" Height="16" Visibility="Collapsed" Name="CommentIcon"/>
+                <Rectangle Fill="White" Opacity="0.6" IsHitTestVisible="False" Height="14" Width="39" 
+                           VerticalAlignment="Bottom" HorizontalAlignment="Center" />
+                <TextBlock 
+                    x:Name="ProcessUnitNameText" 
+                    HorizontalAlignment="Center" 
+                    VerticalAlignment="Bottom"
+                />
+                <TextBox 
+                    x:Name="ProcessUnitNameBox" 
+                    MaxLength="6" 
+                    Width="50" 
+                    Height="24" 
+                    TextChanged="ProcessUnitNameBox_TextChanged"
+                    Visibility="Collapsed"
+                    VerticalAlignment="Bottom"
+                />
+            </Grid>
+    </Border>
+</UserControl>

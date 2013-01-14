@@ -54,9 +54,9 @@ namespace ChemProV.Validation.Feedback
         private List<Feedback> listOfFeedback = new List<Feedback>();
         private Feedback selectedFeedback;
 
-        private WorkSpace workSpaceReference;
+        private WorkspaceControl workSpaceReference;
 
-        public WorkSpace WorkSpaceReference
+        public WorkspaceControl WorkSpaceReference
         {
             get { return workSpaceReference; }
             set { workSpaceReference = value; }
@@ -195,9 +195,9 @@ namespace ChemProV.Validation.Feedback
 
         private void ApplyFeedback(changeFeedback action, object target, bool highlight = false, string message = "", int errorNumber = 0)
         {
-            if (target is IEnumerable<IStream>)
+            if (target is IEnumerable<ChemProV.PFD.Streams.StreamControl>)
             {
-                foreach (IStream stream in (target as IEnumerable<IStream>))
+                foreach (ChemProV.PFD.Streams.StreamControl stream in (target as IEnumerable<ChemProV.PFD.Streams.StreamControl>))
                 {
                     if (action == changeFeedback.HighlightFeedback)
                     {
@@ -248,9 +248,9 @@ namespace ChemProV.Validation.Feedback
                     ipfd.RemoveFeedback();
                 }
             }
-            else if (target is EquationControl)
+            else if (target is EquationRowControl)
             {
-                EquationControl equation = target as EquationControl;
+                EquationRowControl equation = target as EquationRowControl;
                 if (action == changeFeedback.HighlightFeedback)
                 {
                     equation.HighlightFeedback(highlight);
@@ -360,12 +360,12 @@ namespace ChemProV.Validation.Feedback
                 {
                     string[] targetIds = (xmlFeedback.Attribute("target").Value as string).Split(", ".ToCharArray());
                     object targets;
-                    if (workSpaceReference.GetobjectFromId(targetIds[0]) is IStream)
+                    if (workSpaceReference.GetobjectFromId(targetIds[0]) is ChemProV.PFD.Streams.StreamControl)
                     {
-                        List<IStream> list = new List<IStream>();
+                        List<ChemProV.PFD.Streams.StreamControl> list = new List<ChemProV.PFD.Streams.StreamControl>();
                         foreach (string targetID in targetIds)
                         {
-                            list.Add(workSpaceReference.GetobjectFromId(targetID) as IStream);
+                            list.Add(workSpaceReference.GetobjectFromId(targetID) as ChemProV.PFD.Streams.StreamControl);
                         }
                         targets = list;
                     }
@@ -409,11 +409,11 @@ namespace ChemProV.Validation.Feedback
                 object target = feedback.Target;
 
                 string targetIds = "";
-                if (target is IEnumerable<IStream>)
+                if (target is IEnumerable<ChemProV.PFD.Streams.StreamControl>)
                 {
-                    if ((target as IEnumerable<IStream>).Count<IStream>() > 0)
+                    if ((target as IEnumerable<ChemProV.PFD.Streams.StreamControl>).Count<ChemProV.PFD.Streams.StreamControl>() > 0)
                     {
-                        foreach (IStream stream in (target as IEnumerable<IStream>))
+                        foreach (ChemProV.PFD.Streams.StreamControl stream in (target as IEnumerable<ChemProV.PFD.Streams.StreamControl>))
                         {
                             targetIds += ", " + stream.Id;
                         }
@@ -435,9 +435,9 @@ namespace ChemProV.Validation.Feedback
                 {
                     targetIds = (target as IPfdElement).Id;
                 }
-                else if (target is EquationControl)
+                else if (target is EquationRowControl)
                 {
-                    targetIds = (target as EquationControl).Id;
+                    targetIds = (target as EquationRowControl).Id;
                 }
 
                 writer.WriteAttributeString("id", feedback.Id);

@@ -22,6 +22,9 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
     /// </summary>
     public class ReactorProcessUnitRule : GenericProcessUnitRule
     {
+        // Code is stale due to extensive refactoring
+        
+        /*
         protected override ValidationResult CheckOverallFlowRate()
         {
             return ValidationResult.Empty;
@@ -32,12 +35,12 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// </summary>
         /// <param name="streams"></param>
         /// <returns></returns>
-        protected override Dictionary<string, StreamComponent> TallyCompounds(IList<IStream> streams)
+        protected override Dictionary<string, StreamComponent> TallyCompounds(IList<ChemProV.PFD.Streams.AbstractStream> streams)
         {
             Dictionary<string, StreamComponent> compounds = new Dictionary<string, StreamComponent>(5);
 
             //tally up flow rates for each compound
-            foreach (IStream stream in streams)
+            foreach (ChemProV.PFD.Streams.AbstractStream stream in streams)
             {
                 ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
 
@@ -144,7 +147,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
             if (changeInEntropy != q)
             {
-                List<IStream> feedbacktarget = new List<IStream>(target.IncomingStreams);
+                List<ChemProV.PFD.Streams.AbstractStream> feedbacktarget = new List<ChemProV.PFD.Streams.AbstractStream>(target.IncomingStreams);
                 feedbacktarget.AddRange(target.OutgoingStreams);
                 return new ValidationResult(feedbacktarget, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Unconserved_Energy));
             }
@@ -152,11 +155,11 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             return ValidationResult.Empty;
         }
 
-        private double Entropy(IList<IStream> streams, ref double q)
+        private double Entropy(IList<ChemProV.PFD.Streams.AbstractStream> streams, ref double q)
         {
             double Entropy = 0;
 
-            foreach (IStream stream in streams)
+            foreach (ChemProV.PFD.Streams.AbstractStream stream in streams)
             {
                 int i = 0;
                 ITableAdapter ta = TableAdapterFactory.CreateTableAdapter(stream.Table);
@@ -219,12 +222,12 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
         /// </summary>
         /// <param name="streams"></param>
         /// <returns></returns>
-        private ValidationResult CheckMoles(IList<IStream> streams)
+        private ValidationResult CheckMoles(IList<ChemProV.PFD.Streams.AbstractStream> streams)
         {
-            List<IStream> ruleBreakers = new List<IStream>();
+            List<ChemProV.PFD.Streams.AbstractStream> ruleBreakers = new List<ChemProV.PFD.Streams.AbstractStream>();
             if (streams.Count > 0)
             {
-                foreach (IStream stream in streams)
+                foreach (ChemProV.PFD.Streams.AbstractStream stream in streams)
                 {
                     ITableAdapter tableAdapter = TableAdapterFactory.CreateTableAdapter(stream.Table);
                     if (tableAdapter.GetTableType() == TableType.Chemcial)
@@ -252,5 +255,6 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
                 return ValidationResult.Empty;
             }
         }
+        */
     }
 }

@@ -18,10 +18,15 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 {
     public class HeatExchangerWithoutUtilityProcessUnitRule : GenericProcessUnitRule
     {
+        // Extensive refactoring has really broken all the rules, but since they're not used 
+        // at the moment I'm commenting them out. When the time comes where we want to start 
+        // using the rules again, this code will have to be uncommented and altered.
+
+        /*
         /// <summary>
         /// this stores the outgoing and incoming streams so we can set their feedback
         /// </summary>
-        private List<IStream> feedbackTarget;
+        private List<ChemProV.PFD.Streams.AbstractStream> feedbackTarget;
 
         /// <summary>
         /// The first element is the table before it hit the heat exchange without utility.
@@ -37,7 +42,7 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
 
         public override void CheckRule()
         {
-            feedbackTarget = new List<IStream>(target.OutgoingStreams);
+            feedbackTarget = new List<ChemProV.PFD.Streams.AbstractStream>(target.OutgoingStreams);
             feedbackTarget.AddRange(target.IncomingStreams);
 
             if (target.IncomingStreams.Count > 0 || target.OutgoingStreams.Count > 0)
@@ -206,15 +211,15 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             bool matchedFirst = false;
             bool matchedSecond = false;
 
-            if (target.IncomingStreams.Count != target.OutgoingStreams.Count)
+            if (target.ProcessUnit.IncomingStreamCount != target.ProcessUnit.OutgoingStreamCount)
             {
                 return new ValidationResult(feedbackTarget, ErrorMessageGenerator.GenerateMesssage(ErrorMessages.Incoming_Outgoing_Streams_Mismatch));
             }
 
-            foreach (IStream incomingStream in target.IncomingStreams)
+            foreach (ChemProV.PFD.Streams.AbstractStream incomingStream in target.IncomingStreams)
             {
                 int i = 0;
-                foreach (IStream outgoingStream in target.OutgoingStreams)
+                foreach (ChemProV.PFD.Streams.AbstractStream outgoingStream in target.OutgoingStreams)
                 {
                     if (!(i == 0 && matchedFirst == true))
                     {
@@ -288,5 +293,6 @@ namespace ChemProV.Validation.Rules.ProcessUnitRules
             //if everything is the same we return true
             return true;
         }
+        */
     }
 }
