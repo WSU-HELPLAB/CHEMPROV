@@ -1,5 +1,5 @@
 <!--
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -15,51 +15,72 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
     mc:Ignorable="d"
     d:DesignHeight="150" d:DesignWidth="321"
     xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
-             x:Name="Base"
-             >
+    x:Name="Base">
     <UserControl.Resources>
         <eq:ScollViewerHeightConverter x:Key="ScollViewerHeightConverter" />
     </UserControl.Resources>
     <Grid x:Name="LayoutRoot" Background="White">
-        <StackPanel>
-            <StackPanel Background="Silver" HorizontalAlignment="Stretch">
-                    <sdk:Label x:Name="EquationTitle" Content="Equations" Padding="3" FontSize="14" HorizontalContentAlignment="Center" Width="211" />
-            </StackPanel>
-            <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="20" />                    
-                    <ColumnDefinition Width="150"  />
-                    <ColumnDefinition Width="150" />
-                    <ColumnDefinition />
-                </Grid.ColumnDefinitions>
-                <TextBlock Grid.Row="0" Grid.Column="1" Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                <TextBlock Grid.Row="0" Grid.Column="2" Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-                <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
-            </Grid>
-            <ScrollViewer
-                Width="Auto"
-                VerticalScrollBarVisibility="Auto"
-                HorizontalScrollBarVisibility="Auto"
-                Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
-                BorderThickness="0" BorderBrush="Transparent"
-                >
-                <Grid x:Name="EquationsGrid" 
-                      MinWidth="400" 
-                      VerticalAlignment="Top"
-                      >
-                    <Grid.RowDefinitions>
-                        <RowDefinition />
-                        <RowDefinition />
-                    </Grid.RowDefinitions>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="20" />
-                        <ColumnDefinition Width="150"  />
-                        <ColumnDefinition Width="150" />
-                        <ColumnDefinition />
-                    </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="25" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        
+        <sdk:Label
+            x:Name="EquationTitle"
+            Background="Silver"
+            Content="Equations"
+            Padding="3"
+            Grid.Row="0"
+            FontSize="14" HorizontalContentAlignment="Center" />
+        
+        <ScrollViewer
+            Grid.Row="1"
+            Width="Auto"
+            VerticalAlignment="Stretch"
+            VerticalScrollBarVisibility="Auto"
+            HorizontalScrollBarVisibility="Auto"
+            Height="{Binding Path=Height, ElementName=Base, Mode=OneWay, Converter={StaticResource ScollViewerHeightConverter}}"
+            BorderThickness="0" BorderBrush="Transparent"
+            Padding="0,0,0,0">
+                
+                <StackPanel Orientation="Vertical">
 
-                </Grid>
+                    <!-- Grid for the column headers -->
+                    <Grid MinWidth="400" VerticalAlignment="Top" Background="#EFEFEF">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="135" />
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition Width="130" />
+                            <ColumnDefinition />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1" HorizontalAlignment="Center">
+                            <TextBlock Text="Type" FontWeight="Bold" FontSize="13" HorizontalAlignment="Center" />
+                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16" Name="TypeColumnHelpIcon" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="2" HorizontalAlignment="Center">
+                            <TextBlock Text="Scope" FontWeight="Bold" FontSize="13" HorizontalAlignment="Left" />
+                            <Image Source="/UI/Icons/toolbar_about.png" Width="16" Height="16" Name="ScopeColumnHelpIcon" />
+                        </StackPanel>
+                        <TextBlock Grid.Row="0" Grid.Column="3" Text="Equation" FontWeight="Bold" FontSize="13" 
+                            HorizontalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Stack panel for equation controls -->
+                    <StackPanel x:Name="EquationsStackPanel" MinWidth="400" VerticalAlignment="Top" HorizontalAlignment="Stretch">
+                        <!-- EquationControl objects are added at runtime -->
+                        <!-- ALL objects added to this stack panel must be EquationControl objects -->
+                    </StackPanel>
+
+                    <!-- Button to add a new equation row -->
+                    <Button Height="25" HorizontalAlignment="Stretch" Name="AddNewRowButton" Click="AddNewRowButton_Click">
+                        <ToolTipService.ToolTip>Add a new equation row</ToolTipService.ToolTip>
+                        
+                        <Image Width="16" Height="16" Source="/UI/Icons/plus_16x16.png" />
+                    </Button>
+
+                </StackPanel>
+
             </ScrollViewer>
-        </StackPanel>
+
     </Grid>
 </UserControl>

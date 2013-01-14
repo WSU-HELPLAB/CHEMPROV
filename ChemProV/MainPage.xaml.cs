@@ -1,5 +1,5 @@
 /*
-Copyright 2010, 2011 HELP Lab @ Washington State University
+Copyright 2010 - 2012 HELP Lab @ Washington State University
 
 This file is part of ChemProV (http://helplab.org/chemprov).
 
@@ -8,7 +8,7 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 */
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.IO;
 using System.IO.IsolatedStorage;
@@ -16,144 +16,111 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Threading;
-using System.Xml;
 using System.Xml.Linq;
-using System.Xml.Serialization;
-using ChemProV.PFD.EquationEditor;
-using ChemProV.PFD.ProcessUnits;
-using ChemProV.PFD.StickyNote;
-using ChemProV.PFD.Streams;
+using ChemProV.Logic;
 using ChemProV.UI;
-using ChemProV.UI.DrawingCanvas;
-using ChemProV.UI.PalletItems;
-using ChemProV.UI.UserDefinedVariableWindow;
-using ChemProV.Validation.Feedback;
+using ChemProV.UI.OSBLE;
 using ImageTools;
 using ImageTools.IO.Png;
-using ChemProv.Library.OSBLE.Views;
-using ChemProv.Library.OsbleServices;
 
 namespace ChemProV
 {
-    /// <summary>
-    /// Each of these builds of the previous therefore order matters.
-    /// The first (0) is the simplest the last is the most complex
-    /// </summary>
-    public enum OptionDifficultySetting
-    {
-        MaterialBalance = 0,
-        MaterialBalanceWithReactors = 1,
-        MaterialAndEnergyBalance = 2
-    }
-
     public partial class MainPage : UserControl
     {
-        /// <summary>
-        /// This requests for a NewBlankMainPage to be created
-        /// </summary>
-        public event EventHandler RequestNewBlankMainPage = delegate { };
-        public event RequestOpenFileEventHandler RequestOpenFile = delegate { };
-
-        private UserDefinedVariableWindow userDefinedVariableWindow;
-
         private string versionNumber = "";
-        private const string saveFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml|Portable Network Graphics (*.png)|*.png";
-        private const string loadFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml";
-        private const string autoSaveFileName = "autoSave.cpml";
-        private const string configFile = "cpv.config";
+        private const string c_saveFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml|Portable Network Graphics (*.png)|*.png";
+        private const string c_loadFileFilter = "ChemProV PFD XML (*.cpml)|*.cpml";
+        private const string c_autoSaveFileName = "autoSave.cpml";
+        private const string c_configFile = "cpv.config";
         private TimeSpan autoSaveTimeSpan = new TimeSpan(0, 1, 0);
 
-        /// <summary>
-        /// Use the public version of this unless you want to change it without having everyone know
-        /// </summary>
-        private OptionDifficultySetting currentDifficultySetting;
-        private ProcessUnitPalette processUnitPalette = null;
         private DispatcherTimer saveTimer = new DispatcherTimer();
 
         /// <summary>
-        /// This gets or sets the current difficulty setting
+        /// Flag to indicate that events from m_workspace should be ignored. This is set to true when 
+        /// we are modifying the workspace and thus want to ignore the events that are fired during 
+        /// this modification.
         /// </summary>
-        public OptionDifficultySetting CurrentDifficultySetting
-        {
-            get { return currentDifficultySetting; }
-            set
-            {
-                if (OptionDifficultySettingChanged(value))
-                {
-                    currentDifficultySetting = value;
+        private bool m_ignoreWorkspaceChanges = false;
 
-                    if (currentDifficultySetting == OptionDifficultySetting.MaterialBalance)
-                    {
-                        CompoundTable.Visibility = Visibility.Collapsed;
-                    }
-                    else
-                    {
-                        CompoundTable.Visibility = Visibility.Visible;
-                    }
-                }
-            }
-        }
+        private SaveFileDialog m_saveDialog = null;
+
+        /// <summary>
+        /// Represents the logical workspace. Refactoring is still happening but the long term goal 
+        /// is to have all data stored in this object and all UI elements would attach listeners 
+        /// and do their modifications through this object.
+        /// </summary>
+        private Workspace m_workspace = new Workspace();
 
         private bool OptionDifficultySettingChanged(OptionDifficultySetting value)
         {
-            try
+            //save the change in the config file
+            using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                //tell workspace that the difficultyChanged
-                WorkSpace.CurrentDifficultySetting = value;
-
-                //save the change in the config file
-                using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_configFile, FileMode.Create, isf))
                 {
-                    using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(configFile, FileMode.Create, isf))
+                    using (StreamWriter sr = new StreamWriter(isfs))
                     {
-                        using (StreamWriter sr = new StreamWriter(isfs))
-                        {
-                            sr.WriteLine(value.ToString());
-                        }
+                        sr.WriteLine(value.ToString());
                     }
                 }
             }
-            catch
+
+            // Show or hide UI elements appropriately
+            if (m_workspace.Difficulty == OptionDifficultySetting.MaterialBalance)
             {
-                MessageBox.Show("Use of advance process units or streams detected. Please remove them before changing the setting.");
-                return false;
+                Compounds_DF_TabControl.SelectedItem = DFAnalysisTab;
+                CompoundTableTab.Visibility = Visibility.Collapsed;
+            }
+            else
+            {
+                CompoundTableTab.Visibility = Visibility.Visible;
             }
 
-            if (processUnitPalette != null)
-            {
-                this.LeftHandToolBar_StackPanel.Children.Remove(processUnitPalette);
-                processUnitPalette.SelectionChanged -= new EventHandler(PuPalette_PaletteSelectionChanged);
-            }
-
-            processUnitPalette = ProcessUnitPaletteFactory.GetProcessUnitPalette(value);
-
-            processUnitPalette.SetValue(DockPanel.DockProperty, Dock.Left);
-            processUnitPalette.Background = new SolidColorBrush(Colors.White);
-            processUnitPalette.Margin = new Thickness(5);
-            processUnitPalette.Height = 192;
-            processUnitPalette.SelectionChanged += new EventHandler(PuPalette_PaletteSelectionChanged);
-            LeftHandToolBar_StackPanel.Children.Insert(0, processUnitPalette);
+            // Tell the control palette that the difficulty changed
+            PrimaryPalette.RefreshPalette(value);
 
             return true;
         }
 
-        public List<Tuple<string, EquationControl>> UserDefinedVaraibles
-        {
-            get
-            {
-                return userDefinedVariableWindow.VariableDictionary;
-            }
-        }
-
-        public MainPage(FileInfo fileInfo = null)
+        public MainPage()
         {
             // Required to initialize variables
             InitializeComponent();
 
-            userDefinedVariableWindow = new UserDefinedVariableWindow(WorkSpace.IsReadOnly);
+            // Set the workspace for the equation editor and other controls
+            m_workspace.Equations.Add(new ChemProV.Logic.Equations.EquationModel());
+            WorkSpace.EquationEditor.SetWorkspace(m_workspace);
+            WorkSpace.CommentsPane.SetWorkspace(m_workspace);
+            m_workspace.DegreesOfFreedomAnalysis.PropertyChanged += 
+                new PropertyChangedEventHandler(DegreesOfFreedomAnalysis_PropertyChanged);
+            m_workspace.DegreesOfFreedomAnalysis.Comments.CollectionChanged += new System.Collections.Specialized.NotifyCollectionChangedEventHandler(DFCommentsCollectionChanged);
+            WorkSpace.SetWorkspace(m_workspace);
+            CompoundTable.SetWorkspace(m_workspace);
+
+            // Tell the palette control to update
+            PrimaryPalette.RefreshPalette(m_workspace.Difficulty);
+
+            // Monitor when the difficulty changes so we can update the config file
+            m_workspace.PropertyChanged += delegate(object o, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName.Equals("Difficulty"))
+                {
+                    OptionDifficultySettingChanged(m_workspace.Difficulty);
+                }
+            };
+
+            // Monitor when the comments pane visibility changes so we can update tooltips
+            WorkSpace.PropertyChanged += delegate(object o, PropertyChangedEventArgs e)
+            {
+                if (e.PropertyName.Equals("CommentsPaneVisible"))
+                {
+                    ToolTipService.SetToolTip(CommentPaneButton, WorkSpace.CommentsPaneVisible ?
+                        "Hide comments pane" : "Show comments pane");
+                }
+            };
 
             if (Application.Current.IsRunningOutOfBrowser)
             {
@@ -174,16 +141,14 @@ namespace ChemProV
             }
 
             //listen for selection changes in our children
-            WorkSpace.ToolPlaced += new EventHandler(ToolPlaced);
-            WorkSpace.CompoundsUpdated += new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked += new EventHandler(WorkSpace_ValidationChecked);
-            userDefinedVariableWindow.UserDefinedVariablesUpdated += new EventHandler(userDefinedVariableWindow_UserDefinedVariablesUpdated);
 
             CompoundTable.ConstantClicked += new EventHandler(CompoundTable_ConstantClicked);
 
             //setup timer
             saveTimer.Interval = autoSaveTimeSpan;
             saveTimer.Tick += new EventHandler(autoSave);
+            saveTimer.Start();
 
             //find our version number
             Assembly asm = Assembly.GetExecutingAssembly();
@@ -193,27 +158,105 @@ namespace ChemProV
                 versionNumber = assemblyName.Version.ToString();
             }
 
-            if (fileInfo != null)
+            // Intialize the static App class
+            Core.App.Init(this, PrimaryPalette);
+
+            // Make sure that when the equation editor or compounds control gets focus that the 
+            // control palette switches back to select mode
+            WorkSpace.EquationEditor.GotFocus += delegate(object sender, RoutedEventArgs e)
             {
-                OpenFile(fileInfo);
+                Core.App.ControlPalette.SwitchToSelect(false);
+            };
+            CompoundTable.GotFocus += delegate(object sender, RoutedEventArgs e)
+            {
+                Core.App.ControlPalette.SwitchToSelect(false);
+            };
+
+            // Show the debug tab if this is a debug build
+#if DEBUG
+            DebugTab.Visibility = System.Windows.Visibility.Visible;
+
+            m_workspace.StreamsCollectionChanged += new EventHandler(WorkspaceStreamsCollectionChanged);
+            m_workspace.ProcessUnitsCollectionChanged += new EventHandler(WorkspaceProcessUnitsCollectionChanged);
+#endif
+        }
+
+#if DEBUG
+        private void WorkspaceProcessUnitsCollectionChanged(object sender, EventArgs e)
+        {
+            // Right now we don't monitor any properties of the process units. For more robust debug 
+            // functionality in the future this should probably be implemented eventually.
+
+            // Clear and rebuild
+            ProcessUnitsDebugNode.Items.Clear();
+            foreach (AbstractProcessUnit apu in m_workspace.ProcessUnits)
+            {
+                ProcessUnitsDebugNode.Items.Add(new TreeViewItem()
+                {
+                    Header = apu.UIDString + "(" + apu.Label + ")",
+                    Tag = apu
+                });
             }
         }
 
-        private void OpenFile(FileInfo file)
+        private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
         {
-            FileStream fs = file.OpenRead();
-            XDocument doc = XDocument.Load(fs);
+            // Remove previous event listeners
+            foreach (TreeViewItem child in StreamsDebugNode.Items)
+            {
+                AbstractStream stream = child.Tag as AbstractStream;
+                stream.PropertyChanged -= DebugStream_PropertyChanged;
+            }
+            
+            // Clear and rebuild
+            StreamsDebugNode.Items.Clear();
+            foreach (AbstractStream stream in m_workspace.Streams)
+            {
+                StreamsDebugNode.Items.Add(new TreeViewItem()
+                {
+                    Header = stream.UIDString + "\n(src @ " + stream.SourceLocation.ToString() +
+                        ")\n(dst @ " + stream.DestinationLocation.ToString() + ")",
+                    
+                    Tag = stream
+                });
 
-            string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
-            CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
+                stream.PropertyChanged += new PropertyChangedEventHandler(DebugStream_PropertyChanged);
+            }
+        }
 
-            WorkSpace.LoadXmlElements(doc);
+        private void DebugStream_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("SourceLocation") || e.PropertyName.Equals("DestinationLocation"))
+            {
+                AbstractStream stream = sender as AbstractStream;
+                
+                // Find the tree view item for this stream
+                TreeViewItem tvi = null;
+                foreach (TreeViewItem tviTemp in StreamsDebugNode.Items)
+                {
+                    if (object.ReferenceEquals(tviTemp.Tag, stream))
+                    {
+                        tvi = tviTemp;
+                        break;
+                    }
+                }
 
-            userDefinedVariableWindow.LoadXmlElements(doc);
+                if (null != tvi)
+                {
+                    tvi.Header = stream.UIDString + "\n(src @ " + stream.SourceLocation.ToString() +
+                        ")\n(dst @ " + stream.DestinationLocation.ToString() + ")";
+                }
+            }
+        }
+#endif
+
+        public void LoadChemProVFile(Stream stream)
+        {
+            XDocument doc = XDocument.Load(stream);
+            m_workspace.Load(doc);
 
             //we dont want to load the config file so stop the event from firing
             this.Loaded -= new RoutedEventHandler(LoadConfigFile);
-
         }
 
         /// <summary>
@@ -234,24 +277,32 @@ namespace ChemProV
 
         private void WorkSpace_ValidationChecked(object sender, EventArgs e)
         {
-            if (saveTimer.IsEnabled == false)
+            if (!saveTimer.IsEnabled)
             {
                 saveTimer.Start();
                 Saving_TextBlock.Text = "";
+                Saving_TextBlock.Visibility = System.Windows.Visibility.Collapsed;
             }
         }
 
         private void autoSave(object sender, EventArgs e)
         {
+            // Don't save an empty workspace, as that would be pointless
+            if (m_workspace.IsEmpty)
+            {
+                return;
+            }
+            
             Saving_TextBlock.Text = "Auto Saving...";
+            Saving_TextBlock.Visibility = System.Windows.Visibility.Visible;
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(autoSaveFileName, FileMode.OpenOrCreate, isf))
+                using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_autoSaveFileName, FileMode.OpenOrCreate, isf))
                 {
                     SaveChemProVFile(isfs);
                 }
             }
-            Saving_TextBlock.Text = "Auto Saved";
+            Saving_TextBlock.Text = "Last auto save was at " + DateTime.Now.ToString("t");
         }
 
         private void LoadConfigFile(object sender, RoutedEventArgs e)
@@ -266,20 +317,15 @@ namespace ChemProV
 
             using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
             {
-                if (isf.FileExists(autoSaveFileName))
+                if (isf.FileExists(c_autoSaveFileName))
                 {
                     if (MessageBoxResult.OK == MessageBox.Show("There appears to be an auto-saved file would you like to load it?", "Load saved file", MessageBoxButton.OKCancel))
                     {
-                        using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(autoSaveFileName, FileMode.OpenOrCreate, isf))
+                        using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_autoSaveFileName, FileMode.OpenOrCreate, isf))
                         {
                             try
                             {
-                                XDocument doc = XDocument.Load(isfs);
-
-                                string setting = doc.Element("ProcessFlowDiagram").Attribute("DifficultySetting").Value;
-                                CurrentDifficultySetting = (OptionDifficultySetting)Enum.Parse(typeof(OptionDifficultySetting), setting, true);
-
-                                WorkSpace.LoadXmlElements(doc);
+                                LoadChemProVFile(isfs);
                                 loadConfigFile = false;
                             }
                             catch (Exception ex)
@@ -288,19 +334,19 @@ namespace ChemProV
                                 MessageBox.Show(ex.ToString());
                             }
                         }
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                     else
                     {
                         //so they choose not to open the auto save file it will be removed
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
                 if (loadConfigFile)
                 {
                     OptionDifficultySetting loadedSetting;
                     bool showOptionsWindow = false;
-                    using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(configFile, FileMode.OpenOrCreate, isf))
+                    using (IsolatedStorageFileStream isfs = new IsolatedStorageFileStream(c_configFile, FileMode.OpenOrCreate, isf))
                     {
                         using (StreamReader sw = new StreamReader(isfs))
                         {
@@ -317,7 +363,7 @@ namespace ChemProV
                         }
                     }
 
-                    CurrentDifficultySetting = loadedSetting;
+                    m_workspace.TrySetDifficulty(loadedSetting);
 
                     if (showOptionsWindow)
                     {
@@ -328,111 +374,122 @@ namespace ChemProV
             }
         }
 
-        private void userDefinedVariableWindow_UserDefinedVariablesUpdated(object sender, EventArgs e)
-        {
-            WorkSpace.UserDefinedVariablesUpdated(UserDefinedVaraibles);
-        }
-
-        private void WorkSpace_UpdateCompounds(object sender, EventArgs e)
-        {
-            CompoundTable.UpdateCompounds(WorkSpace.Compounds);
-        }
-
         private void CompoundTable_ConstantClicked(object sender, EventArgs e)
         {
-            WorkSpace.EquationEditor.InsertConstant((sender as Button).Content as string);
+            // E.O.
+            // This code used to insert the constant into an equation in the equation editor. At 
+            // some point we might bring that functionality back.
+            //WorkSpace.EquationEditor.InsertConstant((sender as Button).Content as string);
         }
 
-        /// <summary>
-        /// Called whenever the drawing_canvas places a new tool.  We use it here to coordinate with
-        /// the process unit palette control.  Basically, whenenver the drawing drawing_canvas places
-        /// a tool, we reset the tool palette back to the default selection.
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void ToolPlaced(object sender, EventArgs e)
+        public void SaveChemProVFile(Stream stream)
         {
-            processUnitPalette.ResetSelection();
+            saveTimer.Stop();
+
+            m_workspace.Save(stream, versionNumber);
+
+            // Restart the auto-save timer
+            saveTimer.Start();
         }
 
-        /// <summary>
-        /// called whenever the user changes his selection in the process unit palette
-        /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private void PuPalette_PaletteSelectionChanged(object sender, EventArgs e)
+        private void SavePNG(Stream output)
         {
-            //update the change in the drawing drawing_canvas
-            object tool = ((ProcessUnitPalette)sender).SelectedItem.Data;
+            //when saving to image, we really need to keep track of three things:
+            //   1: the drawing drawing_canvas (duh?)
+            //   2: the list of equations
+            //   3: the feedback messages
+            //
+            //In order to do this, we need to create one master image that houses
+            //all three subcomponents.
+            //set 1: find the total size of the image to create:
 
-            //because the selected tool is passed by reference, we need to create
-            //a local copy for placement on the drawing drawing_canvas
-            if (tool is IProcessUnit)
+            //note that we're using the Max height of the equation editor and feedback window
+            //as they share the same space so we only need to know the size of the largest.
+            int height = (int)WorkSpace.DrawingCanvas.ActualHeight
+                       + Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
+
+            //width can just be the drawing_canvas as the drawing_canvas is always the largest object
+            int width = (int)WorkSpace.DrawingCanvas.ActualWidth;
+
+            //with width and height determined, create our writeable bitmap,
+            //along with bitmaps for the drawing drawing_canvas, equation editor, and feedback window
+            WriteableBitmap finalBmp = new WriteableBitmap(width, height);
+            WriteableBitmap canvasBmp = new WriteableBitmap((int)WorkSpace.DrawingCanvas.ActualWidth, (int)WorkSpace.DrawingCanvas.ActualHeight);
+            WriteableBitmap equationBmp = new WriteableBitmap((int)WorkSpace.EquationEditor.ActualWidth, (int)WorkSpace.EquationEditor.ActualHeight);
+            WriteableBitmap feedbackBmp = new WriteableBitmap((int)WorkSpace.FeedbackWindow.ActualWidth, (int)WorkSpace.FeedbackWindow.ActualHeight);
+
+            //step 2: tell each bmp to store an image of their respective controls
+            canvasBmp.Render(WorkSpace.DrawingCanvas, null);
+            canvasBmp.Invalidate();
+
+            equationBmp.Render(WorkSpace.EquationEditor, null);
+            equationBmp.Invalidate();
+
+            feedbackBmp.Render(WorkSpace.FeedbackWindow, null);
+            feedbackBmp.Invalidate();
+
+            //step 3: compose all sub images into the final image
+            //feedback / equations go on top
+            for (int x = 0; x < feedbackBmp.PixelWidth; x++)
             {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = ProcessUnitFactory.ProcessUnitFromProcessUnit(tool as IProcessUnit);
+                for (int y = 0; y < feedbackBmp.PixelHeight; y++)
+                {
+                    finalBmp.Pixels[y * finalBmp.PixelWidth + x] = feedbackBmp.Pixels[y * feedbackBmp.PixelWidth + x];
+                }
             }
-            else if (tool is IStream)
+
+            //next to feedback goes equations
+            for (int x = 0; x < equationBmp.PixelWidth; x++)
             {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = StreamFactory.StreamFromStreamObject(tool as IStream);
+                for (int y = 0; y < equationBmp.PixelHeight; y++)
+                {
+                    finalBmp.Pixels[y * finalBmp.PixelWidth + (feedbackBmp.PixelWidth + x)] = equationBmp.Pixels[y * equationBmp.PixelWidth + x];
+                }
             }
-            else if (((ProcessUnitPalette)sender).SelectedItem.Description == "Sticky Note")
+
+            //finally, do the drawing drawing_canvas
+            int verticalOffset = Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
+            for (int x = 0; x < canvasBmp.PixelWidth; x++)
             {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = new StickyNote();
+                for (int y = 0; y < canvasBmp.PixelHeight; y++)
+                {
+                    finalBmp.Pixels[(y + verticalOffset) * finalBmp.PixelWidth + x] = canvasBmp.Pixels[y * canvasBmp.PixelWidth + x];
+                }
             }
-            //if we get to the ELSE, we must not care whether or not we're playing with a
-            //someone else's reference
+
+            ImageTools.Image foo = finalBmp.ToImage();
+            PngEncoder encoder = new PngEncoder();
+            encoder.Encode(foo, output);
+            output.Flush();
+        }
+
+        private void SaveFileAs_BtnClick(object sender, RoutedEventArgs e)
+        {
+            // If we have a non-null OSBLE state object and we're logged in, then we need to give the 
+            // user a choice of saving to disk or to OSBLE
+            if (null != Core.App.OSBLEState && Core.App.OSBLEState.IsLoggedIn)
+            {
+                UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(
+                    Core.App.OSBLEState, true);
+                win.OnChooseDiskOption += delegate(object o, EventArgs ea)
+                {
+                    SaveFileToDisk();
+                };
+                win.Show();
+            }
             else
             {
-                WorkSpace.DrawingCanvas.SelectedPaletteItem = null;
+                SaveFileToDisk();
             }
         }
 
-        private void SaveChemProVFile(Stream stream)
+        private void SaveFileToDisk()
         {
-            XmlSerializer canvasSerializer = new XmlSerializer(typeof(DrawingCanvas));
-            XmlSerializer equationSerializer = new XmlSerializer(typeof(EquationEditor));
-            XmlSerializer feedbackWindowSerializer = new XmlSerializer(typeof(FeedbackWindow));
-            XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(UserDefinedVariableWindow));
-            // XmlSerializer userDefinedVariablesSerializer = new XmlSerializer(typeof(EquationEditor));
-            //make sure that out XML turns out pretty
-            XmlWriterSettings settings = new XmlWriterSettings();
-            saveTimer.Stop();
-            settings.Indent = true;
-            settings.IndentChars = "   ";
-
-            //create our XML writer
-            using (XmlWriter writer = XmlWriter.Create(stream, settings))
+            if (null == m_saveDialog)
             {
-                //root node
-                writer.WriteStartElement("ProcessFlowDiagram");
-
-                //version number
-                writer.WriteAttributeString("ChemProV.version", versionNumber);
-
-                //setting
-                writer.WriteAttributeString("DifficultySetting", currentDifficultySetting.ToString());
-
-                //write drawing_canvas properties
-                canvasSerializer.Serialize(writer, WorkSpace.DrawingCanvas);
-
-                //write equations
-                equationSerializer.Serialize(writer, WorkSpace.EquationEditor);
-
-                //write feedback
-                feedbackWindowSerializer.Serialize(writer, WorkSpace.FeedbackWindow);
-
-                //write userdefinedvariables
-                userDefinedVariablesSerializer.Serialize(writer, userDefinedVariableWindow);
-
-                //end root node
-                writer.WriteEndElement();
+                m_saveDialog = new SaveFileDialog();
+                m_saveDialog.Filter = c_saveFileFilter;
             }
-        }
-
-        private void SaveFileButton_Click(object sender, RoutedEventArgs e)
-        {
-            SaveFileDialog saveDialog = new SaveFileDialog();
-            saveDialog.Filter = saveFileFilter;
             bool? saveResult = false;
 
             //BIG NOTE: When debuggin this application, make sure to put a breakpoint
@@ -440,146 +497,145 @@ namespace ChemProV
             //throw an exception.  This is a known issue with Silverlight.
             try
             {
-                saveResult = saveDialog.ShowDialog();
+                saveResult = m_saveDialog.ShowDialog();
             }
             catch (Exception ex)
             {
                 //MessageBox.Show(ex.ToString());
             }
-            if (saveResult == true)
+
+            if (!saveResult.HasValue || !saveResult.Value)
             {
-                using (Stream stream = saveDialog.OpenFile())
+                // If the user didn't click "OK" in the dialog then we just return
+                return;
+            }
+
+            // Open the output file stream. We will dispose it after writing the file.
+            Stream stream = m_saveDialog.OpenFile();
+
+            // For whatever reason, filter indices start at 1. An index of 1 means that we want 
+            // to save the regular ChemProV XML.
+            if (1 == m_saveDialog.FilterIndex)
+            {
+                SaveChemProVFile(stream);
+                using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    //filterIndex of zero corresponds to XML
-                    if (saveDialog.FilterIndex == 1)
+                    //remove the temp file because we just saved;
+                    if (isf.FileExists(c_autoSaveFileName))
                     {
-                        SaveChemProVFile(stream);
-                        stream.Close();
-                        using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
-                        {
-                            //remove the temp file because we just saved;
-                            if (isf.FileExists(autoSaveFileName))
-                            {
-                                isf.DeleteFile(autoSaveFileName);
-                            }
-                        }
-                    }
-                    //filter index of 2 means save as PNG
-                    else if (saveDialog.FilterIndex == 2)
-                    {
-                        //when saving to image, we really need to keep track of three things:
-                        //   1: the drawing drawing_canvas (duh?)
-                        //   2: the list of equations
-                        //   3: the feedback messages
-                        //
-                        //In order to do this, we need to create one master image that houses
-                        //all three subcomponents.
-                        //set 1: find the total size of the image to create:
-
-                        //note that we're using the Max height of the equation editor and feedback window
-                        //as they share the same space so we only need to know the size of the largest.
-                        int height = (int)WorkSpace.DrawingCanvas.ActualHeight
-                                   + Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
-
-                        //width can just be the drawing_canvas as the drawing_canvas is always the largest object
-                        int width = (int)WorkSpace.DrawingCanvas.ActualWidth;
-
-                        //with width and height determined, create our writeable bitmap,
-                        //along with bitmaps for the drawing drawing_canvas, equation editor, and feedback window
-                        WriteableBitmap finalBmp = new WriteableBitmap(width, height);
-                        WriteableBitmap canvasBmp = new WriteableBitmap((int)WorkSpace.DrawingCanvas.ActualWidth, (int)WorkSpace.DrawingCanvas.ActualHeight);
-                        WriteableBitmap equationBmp = new WriteableBitmap((int)WorkSpace.EquationEditor.ActualWidth, (int)WorkSpace.EquationEditor.ActualHeight);
-                        WriteableBitmap feedbackBmp = new WriteableBitmap((int)WorkSpace.FeedbackWindow.ActualWidth, (int)WorkSpace.FeedbackWindow.ActualHeight);
-
-                        //step 2: tell each bmp to store an image of their respective controls
-                        canvasBmp.Render(WorkSpace.DrawingCanvas, null);
-                        canvasBmp.Invalidate();
-
-                        equationBmp.Render(WorkSpace.EquationEditor, null);
-                        equationBmp.Invalidate();
-
-                        feedbackBmp.Render(WorkSpace.FeedbackWindow, null);
-                        feedbackBmp.Invalidate();
-
-                        //step 3: compose all sub images into the final image
-                        //feedback / equations go on top
-                        for (int x = 0; x < feedbackBmp.PixelWidth; x++)
-                        {
-                            for (int y = 0; y < feedbackBmp.PixelHeight; y++)
-                            {
-                                finalBmp.Pixels[y * finalBmp.PixelWidth + x] = feedbackBmp.Pixels[y * feedbackBmp.PixelWidth + x];
-                            }
-                        }
-
-                        //next to feedback goes equations
-                        for (int x = 0; x < equationBmp.PixelWidth; x++)
-                        {
-                            for (int y = 0; y < equationBmp.PixelHeight; y++)
-                            {
-                                finalBmp.Pixels[y * finalBmp.PixelWidth + (feedbackBmp.PixelWidth + x)] = equationBmp.Pixels[y * equationBmp.PixelWidth + x];
-                            }
-                        }
-
-                        //finally, do the drawing drawing_canvas
-                        int verticalOffset = Math.Max((int)WorkSpace.EquationEditor.ActualHeight, (int)WorkSpace.FeedbackWindow.ActualHeight);
-                        for (int x = 0; x < canvasBmp.PixelWidth; x++)
-                        {
-                            for (int y = 0; y < canvasBmp.PixelHeight; y++)
-                            {
-                                finalBmp.Pixels[(y + verticalOffset) * finalBmp.PixelWidth + x] = canvasBmp.Pixels[y * canvasBmp.PixelWidth + x];
-                            }
-                        }
-
-                        ImageTools.Image foo = finalBmp.ToImage();
-                        PngEncoder encoder = new PngEncoder();
-                        encoder.Encode(foo, stream);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
             }
+            //filter index of 2 means save as PNG
+            else if (m_saveDialog.FilterIndex == 2)
+            {
+                SavePNG(stream);
+            }
+
+            // Put the file name info in the save button's tooltip
+            ToolTipService.SetToolTip(SaveAsButton, "Save as... (last save was \"" +
+                m_saveDialog.SafeFileName + "\")");
+
+            // Dispose the stream
+            stream.Dispose();
         }
 
         /// <summary>
         /// Will open a new file to edit
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
         private void OpenFileButton_Click(object sender, RoutedEventArgs e)
         {
+            // If we have a non-null OSBLE state object and we're logged in, then we need to give the 
+            // user a choice of saving to disk or to OSBLE
+            if (null != Core.App.OSBLEState && Core.App.OSBLEState.IsLoggedIn)
+            {
+                UI.OSBLE.OSBLEOrDiskWindow win = new UI.OSBLE.OSBLEOrDiskWindow(
+                    Core.App.OSBLEState, false);
+                win.OnChooseDiskOption += delegate(object o, EventArgs ea)
+                {
+                    OpenFileFromDisk();
+                };
+                win.Show();
+            }
+            else
+            {
+                OpenFileFromDisk();
+            }
+        }
+
+        private void OpenFileFromDisk()
+        {            
             OpenFileDialog openDialog = new OpenFileDialog();
-            openDialog.Filter = loadFileFilter;
+            openDialog.Filter = c_loadFileFilter;
             bool? openFileResult = false;
 
             openFileResult = openDialog.ShowDialog();
 
-            if (openFileResult == true)
+            // Make sure that the user selected a file and clicked OK
+            if (!openFileResult.HasValue || !openFileResult.Value)
             {
-                bool openFile = false;
-                if (WorkSpace.DrawingCanvas.Children.Count > 0)
-                {
-                    MessageBoxResult result = MessageBox.Show("Opening a new file will erase the current process flow diagram.  Click OK to continue or CANCEL to go back and save.  This action cannot be undone.", "Open File Confirmation", MessageBoxButton.OKCancel);
-                    if (result == MessageBoxResult.OK)
-                    {
-                        openFile = true;
-                    }
-                }
-                else
+                return;
+            }
+
+            bool openFile = false;
+            if (WorkSpace.DrawingCanvas.Children.Count > 0)
+            {
+                MessageBoxResult result = MessageBox.Show(
+                    "Opening a new file will erase the current process flow diagram.  " + 
+                    "Click OK to continue or CANCEL to go back and save.  This action cannot be undone.",
+                    "Open File Confirmation", MessageBoxButton.OKCancel);
+                if (MessageBoxResult.OK == result)
                 {
                     openFile = true;
                 }
+            }
+            else
+            {
+                openFile = true;
+            }
 
-                if (openFile)
+            if (openFile)
+            {
+                WorkSpace.DrawingCanvas.ClearDrawingCanvas();
+                
+                //delete the tempory file as they do not want it
+                using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    //delete the tempory file as they do not want it
-                    using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
+                    if (isf.FileExists(c_autoSaveFileName))
                     {
-                        if (isf.FileExists(autoSaveFileName))
-                        {
-                            isf.DeleteFile(autoSaveFileName);
-                        }
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
-
-                    RequestOpenFile(this, new RequestOpenFileArgs(openDialog.File));
                 }
+
+                // Put the file name info in the save button's tooltip
+                ToolTipService.SetToolTip(SaveAsButton, "Save as... (file was opened as \"" +
+                    openDialog.File.Name + "\")");
+
+                // Make sure we don't have a palette tool active
+                PrimaryPalette.SwitchToSelect();
+
+                FileStream fs;
+                // Open the file for reading
+                try
+                {
+                    fs = openDialog.File.OpenRead();
+                }
+                catch (Exception)
+                {
+                    MessageBox.Show("The specified file could not be opened");
+                    return;
+                }
+                
+                // This means we succeeded in opening the file for reading and writing
+                LoadChemProVFile(fs);
+
+                // We've loaded, so we're done with the stream
+                fs.Dispose();
+                fs = null;
+
+                // Tell the drawing canvas to update stream positions now that everything is loaded
+                WorkSpace.DrawingCanvas.UpdateAllStreamLocations();
             }
         }
 
@@ -613,8 +669,7 @@ namespace ChemProV
             //before creating a new file, check to see if our drawing drawing_canvas is not
             //empty.  If so, ask the user if they'd like to save the current file
             //before erasing everything.
-            if (WorkSpace.DrawingCanvas.Children
-                .Count > 0)
+            if (WorkSpace.DrawingCanvas.Children.Count > 0)
             {
                 MessageBoxResult result = MessageBox.Show("Creating a new file will erase the current process flow diagram.  Click OK to continue or CANCEL to go back and save.  This action will not be undo-able", "New File Confirmation", MessageBoxButton.OKCancel);
                 if (result == MessageBoxResult.OK)
@@ -632,27 +687,28 @@ namespace ChemProV
                 //delete the tempory file as they do not want it
                 using (IsolatedStorageFile isf = IsolatedStorageFile.GetUserStoreForApplication())
                 {
-                    if (isf.FileExists(autoSaveFileName))
+                    if (isf.FileExists(c_autoSaveFileName))
                     {
-                        isf.DeleteFile(autoSaveFileName);
+                        isf.DeleteFile(c_autoSaveFileName);
                     }
                 }
 
-                this.userDefinedVariableWindow.Window.IsOpen = false;
-
-                //why mess around this will completely reset everything
-                RequestNewBlankMainPage(this, EventArgs.Empty);
+                // Call the clear function to clear everything on the page
+                m_workspace.Clear();
+                Clear();
             }
         }
 
         private void RedoClick_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Redo();
+            WorkSpace.CheckRulesForPFD(null, null);
         }
 
         private void UndoButton_Click(object sender, RoutedEventArgs e)
         {
             WorkSpace.Undo();
+            WorkSpace.CheckRulesForPFD(null, null);
         }
 
         private void InstallButton_Click(object sender, RoutedEventArgs e)
@@ -665,36 +721,18 @@ namespace ChemProV
                 }
                 catch
                 {
-                    MessageBox.Show("Installation Failed: is it installed already? Try refreshing this page");
+                    MessageBox.Show("Installation Failed: is it installed already? Please try refreshing this page");
                 }
             }
         }
 
-        private void UserDefinedVariableButton_Click(object sender, RoutedEventArgs e)
-        {
-            userDefinedVariableWindow.Window.HorizontalOffset = this.ActualWidth / 2 - 50;
-            userDefinedVariableWindow.Window.VerticalOffset = this.ActualHeight / 2 - 50;
-            userDefinedVariableWindow.Window.IsOpen = true;
-        }
-
         private void OptionsButton_Click(object sender, RoutedEventArgs e)
         {
-            OptionWindow optionWindow = new OptionWindow();
-            optionWindow.Simplest.IsChecked = OptionDifficultySetting.MaterialBalance == currentDifficultySetting;
-            optionWindow.Medium.IsChecked = OptionDifficultySetting.MaterialBalanceWithReactors == currentDifficultySetting;
-            optionWindow.MostComplex.IsChecked = OptionDifficultySetting.MaterialAndEnergyBalance == currentDifficultySetting;
-            optionWindow.Closed += new EventHandler(optionWindow_Closed);
+            OptionWindow optionWindow = new OptionWindow(m_workspace);
+            optionWindow.Simplest.IsChecked = OptionDifficultySetting.MaterialBalance == m_workspace.Difficulty;
+            optionWindow.Medium.IsChecked = OptionDifficultySetting.MaterialBalanceWithReactors == m_workspace.Difficulty;
+            optionWindow.MostComplex.IsChecked = OptionDifficultySetting.MaterialAndEnergyBalance == m_workspace.Difficulty;
             optionWindow.Show();
-        }
-
-        private void optionWindow_Closed(object sender, EventArgs e)
-        {
-            OptionWindow optionWindow = sender as OptionWindow;
-            optionWindow.Closed -= new EventHandler(optionWindow_Closed);
-            if (optionWindow.DialogResult.Value == true)
-            {
-                CurrentDifficultySetting = optionWindow.OptionSelection;
-            }
         }
 
         /// <summary>
@@ -716,18 +754,146 @@ namespace ChemProV
             }
 
             //unlisten for selection changes in our children
-            WorkSpace.ToolPlaced -= new EventHandler(ToolPlaced);
-            WorkSpace.CompoundsUpdated -= new EventHandler(WorkSpace_UpdateCompounds);
             WorkSpace.ValidationChecked -= new EventHandler(WorkSpace_ValidationChecked);
-            userDefinedVariableWindow.UserDefinedVariablesUpdated -= new EventHandler(userDefinedVariableWindow_UserDefinedVariablesUpdated);
-
-            userDefinedVariableWindow.Window.IsOpen = false;
 
             CompoundTable.ConstantClicked -= new EventHandler(CompoundTable_ConstantClicked);
 
             //stop timer
             saveTimer.Tick -= new EventHandler(autoSave);
             saveTimer.Stop();
+        }
+
+        public WorkspaceControl WorkspaceReference
+        {
+            get
+            {
+                return WorkSpace;
+            }
+        }
+
+        private void Clear()
+        {
+            // Clear the text in the degrees of freedom analysis text box
+            DFAnalysisTextBox.Text = string.Empty;
+            
+            // Clear the workspace (which will clear the drawing canvas and equation editor)
+            WorkSpace.ClearWorkSpace();
+
+            // Clear the "last save" label
+            Saving_TextBlock.Text = string.Empty;
+            Saving_TextBlock.Visibility = System.Windows.Visibility.Collapsed;
+
+            // Reset the saving related stuff
+            ToolTipService.SetToolTip(SaveAsButton, "Save as...");
+        }
+
+        private void btnOSBLELogin_Click(object sender, RoutedEventArgs e)
+        {
+            LoginWin lw = new LoginWin();
+            lw.LoginAttemptCompleted += new EventHandler(OSBLELoginAttemptCompleted);
+            //lw.LoginAttemptCompleted += new LoginWindow.LoginAttemptCompletedDelegate(OSBLELoginAttemptCompleted);
+            lw.Show();
+        }
+
+        void OSBLELoginAttemptCompleted(object sender, EventArgs e)
+        {
+            LoginWin lw = sender as LoginWin;
+            ChemProV.Logic.OSBLE.OSBLEState state = lw.State;
+
+            // Set the global
+            Core.App.OSBLEState = state;
+
+            if (state.IsLoggedIn)
+            {
+                NormalOsbleIcon.Visibility = System.Windows.Visibility.Collapsed;
+                LoggedInOsble.Visibility = System.Windows.Visibility.Visible;
+            }
+        }
+
+        private void DFAnalysisTab_GotFocus(object sender, RoutedEventArgs e)
+        {
+            Core.App.ClosePopup();
+        }
+
+        private void Compounds_DF_TabControl_GotFocus(object sender, RoutedEventArgs e)
+        {
+            Core.App.ClosePopup();
+        }
+
+        private void DegreesOfFreedomAnalysis_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (m_ignoreWorkspaceChanges)
+            {
+                return;
+            }
+
+            DegreesOfFreedomAnalysis df = (sender as DegreesOfFreedomAnalysis);
+            if (e.PropertyName.Equals("CommentsVisible"))
+            {
+                if (df.CommentsVisible)
+                {
+                    DFCommentsBorder.BorderThickness = new Thickness(2.0);
+                    DFCommentsButton.Content = "Hide comments";
+                }
+                else
+                {
+                    DFCommentsBorder.BorderThickness = new Thickness(0.0);
+                    DFCommentsButton.Content = (df.Comments.Count > 0) ?
+                        "Show comments" : "Add comments";
+                }
+            }
+            else if (e.PropertyName.Equals("Text"))
+            {
+                m_ignoreWorkspaceChanges = true;
+                DFAnalysisTextBox.Text = df.Text;
+                m_ignoreWorkspaceChanges = false;
+            }
+        }
+
+        private void DFCommentsButton_Click(object sender, RoutedEventArgs e)
+        {
+            m_workspace.DegreesOfFreedomAnalysis.CommentsVisible =
+                !m_workspace.DegreesOfFreedomAnalysis.CommentsVisible;
+            
+            // If we've made the degrees of freedom analysis comments visible, ensure that the 
+            // comments pane is visible as well
+            if (m_workspace.DegreesOfFreedomAnalysis.CommentsVisible)
+            {
+                WorkSpace.CommentsPaneVisible = true;
+            }
+        }
+
+        private void DFAnalysisTextBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            // Prevent events from firing
+            m_ignoreWorkspaceChanges = true;
+
+            m_workspace.DegreesOfFreedomAnalysis.Text = DFAnalysisTextBox.Text;
+            
+            // Watch for events again
+            m_ignoreWorkspaceChanges = false;
+        }
+
+        private void DFCommentsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        {
+            DegreesOfFreedomAnalysis_PropertyChanged(
+                m_workspace.DegreesOfFreedomAnalysis, new PropertyChangedEventArgs("CommentsVisible"));
+        }
+
+        /// <summary>
+        /// A MainPage object represents an entire UI for creating and editing a workspace. A workspace is a 
+        /// data object that can be obtained with this call.
+        /// At the time of this writing the Core.Workspace class doesn't yet contain all the relevant data, 
+        /// but future refactoring should change this.
+        /// </summary>
+        public Logic.Workspace GetLogicalWorkspace()
+        {
+            return m_workspace;
+        }
+
+        private void CommentPaneButton_Click(object sender, RoutedEventArgs e)
+        {
+            WorkSpace.CommentsPaneVisible = !WorkSpace.CommentsPaneVisible;
         }
     }
 }

@@ -13,11 +13,15 @@ using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using ChemProV.PFD.Streams.PropertiesWindow;
+using System.ComponentModel;
+using ChemProV.Logic;
 
 namespace ChemProV.UI
 {
-    public partial class CompoundTable : UserControl
+    public partial class CompoundTable : UserControl, ChemProV.Core.IWorkspaceChangeListener
     {
+        private Workspace m_ws = null;
+        
         public CompoundTable()
         {
             InitializeComponent();
@@ -59,39 +63,6 @@ namespace ChemProV.UI
                 Compound_DataGrid.ItemsSource = elements;
                 Constants_DataGrid.ItemsSource = constants;
             }
-        }
-
-        /// <summary>
-        /// This is called when the pfd is changed not just when a compound is changed.  This gets a lit of ipfdElements
-        /// then it pulls out of those the tables and then makes a list of the compounds which it then sets as the elements source
-        /// to our combo_box
-        /// </summary>
-        /// <param name="ipfdElements"></param>
-        public void UpdateCompounds(IList<string> compounds)
-        {
-            int currentSelected = Compound_ComboBox.SelectedIndex;
-
-            Compound_ComboBox.ItemsSource = new ObservableCollection<string>(compounds);
-
-            if (compounds.Count <= 0)
-            {
-                Compound_ComboBox.SelectedIndex = -1;
-            }
-            else
-            {
-                if (currentSelected < compounds.Count)
-                {
-                    if (currentSelected != -1)
-                    {
-                        Compound_ComboBox.SelectedIndex = currentSelected;
-                    }
-                    else
-                    {
-                        Compound_ComboBox.SelectedIndex = 0;
-                    }
-                }
-            }
-            Compound_ComboBox_SelectionChanged(this, EventArgs.Empty as SelectionChangedEventArgs);
         }
 
         private void Constants_DataGrid_LoadingRow(object sender, DataGridRowEventArgs e)
@@ -155,6 +126,95 @@ namespace ChemProV.UI
         private void Constant_Symbol_Button_Click(object sender, RoutedEventArgs e)
         {
             ConstantClicked(sender, e);
+        }
+
+        #region IWorkspaceChangeListener Members
+
+        public void SetWorkspace(Workspace workspace)
+        {
+            // If we have a previous workspace, then unsubscribe from events
+            if (null != m_ws)
+            {
+                // Currently the application never does this. We get a workspace reference once 
+                // as the application initializes and that's it.
+                throw new NotImplementedException();
+            }
+            
+            m_ws = workspace;
+
+            // We need to watch changes in the stream collection and every time a new 
+            // one is added we need to attach listeners.
+            m_ws.StreamsCollectionChanged += new EventHandler(WorkspaceStreamsCollectionChanged);
+        }
+
+        #endregion
+
+        private void WorkspaceStreamsCollectionChanged(object sender, EventArgs e)
+        {
+            foreach (AbstractStream stream in m_ws.Streams)
+            {
+                // Unsubscribe first for safety. A += WILL cause the event handler to fire twice if 
+                // we were already subscribing and we want to avoid this. However, a -= when we're 
+                // not subscribed does not cause an error.
+                stream.PropertiesTable.RowPropertyChanged -= this.PropertiesTable_RowPropertyChanged;
+                
+                stream.PropertiesTable.RowPropertyChanged += this.PropertiesTable_RowPropertyChanged;
+            }
+
+            // Invoke the property change event because the streams that were added most likely 
+            // have tables and those tables could have compounds selected.
+            PropertiesTable_RowPropertyChanged(null, new PropertyChangedEventArgs("SelectedCompound"));
+        }
+
+        private void PropertiesTable_RowPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            // We only care about the selected compounds
+            if (!e.PropertyName.Equals("SelectedCompound"))
+            {
+                return;
+            }
+
+            // Backup the currently selected item
+            string currentSelection = Compound_ComboBox.SelectedItem as string;
+
+            // Clear the combo box items
+            Compound_ComboBox.Items.Clear();
+
+            // Go through all stream properties tables
+            foreach (AbstractStream stream in m_ws.Streams)
+            {
+                StreamPropertiesTable table = stream.PropertiesTable;
+                if (null == table)
+                {
+                    continue;
+                }
+                if (StreamType.Chemical != table.StreamType)
+                {
+                    continue;
+                }
+
+                // Go through the rows and look for at the selected compound. Add items to the 
+                // combo box as needed.
+                foreach (IStreamDataRow data in table.Rows)
+                {
+                    string s = (data as ChemicalStreamData).SelectedCompound;
+                    if (!string.IsNullOrEmpty(s) && !s.Equals("Overall") && 
+                        !Compound_ComboBox.Items.Contains(s))
+                    {
+                        Compound_ComboBox.Items.Add(s);
+                    }
+                }
+            }
+
+            // Re-select what was previously selected
+            if (!string.IsNullOrEmpty(currentSelection) &&
+                Compound_ComboBox.Items.Contains(currentSelection))
+            {
+                Compound_ComboBox.SelectedItem = currentSelection;
+            }
+
+            // Invoke the selection-changed event to ensure that everything works
+            Compound_ComboBox_SelectionChanged(this, EventArgs.Empty as SelectionChangedEventArgs);
         }
     }
 }

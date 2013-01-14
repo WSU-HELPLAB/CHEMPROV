@@ -1,0 +1,154 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2C2F929D-A984-4ED5-BCF3-1A885260BF3A}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>PortableChemProvNet4</RootNamespace>
+    <AssemblyName>PortableChemProvNet4</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\PortableChemProV\Core\CommentMerger.cs">
+      <Link>Core\CommentMerger.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\AbstractProcessUnit.cs">
+      <Link>Logic\AbstractProcessUnit.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\AbstractStream.cs">
+      <Link>Logic\AbstractStream.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\ChemicalCompounds.cs">
+      <Link>Logic\ChemicalCompounds.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\ChemicalStream.cs">
+      <Link>Logic\ChemicalStream.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\ChemicalStreamData.cs">
+      <Link>Logic\ChemicalStreamData.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\ChemicalUnits.cs">
+      <Link>Logic\ChemicalUnits.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\CommentDefs.cs">
+      <Link>Logic\CommentDefs.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\DegreesOfFreedomAnalysis.cs">
+      <Link>Logic\DegreesOfFreedomAnalysis.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\EquationCollection.cs">
+      <Link>Logic\EquationCollection.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\EquationModel.cs">
+      <Link>Logic\Equations\EquationModel.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\EquationScope.cs">
+      <Link>Logic\Equations\EquationScope.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\EquationType.cs">
+      <Link>Logic\Equations\EquationType.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Equations\IEquationModifier.cs">
+      <Link>Logic\Equations\IEquationModifier.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Expression.cs">
+      <Link>Logic\Expression.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\HeatExchangerNoUtility.cs">
+      <Link>Logic\HeatExchangerNoUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\HeatExchangerWithUtility.cs">
+      <Link>Logic\HeatExchangerWithUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\HeatStream.cs">
+      <Link>Logic\HeatStream.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\HeatStreamData.cs">
+      <Link>Logic\HeatStreamData.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\IStreamDataRow.cs">
+      <Link>Logic\IStreamDataRow.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Mixer.cs">
+      <Link>Logic\Mixer.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\ProcessUnitFactory.cs">
+      <Link>Logic\ProcessUnitFactory.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Reactor.cs">
+      <Link>Logic\Reactor.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Separator.cs">
+      <Link>Logic\Separator.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\StickyNote.cs">
+      <Link>Logic\StickyNote.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\StreamPropertiesTable.cs">
+      <Link>Logic\StreamPropertiesTable.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\UndoDefs.cs">
+      <Link>Logic\UndoDefs.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\Workspace.cs">
+      <Link>Logic\Workspace.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\Logic\WorkspaceUtility.cs">
+      <Link>Logic\WorkspaceUtility.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\MathCore\Vector.cs">
+      <Link>MathCore\Vector.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\OptionDifficultySetting.cs">
+      <Link>OptionDifficultySetting.cs</Link>
+    </Compile>
+    <Compile Include="..\PortableChemProV\StreamType.cs">
+      <Link>StreamType.cs</Link>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

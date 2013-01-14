@@ -41,6 +41,10 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
                     return "ethanol";
                 case 8:
                     return "ethylene";
+                case 31:
+                    return "ethylene oxide";
+                case 30:
+                    return "formaldehyde";
                 case 9:
                     return "hydrochloric acid";
                 case 10:
@@ -102,6 +106,10 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
                     return 7;
                 case "ethylene":
                     return 8;
+                case "ethylene oxide":
+                    return 31;
+                case "formaldehyde":
+                    return 30;
                 case "hydrochloric acid":
                     return 9;
                 case "hydrogen":

@@ -14,7 +14,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
 {
     public delegate void TableDataEventHandler(object sender, TableDataChangedEventArgs e);
 
-    public interface IPropertiesWindow : IPfdElement, IXmlSerializable, IComparable
+    public interface IPropertiesWindow : IPfdElement, IXmlSerializable, IComparable, Core.ICanvasElement
     {
         /// <summary>
         /// This occurs when a change has been commited and the data changed as a result
@@ -29,7 +29,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
         /// <summary>
         /// Gets or sets the parent stream that the table is attached to
         /// </summary>
-        IStream ParentStream
+        ChemProV.PFD.Streams.StreamControl ParentStream
         {
             get;
             set;

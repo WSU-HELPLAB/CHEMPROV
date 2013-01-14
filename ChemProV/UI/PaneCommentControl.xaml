@@ -1,0 +1,48 @@
+﻿<UserControl xmlns:toolkit="http://schemas.microsoft.com/winfx/2006/xaml/presentation/toolkit"
+    xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk" 
+    x:Class="ChemProV.UI.PaneCommentControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    d:DesignHeight="100" d:DesignWidth="150">
+
+    <StackPanel x:Name="LayoutRoot" Background="#FFCEC351" VerticalAlignment="Stretch">
+        <Grid VerticalAlignment="Stretch" x:Name="TitleBarGrid">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="20"></ColumnDefinition>
+                <ColumnDefinition Width="*"></ColumnDefinition>
+                <ColumnDefinition Width="20"></ColumnDefinition>
+            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25" />
+            </Grid.RowDefinitions>
+            
+            <!-- Icon that shows up when the control represents a comment for a stream or process unit -->
+            <Image x:Name="IconImage" Width="16" Grid.Column="0" Grid.Row="0" Source="/UI/Icons/pu_stream.png" />
+            
+            <!-- User name label -->
+            <sdk:Label Grid.Column="1" Grid.Row="0" Background="#FFCEC351"
+                HorizontalAlignment="Stretch" 
+                Name="UserNameLabel"
+                HorizontalContentAlignment="Left">User name
+            </sdk:Label>
+
+            <sdk:Label Grid.Column="2" Grid.Row="0" Background="#FFCEC351" HorizontalAlignment="Stretch" 
+                HorizontalContentAlignment="Center"
+                Name="XLabel">X</sdk:Label>
+        </Grid>
+
+        <TextBox AcceptsReturn="True" TextWrapping="Wrap" Name="CommentTextBox"
+            Text="This is a test to see if the text wraps and expands the height of the control. It apparetly does."
+            TextChanged="CommentTextBox_TextChanged">
+            <TextBox.Background>
+                <LinearGradientBrush EndPoint="0.0,1.0" StartPoint="0.0,0.0">
+                    <GradientStop Offset="0.0" Color="#FFFFFCA3" />
+                    <GradientStop Offset="1.0" Color="#FFDFDC83" />
+                </LinearGradientBrush>
+            </TextBox.Background>
+        </TextBox>
+    </StackPanel>
+</UserControl>

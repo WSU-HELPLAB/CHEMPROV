@@ -11,11 +11,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
 	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
 	xmlns:ctk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
 	xmlns:controls="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls"
-	xmlns:ChemProV_UI_PalletItems="clr-namespace:ChemProV.UI.PalletItems"
     xmlns:ChemProV_UI="clr-namespace:ChemProV.UI"
-    xmlns:ChemProV_UI_DrawingCanvas="clr-namespace:ChemProV.UI.DrawingCanvas"
     xmlns:ChemProV_EquationEditor ="clr-namespace:ChemProV.PFD.EquationEditor"
-    xmlns:ProcessUnits="clr-namespace:ChemProV.PFD.ProcessUnits"
     xmlns:ChemProV_Validation_Feedback="clr-namespace:ChemProV.Validation.Feedback"
 	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
 	xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk"
@@ -35,8 +32,8 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Click="OpenFileButton_Click" ToolTipService.ToolTip="Open a saved file">
                     <Image Source="/UI/Icons/toolbar_open.png" />
                 </Button>
-                <Button Margin="0,0,5,0" Click="SaveFileButton_Click" ToolTipService.ToolTip="Save the current PFD">
-                    <Image Source="/UI/Icons/toolbar_save.png" />
+                <Button x:Name="SaveAsButton" Margin="0,0,5,0" Click="SaveFileAs_BtnClick" ToolTipService.ToolTip="Save as...">
+                    <Image Source="/UI/Icons/toolbar_saveas.png" />
                 </Button>
                 <Button Margin="0,0,5,0" Click="UndoButton_Click" ToolTipService.ToolTip="Undo last action">
                     <Image Source="/UI/Icons/toolbar_undo.png" />
@@ -50,23 +47,83 @@ Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
                 <Button Margin="0,0,5,0" Click="OptionsButton_Click" ToolTipService.ToolTip="Options" >
                     <Image Source="/UI/Icons/toolbar_settings.png" />
                 </Button>
+                <Button x:Name="CommentPaneButton" Margin="0,0,5,0" Click="CommentPaneButton_Click" ToolTipService.ToolTip="Show comments pane">
+                    <Image Source="/UI/Icons/comment_16x16.png" />
+                </Button>
                 <Button Margin="0,0,5,0" Click="HelpButton_Click" ToolTipService.ToolTip="About ChemProV" >
                     <Image Source="/UI/Icons/toolbar_about.png" />
                 </Button>
+                
+                <!-- For tests and debugging -->
+                <!-- OSBLE login button -->
+                <Button Name="btnOSBLELogin" Margin="0,0,5,0" Click="btnOSBLELogin_Click" Visibility="Visible">
+                    <ToolTipService.ToolTip>OSBLE login...</ToolTipService.ToolTip>
+                    <StackPanel Orientation="Vertical">
+                        <Image x:Name="NormalOsbleIcon" Source="/UI/Icons/OSBLE_person_16x16.png"></Image>
+                        <Image x:Name="LoggedInOsble" Visibility="Collapsed" Source="/UI/Icons/OSBLE_person_active_16x16.png"></Image>
+                    </StackPanel>
+                </Button>
+                
             </StackPanel>
         </StackPanel>
 
         <!-- Left-Hand toolbar -->
-        <StackPanel x:Name="LeftHandToolBar_StackPanel">
-            <!--this is where the ProcessPalette will go-->
-            <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
-            <ScrollViewer VerticalScrollBarVisibility="Auto" x:Name="CompoundTableScrollViewer" BorderBrush="Transparent">
-                <ChemProV_UI:CompoundTable x:Name="CompoundTable"/>
-            </ScrollViewer>
-            <TextBlock x:Name="Saving_TextBlock"/>
-        </StackPanel>
-        <ChemProV_UI:WorkSpace x:Name="WorkSpace">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
 
-        </ChemProV_UI:WorkSpace>
+            <StackPanel Grid.Row="0">
+                <ChemProV_UI:ControlPalette x:Name="PrimaryPalette" IsHitTestVisible="True">
+                </ChemProV_UI:ControlPalette>
+                <Rectangle Width="Auto" Height="2" Fill="Gray" Margin="0,5,0,5" />
+            </StackPanel>
+
+            <!-- Tab control for compounds and degrees of freedom analysis -->
+            <sdk:TabControl VerticalAlignment="Stretch" Grid.Row="1" Width="175" x:Name="Compounds_DF_TabControl"
+                GotFocus="Compounds_DF_TabControl_GotFocus">
+                
+                <sdk:TabItem Header="Compounds" x:Name="CompoundTableTab">
+                    <ChemProV_UI:CompoundTable x:Name="CompoundTable"/>
+                </sdk:TabItem>
+                
+                <sdk:TabItem Header="DF Analysis" x:Name="DFAnalysisTab" GotFocus="DFAnalysisTab_GotFocus">
+                    <ToolTipService.ToolTip>Degrees of Freedom Analysis</ToolTipService.ToolTip>
+                    <Border x:Name="DFCommentsBorder" Grid.Row="1"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        CornerRadius="3" BorderThickness="0" BorderBrush="#F02AB0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="30" />
+                            </Grid.RowDefinitions>
+                        
+                            <TextBox x:Name="DFAnalysisTextBox" VerticalAlignment="Stretch" HorizontalAlignment="Stretch"
+                                TextWrapping="Wrap" AcceptsReturn="True" VerticalScrollBarVisibility="Auto" Grid.Row="0"
+                                TextChanged="DFAnalysisTextBox_TextChanged"/>
+                            
+                            <!-- Button to add, show, or hide comments. -->
+                            <Button x:Name="DFCommentsButton" Grid.Row="1" Margin="3,3,3,3" Click="DFCommentsButton_Click" >Add a comment</Button>
+                        </Grid>
+                    </Border>
+                </sdk:TabItem>
+                
+                <sdk:TabItem Header="Debug" x:Name="DebugTab" Visibility="Collapsed">
+                    <sdk:TreeView>
+                        <sdk:TreeViewItem x:Name="StreamsDebugNode" Header="Streams" />
+                        <sdk:TreeViewItem x:Name="ProcessUnitsDebugNode" Header="Process Units" />
+                    </sdk:TreeView>
+                </sdk:TabItem>
+                
+            </sdk:TabControl>
+            <!-- End of tab control for compounds and degrees of freedom analysis -->
+
+            <TextBlock x:Name="Saving_TextBlock" Grid.Row="2" />
+        </Grid>
+        
+        <!-- Workspace control -->
+        <ChemProV_UI:WorkspaceControl x:Name="WorkSpace" />
     </ctk:DockPanel>
 </UserControl>
