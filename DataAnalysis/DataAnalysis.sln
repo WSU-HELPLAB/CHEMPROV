@@ -1,0 +1,38 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CommentCounter", "CommentCounter\CommentCounter.csproj", "{42EB4BFC-4F0D-47E7-BD9A-52B76F36D680}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudentCommentCounter", "StudentCommentCounter\StudentCommentCounter.csproj", "{41C7F805-5A73-43FF-95AE-A6D43F0012D4}"
+EndProject
+Global
+	GlobalSection(TeamFoundationVersionControl) = preSolution
+		SccNumberOfProjects = 3
+		SccEnterpriseProvider = {4CA58AB2-18FA-4F8D-95D4-32DDF27D184C}
+		SccTeamFoundationServer = https://tfs.codeplex.com/tfs/tfs25
+		SccLocalPath0 = .
+		SccProjectUniqueName1 = CommentCounter\\CommentCounter.csproj
+		SccProjectName1 = CommentCounter
+		SccLocalPath1 = CommentCounter
+		SccProjectUniqueName2 = StudentCommentCounter\\StudentCommentCounter.csproj
+		SccProjectName2 = StudentCommentCounter
+		SccLocalPath2 = StudentCommentCounter
+	EndGlobalSection
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42EB4BFC-4F0D-47E7-BD9A-52B76F36D680}.Debug|x86.ActiveCfg = Debug|x86
+		{42EB4BFC-4F0D-47E7-BD9A-52B76F36D680}.Debug|x86.Build.0 = Debug|x86
+		{42EB4BFC-4F0D-47E7-BD9A-52B76F36D680}.Release|x86.ActiveCfg = Release|x86
+		{42EB4BFC-4F0D-47E7-BD9A-52B76F36D680}.Release|x86.Build.0 = Release|x86
+		{41C7F805-5A73-43FF-95AE-A6D43F0012D4}.Debug|x86.ActiveCfg = Debug|x86
+		{41C7F805-5A73-43FF-95AE-A6D43F0012D4}.Debug|x86.Build.0 = Debug|x86
+		{41C7F805-5A73-43FF-95AE-A6D43F0012D4}.Release|x86.ActiveCfg = Release|x86
+		{41C7F805-5A73-43FF-95AE-A6D43F0012D4}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
