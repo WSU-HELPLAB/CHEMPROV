@@ -184,6 +184,21 @@ namespace ChemProV.Core
         }
 
         /// <summary>
+        /// Goes through a list of BasicComments objects and sets the user name to the specified value 
+        /// if the StickyNote's user name is null or empty.
+        /// </summary>
+        private static void SetUserNameIfAbsent(IList<BasicComment> commentList, string userName)
+        {
+            foreach (BasicComment sn in commentList)
+            {
+                if (string.IsNullOrEmpty(sn.CommentUserName))
+                {
+                    sn.CommentUserName = userName;
+                }
+            }
+        }
+
+        /// <summary>
         /// Checks for any comments in the entire workspace that lack a user name and replaces the 
         /// user name with the specified string.
         /// </summary>
@@ -206,16 +221,14 @@ namespace ChemProV.Core
                 SetUserNameIfAbsent(apu.Comments, userName);
             }
 
+            //equations
             foreach (EquationModel equation in workspace.Equations)
             {
-                foreach (BasicComment comment in equation.Comments)
-                {
-                    if(string.IsNullOrEmpty(comment.CommentUserName))
-                    {
-                        comment.CommentUserName = userName;
-                    }
-                }
+                SetUserNameIfAbsent(equation.Comments, userName);
             }
+
+            //degrees of freedom analysis
+            SetUserNameIfAbsent(workspace.DegreesOfFreedomAnalysis.Comments, userName);
             
             // Go through the free-floating sticky notes in the workspace as well
             SetUserNameIfAbsent(workspace.StickyNotes, userName);
