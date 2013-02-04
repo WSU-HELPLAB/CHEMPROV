@@ -119,14 +119,37 @@ namespace CommentCounter
                 List<string> pieces = new List<string>();
                 pieces.Add(Path.GetFileName(fileName));
                 int counter = 0;
+                
+                //determine author if possible
+                string[] authorPieces = Path.GetFileNameWithoutExtension(fileName).Split('_');
+                string author = authorPieces[0];
+                if (userComments.ContainsKey(author) == true)
+                {
+                    pieces.Add(string.Format("\"{0}:{1}\"", author, userComments[author].Count));
+                    userComments.Remove(author);
+                }
+                else
+                {
+                    //add blank spot where author should be
+                    pieces.Add("");
+                }
+
+                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.csv", Path.GetFileNameWithoutExtension(fileName)));
+
                 foreach (string key in userComments.Keys)
                 {
                     counter += userComments[key].Count;
-                    pieces.Add(string.Format("{0}:{1}", key, userComments[key].Count));
+                    pieces.Add(string.Format("\"{0}:{1}\"", key, userComments[key].Count));
+                    foreach (string comment in userComments[key])
+                    {
+                        commentsFile.WriteLine(string.Format("\"{0}\", \"{1}\"", key, comment));
+                    }
                 }
+                commentsFile.Close();
                 pieces.Insert(1, counter.ToString());
                 textFile.WriteLine(string.Join(",", pieces));
                 textFile.Flush();
+                
             }
             textFile.Close();
         }
