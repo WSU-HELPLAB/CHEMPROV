@@ -205,6 +205,17 @@ namespace ChemProV.Core
             {
                 SetUserNameIfAbsent(apu.Comments, userName);
             }
+
+            foreach (EquationModel equation in workspace.Equations)
+            {
+                foreach (BasicComment comment in equation.Comments)
+                {
+                    if(string.IsNullOrEmpty(comment.CommentUserName))
+                    {
+                        comment.CommentUserName = userName;
+                    }
+                }
+            }
             
             // Go through the free-floating sticky notes in the workspace as well
             SetUserNameIfAbsent(workspace.StickyNotes, userName);
