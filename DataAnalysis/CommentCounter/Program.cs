@@ -134,7 +134,7 @@ namespace CommentCounter
                     pieces.Add("");
                 }
 
-                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.csv", Path.GetFileNameWithoutExtension(fileName)));
+                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.txt", Path.GetFileNameWithoutExtension(fileName)));
 
                 foreach (string key in userComments.Keys)
                 {
@@ -142,7 +142,7 @@ namespace CommentCounter
                     pieces.Add(string.Format("\"{0}:{1}\"", key, userComments[key].Count));
                     foreach (string comment in userComments[key])
                     {
-                        commentsFile.WriteLine(string.Format("\"{0}\", \"{1}\"", key, comment));
+                        commentsFile.WriteLine(string.Format("Comment Author: {0}\r\nComment: {1}\r\n\r\n-----", key, comment));
                     }
                 }
                 commentsFile.Close();
