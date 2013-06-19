@@ -23,13 +23,13 @@
     <MetadataSource Address="https://osble.org/services/AuthenticationService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="AuthenticationService.xsd" MetadataType="Schema" ID="31fff98d-adab-47e1-bdec-b49cc82ecffc" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?xsd=xsd3" />
-    <MetadataFile FileName="AuthenticationService.wsdl" MetadataType="Wsdl" ID="1bcc7252-5648-4df9-a8fd-0600618509f3" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?wsdl" />
-    <MetadataFile FileName="AuthenticationService.disco" MetadataType="Disco" ID="bbf8b8b7-7161-4ddd-9046-f512ada6ea2c" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?disco" />
-    <MetadataFile FileName="AuthenticationService1.wsdl" MetadataType="Wsdl" ID="7fc74b94-b572-4474-ab8f-7359b9da6b76" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?wsdl=wsdl0" />
-    <MetadataFile FileName="AuthenticationService1.xsd" MetadataType="Schema" ID="42de449a-f337-47a7-aecc-6cb810c4b646" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?xsd=xsd0" />
-    <MetadataFile FileName="AuthenticationService2.xsd" MetadataType="Schema" ID="94375826-3a72-438c-b670-3591508bfe54" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?xsd=xsd1" />
-    <MetadataFile FileName="AuthenticationService3.xsd" MetadataType="Schema" ID="e80ed33b-e0df-4992-a33d-8e0fcf670e2d" SourceId="1" SourceUrl="https://osble.org/Services/AuthenticationService.svc?xsd=xsd2" />
+    <MetadataFile FileName="AuthenticationService412.xsd" MetadataType="Schema" ID="b0784546-ea11-4371-bb5c-d0cee867519b" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?xsd=xsd0" />
+    <MetadataFile FileName="AuthenticationService413.xsd" MetadataType="Schema" ID="ec347405-463c-43e2-8879-f0e4358af77f" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?xsd=xsd1" />
+    <MetadataFile FileName="AuthenticationService13.disco" MetadataType="Disco" ID="c619b0b8-bde5-43b3-9cb4-a28e6f474174" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?disco" />
+    <MetadataFile FileName="AuthenticationService414.xsd" MetadataType="Schema" ID="f62b9080-5d9b-49fe-8f6c-d4ded5164ac8" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?xsd=xsd3" />
+    <MetadataFile FileName="AuthenticationService26.wsdl" MetadataType="Wsdl" ID="4b325d61-88cc-4920-b21b-a273c1b70199" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?wsdl" />
+    <MetadataFile FileName="AuthenticationService415.xsd" MetadataType="Schema" ID="d06db4a9-5dba-49d0-967e-9c634ebc4b39" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?xsd=xsd2" />
+    <MetadataFile FileName="AuthenticationService27.wsdl" MetadataType="Wsdl" ID="187a0ec7-b383-4202-a4be-c1a1e2336ba7" SourceId="1" SourceUrl="http://osble.org/services/AuthenticationService.svc?wsdl=wsdl0" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
