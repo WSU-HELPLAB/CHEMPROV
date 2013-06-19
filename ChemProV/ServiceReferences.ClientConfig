@@ -4,21 +4,21 @@
             <basicHttpBinding>
                 <binding name="BasicHttpBinding_AuthenticationService" maxBufferSize="2147483647"
                     maxReceivedMessageSize="2147483647">
-                    <security mode="Transport" />
+                    <security mode="None" />
                 </binding>
-                <binding name="BasicHttpBinding_OsbleService1" maxBufferSize="2147483647"
+                <binding name="BasicHttpBinding_OsbleService" maxBufferSize="2147483647"
                     maxReceivedMessageSize="2147483647">
-                    <security mode="Transport" />
+                    <security mode="None" />
                 </binding>
             </basicHttpBinding>
         </bindings>
         <client>
-            <endpoint address="https://osble.org/Services/AuthenticationService.svc/Services/AuthenticationService.svc"
+            <endpoint address="http://osble.org/services/AuthenticationService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService"
                 contract="OSBLEAuthServiceRef.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
-            <endpoint address="https://www.osble.org/Services/OsbleService.svc/Services/OsbleService.svc"
-                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService1"
-                contract="OSBLEClientReference.OsbleService" name="BasicHttpBinding_OsbleService1" />
+            <endpoint address="http://www.osble.org/services/OsbleService.svc"
+                binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService"
+                contract="OSBLEClientReference.OsbleService" name="BasicHttpBinding_OsbleService" />
         </client>
     </system.serviceModel>
 </configuration>

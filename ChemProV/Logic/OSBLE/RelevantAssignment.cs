@@ -292,7 +292,7 @@ namespace ChemProV.Logic.OSBLE
         {
             get
             {
-                return m_a.Deliverables;
+                return new ObservableCollection<Deliverable>(m_a.Deliverables);
             }
         }
 
