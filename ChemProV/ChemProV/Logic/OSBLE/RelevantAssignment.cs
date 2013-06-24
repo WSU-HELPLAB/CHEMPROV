@@ -178,7 +178,7 @@ namespace ChemProV.Logic.OSBLE
                 osc.GetMergedReviewDocumentCompleted += new EventHandler<GetMergedReviewDocumentCompletedEventArgs>(GetMergedReviewDocumentCompleted);
                 try
                 {
-                    osc.GetMergedReviewDocumentAsync((int)m_a.PrecededingAssignmentID, authToken, args);
+                    osc.GetMergedReviewDocumentAsync(m_a.ID, authToken, args);
                 }
                 catch (Exception)
                 { }
