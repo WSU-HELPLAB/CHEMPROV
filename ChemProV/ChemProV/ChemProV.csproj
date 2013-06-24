@@ -395,18 +395,18 @@
   <ItemGroup>
     <Content Include="Libraries\SharpZipLib.Silverlight4.dll" />
     <None Include="DevDocs\ChemProV Design Overview.pptx" />
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService26.wsdl" />
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService27.wsdl" />
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService412.xsd">
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService413.xsd">
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService414.xsd">
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService415.xsd">
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OSBLEAuthServiceRef\ChemProV.OSBLEAuthServiceRef.UserProfile.datasource">
@@ -429,41 +429,41 @@
     </None>
     <None Include="Service References\OSBLEClientReference\configuration91.svcinfo" />
     <None Include="Service References\OSBLEClientReference\configuration.svcinfo" />
-    <None Include="Service References\OSBLEClientReference\OsbleService28.wsdl" />
-    <None Include="Service References\OSBLEClientReference\OsbleService29.wsdl" />
-    <None Include="Service References\OSBLEClientReference\OsbleService936.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService937.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService1.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService1.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService938.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService2.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService939.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService3.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService940.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService4.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService941.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService5.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService942.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService6.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService943.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService7.xsd">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Service References\OSBLEClientReference\OsbleService944.xsd">
+    <None Include="Service References\OSBLEClientReference\OsbleService8.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OSBLEClientReference\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
-    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService13.disco" />
-    <None Include="Service References\OSBLEClientReference\OsbleService14.disco" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.disco" />
+    <None Include="Service References\OSBLEClientReference\OsbleService.disco" />
     <Content Include="UI\Icons\down_arrow_16x16.png" />
     <Content Include="UI\Icons\OSBLE_person_active_16x16.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

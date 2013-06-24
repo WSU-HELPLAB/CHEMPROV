@@ -13,10 +13,10 @@
             </basicHttpBinding>
         </bindings>
         <client>
-            <endpoint address="http://osble.org/services/AuthenticationService.svc"
+            <endpoint address="http://localhost:17532/services/AuthenticationService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService"
                 contract="OSBLEAuthServiceRef.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
-            <endpoint address="http://www.osble.org/services/OsbleService.svc"
+            <endpoint address="http://localhost:17532/services/OsbleService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService"
                 contract="OSBLEClientReference.OsbleService" name="BasicHttpBinding_OsbleService" />
         </client>
