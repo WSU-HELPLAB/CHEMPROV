@@ -41,7 +41,7 @@ namespace ChemProV.Logic.OSBLE
 
         private void AuthClient_ValidateUserCompleted(object sender, ValidateUserCompletedEventArgs e)
         {
-            if (null != e.Error)
+            if (null != e.Error || string.IsNullOrEmpty(e.Result))
             {
                 m_authToken = null;
                 m_isLoggedIn = false;
