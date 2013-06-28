@@ -393,7 +393,6 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Libraries\SharpZipLib.Silverlight4.dll" />
     <None Include="DevDocs\ChemProV Design Overview.pptx" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.wsdl" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.xsd">
@@ -489,29 +488,6 @@
   <ItemGroup>
     <Content Include="Libraries\Behaviors.dll" />
     <Content Include="Libraries\Behaviors.pdb" />
-    <Content Include="Libraries\ImageTools.Controls.dll" />
-    <Content Include="Libraries\ImageTools.Controls.pdb" />
-    <Content Include="Libraries\ImageTools.Controls.XML" />
-    <Content Include="Libraries\ImageTools.dll" />
-    <Content Include="Libraries\ImageTools.Filtering.dll" />
-    <Content Include="Libraries\ImageTools.Filtering.pdb" />
-    <Content Include="Libraries\ImageTools.Filtering.XML" />
-    <Content Include="Libraries\ImageTools.IO.Bmp.dll" />
-    <Content Include="Libraries\ImageTools.IO.Bmp.pdb" />
-    <Content Include="Libraries\ImageTools.IO.Bmp.XML" />
-    <Content Include="Libraries\ImageTools.IO.Gif.dll" />
-    <Content Include="Libraries\ImageTools.IO.Gif.pdb" />
-    <Content Include="Libraries\ImageTools.IO.Gif.XML" />
-    <Content Include="Libraries\ImageTools.IO.Jpeg.dll" />
-    <Content Include="Libraries\ImageTools.IO.Jpeg.pdb" />
-    <Content Include="Libraries\ImageTools.IO.Jpeg.XML" />
-    <Content Include="Libraries\ImageTools.IO.Png.dll" />
-    <Content Include="Libraries\ImageTools.IO.Png.pdb" />
-    <Content Include="Libraries\ImageTools.IO.Png.XML" />
-    <Content Include="Libraries\ImageTools.pdb" />
-    <Content Include="Libraries\ImageTools.Utils.dll" />
-    <Content Include="Libraries\ImageTools.Utils.pdb" />
-    <Content Include="Libraries\ImageTools.XML" />
     <Content Include="Libraries\Microsoft.Expression.Drawing.dll" />
     <Content Include="Libraries\Silverlight.Controls.dll" />
     <Content Include="Libraries\Silverlight.Controls.pdb" />
