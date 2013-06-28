@@ -81,17 +81,7 @@
     <Reference Include="Behaviors">
       <HintPath>..\Behaviors.dll</HintPath>
     </Reference>
-    <Reference Include="ImageTools">
-      <HintPath>Libraries\ImageTools.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.IO.Png">
-      <HintPath>Libraries\ImageTools.IO.Png.dll</HintPath>
-    </Reference>
-    <Reference Include="ImageTools.Utils">
-      <HintPath>Libraries\ImageTools.Utils.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.Expression.Drawing, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
-    <Reference Include="SharpZipLib.Silverlight4, Version=0.0.0.0, Culture=neutral, PublicKeyToken=a37ef23abf01322c, processorArchitecture=MSIL" />
     <Reference Include="Silverlight.Controls">
       <HintPath>Libraries\Silverlight.Controls.dll</HintPath>
     </Reference>
