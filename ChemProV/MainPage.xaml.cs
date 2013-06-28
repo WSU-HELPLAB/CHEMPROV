@@ -457,7 +457,7 @@ namespace ChemProV
                 }
             }
 
-            ImageTools.Image foo = finalBmp.ToImage();
+            ExtendedImage foo = ImageTools.ImageExtensions.ToImage(finalBmp);
             PngEncoder encoder = new PngEncoder();
             encoder.Encode(foo, output);
             output.Flush();
