@@ -126,6 +126,9 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
         ///
         ///"water":
         ///newCompound.Abbr = "wa";
+        ///
+        /// "xylene"
+        /// newCompound.Abbr = "xy";
         /// </summary>
         public string Abbr
         {
