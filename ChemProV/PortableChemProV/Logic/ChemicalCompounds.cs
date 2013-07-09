@@ -31,7 +31,8 @@ namespace ChemProV.Logic
         SodiumHydroxide,
         SulfuricAcid,
         Toluene,
-        Water
+        Water,
+        Xylene
     }
 
     public static class ChemicalCompoundOptions
@@ -61,7 +62,8 @@ namespace ChemProV.Logic
         //    "Sodium Hydroxide",
         //    "Sulfuric Acid",
         //    "Toluene",
-        //    "Water"};
+        //    "Water",
+        //    "Xylene" };
 
         public static readonly string[] All = new string[]{
             "acetic acid",
@@ -89,7 +91,8 @@ namespace ChemProV.Logic
             "sodium hydroxide",
             "sulfuric acid",
             "toluene",
-            "water"};
+            "water",
+            "xylene"};
     }
 
     /// <summary>

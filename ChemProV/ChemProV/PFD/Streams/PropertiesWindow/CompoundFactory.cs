@@ -100,6 +100,9 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
 
                 case "wa":
                     return "water";
+
+                case "xy":
+                    return "xylene";
             }
             return "";
         }
@@ -441,6 +444,19 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                         newCompound.BoilingPoint = 100;
                         newCompound.MeltingPoint = 0;
                         newCompound.Abbr = "wa";
+                    }
+                    break;
+
+                case "xylene":
+                    {
+                        elements.Add(hydrogren, 10);
+                        elements.Add(carbon, 8);
+                        newCompound.HeatCapacity = 0.182;
+                        newCompound.HeatFormation = -24.4;
+                        newCompound.HeatVaporization = 35.7;
+                        newCompound.BoilingPoint = 138.5;
+                        newCompound.MeltingPoint = -47.4;
+                        newCompound.Abbr = "xy";
                     }
                     break;
             }

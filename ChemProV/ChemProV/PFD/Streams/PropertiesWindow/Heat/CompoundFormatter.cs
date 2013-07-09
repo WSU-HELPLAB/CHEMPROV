@@ -79,6 +79,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
                     return "Select";
                 case 25:
                     return "Overall";
+                case 32:
+                    return "xylene";
                 default:
                     return "";
             }
@@ -140,6 +142,8 @@ namespace ChemProV.PFD.Streams.PropertiesWindow.Heat
                     return 22;
                 case "water":
                     return 23;
+                case "xylene":
+                    return 32;
                 case "Select":
                     return 0;
                 case "Overall":
