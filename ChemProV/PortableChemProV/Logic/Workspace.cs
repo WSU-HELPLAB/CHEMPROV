@@ -139,6 +139,13 @@ namespace ChemProV.Logic
             {
                 PropertyChanged(this, new PropertyChangedEventArgs("UndoTitle"));
             }
+            
+            //AC: A little heavy handed, but this will update the list of process unit names
+            //on every potential undo action
+            if (null != ProcessUnitsCollectionChanged)
+            {
+                ProcessUnitsCollectionChanged(this, EventArgs.Empty);
+            }
 
             return true;
         }
@@ -453,6 +460,13 @@ namespace ChemProV.Logic
                     PropertyChanged(this, new PropertyChangedEventArgs("UndoTitle"));
                     PropertyChanged(this, new PropertyChangedEventArgs("RedoTitle"));
                 }
+
+                //AC: A little heavy handed, but this will update the list of process unit names
+                //on every potential undo action
+                if (null != ProcessUnitsCollectionChanged)
+                {
+                    ProcessUnitsCollectionChanged(this, EventArgs.Empty);
+                }
             }
         }
 
@@ -736,6 +750,13 @@ namespace ChemProV.Logic
                 // Send a notification that this may have changed the undo/redo titles
                 PropertyChanged(this, new PropertyChangedEventArgs("UndoTitle"));
                 PropertyChanged(this, new PropertyChangedEventArgs("RedoTitle"));
+
+                //AC: A little heavy handed, but this will update the list of process unit names
+                //on every potential undo action
+                if (null != ProcessUnitsCollectionChanged)
+                {
+                    ProcessUnitsCollectionChanged(this, EventArgs.Empty);
+                }
             }
         }
 
