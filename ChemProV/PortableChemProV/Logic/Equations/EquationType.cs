@@ -10,6 +10,7 @@ namespace ChemProV.Logic.Equations
         VariableDefinition,
         Energy,
         Specification,
+        Basis
     }
     
     public class EquationType : IEquationModifier, IComparable

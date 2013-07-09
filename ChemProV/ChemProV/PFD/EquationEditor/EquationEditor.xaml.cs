@@ -320,6 +320,7 @@ namespace ChemProV.PFD.EquationEditor
             ObservableCollection<EquationType> equationTypes = new ObservableCollection<EquationType>();
             equationTypes.Add(new EquationType(EquationTypeClassification.Total, "Total"));
             equationTypes.Add(new EquationType(EquationTypeClassification.Specification, "Specification"));
+            equationTypes.Add(new EquationType(EquationTypeClassification.Basis, "Basis"));
 
             foreach (string compound in compounds)
             {
