@@ -271,6 +271,7 @@ namespace ChemProV.UI
             List<string> equationTypes = new List<string>();
             equationTypes.Add("Total");
             equationTypes.Add("Specification");
+            equationTypes.Add("Basis");
             foreach (string compound in compounds)
             {
                 if (compound != "Overall")
