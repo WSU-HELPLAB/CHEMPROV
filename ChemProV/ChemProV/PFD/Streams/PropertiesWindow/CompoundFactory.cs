@@ -451,7 +451,7 @@ namespace ChemProV.PFD.Streams.PropertiesWindow
                     {
                         elements.Add(hydrogren, 10);
                         elements.Add(carbon, 8);
-                        newCompound.HeatCapacity = 0.182;
+                        newCompound.HeatCapacity = 182;
                         newCompound.HeatFormation = -24.4;
                         newCompound.HeatVaporization = 35.7;
                         newCompound.BoilingPoint = 138.5;
