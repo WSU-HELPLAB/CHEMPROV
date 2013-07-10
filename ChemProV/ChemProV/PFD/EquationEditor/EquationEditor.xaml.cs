@@ -37,13 +37,18 @@ namespace ChemProV.PFD.EquationEditor
         #region instance variables
 
         private List<string> elements = new List<string>();
-        
+
         private ObservableCollection<EquationType> m_equationTypes = new ObservableCollection<EquationType>();
 
         /// <summary>
         /// List of process units that we've attached property-changed listeners to.
         /// </summary>
         private List<AbstractProcessUnit> m_monitoredProcessUnits = new List<AbstractProcessUnit>();
+
+        /// <summary>
+        /// List of streams that we've attached property-change listeners to.
+        /// </summary>
+        private List<AbstractStream> m_monitoredStreams = new List<AbstractStream>();
 
         /// <summary>
         /// List of stream property tables that we've attached row-change listeners to. Gets updated 
@@ -100,7 +105,7 @@ namespace ChemProV.PFD.EquationEditor
         private void MoveDownButton_Click(object sender, RoutedEventArgs e)
         {
             EquationRowControl row = null;
-            
+
             // Start by finding the row index in the stack panel
             int indexOfThis = -1;
             for (int i = 0; i < EquationsStackPanel.Children.Count; i++)
@@ -109,7 +114,7 @@ namespace ChemProV.PFD.EquationEditor
                 // what we want since the design contract is that all objects in the stack panel 
                 // must be EquationControl objects.
                 EquationRowControl ec = (EquationRowControl)EquationsStackPanel.Children[i];
-                
+
                 if (object.ReferenceEquals(sender, ec.MoveDownButton))
                 {
                     indexOfThis = i;
@@ -187,7 +192,7 @@ namespace ChemProV.PFD.EquationEditor
                 EquationRowControl ec = GetRow(i);
 
                 // Row number label
-                Brush clrBrush = new SolidColorBrush(Color.FromArgb(255,42,176,240));
+                Brush clrBrush = new SolidColorBrush(Color.FromArgb(255, 42, 176, 240));
                 ec.NumberLabel.Content = (i + 1).ToString() + ".";
                 ec.NumberLabel.Foreground = clrBrush;
 
@@ -251,7 +256,7 @@ namespace ChemProV.PFD.EquationEditor
                     "Request was made to delete an equation that was not found in the collection");
             }
 #endif
-            
+
             // Create an undo that will add it back
             m_workspace.AddUndo(new UndoRedoCollection(
                 "Undo deleting equation row",
@@ -260,7 +265,7 @@ namespace ChemProV.PFD.EquationEditor
             // Remove it from the workspace. There are event listeners that will update the UI 
             // when doing this
             m_workspace.Equations.Remove(thisOne.Model);
-            
+
             // Fix row numbers and buttons
             UpdateRowProperties();
         }
@@ -344,7 +349,7 @@ namespace ChemProV.PFD.EquationEditor
         private List<object> GetElementAndStreams(AbstractProcessUnit unit)
         {
             List<object> elements = new List<object>();
-            
+
             // Add the process unit as well as its incoming and outgoing streams
             elements.Add(unit);
             foreach (AbstractStream element in unit.IncomingStreams)
@@ -368,8 +373,8 @@ namespace ChemProV.PFD.EquationEditor
                 //With a single unit, all we care about is that unit and its related streams
                 case EquationScopeClassification.SingleUnit:
                     AbstractProcessUnit selectedUnit = (from element in m_workspace.ProcessUnits
-                                                      where (element as AbstractProcessUnit).Label == equation.Scope.Name
-                                                      select element).FirstOrDefault() as AbstractProcessUnit;
+                                                        where (element as AbstractProcessUnit).Label == equation.Scope.Name
+                                                        select element).FirstOrDefault() as AbstractProcessUnit;
                     if (selectedUnit != null)
                     {
                         relevantUnits = GetElementAndStreams(selectedUnit);
@@ -443,7 +448,7 @@ namespace ChemProV.PFD.EquationEditor
         public int EquationRowCount
         {
             get
-            {                
+            {
                 int rowsSeen = 0;
                 foreach (UIElement uie in EquationsStackPanel.Children)
                 {
@@ -615,10 +620,7 @@ namespace ChemProV.PFD.EquationEditor
 
         private void ProcessUnitPropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName.Equals("Subprocess"))
-            {
-                updateScopes();
-            }
+            updateScopes();
         }
 
         /// <summary>
@@ -631,12 +633,12 @@ namespace ChemProV.PFD.EquationEditor
             // controls and creating new ones, which would certainly work, we'll take a more efficient 
             // approach. We start by creating the exact number of row controls that are needed. This 
             // may require deleting or adding rows.
-            
+
             // If there are too many equation row controls, then we have to delete
             while (EquationsStackPanel.Children.Count > m_workspace.Equations.Count)
             {
                 // Remove the last one
-                EquationRowControl ec = 
+                EquationRowControl ec =
                     EquationsStackPanel.Children[EquationsStackPanel.Children.Count - 1] as EquationRowControl;
                 ec.SetModel(null);
                 EquationsStackPanel.Children.Remove(ec);
@@ -650,7 +652,7 @@ namespace ChemProV.PFD.EquationEditor
                 SetupEquationControlEvents(ec);
                 EquationsStackPanel.Children.Add(ec);
             }
-            
+
             // Now we have the correct number of controls to match the number of equations in the workspace. Go 
             // through each one and set the data.
             for (int i = 0; i < m_workspace.Equations.Count; i++)
@@ -677,7 +679,7 @@ namespace ChemProV.PFD.EquationEditor
             {
                 return;
             }
-            
+
             EquationScopes = new ObservableCollection<EquationScope>();
 
             //add "overall" scope
@@ -712,6 +714,12 @@ namespace ChemProV.PFD.EquationEditor
                 }
             }
 
+            //add streams as well
+            foreach (AbstractStream stream in m_workspace.Streams)
+            {
+                EquationScopes.Add(new EquationScope(EquationScopeClassification.Unknown, string.Format("Stream #{0}", stream.Id)));
+            }
+
             // Update all of the equation controls
             for (int i = 0; i < EquationRowCount; i++)
             {
@@ -729,12 +737,17 @@ namespace ChemProV.PFD.EquationEditor
                 apu.PropertyChanged -= this.ProcessUnitPropertyChanged;
             }
             m_monitoredProcessUnits.Clear();
+
             foreach (AbstractProcessUnit apu in m_workspace.ProcessUnits)
             {
                 m_monitoredProcessUnits.Add(apu);
                 apu.PropertyChanged += this.ProcessUnitPropertyChanged;
             }
-            
+            updateScopes();
+        }
+
+        void StreamPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
             updateScopes();
         }
 
@@ -776,7 +789,19 @@ namespace ChemProV.PFD.EquationEditor
                 table.RowPropertyChanged += this.TableRowPropertyChanged;
             }
 
+            //this code handles changes made to streams for the purposes of the scopes menu
+            foreach (AbstractStream stream in m_monitoredStreams)
+            {
+                stream.PropertyChanged -= this.StreamPropertyChanged;
+            }
+            m_monitoredStreams.Clear();
+            foreach (AbstractStream stream in m_workspace.Streams)
+            {
+                m_monitoredStreams.Add(stream);
+                stream.PropertyChanged += new PropertyChangedEventHandler(StreamPropertyChanged);
+            }
             UpdateCompounds();
+            updateScopes();
         }
     }
 }
