@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="rpjnmjanxpOkN/TA6iNRCEEXf0Y=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="+g3X36hlo+LzoAldrI6UqvJL6+g=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_OsbleService">
       <properties>
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_OsbleService" contract="OSBLEClientReference.OsbleService" bindingType="basicHttpBinding" address="http://www.osble.org/services/OsbleService.svc" bindingConfiguration="BasicHttpBinding_OsbleService">
+    <endpoint name="BasicHttpBinding_OsbleService" contract="OSBLEClientReference.OsbleService" bindingType="basicHttpBinding" address="http://www.osble.org/Services/OsbleService.svc" bindingConfiguration="BasicHttpBinding_OsbleService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://www.osble.org/services/OsbleService.svc</serializedValue>
+          <serializedValue>http://www.osble.org/Services/OsbleService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
