@@ -425,10 +425,24 @@
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.wsdl" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.wsdl" />
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService7.xsd">
       <SubType>Designer</SubType>
     </None>
     <None Include="Service References\OSBLEAuthServiceRef\ChemProV.OSBLEAuthServiceRef.UserProfile.datasource">
@@ -459,9 +473,35 @@
     <None Include="Service References\OSBLEClientReference\OsbleService1.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService10.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService11.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService12.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService13.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService14.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService15.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService16.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService17.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService2.wsdl" />
     <None Include="Service References\OSBLEClientReference\OsbleService2.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService3.wsdl" />
     <None Include="Service References\OSBLEClientReference\OsbleService3.xsd">
       <SubType>Designer</SubType>
     </None>
@@ -480,12 +520,17 @@
     <None Include="Service References\OSBLEClientReference\OsbleService8.xsd">
       <SubType>Designer</SubType>
     </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService9.xsd">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="Service References\OSBLEClientReference\Reference.svcmap">
       <Generator>WCF Proxy Generator</Generator>
       <LastGenOutput>Reference.cs</LastGenOutput>
     </None>
     <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.disco" />
     <None Include="Service References\OSBLEClientReference\OsbleService.disco" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.disco" />
+    <None Include="Service References\OSBLEClientReference\OsbleService1.disco" />
     <Content Include="UI\Icons\down_arrow_16x16.png" />
     <Content Include="UI\Icons\OSBLE_person_active_16x16.png">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

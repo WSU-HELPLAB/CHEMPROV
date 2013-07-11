@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="/pvnS/Zl25oNjrIyTf//UsrGSVI=">
+<SavedWcfConfigurationInformation xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" Version="9.1" CheckSum="3iPFqoXV0KEY+xLuxB9sieDHIAo=">
   <bindingConfigurations>
     <bindingConfiguration bindingType="basicHttpBinding" name="BasicHttpBinding_AuthenticationService">
       <properties>
@@ -112,10 +112,10 @@
     </bindingConfiguration>
   </bindingConfigurations>
   <endpoints>
-    <endpoint name="BasicHttpBinding_AuthenticationService" contract="OSBLEAuthServiceRef.AuthenticationService" bindingType="basicHttpBinding" address="http://osble.org/services/AuthenticationService.svc" bindingConfiguration="BasicHttpBinding_AuthenticationService">
+    <endpoint name="BasicHttpBinding_AuthenticationService" contract="OSBLEAuthServiceRef.AuthenticationService" bindingType="basicHttpBinding" address="http://osble.org/Services/AuthenticationService.svc" bindingConfiguration="BasicHttpBinding_AuthenticationService">
       <properties>
         <property path="/address" isComplexType="false" isExplicitlyDefined="true" clrType="System.Uri, System, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
-          <serializedValue>http://osble.org/services/AuthenticationService.svc</serializedValue>
+          <serializedValue>http://osble.org/Services/AuthenticationService.svc</serializedValue>
         </property>
         <property path="/behaviorConfiguration" isComplexType="false" isExplicitlyDefined="false" clrType="System.String, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
           <serializedValue />
