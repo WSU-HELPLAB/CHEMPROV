@@ -9,5 +9,6 @@ namespace CommentCounter
     {
         public string Author { get; set; }
         public string Comment { get; set; }
+        public string Referent { get; set; }
     }
 }

@@ -21,7 +21,7 @@ namespace CommentCounter
                     continue;
                 }
                 XDocument doc = XDocument.Load(fileName);
-                Dictionary<string, List<string>> userComments = new Dictionary<string, List<string>>();
+                Dictionary<string, List<DocumentComment>> userComments = new Dictionary<string, List<DocumentComment>>();
 
                 //all but equation comments and sticky notes should be pulled by the "Comment" element
                 foreach (XElement comment in doc.Descendants("Comment"))
@@ -29,9 +29,19 @@ namespace CommentCounter
                     //user name can either be an attribute or a sub element
                     XAttribute userNameAttribute = comment.Attribute("UserName");
                     string userName = "Unknown";
+                    string referent = "Unknown";
+                    XElement top = comment.Parent.Parent;
+                    if (top.Attribute("ProcessUnitType") != null)
+                    {
+                        referent = top.Attribute("ProcessUnitType").Value;
+                    }
+                    if (top.Attribute("StreamType") != null)
+                    {
+                        referent = top.Attribute("StreamType").Value;
+                    }
                     if (userNameAttribute != null)
                     {
-                        userName = userNameAttribute.Value;
+                        userName = userNameAttribute.Value + " stream";
                     }
                     else
                     {
@@ -46,7 +56,7 @@ namespace CommentCounter
                     //add entry for user if necessary
                     if (userComments.ContainsKey(userName) == false)
                     {
-                        userComments.Add(userName, new List<string>());
+                        userComments.Add(userName, new List<DocumentComment>());
                     }
 
                     //comment can either be in a "content" block or just inline
@@ -64,7 +74,7 @@ namespace CommentCounter
                     //add comment to the dictionary
                     if (content.Length > 0)
                     {
-                        userComments[userName].Add(content);
+                        userComments[userName].Add(new DocumentComment() { Comment = content, Referent = referent });
                     }
                 }
 
@@ -81,13 +91,13 @@ namespace CommentCounter
                     //add entry for user if necessary
                     if (userComments.ContainsKey(userName) == false)
                     {
-                        userComments.Add(userName, new List<string>());
+                        userComments.Add(userName, new List<DocumentComment>());
                     }
 
                     //add comment
                     if (element.Value.Length > 0)
                     {
-                        userComments[userName].Add(element.Value);
+                        userComments[userName].Add(new DocumentComment() { Comment = element.Value, Referent = "Equation" });
                     }
                 }
 
@@ -104,14 +114,14 @@ namespace CommentCounter
                     //add entry for user if necessary
                     if (userComments.ContainsKey(userName) == false)
                     {
-                        userComments.Add(userName, new List<string>());
+                        userComments.Add(userName, new List<DocumentComment>());
                     }
 
                     //add comment
                     string comment = element.Descendants("Content").FirstOrDefault().Value;
                     if (comment.Length > 0)
                     {
-                        userComments[userName].Add(comment);
+                        userComments[userName].Add(new DocumentComment() { Comment = comment, Referent = "Sticky Note" });
                     }
                 }
 
@@ -133,23 +143,38 @@ namespace CommentCounter
                     //add blank spot where author should be
                     pieces.Add("");
                 }
-
-                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.txt", Path.GetFileNameWithoutExtension(fileName)));
-
+                TextWriter expertsFile = File.CreateText(string.Format("{0}_expert.xls", Path.GetFileNameWithoutExtension(fileName)));
+                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.xls", Path.GetFileNameWithoutExtension(fileName)));
+                commentsFile.WriteLine("<table>");
+                expertsFile.WriteLine("<table>");
+                string expertsHeader = "<tr><th>Author</th><th>Comment</th><th>#Actual Errors</th><th># correct stylistic</th><th># incorrect stylistic</th><th># correct non-stylistic</th><th>#incorrect non-stylistic</th></tr>";
+                string commentsHeader = "<tr><th>Author</th><th>Referent</th><th>Comment</th></tr>";
+                expertsFile.WriteLine(expertsHeader);
+                commentsFile.WriteLine(commentsHeader);
                 foreach (string key in userComments.Keys)
                 {
                     counter += userComments[key].Count;
                     pieces.Add(string.Format("\"{0}:{1}\"", key, userComments[key].Count));
-                    foreach (string comment in userComments[key])
+                    foreach (DocumentComment comment in userComments[key])
                     {
-                        string[] commentPieces = comment.Split(new string[] { "\n", Environment.NewLine, "." }, StringSplitOptions.None);
+                        expertsFile.WriteLine("<tr><td>{0}</td><td>{1}</td></tr>", key, comment.Comment);
+                        string[] commentPieces = comment.Comment.Split(new string[] { "\n", Environment.NewLine, "." }, StringSplitOptions.None);
                         foreach (string piece in commentPieces)
                         {
-                            commentsFile.WriteLine(string.Format("{0}\t{1}", key, piece));
+                            if (piece.Length == 0)
+                            {
+                                continue;
+                            }
+                            commentsFile.WriteLine("<tr>");
+                            commentsFile.WriteLine(string.Format("<td>{0}</td><td>{1}</td><td>{2}</td>", key, comment.Referent, piece));
+                            commentsFile.WriteLine("</tr>");
                         }
                     }
                 }
+                commentsFile.WriteLine("</table>");
+                expertsFile.WriteLine("</table>");
                 commentsFile.Close();
+                expertsFile.Close();
                 pieces.Insert(1, counter.ToString());
                 textFile.WriteLine(string.Join(",", pieces));
                 textFile.Flush();
