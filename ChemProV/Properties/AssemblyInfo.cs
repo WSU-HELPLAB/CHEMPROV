@@ -18,7 +18,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("HELP Lab @ Washington State University")]
 [assembly: AssemblyProduct("ChemProV")]
-[assembly: AssemblyCopyright("Copyright © HELP Lab 2010 - 2012")]
+[assembly: AssemblyCopyright("Copyright © HELP Lab 2010 - 2014")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -39,5 +39,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("13.07.11.27959")]
-[assembly: AssemblyFileVersion("13.07.11.27959")]
+[assembly: AssemblyVersion("14.03.25.01")]
+[assembly: AssemblyFileVersion("14.03.25.01")]
