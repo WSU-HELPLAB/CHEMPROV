@@ -1,6 +1,6 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV", "ChemProV\ChemProV.csproj", "{BE128A42-BBE6-4227-A791-0C4A45D55D93}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ChemProV.Web", "ChemProV.Web\ChemProV.Web.csproj", "{55A67B1F-DFD8-4B50-A99C-89B8B4948A42}"

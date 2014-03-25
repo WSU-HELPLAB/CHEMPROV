@@ -77,7 +77,7 @@ namespace ChemProV.Logic.OSBLE
 #if DEBUG
         public const string AuthServiceLink = "http://localhost:17532/Services/AuthenticationService.svc";
 #else
-        public const string AuthServiceLink = "https://www.osble.org/Services/AuthenticationService.svc";
+        public const string AuthServiceLink = "https://osble.org/Services/AuthenticationService.svc";
 #endif
 
         /// <summary>
@@ -365,7 +365,7 @@ namespace ChemProV.Logic.OSBLE
 #if DEBUG
         public const string OSBLEServiceLink = "http://localhost:17532/Services/OsbleService.svc";
 #else
-        public const string OSBLEServiceLink = "https://www.osble.org/Services/OsbleService.svc";
+        public const string OSBLEServiceLink = "https://osble.org/Services/OsbleService.svc";
 #endif
 
         public void RefreshAsync()

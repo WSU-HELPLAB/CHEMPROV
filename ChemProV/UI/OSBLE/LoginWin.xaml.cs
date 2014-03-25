@@ -203,7 +203,7 @@ namespace ChemProV.UI.OSBLE
 
             //WebClient wc = new WebClient();
             //wc.DownloadStringCompleted += new DownloadStringCompletedEventHandler(wc_DownloadStringCompleted);
-            //wc.DownloadStringAsync(new Uri("https://www.osble.org/Services/AuthenticationService.svc"));
+            //wc.DownloadStringAsync(new Uri("https://osble.org/Services/AuthenticationService.svc"));
 
             #endregion
         }

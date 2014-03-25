@@ -40,7 +40,7 @@ namespace ChemProV.UI.OSBLE
 #if DEBUG
         private static string s_URLPrefix = "http://localhost:17532";
 #else
-        private static string s_URLPrefix = "https://www.osble.org";
+        private static string s_URLPrefix = "https://osble.org";
 #endif
 
         public AssignmentChooserWindow(OSBLEState state, bool showLoginMessage, bool saveMode)
