@@ -16,7 +16,7 @@
             <endpoint address="http://osble.org/Services/AuthenticationService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_AuthenticationService"
                 contract="OSBLEAuthServiceRef.AuthenticationService" name="BasicHttpBinding_AuthenticationService" />
-            <endpoint address="http://www.osble.org/Services/OsbleService.svc"
+            <endpoint address="http://osble.org/Services/OsbleService.svc"
                 binding="basicHttpBinding" bindingConfiguration="BasicHttpBinding_OsbleService"
                 contract="OSBLEClientReference.OsbleService" name="BasicHttpBinding_OsbleService" />
         </client>

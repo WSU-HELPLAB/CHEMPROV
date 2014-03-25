@@ -20,21 +20,21 @@
     <ServiceContractMappings />
   </ClientOptions>
   <MetadataSources>
-    <MetadataSource Address="https://www.osble.org/Services/OsbleService.svc" Protocol="http" SourceId="1" />
+    <MetadataSource Address="https://osble.org/Services/OsbleService.svc" Protocol="http" SourceId="1" />
   </MetadataSources>
   <Metadata>
-    <MetadataFile FileName="OsbleService9.xsd" MetadataType="Schema" ID="cb3e3134-f889-4dc2-942b-ca72417f93bc" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd7" />
-    <MetadataFile FileName="OsbleService10.xsd" MetadataType="Schema" ID="2efbd4a7-e086-4d1e-b9bd-1e25e18cb84d" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd8" />
-    <MetadataFile FileName="OsbleService11.xsd" MetadataType="Schema" ID="8843d097-830d-46b0-ad10-aba45fcdeb49" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd2" />
-    <MetadataFile FileName="OsbleService1.disco" MetadataType="Disco" ID="0eb3c717-2d45-4f93-9c33-2f436b2f55c3" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?disco" />
-    <MetadataFile FileName="OsbleService12.xsd" MetadataType="Schema" ID="9995ae65-10f1-4a8c-9cd6-d569967a69b5" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd6" />
-    <MetadataFile FileName="OsbleService2.wsdl" MetadataType="Wsdl" ID="f7e554ad-9378-41de-9705-7d052d93a86c" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?wsdl=wsdl0" />
-    <MetadataFile FileName="OsbleService13.xsd" MetadataType="Schema" ID="3b91ece1-eeab-4aaa-aadf-3ac6dedb06da" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd5" />
-    <MetadataFile FileName="OsbleService14.xsd" MetadataType="Schema" ID="9a992f80-31cc-4c05-8fbd-667e61aef843" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd0" />
-    <MetadataFile FileName="OsbleService15.xsd" MetadataType="Schema" ID="48c81574-1565-486c-be00-5d72bdc35405" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd1" />
-    <MetadataFile FileName="OsbleService3.wsdl" MetadataType="Wsdl" ID="4b55a3ea-2b89-407e-8ddc-9220f8cd8463" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?wsdl" />
-    <MetadataFile FileName="OsbleService16.xsd" MetadataType="Schema" ID="a058fedc-cd04-49cd-9488-5cdc1c731b7a" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd3" />
-    <MetadataFile FileName="OsbleService17.xsd" MetadataType="Schema" ID="2505bcc1-40db-4969-af3e-9d1febec4f60" SourceId="1" SourceUrl="http://www.osble.org/Services/OsbleService.svc?xsd=xsd4" />
+    <MetadataFile FileName="OsbleService9.xsd" MetadataType="Schema" ID="cb3e3134-f889-4dc2-942b-ca72417f93bc" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd7" />
+    <MetadataFile FileName="OsbleService10.xsd" MetadataType="Schema" ID="2efbd4a7-e086-4d1e-b9bd-1e25e18cb84d" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd8" />
+    <MetadataFile FileName="OsbleService11.xsd" MetadataType="Schema" ID="8843d097-830d-46b0-ad10-aba45fcdeb49" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd2" />
+    <MetadataFile FileName="OsbleService1.disco" MetadataType="Disco" ID="0eb3c717-2d45-4f93-9c33-2f436b2f55c3" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?disco" />
+    <MetadataFile FileName="OsbleService12.xsd" MetadataType="Schema" ID="9995ae65-10f1-4a8c-9cd6-d569967a69b5" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd6" />
+    <MetadataFile FileName="OsbleService2.wsdl" MetadataType="Wsdl" ID="f7e554ad-9378-41de-9705-7d052d93a86c" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?wsdl=wsdl0" />
+    <MetadataFile FileName="OsbleService13.xsd" MetadataType="Schema" ID="3b91ece1-eeab-4aaa-aadf-3ac6dedb06da" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd5" />
+    <MetadataFile FileName="OsbleService14.xsd" MetadataType="Schema" ID="9a992f80-31cc-4c05-8fbd-667e61aef843" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd0" />
+    <MetadataFile FileName="OsbleService15.xsd" MetadataType="Schema" ID="48c81574-1565-486c-be00-5d72bdc35405" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd1" />
+    <MetadataFile FileName="OsbleService3.wsdl" MetadataType="Wsdl" ID="4b55a3ea-2b89-407e-8ddc-9220f8cd8463" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?wsdl" />
+    <MetadataFile FileName="OsbleService16.xsd" MetadataType="Schema" ID="a058fedc-cd04-49cd-9488-5cdc1c731b7a" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd3" />
+    <MetadataFile FileName="OsbleService17.xsd" MetadataType="Schema" ID="2505bcc1-40db-4969-af3e-9d1febec4f60" SourceId="1" SourceUrl="http://osble.org/Services/OsbleService.svc?xsd=xsd4" />
   </Metadata>
   <Extensions>
     <ExtensionFile FileName="configuration91.svcinfo" Name="configuration91.svcinfo" />
