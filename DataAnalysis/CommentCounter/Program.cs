@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Xml.Linq;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace CommentCounter
 {
@@ -12,6 +13,8 @@ namespace CommentCounter
         static void Main(string[] args)
         {
             string[] files = Directory.GetFiles(Directory.GetCurrentDirectory());
+            Dictionary<string, int> userLookupTable = new Dictionary<string, int>();
+            int userLookupCounter = 1;
             TextWriter textFile = File.CreateText("output.csv");
             foreach (string fileName in files)
             {
@@ -143,12 +146,20 @@ namespace CommentCounter
                     //add blank spot where author should be
                     pieces.Add("");
                 }
-                TextWriter expertsFile = File.CreateText(string.Format("{0}_expert.xls", Path.GetFileNameWithoutExtension(fileName)));
-                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.xls", Path.GetFileNameWithoutExtension(fileName)));
+
+                string authorName = Path.GetFileNameWithoutExtension(fileName);
+                if (userLookupTable.ContainsKey(authorName) == false)
+                {
+                    userLookupTable.Add(authorName, userLookupCounter);
+                    userLookupCounter++;
+                }
+
+                TextWriter expertsFile = File.CreateText(string.Format("{0}_expert.xls", userLookupTable[authorName]));
+                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.xls", userLookupTable[authorName]));
                 commentsFile.WriteLine("<table>");
                 expertsFile.WriteLine("<table>");
                 string expertsHeader = "<tr><th>Author</th><th>Comment</th><th>#Actual Errors</th><th># correct stylistic</th><th># incorrect stylistic</th><th># correct non-stylistic</th><th>#incorrect non-stylistic</th></tr>";
-                string commentsHeader = "<tr><th>Author</th><th>Referent</th><th>Comment</th></tr>";
+                string commentsHeader = "<tr><th>Author</th><th>Source</th><th>Comment</th><th>Relevance</th><th>Referent</th><th>Content</th><th>Validity</th><th>Correctness of issue</th><th>Correctness of proposed solution</th><th>expert error #</th></tr>";
                 expertsFile.WriteLine(expertsHeader);
                 commentsFile.WriteLine(commentsHeader);
                 foreach (string key in userComments.Keys)
@@ -157,8 +168,13 @@ namespace CommentCounter
                     pieces.Add(string.Format("\"{0}:{1}\"", key, userComments[key].Count));
                     foreach (DocumentComment comment in userComments[key])
                     {
+                        if(userLookupTable.ContainsKey(key) == false)
+                        {
+                            userLookupTable.Add(key, userLookupCounter);
+                            userLookupCounter++;
+                        }
                         expertsFile.WriteLine("<tr><td>{0}</td><td>{1}</td></tr>", key, comment.Comment);
-                        string[] commentPieces = comment.Comment.Split(new string[] { "\n", Environment.NewLine, "." }, StringSplitOptions.None);
+                        string[] commentPieces = comment.Comment.Split(new string[] { "\n", Environment.NewLine, ". " }, StringSplitOptions.RemoveEmptyEntries);
                         foreach (string piece in commentPieces)
                         {
                             if (piece.Length == 0)
@@ -166,7 +182,7 @@ namespace CommentCounter
                                 continue;
                             }
                             commentsFile.WriteLine("<tr>");
-                            commentsFile.WriteLine(string.Format("<td>{0}</td><td>{1}</td><td>{2}</td>", key, comment.Referent, piece));
+                            commentsFile.WriteLine(string.Format("<td>{0}</td><td>{1}</td><td>{2}</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>", userLookupTable[key], comment.Referent, piece));
                             commentsFile.WriteLine("</tr>");
                         }
                     }
@@ -175,6 +191,14 @@ namespace CommentCounter
                 expertsFile.WriteLine("</table>");
                 commentsFile.Close();
                 expertsFile.Close();
+
+                TextWriter lookupFile = File.CreateText("lookup_table.txt");
+                foreach(KeyValuePair<string,int> kvp in userLookupTable)
+                {
+                    lookupFile.WriteLine(string.Format("{0}: {1}", kvp.Key, kvp.Value));
+                }
+                lookupFile.Close();
+
                 pieces.Insert(1, counter.ToString());
                 textFile.WriteLine(string.Join(",", pieces));
                 textFile.Flush();
