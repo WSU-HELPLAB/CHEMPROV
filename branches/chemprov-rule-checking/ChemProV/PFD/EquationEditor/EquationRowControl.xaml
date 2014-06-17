@@ -1,0 +1,69 @@
+<!--
+Copyright 2010 - 2012 HELP Lab @ Washington State University
+
+This file is part of ChemProV (http://helplab.org/chemprov).
+
+ChemProV is distributed under the Microsoft Reciprocal License (Ms-RL).
+Consult "LICENSE.txt" included in this package for the complete Ms-RL license.
+-->
+<UserControl x:Class="ChemProV.PFD.EquationEditor.EquationRowControl"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:ctk="clr-namespace:System.Windows.Controls;assembly=System.Windows.Controls.Toolkit"
+    mc:Ignorable="d"
+    d:DesignHeight="50" d:DesignWidth="635" xmlns:sdk="http://schemas.microsoft.com/winfx/2006/xaml/presentation/sdk">
+    <Border>
+        <StackPanel x:Name="LayoutRoot" Background="White" Orientation="Vertical">
+            <ctk:DockPanel>
+                
+                <!-- Number label for this row. Will have it's value set by the parent container. -->
+                <sdk:Label
+                    Width="25" FontSize="12"
+                    Foreground="#2AB0F0" FontWeight="Bold"
+                    Name="NumberLabel">1.</sdk:Label>
+                
+                <!-- Delete button -->
+                <Button Width="25" Margin="0,0,5,0" Name="DeleteRowButton" Click="DeleteRowButton_Click">
+                    <ToolTipService.ToolTip>Delete this equation row</ToolTipService.ToolTip>
+                    
+                    <Image Source="/UI/Icons/XBtn_16x16.png" Width="16" Height="16" />
+                </Button>
+                
+                <!-- Button to move the control up a row. Events handled by parent equation editor control. -->
+                <Button Width="25" Name="MoveUpButton">
+                    <ToolTipService.ToolTip>Move this equation up one row</ToolTipService.ToolTip>
+
+                    <Image Source="/UI/Icons/up_arrow_16x16.png" Width="16" Height="16" />
+                </Button>
+
+                <!-- Button to move the control down a row. Events handled by parent equation editor control. -->
+                <Button Width="25" Margin="0,0,5,0" Name="MoveDownButton">
+                    <ToolTipService.ToolTip>Move this equation down one row</ToolTipService.ToolTip>
+
+                    <Image Source="/UI/Icons/down_arrow_16x16.png" Width="16" Height="16" />
+                </Button>
+                
+                <!-- Comment icon + border -->
+                <Border Width="25" BorderBrush="Gray" BorderThickness="2" CornerRadius="3" Name="CommentIconBorder">
+                    <Image Source="/UI/Icons/comment_16x16.png" Width="16" Height="16"></Image>
+                </Border>
+
+                <!-- Type and scope combo boxes -->
+                <ComboBox x:Name="TypeComboBox" MinWidth="130" SelectionChanged="TypeComboBox_SelectionChanged" />
+                <ComboBox x:Name="ScopeComboBox" MinWidth="130" SelectionChanged="ScopeComboBox_SelectionChanged"/>
+
+                <!-- Equation text box -->
+                <TextBox
+                    x:Name="EquationTextBox"
+                    FontSize="18" FontFamily="Courier New"
+                    AcceptsReturn="False" MinWidth="200"  
+                    TextWrapping="Wrap" HorizontalAlignment="Stretch" TextChanged="EquationTextBox_TextChanged" />
+            </ctk:DockPanel>
+            
+            <!-- Can put more controls here in the future for things like equation feedback messages -->
+
+        </StackPanel>
+    </Border>
+</UserControl>

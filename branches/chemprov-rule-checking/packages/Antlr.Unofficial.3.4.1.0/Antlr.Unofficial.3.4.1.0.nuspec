@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata>
+    <id>Antlr.Unofficial</id>
+    <version>3.4.1.0</version>
+    <title>An unofficial packaging of Antlr 3.4.1</title>
+    <authors>Stefan Popov</authors>
+    <owners>Stefan Popov</owners>
+    <projectUrl>http://www.antlr.org/</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>This is an unofficial packaging of the latest ANTLR runtime. Couldn't find one on nuget.org, so I created my own.</description>
+  </metadata>
+</package>

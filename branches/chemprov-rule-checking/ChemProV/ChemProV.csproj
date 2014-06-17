@@ -1,0 +1,702 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(MSBuildToolsVersion)' == '3.5'">
+    <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
+  </PropertyGroup>
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>9.0.30729</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{BE128A42-BBE6-4227-A791-0C4A45D55D93}</ProjectGuid>
+    <ProjectTypeGuids>{A1591282-1198-4647-A2B1-27E5FF5F6F3B};{fae04ec0-301f-11d3-bf4b-00c04f79efbc}</ProjectTypeGuids>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>ChemProV</RootNamespace>
+    <AssemblyName>ChemProV</AssemblyName>
+    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
+    <SilverlightApplication>true</SilverlightApplication>
+    <SupportedCultures>
+    </SupportedCultures>
+    <XapOutputs>true</XapOutputs>
+    <GenerateSilverlightManifest>true</GenerateSilverlightManifest>
+    <XapFilename>ChemProV.xap</XapFilename>
+    <SilverlightManifestTemplate>Properties\AppManifest.xml</SilverlightManifestTemplate>
+    <SilverlightAppEntry>ChemProV.App</SilverlightAppEntry>
+    <TestPageFileName>TestPage.html</TestPageFileName>
+    <CreateTestPage>true</CreateTestPage>
+    <ValidateXaml>true</ValidateXaml>
+    <EnableOutOfBrowser>true</EnableOutOfBrowser>
+    <OutOfBrowserSettingsFile>Properties\OutOfBrowserSettings.xml</OutOfBrowserSettingsFile>
+    <UsePlatformExtensions>false</UsePlatformExtensions>
+    <ThrowErrorsInValidation>true</ThrowErrorsInValidation>
+    <LinkedServerProject>
+    </LinkedServerProject>
+    <ExpressionBlendVersion>4.0.20421.0</ExpressionBlendVersion>
+    <TargetFrameworkIdentifier>Silverlight</TargetFrameworkIdentifier>
+    <SilverlightVersion>$(TargetFrameworkVersion)</SilverlightVersion>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <OldToolsVersion>3.5</OldToolsVersion>
+    <UpgradeBackupLocation />
+    <TargetFrameworkProfile />
+    <Utf8Output>true</Utf8Output>
+    <SccProjectName>SAK</SccProjectName>
+    <SccLocalPath>SAK</SccLocalPath>
+    <SccAuxPath>SAK</SccAuxPath>
+    <SccProvider>SAK</SccProvider>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>Bin\Debug</OutputPath>
+    <DefineConstants>DEBUG;TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+    <RunCodeAnalysis>false</RunCodeAnalysis>
+    <NoWarn>
+    </NoWarn>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>Bin\Release</OutputPath>
+    <DefineConstants>TRACE;SILVERLIGHT</DefineConstants>
+    <NoStdLib>true</NoStdLib>
+    <NoConfig>true</NoConfig>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Antlr3.Runtime.Silverlight">
+      <HintPath>..\packages\Antlr.Silverlight\Antlr3.Runtime.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="Behaviors">
+      <HintPath>..\Behaviors.dll</HintPath>
+    </Reference>
+    <Reference Include="ICSharpCode.SharpZLib.Silverlight">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ICSharpCode.SharpZLib.Silverlight.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fb8ec453a8e30e6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.Controls">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.Filtering">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.Filtering.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.IO.Bmp">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.IO.Bmp.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.IO.Gif">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.IO.Gif.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.IO.Jpeg">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.IO.Jpeg.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.IO.Png, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fb8ec453a8e30e6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.IO.Png.dll</HintPath>
+    </Reference>
+    <Reference Include="ImageTools.Utils, Version=1.0.0.0, Culture=neutral, PublicKeyToken=fb8ec453a8e30e6c, processorArchitecture=MSIL">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\ImageTools.Utils.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.Expression.Drawing, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="SharpZipLib.Silverlight4, Version=0.0.0.0, Culture=neutral, PublicKeyToken=a37ef23abf01322c, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpZipLib.0.86.0\lib\SL4\SharpZipLib.Silverlight4.dll</HintPath>
+    </Reference>
+    <Reference Include="Silverlight.Controls">
+      <HintPath>Libraries\Silverlight.Controls.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.DataAnnotations, Version=5.0.5.0, Culture=neutral, PublicKeyToken=ddd0da4d3e678217, processorArchitecture=MSIL" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows" />
+    <Reference Include="mscorlib" />
+    <Reference Include="system" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Windows.Controls, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data.DataForm.Toolkit.dll">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Microsoft SDKs\Silverlight\v3.0\Toolkit\Nov09\Bin\System.Windows.Controls.Data.DataForm.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Windows.Controls.Data.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Data.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Input, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Input.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Controls.Toolkit.Internals, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Data, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Windows.Interactivity, Version=4.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Windows.Browser" />
+    <Reference Include="System.Xml.Linq, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.Serialization, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="System.Xml.XPath, Version=5.0.5.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
+    <Reference Include="zxing.Silverlight">
+      <HintPath>..\packages\ImageTools.0.3.1\lib\sl40\zxing.Silverlight.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Core\IRemoveSelfFromCanvas.cs" />
+    <Compile Include="Core\App.cs" />
+    <Compile Include="Core\DrawingCanvasCommands.cs" />
+    <Compile Include="Core\ICanvasElement.cs" />
+    <Compile Include="Core\NamedColors.cs" />
+    <Compile Include="Core\IWorkspaceChangeListener.cs" />
+    <Compile Include="Grammars\ChemProVLexer.cs" />
+    <Compile Include="Grammars\ChemProVParser.cs" />
+    <Compile Include="Grammars\ChemProVTree.cs" />
+    <Compile Include="Grammars\Equation.cs" />
+    <Compile Include="Grammars\Variable.cs" />
+    <Compile Include="Logic\OSBLE\OSBLEState.cs" />
+    <Compile Include="Logic\OSBLE\RelevantAssignment.cs" />
+    <Compile Include="Logic\Undos\AddToWorkspace.cs" />
+    <Compile Include="Logic\Undos\InsertBasicComment.cs" />
+    <Compile Include="Logic\Undos\InsertTableRow.cs" />
+    <Compile Include="Logic\Undos\MoveEquationDown.cs" />
+    <Compile Include="Logic\Undos\MoveEquationUp.cs" />
+    <Compile Include="Logic\Undos\RemoveBasicComment.cs" />
+    <Compile Include="Logic\Undos\RemoveProcessUnit.cs" />
+    <Compile Include="Logic\Undos\RemoveStickyNote.cs" />
+    <Compile Include="Logic\Undos\RemoveStream.cs" />
+    <Compile Include="Logic\Undos\RemoveTableRow.cs" />
+    <Compile Include="Logic\Undos\ResizeStickyNote.cs" />
+    <Compile Include="Logic\Undos\SetEquationText.cs" />
+    <Compile Include="Logic\Undos\SetProcessUnitLocation.cs" />
+    <Compile Include="Logic\Undos\SetProperty.cs" />
+    <Compile Include="Logic\Undos\SetStickyNoteLocation.cs" />
+    <Compile Include="Logic\Undos\SetStickyNoteText.cs" />
+    <Compile Include="Logic\Undos\SetStreamDestinationLocation.cs" />
+    <Compile Include="Logic\Undos\SetStreamId.cs" />
+    <Compile Include="Logic\Undos\SetStreamSourceLocation.cs" />
+    <Compile Include="Logic\Undos\SetSubprocess.cs" />
+    <Compile Include="Logic\Undos\SetTableRowData.cs" />
+    <Compile Include="MainPage.xaml.cs">
+      <DependentUpon>MainPage.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="MathCore\LineSegment.cs" />
+    <Compile Include="MathCore\Rectangle.cs" />
+    <Compile Include="PFD\EquationEditor\EquationRowControl.xaml.cs">
+      <DependentUpon>EquationRowControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\EquationEditor.xaml.cs">
+      <DependentUpon>EquationEditor.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\EquationEditor\ScollViewerHeightConverter.cs" />
+    <Compile Include="PFD\IPfdElement.cs" />
+    <Compile Include="Service References\OSBLEAuthServiceRef\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="Service References\OSBLEClientReference\Reference.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ChangeStreamNumberWindow.xaml.cs">
+      <DependentUpon>ChangeStreamNumberWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OSBLE\AssignmentChooserWindow.xaml.cs">
+      <DependentUpon>AssignmentChooserWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OSBLE\LoginWin.xaml.cs">
+      <DependentUpon>LoginWin.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OSBLE\OSBLEOrDiskWindow.xaml.cs">
+      <DependentUpon>OSBLEOrDiskWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ProcessUnitControl.xaml.cs">
+      <DependentUpon>ProcessUnitControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\StickyNoteControl.xaml.cs">
+      <DependentUpon>StickyNoteControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\StreamControl.xaml.cs">
+      <DependentUpon>StreamControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\DraggableStreamEndpoint.xaml.cs">
+      <DependentUpon>DraggableStreamEndpoint.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="PFD\Streams\PropertiesWindow\Compound.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\CompoundFactory.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Element.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\GenericTableData.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Heat\CompoundFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\Heat\UnitsFormatter.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\IPropertiesWindow.cs" />
+    <Compile Include="PFD\Streams\PropertiesWindow\TableDataChangedEventArgs.cs" />
+    <Compile Include="Logic\Undos\AttachOutgoingStream.cs" />
+    <Compile Include="Logic\Undos\DetachOutgoingStream.cs" />
+    <Compile Include="Logic\Undos\InsertComment.cs" />
+    <Compile Include="PFD\Undos\InsertEquation.cs" />
+    <Compile Include="Logic\Undos\RemoveComment.cs" />
+    <Compile Include="PFD\Undos\RemoveEquation.cs" />
+    <Compile Include="Logic\Undos\DetachIncomingStream.cs" />
+    <Compile Include="Logic\Undos\AttachIncomingStream.cs" />
+    <Compile Include="PFD\Undos\RestoreLocation.cs" />
+    <Compile Include="PFD\Undos\SetProcessUnitLabel.cs" />
+    <Compile Include="Logic\Undos\SetStreamDestination.cs" />
+    <Compile Include="Logic\Undos\SetStreamSource.cs" />
+    <Compile Include="UI\AboutWindow.xaml.cs">
+      <DependentUpon>AboutWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CommentPane.xaml.cs">
+      <DependentUpon>CommentPane.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CompoundTable.xaml.cs">
+      <DependentUpon>CompoundTable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\CompoundTableData.cs" />
+    <Compile Include="UI\ConstantsTableData.cs" />
+    <Compile Include="UI\ControlPalette.xaml.cs">
+      <DependentUpon>ControlPalette.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\DrawingCanvas.cs" />
+    <Compile Include="UI\DrawingCanvasStates\IState.cs" />
+    <Compile Include="UI\DrawingCanvasStates\MenuState.cs" />
+    <Compile Include="UI\DrawingCanvasStates\MovingState.cs" />
+    <Compile Include="UI\DrawingCanvasStates\MovingStreamEndpoint.cs" />
+    <Compile Include="UI\DrawingCanvasStates\PlacingNewStream.cs" />
+    <Compile Include="UI\DrawingCanvasStates\PlacingNewProcessUnit.cs" />
+    <Compile Include="UI\DrawingCanvasStates\PlacingNewCommentNote.cs" />
+    <Compile Include="UI\DrawingCanvasStates\ResizingStickyNote.cs" />
+    <Compile Include="UI\PaneCommentControl.xaml.cs">
+      <DependentUpon>PaneCommentControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\ICommentControlManager.cs" />
+    <Compile Include="UI\MiniStreamTable.xaml.cs">
+      <DependentUpon>MiniStreamTable.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\OptionWindow.xaml.cs">
+      <DependentUpon>OptionWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\StreamTableControl.xaml.cs">
+      <DependentUpon>StreamTableControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\SubprocessChooserWindow.xaml.cs">
+      <DependentUpon>SubprocessChooserWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="UI\WorkspaceControl.xaml.cs">
+      <DependentUpon>WorkspaceControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Validation\ErrorMessageGenerator.cs" />
+    <Compile Include="Validation\Feedback\Feedback.cs" />
+    <Compile Include="Validation\Feedback\FeedbackWindow.xaml.cs">
+      <DependentUpon>FeedbackWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Validation\Feedback\ScollViewerHeightConverter.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\HeatTableAdapter.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\ITableAdapter.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\TableAdapterFactory.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\ChemicalTableAdapter.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\HeatExchangerWithoutUtilityProcessUnitRule.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\ProcessUnitRuleFactory.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\ReactorProcessUnitRule.cs" />
+    <Compile Include="Validation\Rules\TableRule.cs" />
+    <Compile Include="Validation\Rules\IRule.cs" />
+    <Compile Include="Validation\Rules\NullRule.cs" />
+    <Compile Include="Validation\Rules\Adapters\Table\NullTableAdapter.cs" />
+    <Compile Include="Validation\Rules\ProcessUnitRules\GenericProcessUnitRule.cs" />
+    <Compile Include="Validation\Rules\RuleManager.cs" />
+    <Compile Include="Validation\Rules\ValidationResult.cs" />
+    <Compile Include="Validation\Rules\ValidationResultsException.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Page Include="MainPage.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\EquationEditor\EquationRowControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="PFD\EquationEditor\EquationEditor.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ChangeStreamNumberWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OSBLE\AssignmentChooserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OSBLE\LoginWin.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OSBLE\OSBLEOrDiskWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ProcessUnitControl.xaml">
+      <Generator>MSBuild:MarkupCompilePass1</Generator>
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="UI\StickyNoteControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\Streams\StreamControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="PFD\Streams\DraggableStreamEndpoint.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\AboutWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\CommentPane.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\CompoundTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\ControlPalette.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\PaneCommentControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\MiniStreamTable.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\OptionWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\StreamTableControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\SubprocessChooserWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="UI\WorkspaceControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Validation\Feedback\FeedbackWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="DevDocs\ChemProV Design Overview.pptx" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.wsdl" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\ChemProV.OSBLEAuthServiceRef.UserProfile.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\configuration91.svcinfo" />
+    <None Include="Service References\OSBLEAuthServiceRef\configuration.svcinfo" />
+    <None Include="Service References\OSBLEAuthServiceRef\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.Assignment.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.Course.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\ChemProV.OSBLEClientReference.CourseRole.datasource">
+      <DependentUpon>Reference.svcmap</DependentUpon>
+    </None>
+    <None Include="Service References\OSBLEClientReference\configuration91.svcinfo" />
+    <None Include="Service References\OSBLEClientReference\configuration.svcinfo" />
+    <None Include="Service References\OSBLEClientReference\OsbleService.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService1.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService1.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService10.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService11.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService12.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService13.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService14.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService15.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService16.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService17.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService2.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService2.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService3.wsdl" />
+    <None Include="Service References\OSBLEClientReference\OsbleService3.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService4.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService5.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService6.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService7.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService8.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\OsbleService9.xsd">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Service References\OSBLEClientReference\Reference.svcmap">
+      <Generator>WCF Proxy Generator</Generator>
+      <LastGenOutput>Reference.cs</LastGenOutput>
+    </None>
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService.disco" />
+    <None Include="Service References\OSBLEClientReference\OsbleService.disco" />
+    <None Include="Service References\OSBLEAuthServiceRef\AuthenticationService1.disco" />
+    <None Include="Service References\OSBLEClientReference\OsbleService1.disco" />
+    <Content Include="UI\Icons\down_arrow_16x16.png" />
+    <Content Include="UI\Icons\OSBLE_person_active_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\plus_16x16.png" />
+    <Content Include="UI\Icons\up_arrow_16x16.png" />
+    <Content Include="UI\Icons\XBtn_16x16.png" />
+    <None Include="Grammars\ChemProV.g" />
+    <None Include="Grammars\ChemProV.tokens" />
+    <None Include="Grammars\ChemProVTree.g" />
+    <None Include="Grammars\ChemProVTree.tokens" />
+    <None Include="Properties\AppManifest.xml" />
+    <None Include="Properties\DataSources\ChemProv.Library.OsbleServices.UserProfile.datasource" />
+    <Content Include="ServiceReferences.ClientConfig">
+      <SubType>Designer</SubType>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Properties\OutOfBrowserSettings.xml">
+      <SubType>Designer</SubType>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Libraries\Behaviors.dll" />
+    <Content Include="Libraries\Behaviors.pdb" />
+    <Content Include="Libraries\Microsoft.Expression.Drawing.dll" />
+    <Content Include="Libraries\Silverlight.Controls.dll" />
+    <Content Include="Libraries\Silverlight.Controls.pdb" />
+    <Content Include="Libraries\System.Windows.Interactivity.dll" />
+    <Content Include="UI\Icons\check_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\comment_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo128.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo32.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo48.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\logo_about.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\OSBLE_person_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_select.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_stickyNote.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_stickyNote_16x16.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\palette_stickyNote_16x16_gray.png" />
+    <Content Include="UI\Icons\pu.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_blank.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_generic.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_heat_exchanger.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_heat_exchanger_no_utility.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_heat_stream.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_mixer.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_reactor.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_separator.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_sink.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_source.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\pu_stream.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\StreamSourceConnection.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_about.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_install.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_new.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_open.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_osble.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_print.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_redo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_save.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_saveas.png" />
+    <Content Include="UI\Icons\toolbar_save_all.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_settings.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_stickynote.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="UI\Icons\toolbar_undo.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PortableChemProV\PortableChemProV.csproj">
+      <Project>{CDF84A87-F71F-44FC-9FA4-2AC97133C983}</Project>
+      <Name>PortableChemProV</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadataStorage Include="Service References\OSBLEAuthServiceRef\" />
+    <WCFMetadataStorage Include="Service References\OSBLEClientReference\" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Silverlight\$(SilverlightVersion)\Microsoft.Silverlight.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+  <ProjectExtensions>
+    <VisualStudio>
+      <FlavorProperties GUID="{A1591282-1198-4647-A2B1-27E5FF5F6F3B}">
+        <SilverlightProjectProperties />
+      </FlavorProperties>
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>
