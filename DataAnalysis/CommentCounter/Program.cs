@@ -5,6 +5,7 @@ using System.Text;
 using System.Xml.Linq;
 using System.IO;
 using System.Text.RegularExpressions;
+using System.Xml;
 
 namespace CommentCounter
 {
@@ -53,6 +54,9 @@ namespace CommentCounter
                         if (userNameElement != null)
                         {
                             userName = userNameElement.Value;
+
+                            //anonymize author
+                            userNameElement.Value = "";
                         }
                     }
 
@@ -89,6 +93,9 @@ namespace CommentCounter
                     if (userNameAttribute != null)
                     {
                         userName = userNameAttribute.Value;
+
+                        //anonymize user
+                        userNameAttribute.Value = "";
                     }
 
                     //add entry for user if necessary
@@ -112,6 +119,9 @@ namespace CommentCounter
                     if (userNameElement != null)
                     {
                         userName = userNameElement.Value;
+
+                        //anonymize author
+                        userNameElement.Value = "";
                     }
 
                     //add entry for user if necessary
@@ -166,6 +176,7 @@ namespace CommentCounter
                     outputFileName += "_" + userLookupTable[key];
                 }
 
+                doc.Save(string.Format("{0}_solution.cpml", outputFileName));
                 TextWriter expertsFile = File.CreateText(string.Format("{0}_expert.xls", outputFileName));
                 TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.xls", outputFileName));
                 commentsFile.WriteLine("<table>");
