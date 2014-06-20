@@ -154,8 +154,20 @@ namespace CommentCounter
                     userLookupCounter++;
                 }
 
-                TextWriter expertsFile = File.CreateText(string.Format("{0}_expert.xls", userLookupTable[authorName]));
-                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.xls", userLookupTable[authorName]));
+                //build output file name based on author and reviewers
+                string outputFileName = userLookupTable[authorName].ToString();
+                foreach(string key in userComments.Keys)
+                {
+                    if (userLookupTable.ContainsKey(key) == false)
+                    {
+                        userLookupTable.Add(key, userLookupCounter);
+                        userLookupCounter++;
+                    }
+                    outputFileName += "_" + userLookupTable[key];
+                }
+
+                TextWriter expertsFile = File.CreateText(string.Format("{0}_expert.xls", outputFileName));
+                TextWriter commentsFile = File.CreateText(string.Format("{0}_comments.xls", outputFileName));
                 commentsFile.WriteLine("<table>");
                 expertsFile.WriteLine("<table>");
                 string expertsHeader = "<tr><th>Author</th><th>Comment</th><th>#Actual Errors</th><th># correct stylistic</th><th># incorrect stylistic</th><th># correct non-stylistic</th><th>#incorrect non-stylistic</th></tr>";
